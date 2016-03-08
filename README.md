@@ -1,11 +1,10 @@
 # YeAPF<br>
 Yet Another PHP Framework<br>
-(C) 2016 Esteban D.Dortta<br>
+(C) Esteban D.Dortta<br>
 <br>
 Easy steps<br>
 1) Installing and configuring<br>
-Assuming your base folder is /var/www/html<br>
-Create a folder under that called 'sample'<br>
+Create a folder under your www folder called 'sample'<br>
 Place 'includes' folder inside it<br>
 Place 'configure.php' and 'yeapf.db.ini' from skel/webApp/ inside 'sample' too<br>
 Give enough rights to Apache rwx on 'sample' folder<br>

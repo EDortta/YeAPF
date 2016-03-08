@@ -1,0 +1,96 @@
+<style>
+  .fieldEntry {
+    float: left;
+    margin-right: 8px;
+    padding: 2px;
+  }
+  .fieldGroup {
+    width: 480px;
+    overflow: hidden;
+    border-top: dotted 1px #E5E5E5;
+    padding-top: 4px;
+    margin-top: 4px;
+  }
+</style>
+
+<div style='width: 480px'>
+  <form method='post' name=fdbMenu>
+    <div class=fieldGroup>
+      <div class=fieldEntry>
+          <div class=fieldTitle>label</div>
+          <div class=fieldValue><input type=text name='Xlabel' id='Xlabel' size=36 value='#(Xlabel)'></div>
+      </div>
+      <div class=fieldEntry>
+          <div class=fieldTitle>Subject (s)</div>
+          <div class=fieldValue><input type=text name='Xs' id='Xs' size=19 value='#(Xs)'></div>
+      </div>
+      <div class=fieldEntry>
+          <div class=fieldTitle>Action (a)</div>
+          <div class=fieldValue><input type=text name='Xa' id='Xa' size=34 value='#(Xa)'></div>
+      </div>
+    </div>
+
+    <div class=fieldGroup>
+      <div class=fieldEntry>
+        <div class=fieldTitle>Event explanation</div>
+        <div class=fieldValue><textarea name='Xexplanation' id='Xexplanation' cols=60 rows=6>#(Xexplanation)</textarea></div>
+      </div>
+    </div>
+
+    <div class=fieldGroup>
+      <div class=fieldEntry>
+          <div class=fieldTitle>ID</div>
+          <div class=fieldValue><input type=text name='XID' id='XID' size=8 value='#(XID)'></div>
+      </div>
+      <div class=fieldEntry>
+          <div class=fieldTitle>Enabled</div>
+          <div class=fieldValue>
+            <select name='Xenabled' id='Xenabled'>
+              <option value='N' #checked('#(Xenabled)','N')>No</option>
+              <option value='Y' #checked('#(Xenabled)','Y')>Yes</option>
+            </select>
+          </div>
+      </div>
+      <div class=fieldEntry>
+          <div class=fieldTitle>ancestor</div>
+          <div class=fieldValue><input type=text name='Xancestor' id='Xancestor' size=8 value='#(Xancestor)'></div>
+      </div>
+    </div>
+
+    <div class=fieldGroup>
+      <div class=fieldEntry style='background-color: #C8DFE6'>
+          <div class=fieldTitle>Application attribution mask</div>
+          <div class=fieldValue>
+            #for("#sequenceProducer(0,7,1)")
+            <input type=checkbox name='Xattr_#(curValue)' id='Xattr_#(curValue)' #checked(#('Xattr_#(curValue)'),1) value=1>
+            #next
+          </div>
+      </div>
+      <div class=fieldEntry style='background-color: #E5E5E5'>
+          <div class=fieldTitle>User required rights</div>
+          <div class=fieldValue>
+            #for("#sequenceProducer(0,7,1)")
+            <input type=checkbox name='Xrights_#(curValue)' id='Xrights_#(curValue)' #checked(#('Xrights_#(curValue)'),1) value=1>
+            #next
+          </div>
+      </div>
+    </div>
+    <div class=fieldGroup>
+      <div class=fieldEntry>
+          <div class=fieldTitle>Implementation script name (empty for default action)</div>
+          <div class=fieldValue><input type=text name='Ximplementation' id='Ximplementation' size=44 value='#(Ximplementation)'></div>
+      </div>
+      <div class=fieldEntry>
+          <div class=fieldTitle>app</div>
+          <div class=fieldValue><input type=text name='Xapp' id='Xapp' size=8 value='#(Xapp)'></div>
+      </div>
+    </div>
+    <input type=hidden id=XID name=XID value='#(XID)'>
+    <input type=button value='Salvar' onclick='javascript:myDevelop.saveForm("fdbMenu", "dbMenu")'>
+    <input type=checkbox id='_deleteItem_' onchange='javascript:$("btnEliminar").style.display=$("_deleteItem_").checked?"block":"none"'><label for='_deleteItem_'> Sim, quero eliminar</label>
+    <span style='display:none; float: left; color: #900'  id=btnEliminar>
+      <input type=button value='Eliminar' style='color: #900' onclick='javascript:myDevelop.deleteItem("fdbMenu", "dbMenu")'>
+      <input type=checkbox id='_deleteChildrens_' value='Y'><label for='_deleteChildrens_'>Eliminar todos os galhos inferiores</label>
+    </span>
+  </form>
+</div>

@@ -1,0 +1,41 @@
+Razão:
+Nem sempre um aplicativo Web é a melhor solução para um determinado problemas.
+Também não acho que o melhor seja um aplicativo desktop.
+
+Acho que a solução para a próxima geração de aplicativos passa por um misto de desktop/web em que o melhor dos dois mundos possa ser conjugado para produzir soluções com ótimo desempenho e independencia de conexão sem descuidar a interface com o usuário.
+
+Objetivo:
+O que pretendo, é construir uma serie de funções que acrescentem algumas funcionalidades ao javascript e que permitam coisas simples na superficie como as que seguem sem chegar a ser uma lista exaustiva:
+1) Carregar se não existe ou atualizar se for diferente um formulário/relatório do servidor.  Uma vez carregado, ele pode ser usado localmente.  Em caso de não haver conexão, a última versão liberada pode ser usada.  Isso nos leva a colocar tempo de vida nos formulários/relatórios.
+2) Manter uma cópia sincronizada dos dados que há no(s) servidor(es) no dispositivo (seja este móvel ou não)
+
+Resumo: Devo de ter enlouquecido e quero manter um espelho do aplicativo e seus dados o mais fiel possível ao original e ao mesmo tempo, alterando esse original.
+
+Implementação:  existem tres objetos com funcionamento similar.  Um para conter os scripts outro as telas (e sua formatação) e outro os dados.
+
+Esboço de um aplicativo js com YeAPF:
+
+  index.html:
+  <html>
+    <script src='yeapf.js'></script>
+    <script>
+      // funções que são necessárias ao aplicativo
+      // serão carregadas se não existem no cache do navegador
+      yScripts.load('minhasFuncoes.js');
+
+      // criar um formulário com o títlo 'Logon'
+      var aLogon=yForms.create('Logon');
+
+      // abrir o 'f_logon.html' dentro do formulário criado.
+      // se o 'f_logon.html' não está no cache do aplicativo, carregar do servidor
+      aLogon.open('f_logon.html');
+      aLogon.onsubmit=function() {
+        // verificar o logon
+        // carregar outras telas se necessário
+      };
+      
+      // mostrar o formulário, tornando-o operacional
+      aLogon.show();
+    </script>
+  </html>
+
