@@ -3042,12 +3042,12 @@
 <end>34</end>
 </code></copyFile><copyMobileFiles><name>copyMobileFiles</name>
 <parameters><targetFolder><dummy>ok</dummy>
-</targetFolder></parameters><code><md5>127646c4b876302eb85a729b09a502b0</md5>
+</targetFolder></parameters><code><md5>36df5ced10f8c6ba64916f60b333b5bc</md5>
 <start>36</start>
 <end>47</end>
 </code></copyMobileFiles><copyYeapfAppFiles><name>copyYeapfAppFiles</name>
 <parameters><targetFolder><dummy>ok</dummy>
-</targetFolder></parameters><code><md5>eef07a5b85e4aa96b401187381a4a356</md5>
+</targetFolder></parameters><code><md5>cbccf8486b5fb3a35447e68be1c0d9f3</md5>
 <start>49</start>
 <end>52</end>
 </code></copyYeapfAppFiles><putVersion><name>putVersion</name>
@@ -3066,7 +3066,7 @@
 <functions></functions></teste-invalid-charset.php><teste-script-errado.php><filename>teste-script-errado.php</filename>
 <folder>tools</folder>
 <functions></functions></teste-script-errado.php><configure.php><filename>configure.php</filename>
-<folder>skel%2FwebSocket</folder>
+<folder>templates%2Fbootstrap3</folder>
 <functions><getSgugPath><name>getSgugPath</name>
 <parameters><base><dummy>ok</dummy>
 </base></parameters><code><md5>3b2a090de57663a2c32fb4371e8b731b</md5>
@@ -3085,7 +3085,7 @@
 <parameters><aPath><dummy>ok</dummy>
 </aPath><aFileName><dummy>ok</dummy>
 </aFileName><showPlace><default>false</default>
-</showPlace></parameters><code><md5>d8f87820a647819dc5cf5ec67fa17656</md5>
+</showPlace></parameters><code><md5>0ff74cc9ab520251c322df4d3f91b67b</md5>
 <start>100</start>
 <end>147</end>
 </code></whereis><getMinPath><name>getMinPath</name>
@@ -3108,7 +3108,7 @@
 <start>210</start>
 <end>219</end>
 </code></locateFileInPath><openConfigFile><name>openConfigFile</name>
-<parameters></parameters><code><md5>b94dee13b19ac6e1d762163807df49ec</md5>
+<parameters></parameters><code><md5>a09eda1688b61522ac370c22fcd7622e</md5>
 <start>221</start>
 <end>240</end>
 </code></openConfigFile><writeConfigFile><name>writeConfigFile</name>
@@ -3128,8 +3128,8 @@
 <end>383</end>
 </code></verifyConfigFolder><verifyActiveApp><name>verifyActiveApp</name>
 <parameters></parameters><code><md5>64f830d7c63095a1b77b8959dbc1a584</md5>
-<start>584</start>
-<end>592</end>
+<start>582</start>
+<end>590</end>
 </code></verifyActiveApp></functions></configure.php><yeapf.php><filename>yeapf.php</filename>
 <folder>tools%2FyDoc</folder>
 <functions><_yLoaderDie><name>_yLoaderDie</name>
@@ -3288,9 +3288,9 @@
 <start>81</start>
 <end>100</end>
 </code></yCreateMenu></functions></menu.php><query.php><filename>query.php</filename>
-<folder>skel%2FwebApp</folder>
+<folder>templates%2Fbootstrap3</folder>
 <functions></functions></query.php><rest.php><filename>rest.php</filename>
-<folder>skel%2FwebApp</folder>
+<folder>templates%2Fbootstrap3</folder>
 <functions></functions></rest.php><slotEmptyImplementation.php><filename>slotEmptyImplementation.php</filename>
 <folder>skel%2FwebApp</folder>
 <functions><q></q><g></g><w></w><r></r><f></f><c></c><e></e></functions></slotEmptyImplementation.php><myEvent.php><filename>myEvent.php</filename>

@@ -1,0 +1,327 @@
+<html><head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <script type="text/javascript" src="js/jquery.min.js"></script>
+        <script type="text/javascript" src="js/bootstrap.min.js"></script>
+        <script src="js/yloader.min.js"></script>
+        <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
+        <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+        <link href="css/sample.css" rel="stylesheet" type="text/css">
+        <title>Bootstrap3 and YeAPF sample</title>
+    </head><body>
+        <div class="navbar navbar-default navbar-static-top main-menu">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navbar-ex-collapse">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="javascript:mTabNav.showTab('section_bemvindo')"><span>Exemplo</span></a>
+                </div>
+                <div class="collapse navbar-collapse" id="navbar-ex-collapse">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li id="menuClientes">
+                            <a href="#" class="cl-actions" id="clientes_op">Clientes</a>
+                        </li>
+                        <li id="menuOrdem">
+                            <a href="#" class="cl-actions" id="ordens_op">Ordens</a>
+                        </li>
+                        <li id="menuUsuarios">
+                            <a href="#" class="cl-actions" id="usuarios_op">Usu&aacute;rios</a>
+                        </li>
+                        <li id="menuConta">
+                            <a href="#" class="cl-actions" id="conta_op">Conta</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="main-page tnContainer">
+            <div class="section tnTab" id="section_bemvindo">
+            <div class="container"><div class="row"><div class="col-md-12"><div class="jumbotron"> <h1>Obrigado por vir!</h1> <p contenteditable="false">Este &eacute; apenas um pequeno sistema de exemplo integrando <a href="http://getbootstrap.com/getting-started/#download">BootStrap3</a> e <a href="http://yeapf.com">YeAPF</a>.<br>Qualquer vers&atilde;o da serie 0.8.x do YeAPF deve poder ser utilizada aqui, mas estamos usando especificamente a 0.8.47<br>Inclu&iacute; as fontes e o css na distruibui&ccedil;&atilde;o porque na minha magra experi&ecirc;ncia, os servidores cdn mais atrapalham do que ajudam, em especial em aplicativos intramuros.<br>Uma das vantagens de trabalhar com este template &eacute; que pode ser f&aacute;cilmente modificado com o Pingendo ou outros editores de BootStrap3<br>Abra o c&oacute;digo e repare que cada uma das <b>section</b>&nbsp;tem um <b>id</b>&nbsp;e faz parte da classe <b>tnTab</b>.<br>Inclu&iacute; um script de exemplo para alternar as abas clicando nas op&ccedil;&otilde;es de men&uacute; logo acima.<br>Se quiser brincar, pode mudar de aba usando o <b>id</b>&nbsp;do men&uacute;, assim:&nbsp;
+            </p>
+            <div style='padding: 16px'><pre>sampleObj.openTabByClick(y$('ordens_op'));</pre></div>
+            <p>Bom divertimento!</p> <p>Esteban D.Dortta</p> </div></div></div></div></div>
+            <div class="section tnTab" id="section_clientes">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h1>Clientes</h1>
+                            <div class="btn-group">
+                                <a href="#" class="btn btn-default" id="btnClientesNovo">Novo Cliente</a>
+                                <a href="#" class="btn btn-default" id="btnClientesListar">Listagem</a>
+                                <a href="#" class="btn btn-default" id="btnClientesAtualizar"><i class="fa fa-fw fa-refresh"></i>Atualizar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table" id="tbl_clientes">
+                                <thead>
+                                    <tr>
+                                        <th rowspan="2">#</th>
+                                        <th rowspan="2">Cliente</th>
+                                        <th rowspan="2">Contato</th>
+                                        <th rowspan="2">Local</th>
+                                        <th colspan="2">Notas</th>
+                                        <th colspan="2">Acesso</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Recebidas</th>
+                                        <th>Emitidas</th>
+                                        <th>Login</th>
+                                        <th>Acesso</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="section tnTab" id="section_usuarios">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h1>Usu&aacute;rios</h1>
+                            <div class="btn-group">
+                                <a href="#" class="btn btn-default" id="btnUsuarioAjuda">Como usar</a>
+                                <a href="#" class="btn btn-default" id="btnUsuarioNovo">Novo Usu&aacute;rio</a>
+                                <a href="#" class="btn btn-default" id="btnUsuarioAtualizar"><i class="fa fa-fw fa-refresh"></i>Atualizar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <table class="table" id="tbl_usuarios">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Criador</th>
+                                        <th>Vencimento</th>
+                                        <th>&Uacute;ltimo Acesso</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="section tnTab" id="section_conta">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h1>Conta</h1>
+
+                        </div>
+                    </div>
+                    <form role="form">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3  class="text-center">Identidade fiscal</h3>
+                                <div class="form-group" id="cliente_cnpj_fld">
+                                    <label class="control-label" for="cliente_cnpj">CNPJ</label>
+                                    <input class="form-control" id="cliente_cnpj" placeholder="CNPJ" type="text">
+                                </div>
+                                <div class="form-group" id="cliente_ie_fld">
+                                    <label class="control-label" for="cliente_ie">Inscri&ccedil;&atilde;o Estadual</label>
+                                    <input class="form-control" id="cliente_ie" placeholder="I.E." type="text">
+                                </div>
+                                <div class="form-group" id="cliente_nomefantasia_fld">
+                                    <label class="control-label" for="cliente_nomefantasia">Nome Fantas&iacute;a</label>
+                                    <input class="form-control" id="cliente_nomefantasia" placeholder="Nome Fantasia (se existir)" type="text">
+                                </div>
+                                <div class="form-group" id="cliente_razaosocial_fld">
+                                    <label class="control-label" for="cliente_razaosocial">Raz&atilde;o Social
+                                        <br>
+                                    </label>
+                                    <input class="form-control" id="cliente_razaosocial" placeholder="Raz&atilde;o Social" type="text">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h3 class="text-center">Endere&ccedil;o</h3>
+                                <div class="form-group" id="cliente_cep_fld">
+                                    <label class="control-label" for="cliente_cep">CEP</label>
+                                    <input class="form-control" id="cliente_cep" placeholder="CEP" type="text">
+                                </div>
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-md-10 no-padding">
+                                            <div class="form-group" id="cliente_endereco_fld">
+                                                <label class="control-label" for="cliente_endereco">Endere&ccedil;o</label>
+                                                <input class="form-control" id="cliente_endereco" placeholder="Logradouro" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group" id="cliente_numero_fld">
+                                                <label class="control-label" for="cliente_numero">N&uacute;mero</label>
+                                                <input class="form-control" id="cliente_numero" placeholder="N&uacute;mero" type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group" id="cliente_complemento_fld">
+                                    <label class="control-label" for="cliente_complemento">Complemento &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                        <br>
+                                    </label>
+                                    <input class="form-control" id="cliente_complemento" placeholder="Complemento" type="text">
+                                </div>
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-md-10 no-padding">
+                                            <div class="form-group" id="cliente_cidade_fld">
+                                                <label class="control-label" for="cliente_cidade">Cidade
+                                                    <br>
+                                                </label>
+                                                <input class="form-control" id="cliente_cidade" placeholder="Cidade" type="text">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-2">
+                                            <div class="form-group" id="cliente_uf_fld">
+                                                <label class="control-label" for="cliente_uf">UF
+                                                    <br>
+                                                </label>
+                                                <input class="form-control" id="cliente_uf" placeholder="U.F." type="text">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h3 class="text-center">Contato</h3>
+                                <div class="form-group" id="cliente_dddtelefone_fld">
+                                    <label class="control-label" for="cliente_dddtelefone">DDD</label>
+                                    <input class="form-control" id="cliente_dddtelefone" placeholder="DDD do telefone" type="text">
+                                </div>
+                                <div class="form-group" id="cliente_telefone_fld">
+                                    <label class="control-label" for="cliente_telefone">Telefone</label>
+                                    <input class="form-control" id="cliente_telefone" placeholder="Telefone" type="text">
+                                </div>
+                                <div class="form-group" id="cliente_dddsms_fld">
+                                    <label class="control-label" for="cliente_dddsms">DDD</label>
+                                    <input class="form-control" id="cliente_dddsms" placeholder="DDD do celular para SMS" type="text">
+                                </div>
+                                <div class="form-group" id="cliente_sms_fld">
+                                    <label class="control-label" for="cliente_sms">Celular para SMS
+                                        <br>
+                                    </label>
+                                    <input class="form-control" id="cliente_sms" placeholder="Celular" type="text">
+                                </div>
+                                <div class="form-group" id="cliente_observacoes_fld">
+                                    <label class="control-label" for="cliente_observacoes">Observa&ccedil;&otilde;es
+                                        <br>
+                                    </label>
+                                    <input class="form-control" id="cliente_observacoes" type="text">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h3 class="text-center">Acesso ao sistema on-line</h3>
+                                <div class="form-group" id="cliente_email_fld">
+                                    <label class="control-label" for="cliente_email">E-mail para recupera&ccedil;&atilde;o de senha e informa&ccedil;&otilde;es do sistema
+                                        <br>
+                                    </label>
+                                    <input class="form-control" id="cliente_email" type="text" placeholder="e-mail (ser&aacute; disparada uma autoriza&ccedil;&atilde;o caso altere)">
+                                </div>
+                                <div class="form-group" id="cliente_senha_fld">
+                                    <label class="control-label" for="cliente_senha">Senha</label>
+                                    <input class="form-control" id="cliente_senha" type="password" placeholder="Senha segura de acesso. minimo de quatro letras">
+                                </div>
+                                <div class="form-group" id="cliente_senha2_fld">
+                                    <label class="control-label" for="cliente_senha2">Repeti&ccedil;&atilde;o da Senha</label>
+                                    <input class="form-control" id="cliente_senha2" type="password" placeholder="Digite de novo">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-default" id="btnClientesSalvar">Salvar</button>
+                                <button type="button" class="btn btn-default" id="btnClientesCancelar">Cancelar</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="section tnTab" id="section_ordens">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <h1>Ordens de servi&ccedil;o</h1>
+                            <div class="btn-group">
+                                <a href="#" class="btn btn-default" id="btnOrdensAbertas">Abertas</a>
+                                <a href="#" class="btn btn-default" id="btnOrdensAndando">Em andamento</a>
+                                <a href="#" class="btn btn-default" id="btnOrdensConcluidas">Concluidas</a>
+                                <a href="#" class="btn btn-default" id="btnOrdensAtualizar"><i class="fa fa-fw fa-refresh"></i>Atualizar</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <form class="form-horizontal" role="form">
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="form-group" id="ordens_doc_fld">
+                                            <div class="col-sm-2">
+                                                <label for="ordens_doc" class="control-label">Doc</label>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="ordens_doc" placeholder="e-mail, CNPJ ou CPF do cliente">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-7">
+                                        <div class="form-group" id="ordens_datas_fld">
+                                            <div class="col-sm-2">
+                                                <label for="ordens_datas" class="control-label">Limites</label>
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <input type="text" class="form-control" id="ordens_datainicio" placeholder="Inicio">
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <input type="text" class="form-control" id="ordens_datafinal" placeholder="Fim">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-1">
+                                        <div class="form-group">
+                                            <div class="col-sm-offset-2 col-sm-10">
+                                                <button type="button" class="btn btn-default" id="btnOrdensFiltrar">Filtrar</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                            <table class="table" id="tbl_ordens">
+                                <thead>
+                                    <tr>
+                                        <th>CNPJ</th>
+                                        <th>NOME</th>
+                                        <th>N&uacute;mero</th>
+                                        <th>Emiss&atilde;o</th>
+                                        <th>Descri&ccedil;&atilde;o</th>
+                                        <th>Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+<script src="js/sample.js"></script>
+
+</body></html>

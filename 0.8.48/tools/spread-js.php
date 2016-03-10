@@ -1,9 +1,9 @@
 <?php
   /*
     tools/spread-js.php
-    YeAPF 0.8.48-1 built on 2016-03-07 13:46 (-3 DST)
+    YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-03-07 13:45:08 (-3 DST)
+    2016-03-09 08:46:05 (-3 DST)
 
     This script will distribute monolite version of yloader.js
     among different application skeletons
@@ -20,7 +20,7 @@
     if (file_exists($srcFileName)) {
       $auxFile = _file($srcFileName);
       if ($addHeader) {
-        $auxFile = "/* YeAPF 0.8.48-1 built on 2016-03-07 13:46 (-3 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
+        $auxFile = "/* YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
       }
       if (file_put_contents("$tgtFolder/$srcFileName", $auxFile))
         echo "\t$srcFileName: OK\n";
@@ -35,20 +35,20 @@
 
   function copyMobileFiles($targetFolder)
   {
-    copyFile("ysandboxifc.js",       $targetFolder);
-    copyFile("ystorage.js",          $targetFolder);
-    copyFile("yifc.js",              $targetFolder);
-    copyFile("ycomm-worker.js",      $targetFolder);
+    copyFile("app-src/js/ysandboxifc.js",       $targetFolder);
+    copyFile("app-src/js/ystorage.js",          $targetFolder);
+    copyFile("app-src/js/yifc.js",              $targetFolder);
+    copyFile("app-src/js/ycomm-worker.js",      $targetFolder);
 
-    copyFile("ysandboxifc.min.js",   $targetFolder, true);
-    copyFile("ystorage.min.js",      $targetFolder, true);
-    copyFile("yifc.min.js",          $targetFolder, true);
-    copyFile("ycomm-worker.min.js",  $targetFolder, true);
+    copyFile("app-src/js/ysandboxifc.min.js",   $targetFolder, true);
+    copyFile("app-src/js/ystorage.min.js",      $targetFolder, true);
+    copyFile("app-src/js/yifc.min.js",          $targetFolder, true);
+    copyFile("app-src/js/ycomm-worker.min.js",  $targetFolder, true);
   }
 
   function copyYeapfAppFiles($targetFolder)
   {
-    copyFile("yapp.min.js",      $targetFolder, true);
+    copyFile("app-src/js/yapp.min.js",      $targetFolder, true);
   }
 
   function putVersion($targetFilename, $fileContent)
@@ -84,7 +84,7 @@
     if (file_exists($minJS)) {
       echo "Minified version source: $minJS\n";
       $yeapf_minJS = join("", file($minJS));
-      $yeapf_minJS = "/* YeAPF 0.8.48-1 built on 2016-03-07 13:46 (-3 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
+      $yeapf_minJS = "/* YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
     }
   }
 
@@ -107,8 +107,8 @@
     copyMobileFiles("skel/chromeApp/js");
 
     if (putVersion("skel/webApp/js/yloader.min.js", $yeapf_minJS)) {
-      copyFile("ycomm-worker.js",          "skel/webApp/js");
-      copyFile("ycomm-worker.min.js",      "skel/webApp/js", false);
+      copyFile("app-src/js/ycomm-worker.js",          "skel/webApp/js");
+      copyFile("app-src/js/ycomm-worker.min.js",      "skel/webApp/js", false);
 
       echo "OK\n";
     } else {

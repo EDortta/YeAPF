@@ -18,6 +18,7 @@ for a in 'ysandboxifc' 'ystorage' 'yifc' 'yapp' 'ycomm-worker'
 do
   echo "    $a.js"
 
+  a="app-src/js/$a"
   java -jar tools/compressors/compiler.jar --js "$a.js" --js_output_file "$a.min.js"
 
 done
