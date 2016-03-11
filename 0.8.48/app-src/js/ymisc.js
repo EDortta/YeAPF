@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.48-20 built on 2016-03-11 16:56 (-3 DST)
+ * YeAPF 0.8.48-21 built on 2016-03-11 17:06 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-03-11 16:56:21 (-3 DST)
+ * 2016-03-11 17:04:37 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -991,6 +991,7 @@ var dateTransform = function (aStrDate, srcFormat, destFormat) {
       var auxMap={};
       var emptyDate = extractDateValues("111111111111", destFormat, auxMap);
       var ret=destFormat;
+
       for(var i=0; i<auxMap.elems.length; i++) {
         /* e is a shortcut to the array map */
         var e = auxMap.elems[i];
@@ -1006,6 +1007,7 @@ var dateTransform = function (aStrDate, srcFormat, destFormat) {
           ret=ret.substr(0,e[0]) + value + ret.substr(e[0]+e[3], ret.length);
         }
       }
+
     }
     return ret;
   } else
