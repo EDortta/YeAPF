@@ -3,9 +3,9 @@
   /*
    * tools
    * tools/ycreatewebappevent
-   * YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST)
+   * YeAPF 0.8.48-22 built on 2016-03-17 11:03 (-3 DST)
    * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2016-01-23 22:00:43 (-3 DST)
+   * 2016-03-17 11:02:52 (-3 DST)
    */
 
   $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
@@ -13,10 +13,8 @@
   (@include_once "$mydir/yclilib.php") or die("yclilib.php not found\n");
 
   $args = new ArgumentsProcessor();
-  $appFolder=$args->getSrc(0);
-  $eventLabel=$args->argValue('label','');
-  $eventMap=$args->argValue('parent','/');
-  $eventName=$args->argValue('name','');
+  $eventName=$args->getSrc(1);
+  $appFolder=$args->getSrc(1);
   $toHelp=$args->argValue('help',__FALSE__)==__TRUE__;
 
   if ($appFolder=='')
@@ -24,11 +22,8 @@
 
   echo "ycreatewebappevent\nYeAPF 0.8.48\n";
   if (($toHelp) || ($eventName=='')) {
-    echo "simple usage:\n\t".basename("tools/ycreatewebappevent")." app-folder [options]\n\n";
-    echo "options:\n";
-    echo "\t--label <label>\n";
-    echo "\t--parent <parent>   \ti.e. / \n";
-    echo "\t--name <event-name>   \ti.e. customers \n";
+    echo "simple usage:\n\t".basename("tools/ycreatewebappevent")." <subject> [app-folder]\n\n";
+    echo "\t app-folder defaults to current working directory\n";
     die("\n\n");
   }
 
@@ -51,73 +46,34 @@
         if (!file_exists($sei_filename))
           die("Error: $sei_filename not found!");
 
-        if (substr($eventMap,0,1)!='/')
-          die("Error: You need to write a complete path to the event\ni.e.: '/home/customers' followed by a label: 'Customers' in 'myapp' folder\nycreatewebapp myapp /home/customers Customers");
-        else {
-          $yeapfConfigLoaded=false;
-          if (file_exists("$appFolder/.config/yeapf.config")) {
-            (@include_once("$appFolder/.config/yeapf.config")) || die("Erro ao carregar yeapf.config");
-            $yeapfConfigLoaded=true;
-          }
-          if (!$yeapfConfigLoaded) {
-            $yeapfConfig=array();
-            $yeapfConfig['yeapfDB']="$appFolder/sgug.ini";
-          }
-          if (isset($yeapfConfig['yeapfDB'])) {
-            echo "dbConfig = ".$yeapfConfig['yeapfDB']."\nLoading .";
-            $dbConnect='yes';
-            $cfgCLI=true;
-            _LOAD_YEAPF_();
-            echo ".";
-            $eventMap=trim(unquote($eventMap));
-            $eventLabel=trim(unquote($eventLabel));
 
-            $ancestor=intval("$yMenuRoot")!=0?intval($yMenuRoot):-1;
-            if (!isset($yMenuAttr))
-              $yMenuAttr=2;
-            $yMenuAttr=intval($yMenuAttr);
-
-            $lastID=0;
-            $s='';
-            $eventTree=explode('/',$eventMap);
-            echo ".\n";
-            echo "event tree:\n";
-            foreach($eventTree as $k=>$v) {
-              echo " '$v' (id:$k) /";
-              if ($k>=1) {
-                $cc=db_sql("select count(*) from is_menu where s='$v'");
-                if ($cc==0) {
-                  $id=max(1,intval(db_sql("select max(id) from is_menu"))+1);
-                  db_sql("insert into is_menu(id, enabled, s, ancestor,attr)
-                                      values ($id, 'Y', '$v', $ancestor, $yMenuAttr)");
-                } else {
-                  $curAncestor=db_sql("select ancestor from is_menu where s='$v'");
-                  if ($ancestor!=$curAncestor)
-                    die("Error: Your event path is not the same at system menu\n");
-                }
-                $newAncestor=db_sql("select id from is_menu where s='$v'");
-                $lastID=$newAncestor;
-                $s=$v;
-                echo "$ancestor -> $v (/$newAncestor)\n";
-              }
-            }
-
-            if ($lastID>0) {
-              echo "Updating label for '$s' event\n";
-              db_sql("update is_menu set label='$eventLabel' where id=$lastID");
-              $eventManager="$appFolder/$s.php";
-              if (!file_exists($eventManager)) {
-                echo "Creating event manager '$eventManager'\n";
-                $newEventScript=_file($sei_filename);
-                $f=fopen($eventManager, "w");
-                fwrite($f,$newEventScript);
-                fclose($f);
-              } else
-                echo "Event manager '$eventManager' untouched\n";
-            }
-          } else
-            die("Error: db connection cannot be found.\nCreate yeapf.db.ini and run configure.php again\n");
+        $yeapfConfigLoaded=false;
+        if (file_exists("$appFolder/.config/yeapf.config")) {
+          (@include_once("$appFolder/.config/yeapf.config")) || die("Erro ao carregar yeapf.config");
+          $yeapfConfigLoaded=true;
         }
+        if (!$yeapfConfigLoaded) {
+          $yeapfConfig=array();
+          $yeapfConfig['yeapfDB']="$appFolder/sgug.ini";
+        }
+        if (isset($yeapfConfig['yeapfDB'])) {
+          echo "dbConfig = ".$yeapfConfig['yeapfDB']."\nLoading .";
+          $dbConnect='no';
+          $cfgCLI=true;
+          _LOAD_YEAPF_();
+          echo "..\n";
+          $eventManager="$appFolder/$s.php";
+          if (!file_exists($eventManager)) {
+            echo "Creating event manager '$eventManager'\n";
+            $newEventScript=_file($sei_filename);
+            $f=fopen($eventManager, "w");
+            fwrite($f,$newEventScript);
+            fclose($f);
+          } else
+            echo "Event manager '$eventManager' untouched\n";
+        } else
+          die("Error: db connection cannot be found.\nCreate yeapf.db.ini and run configure.php again\n");
+
 
       } else
         die ("Error: '$appFolder' is not well configured.\nRun 'configure.php' from your browser first\n\n");
