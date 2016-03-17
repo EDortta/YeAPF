@@ -3,9 +3,9 @@
   /*
    * tools
    * tools/ycreatewebappevent
-   * YeAPF 0.8.48-25 built on 2016-03-17 11:17 (-3 DST)
+   * YeAPF 0.8.48-26 built on 2016-03-17 11:20 (-3 DST)
    * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2016-03-17 11:10:30 (-3 DST)
+   * 2016-03-17 11:18:47 (-3 DST)
    */
 
   $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
@@ -61,8 +61,10 @@
           _LOAD_YEAPF_();
           echo "..\n";
           $eventManager="$appFolder/$eventName.php";
+          $eventManager=str_replace("//", "/", $eventManager);
           if (!file_exists($eventManager)) {
             echo "Creating event manager '$eventManager'\n";
+            $GLOBALS['s']=$eventName;
             $newEventScript=_file($sei_filename);
             $f=fopen($eventManager, "w");
             fwrite($f,$newEventScript);
