@@ -1,14 +1,14 @@
 <?php
 /*
     includes/yeapf.locks.php
-    YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST)
+    YeAPF 0.8.48-25 built on 2016-03-17 11:17 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-01-23 22:00:40 (-3 DST)
+    2016-03-17 11:16:36 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
-  global $LOCK_DIR, $isCLI, $LOCK_VERSION;
+  global $LOCK_DIR, $isCLI, $LOCK_VERSION, $__GSem__, $__SMem__;
 
   if( !function_exists('ftok') )
   {
@@ -89,6 +89,10 @@
 
     $__GSem__=sem_get(__keyToInt__("YeAPF-SharedMemorySemaphore"));
     if (LOCK_DEBUG) _dumpY(2,2,"sem_get(): '$__GSem__'");
+    if ($__GSem__===false) {
+      file_put_contents(".config/lock_version", "0");
+      $LOCK_VERSION=0;
+    }
   }
 
   function _sm_open(&$sm)
