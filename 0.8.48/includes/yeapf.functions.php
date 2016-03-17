@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST)
+    YeAPF 0.8.48-27 built on 2016-03-17 11:34 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-01-29 18:02:53 (-3 DST)
+    2016-03-17 11:33:17 (-3 DST)
    */
 
   /*
@@ -1339,15 +1339,12 @@
               }
           } else {
             _dumpY(1,2,"'$formFile' not found!");
-            saveBestName($formFile, $protocolIdentifier, "NOT FOUND");
-            /*
             if (isset($yeapfConfig['files']))
               if (isset($yeapfConfig['files'][$fileID])) {
                 _dumpY(1,5,"Deleting '$formFile' as '$attemp' on $protocolIdentifier protocol");
                 unset($yeapfConfig['files'][$fileID]);
                 _saveConfigFile();
               }
-            */
           }
 
         } else if ($attemp=='NOT FOUND')
