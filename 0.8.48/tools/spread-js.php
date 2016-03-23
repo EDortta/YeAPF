@@ -1,9 +1,9 @@
 <?php
   /*
     tools/spread-js.php
-    YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST)
+    YeAPF 0.8.48-30 built on 2016-03-23 12:02 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-03-09 08:46:05 (-3 DST)
+    2016-03-18 13:26:05 (-3 DST)
 
     This script will distribute monolite version of yloader.js
     among different application skeletons
@@ -20,7 +20,7 @@
     if (file_exists($srcFileName)) {
       $auxFile = _file($srcFileName);
       if ($addHeader) {
-        $auxFile = "/* YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
+        $auxFile = "/* YeAPF 0.8.48-30 built on 2016-03-23 12:02 (-3 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
       }
       if (file_put_contents("$tgtFolder/$srcFileName", $auxFile))
         echo "\t$srcFileName: OK\n";
@@ -77,17 +77,14 @@
   echo "Expanded version source: $temp\n";
   $yeapfJS = join(" ", file($temp));
 
-
   $yeapf_minJS='';
   $minJS = $argv[2];
-  if (file_exists($minJS)) {
-    if (file_exists($minJS)) {
-      echo "Minified version source: $minJS\n";
-      $yeapf_minJS = join("", file($minJS));
-      $yeapf_minJS = "/* YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
-    }
-  }
 
+  if (file_exists($minJS)) {
+    echo "Minified version source: $minJS\n";
+    $yeapf_minJS = join("", file($minJS));
+    $yeapf_minJS = "/* YeAPF 0.8.48-30 built on 2016-03-23 12:02 (-3 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
+  }
 
   verifyDirExists("skel/chromeApp/js");
   verifyDirExists("skel/MoSyncApp/LocalFiles/js");
@@ -96,17 +93,26 @@
   verifyDirExists("skel/webSocket");
   copy("skel/webApp/configure.php", "skel/webSocket/configure.php");
 
+  putVersion("skel/chromeApp/js/yloader.js", $yeapfJS);
   putVersion("skel/chromeApp/js/yloader.min.js", $yeapf_minJS);
+
+  putVersion("skel/webApp/js/yloader.js", $yeapfJS);
   putVersion("skel/webApp/js/yloader.min.js", $yeapf_minJS);
-  if (putVersion("templates/bootstrap3/js/yloader.min.js", $yeapf_minJS))
+
+  if (putVersion("templates/bootstrap3/js/yloader.min.js", $yeapf_minJS)) {
+    putVersion("templates/bootstrap3/js/yloader.js", $yeapfJS);
     copyYeapfAppFiles("templates/bootstrap3/js");
+  }
+  putVersion("skel/MoSyncApp/LocalFiles/js/yloader.js", $yeapfJS);
   putVersion("skel/MoSyncApp/LocalFiles/js/yloader.min.js", $yeapf_minJS);
 
   if (putVersion("skel/chromeApp/js/yloader.min.js", $yeapf_minJS)) {
+    putVersion("skel/chromeApp/js/yloader.js", $yeapfJS);
     echo "OK\n";
     copyMobileFiles("skel/chromeApp/js");
 
     if (putVersion("skel/webApp/js/yloader.min.js", $yeapf_minJS)) {
+      putVersion("skel/webApp/js/yloader.js", $yeapfJS);
       copyFile("app-src/js/ycomm-worker.js",          "skel/webApp/js");
       copyFile("app-src/js/ycomm-worker.min.js",      "skel/webApp/js", false);
 
@@ -115,7 +121,8 @@
       die("Error!\n");
     }
 
-    if (putVersion("skel/MoSyncApp/LocalFiles/js/yloader.js", $yeapfJS)) {
+    if (putVersion("skel/MoSyncApp/LocalFiles/js/yloader.min.js", $yeapf_minJS)) {
+      putVersion("skel/MoSyncApp/LocalFiles/js/yloader.js", $yeapfJS);
       echo "OK\n";
 
       copyMobileFiles("skel/MoSyncApp/LocalFiles/js");

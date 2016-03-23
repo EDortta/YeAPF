@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST)
+  * YeAPF 0.8.48-30 built on 2016-03-23 12:02 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-03-03 14:38:22 (-3 DST)
+  * 2016-03-23 12:02:35 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -1231,23 +1231,27 @@
      var dateTransform = function (aStrDate, srcFormat, destFormat) {
        if (aStrDate) {
          var tmpDate = extractDateValues(aStrDate, srcFormat);
-         var auxMap={};
-         var emptyDate = extractDateValues("111111111111", destFormat, auxMap);
-         var ret=destFormat;
-         for(var i=0; i<auxMap.elems.length; i++) {
-           /* e is a shortcut to the array map */
-           var e = auxMap.elems[i];
-           if (e[0] !== null) {
-             /* pos 2 is the date index (y,m,d,H,M,S)
-              * pos 3 is the target length */
-             var value = pad(tmpDate[e[2]],e[3]);
+         if (tmpDate) {
+           var auxMap={};
+           var emptyDate = extractDateValues("111111111111", destFormat, auxMap);
+           var ret=destFormat;
      
-             /* pos 0 is the start of the date element
-              * we expect to have enough space in date return */
-             while (ret.length < e[0] + e[3])
-               ret = ret+' ';
-             ret=ret.substr(0,e[0]) + value + ret.substr(e[0]+e[3], ret.length);
+           for(var i=0; i<auxMap.elems.length; i++) {
+             /* e is a shortcut to the array map */
+             var e = auxMap.elems[i];
+             if (e[0] !== null) {
+               /* pos 2 is the date index (y,m,d,H,M,S)
+                * pos 3 is the target length */
+               var value = pad(tmpDate[e[2]],e[3]);
+     
+               /* pos 0 is the start of the date element
+                * we expect to have enough space in date return */
+               while (ret.length < e[0] + e[3])
+                 ret = ret+' ';
+               ret=ret.substr(0,e[0]) + value + ret.substr(e[0]+e[3], ret.length);
+             }
            }
+     
          }
          return ret;
        } else
