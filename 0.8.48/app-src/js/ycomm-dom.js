@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.48-35 built on 2016-03-28 16:37 (-3 DST)
+ * YeAPF 0.8.48-36 built on 2016-03-28 16:38 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-03-28 16:36:27 (-3 DST)
+ * 2016-03-28 16:37:51 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -135,7 +135,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
         if (typeof (aLineSpec.columns || aLineSpec.rows || aLineSpec.html) == "undefined") {
           ycomm.dom._elem_templates[aElementID]={};
           ycomm.dom._elem_templates[aElementID].rows = [];
-          for(i=0; i<count(oTable.rows.length); i++)
+          for(i=0; i<oTable.rows.length; i++)
             ycomm.dom._elem_templates[aElementID].rows[i]=oTable.rows[i].innerHTML;
         } else {
           ycomm.dom._elem_templates[aElementID]={};
