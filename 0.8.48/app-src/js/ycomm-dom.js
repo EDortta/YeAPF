@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.48-32 built on 2016-03-28 16:24 (-3 DST)
+ * YeAPF 0.8.48-33 built on 2016-03-28 16:30 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-03-28 16:24:17 (-3 DST)
+ * 2016-03-28 16:30:08 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -132,7 +132,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
       /* 1) if this is the first time, pull the template from the table itself
        * 2) the 'aLineSpec' has higher priority */
       if (first_time) {
-        if (aLineSpec.columns == aLineSpec.rows == aLineSpec.html == null) {
+        if (aLineSpec.columns == aLineSpec.rows == aLineSpec.html == undefined) {
           ycomm.dom._elem_templates[aElementID].rows = [];
           for(i=0; i<count(oTable.rows.length); i++)
             ycomm.dom._elem_templates[aElementID].rows[i]=oTable.rows[i].innerHTML;
