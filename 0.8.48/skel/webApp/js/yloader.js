@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.48-30 built on 2016-03-23 12:02 (-3 DST)
+  * YeAPF 0.8.48-31 built on 2016-03-28 16:15 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-03-23 12:02:35 (-3 DST)
+  * 2016-03-28 16:15:42 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -3612,7 +3612,9 @@
      **********************************************/
      
      
-     ycomm.dom = {};
+     ycomm.dom = {
+       _elem_templates: []
+     };
      
      /*
       * aElementID - ID do elemento (SELECT ou TABLE)
@@ -3660,7 +3662,8 @@
      
        var idFieldName, colName, newRow, canCreateRow,
            aElement = y$(aElementID),
-           rowIdOffset=0;
+           rowIdOffset=0,
+           first_time = typeof ycomm.dom._elem_templates[aElementID] == "undefined";
      
        idFieldName = aLineSpec.idFieldName || 'id';
      
@@ -3730,6 +3733,21 @@
              oTable = aElement;
            if (oTable.getElementsByTagName('tbody').length>0)
              oTable = oTable.getElementsByTagName('tbody')[0];
+     
+           /* 1) if this is the first time, pull the template from the table itself
+            * 2) the 'aLineSpec' has higher priority */
+           if (first_time) {
+             if (aLineSpec.columns == aLineSpec.rows == aLineSpec.html == null) {
+               ycomm.dom._elem_templates[aElementID].rows = [];
+               for(i=0; i<count(oTable.rows.length); i++)
+                 ycomm.dom._elem_templates[aElementID].rows[i]=oTable.rows[i].innerHTML;
+             } else {
+               ycomm.dom._elem_templates[aElementID].columns = aLineSpec.columns;
+               ycomm.dom._elem_templates[aElementID].rows    = aLineSpec.rows;
+               ycomm.dom._elem_templates[aElementID].html    = aLineSpec.html;
+             }
+           }
+           mergeObject(ycomm.dom._elem_templates[aElementID], aLineSpec, true);
      
            if (aDeleteRows) {
              while(oTable.rows.length>0)

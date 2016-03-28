@@ -1,13 +1,15 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST)
+ * YeAPF 0.8.48-31 built on 2016-03-28 16:15 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-02-24 16:25:52 (-3 DST)
+ * 2016-03-28 16:15:02 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
 
-ycomm.dom = {};
+ycomm.dom = {
+  _elem_templates: []
+};
 
 /*
  * aElementID - ID do elemento (SELECT ou TABLE)
@@ -55,7 +57,8 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
 
   var idFieldName, colName, newRow, canCreateRow,
       aElement = y$(aElementID),
-      rowIdOffset=0;
+      rowIdOffset=0,
+      first_time = typeof ycomm.dom._elem_templates[aElementID] == "undefined";
 
   idFieldName = aLineSpec.idFieldName || 'id';
 
@@ -125,6 +128,21 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
         oTable = aElement;
       if (oTable.getElementsByTagName('tbody').length>0)
         oTable = oTable.getElementsByTagName('tbody')[0];
+
+      /* 1) if this is the first time, pull the template from the table itself
+       * 2) the 'aLineSpec' has higher priority */
+      if (first_time) {
+        if (aLineSpec.columns == aLineSpec.rows == aLineSpec.html == null) {
+          ycomm.dom._elem_templates[aElementID].rows = [];
+          for(i=0; i<count(oTable.rows.length); i++)
+            ycomm.dom._elem_templates[aElementID].rows[i]=oTable.rows[i].innerHTML;
+        } else {
+          ycomm.dom._elem_templates[aElementID].columns = aLineSpec.columns;
+          ycomm.dom._elem_templates[aElementID].rows    = aLineSpec.rows;
+          ycomm.dom._elem_templates[aElementID].html    = aLineSpec.html;
+        }
+      }
+      mergeObject(ycomm.dom._elem_templates[aElementID], aLineSpec, true);
 
       if (aDeleteRows) {
         while(oTable.rows.length>0)
