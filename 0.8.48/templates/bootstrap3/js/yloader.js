@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.48-36 built on 2016-03-28 16:38 (-3 DST)
+  * YeAPF 0.8.48-38 built on 2016-04-04 16:30 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-03-28 16:38:26 (-3 DST)
+  * 2016-04-04 16:30:03 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -3785,7 +3785,7 @@
      
                // xData[j]['rowid'] = parseInt(xData[j]['rowid']) + rowIdOffset + '';
                internalRowId++;
-               xData[j].rowid = newRow.rowIndex || internalRowId + '';
+               xData[j].rowid = (typeof newRow.rowIndex !== "undefined" )?newRow.rowIndex:internalRowId + '';
                xData[j]._elementid_ = aElementID;
      
                setNewRowAttributes(newRow);

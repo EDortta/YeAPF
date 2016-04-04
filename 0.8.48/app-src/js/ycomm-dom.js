@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.48-36 built on 2016-03-28 16:38 (-3 DST)
+ * YeAPF 0.8.48-38 built on 2016-04-04 16:30 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-03-28 16:37:51 (-3 DST)
+ * 2016-04-04 16:29:24 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -180,7 +180,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
 
           // xData[j]['rowid'] = parseInt(xData[j]['rowid']) + rowIdOffset + '';
           internalRowId++;
-          xData[j].rowid = newRow.rowIndex || internalRowId + '';
+          xData[j].rowid = (typeof newRow.rowIndex !== "undefined" )?newRow.rowIndex:internalRowId + '';
           xData[j]._elementid_ = aElementID;
 
           setNewRowAttributes(newRow);
