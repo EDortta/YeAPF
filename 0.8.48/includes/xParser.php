@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xParser.php
-    YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST)
+    YeAPF 0.8.48-39 built on 2016-04-05 11:44 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-01-23 22:00:40 (-3 DST)
+    2016-04-05 11:41:01 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -119,16 +119,16 @@
     function isCommentBlockStart($token)
     {
       return (
-               ($token=='/*') ||
-               ($token=='(*')
+               (substr($token,0,2)=='/*') ||
+               (substr($token,0,2)=='(*')
               );
     }
 
     function isCommentBlockEnd($token)
     {
       return (
-               ($token=='*/') ||
-               ($token=='*)')
+               (substr($token,-2)=='*/') ||
+               (substr($token,-2)=='*)')
               );
     }
 
@@ -218,7 +218,7 @@
               $priorC=$c;
               $c=substr($this->code,$this->pos,1);  $C=strtoupper($c);
 
-              if (($c>=' ') || ($type==5)) {
+              if (($c>=' ') || ($type==5) || ($type==7)) {
                 if ($c==chr(10)) {
                   $this->addNewLine();
                 }
@@ -230,20 +230,32 @@
                      (($type==5)) ||
                      ($inComment)
                     ) {
-                  if ($this->toDebug) echo "\t$c oe".intval($this->isOperator($token)).':s'.intval($this->isSymbol($c)).':oo'.intval($this->isOperator($c)).':c'.intval($inComment);
+                  if ($this->toDebug) {
+                    echo "\t$c oe".intval($this->isOperator($token));
+                    echo ':s'.intval($this->isSymbol($c));
+                    echo ':oo'.intval($this->isOperator($c)).':c'.intval($inComment).'/'.$this->commentLevel.':t'.$type;
+                  }
                   $token.=$c;
+                  if ($this->toDebug) {
+                    echo "[".substr($token,-2)."]\n";
+                  }
                   if ($type!=5) {
-                    if (strlen($token)==2) {
-                      $commentStarting=$this->isCommentBlockStart($token);
-                      if ($commentStarting)
+                    if ($this->isCommentBlockStart($token)) {
+                      $commentStarting=strlen($token)==2;
+                      if ($commentStarting) {
                         $this->commentLevel++;
+                        if ($this->toDebug)  echo "\n-----Comment Start\n";
+                      }
                       $inComment = $inComment || $commentStarting || $this->isCommentLine($token);
                       if ($inComment)
                         $type=7;
                     }
-                    if ($this->isCommentBlockEnd(substr($token, strlen($token)-2))) {
+                    if ($this->isCommentBlockEnd($token)) {
                       $this->commentLevel--;
-                      $inComment=($this->commentLevel<=0);
+                      if ($this->commentLevel<=0) {
+                        $ok=$inComment=false;
+                        if ($this->toDebug)  echo "\n-----Comment Finish\n";
+                      }
                     }
                   }
                   if ($this->toDebug) echo ":cl".intval($this->commentLevel);

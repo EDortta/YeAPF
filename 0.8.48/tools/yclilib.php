@@ -1,9 +1,9 @@
 <?php
 /*
     tools/yclilib.php
-    YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST)
+    YeAPF 0.8.48-39 built on 2016-04-05 11:44 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-01-23 22:00:43 (-3 DST)
+    2016-04-05 11:41:46 (-3 DST)
 */
 
   function ver2value($aVer, &$updateSequence)
@@ -33,12 +33,12 @@
 
   $GLOBALS['__yeapfPath']='%_YEAPF_PATH_%';
 
-  function _LOAD_YEAPF_($libraryList='') 
+  function _LOAD_YEAPF_($libraryList='')
   {
     global $__yeapfPath;
     /* to be used when on development stage */
     if (substr($__yeapfPath,0,1)=='%')
-      $__yeapfPath = '../../';
+      $__yeapfPath = __DIR__."/../";
 
     (@include_once("$__yeapfPath/includes/yeapf.functions.php")) or die("Impossible to load YeAPF functions\npath: $__yeapfPath\n");
     if ($libraryList>'') {

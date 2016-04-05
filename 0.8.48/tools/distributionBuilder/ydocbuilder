@@ -2,48 +2,64 @@
 <?php
 /*
     tools/distributionBuilder/ydocbuilder
-    YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST)
+    YeAPF 0.8.48-39 built on 2016-04-05 11:44 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2015-02-05 07:00:25 (-3 DST)
+    2016-04-05 11:42:01 (-3 DST)
 */
 
-  function processSourceFile($filename)
+  function _parseFile($filename, $p, $funcNameBase='')
   {
-    global $src, $arrData, $arrNdx, $verbose;
+    global $verbose;
 
-    if ($verbose) echo "\n\n$filename\n==================================================";
-    $arrNdx++;
-    $ndx="file_".$arrNdx;
-
-    $ndx=basename($filename);
-
-    $arrData[$ndx]=array();
-    $arrData[$ndx]['filename']=basename($filename);
-    $arrData[$ndx]['folder']=urlencode(dirname($filename));
-    $arrData[$ndx]['functions']=array();
+    $retData=array();
+    $retData['filename']=basename($filename);
+    $retData['folder']=urlencode(dirname($filename));
+    $retData['functions']=array();
     $funcNdx=0;
     $funcNdxNum=0;
 
-    $f=join('',file($filename));
-    $p=new xParser($f);
-
+    $token_minus_1 = $token_minus_2 = '';
     $token='';
     $type=0;
+    $nestingLevel=0;
     do {
       $ok=$p->get($token,$type);
+      // echo "\n[ $token ] ".$p->commentLevel;
+
       if ($ok) {
+        if ($token=='{')
+          $nestingLevel++;
+        else if ($token=='}') {
+          $nestingLevel--;
+          if ($nestingLevel<=0)
+            $ok=false;
+        }
         // if ($verbose)  echo "$token $type (".$p->commentLevel.")  ";
-        if ($p->commentLevel==0) {
-          // wait for a 'function'
+        if ($ok) {
+
+          /*
+              wait for a 'function'
+              In php, functions are declared as function name (...)
+              In javascript it can be declared as var name = function (...)
+          */
           if ($token=='function') {
             $p->toDebug=false;
             // get the function name
-            if ($p->get($funcName, $type)) {
-              if ($verbose) echo "\n$funcName ";
+            if ($token_minus_1=='=') {
+              $funcName = $token_minus_2;
+              $ok=true;
+            } else {
+              $ok=$p->get($funcName, $type);
+              $ok=$ok && $type==3;
+            }
+            if ($funcNameBase>'')
+              $funcName="$funcNameBase.$funcName";
+            if ($ok) {
+              if ($verbose) echo "\nfunc: $funcName (type: $type)";
               //if ($verbose) echo "l: ".$p->line()." c:".$p->col().'  ';
               $funcNdxNum++;
               $funcNdx=$funcName;
-              $arrData[$ndx]['functions'][$funcNdx] = array();
+              $retData['functions'][$funcNdx] = array();
 
               $funcStartLine = $p->line();
               // get the first parentesis
@@ -54,9 +70,10 @@
                 while (($token!=')') && (!$p->eof())) {
                   // pick parameter name
                   $p->get($token, $type);
-                  if ($type==2) {
+                  if ($verbose) echo "\ttoken: $token type: $type";
+                  if (($type==2) || ($type==3)) {
                     $paramName=$token;
-                    if ($p->toDebug) echo " { $paramName $type } ";
+                    if ($verbose) echo " { $paramName $type } ";
                     $paramName = str_replace('$','',$paramName);
                     $funcParam[$paramName]=array();
 
@@ -110,12 +127,15 @@
                   }
                 }
 
-                $arrData[$ndx]['functions'][$funcNdx]['name']=$funcName;
-                $arrData[$ndx]['functions'][$funcNdx]['parameters']=$funcParam;
+                $retData['functions'][$funcNdx]['name']=$funcName;
+                $retData['functions'][$funcNdx]['parameters']=$funcParam;
 
                 $p->get($token, $type);
                 $code='';
                 if ($token=='{') {
+                  $p->rewind();
+                  $retData['functions'][$funcNdx]['inner']=(_parseFile($filename, $p, $funcName));
+                  /*
                   $levelCount=1;
                   $code='';
                   while ((!$p->eof()) && ($levelCount>0)) {
@@ -127,21 +147,44 @@
                     else
                       $code.=$token;
                   }
+                  */
                 }
                 $funcEndLine = $p->line();
                 if ($verbose) echo " $funcStartLine .. $funcEndLine";
                 $funcMD5=md5($code);
-                $arrData[$ndx]['functions'][$funcNdx]['code']=array();
-                $arrData[$ndx]['functions'][$funcNdx]['code']['md5']=$funcMD5;
-                $arrData[$ndx]['functions'][$funcNdx]['code']['start']=$funcStartLine;
-                $arrData[$ndx]['functions'][$funcNdx]['code']['end']=$funcEndLine;
+                $retData['functions'][$funcNdx]['code']=array();
+                $retData['functions'][$funcNdx]['code']['md5']=$funcMD5;
+                $retData['functions'][$funcNdx]['code']['start']=$funcStartLine;
+                $retData['functions'][$funcNdx]['code']['end']=$funcEndLine;
               }
             }
           }
           $p->toDebug=false;
         }
+        $token_minus_2=$token_minus_1;
+        $token_minus_1=$token;
       }
     } while ($ok);
+
+    return $retData;
+  }
+
+  function processSourceFile($filename)
+  {
+    global $src, $arrData, $arrNdx, $verbose;
+
+    if ($verbose) echo "\n\n$filename\n==================================================";
+    $arrNdx++;
+    $ndx="file_".$arrNdx;
+
+    $ndx=basename($filename);
+
+    $f=join('',file($filename));
+    $p=new xParser($f);
+    $p->toDebug=false;
+
+    $arrData[$ndx]=_parseFile($filename, $p);
+
   }
 
   function processSourceFolder($folderOrFile)
@@ -157,8 +200,8 @@
         if (($filename!='.') && ($filename!='..'))
           processSourceFolder("$filename");
       } else {
-        $ext = pathinfo($filename, PATHINFO_EXTENSION);
-        if ($ext == 'php')
+        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+        if (($ext == 'js') || ($ext == 'php'))
           processSourceFile("$filename");
       }
     }
