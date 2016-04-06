@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ydocbuilder
-    YeAPF 0.8.48-40 built on 2016-04-06 09:45 (-3 DST)
+    YeAPF 0.8.48-41 built on 2016-04-06 10:49 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-06 09:45:07 (-3 DST)
+    2016-04-06 09:46:45 (-3 DST)
 */
 
   function _parseFile($filename, $p, $funcNameBase='')
@@ -154,6 +154,7 @@
                   $funcNameBase=$funcName;
                   $retData['classes'][$funcNameBase]['name']=$funcName;
                   $p->rewind();
+                  $code='';
                   $inner=(_parseFile($filename, $p, $funcName));
                   if ((isset($inner['functions'])) || (isset($inner['classes']))) {
                     $retData['classes'][$funcNameBase]['inner']=$inner;
