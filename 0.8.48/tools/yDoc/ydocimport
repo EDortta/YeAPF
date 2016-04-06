@@ -2,15 +2,15 @@
 <?php
 /*
     tools/yDoc/ydocimport
-    YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST)
+    YeAPF 0.8.48-40 built on 2016-04-06 09:45 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2015-05-18 23:18:41 (-3 DST)
+    2016-04-05 17:59:30 (-3 DST)
 */
 
   $myself=basename($argv[0]);
   echo "YeAPF 0.8.48 $myself\nCopyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
   if (!file_exists("yeapf.php")) {
-    die("$myself need to be invoked from a YeAPF well configured folder.\n=============================================================\nBEWARE!.It will write data on your local configured database!\n=============================================================\n");
+    die("$myself need to be invoked from a well configured YeAPF folder.\n=============================================================\nBEWARE!.It will write data on your local configured database!\n=============================================================\n");
   }
   require_once "yeapf.php";
 

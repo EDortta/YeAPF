@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ydocbuilder
-    YeAPF 0.8.48-39 built on 2016-04-05 11:44 (-3 DST)
+    YeAPF 0.8.48-40 built on 2016-04-06 09:45 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-05 11:42:01 (-3 DST)
+    2016-04-06 09:45:07 (-3 DST)
 */
 
   function _parseFile($filename, $p, $funcNameBase='')
@@ -42,7 +42,9 @@
               In php, functions are declared as function name (...)
               In javascript it can be declared as var name = function (...)
           */
-          if ($token=='function') {
+          $token==strtolower($token);
+          if ( ($token=='function') ||
+               ($token=='class') ) {
             $p->toDebug=false;
             // get the function name
             if ($token_minus_1=='=') {
@@ -62,100 +64,108 @@
               $retData['functions'][$funcNdx] = array();
 
               $funcStartLine = $p->line();
-              // get the first parentesis
-              if (($p->getExpectingType($token, 4)) && ($token=='(')) {
-                $funcParam = array();
-                if (isset($default))
-                  unset($default);
-                while (($token!=')') && (!$p->eof())) {
-                  // pick parameter name
-                  $p->get($token, $type);
-                  if ($verbose) echo "\ttoken: $token type: $type";
-                  if (($type==2) || ($type==3)) {
-                    $paramName=$token;
-                    if ($verbose) echo " { $paramName $type } ";
-                    $paramName = str_replace('$','',$paramName);
-                    $funcParam[$paramName]=array();
-
+              // get the first parentheses or curly bracket
+              $ok=$p->get($token, $type);
+              if ($ok) {
+                if ($token=='(') {
+                  $funcParam = array();
+                  if (isset($default))
+                    unset($default);
+                  while (($token!=')') && (!$p->eof())) {
+                    // pick parameter name
                     $p->get($token, $type);
-                    if (($type==6) && ($token=='=')) {
-                      if ($p->toDebug) echo " getting default value ";
-                      // pick default value
+                    if ($verbose) echo "\ttoken: $token type: $type";
+                    if (($type==2) || ($type==3)) {
+                      $paramName=$token;
+                      if ($verbose) echo " { $paramName $type } ";
+                      $paramName = str_replace('$','',$paramName);
+                      $funcParam[$paramName]=array();
+
                       $p->get($token, $type);
-                      $default=$token;
-                      $k=0;
+                      if (($type==6) && ($token=='=')) {
+                        if ($p->toDebug) echo " getting default value ";
+                        // pick default value
+                        $p->get($token, $type);
+                        $default=$token;
+                        $k=0;
 
-                      if (!(($type==1) || ($type==3) || ($type==5))) {
+                        if (!(($type==1) || ($type==3) || ($type==5))) {
 
-                        $nroParentesis=0;
-                        while ((!$p->eof()) && ($token!=',')) {
-                          $p->get($token, $type);
-                          if ($token=='(')
-                            $nroParentesis++;
-                          else if ($token==')') {
-                            $nroParentesis--;
+                          $nroParentesis=0;
+                          while ((!$p->eof()) && ($token!=',')) {
+                            $p->get($token, $type);
+                            if ($token=='(')
+                              $nroParentesis++;
+                            else if ($token==')') {
+                              $nroParentesis--;
+                            }
+
+                            if ($token!=',')
+                              $default.=' '.$token;
+                            $k++;
+                            if ($k>10)
+                              die();
+                            if ($nroParentesis==0)
+                              break;
                           }
 
-                          if ($token!=',')
-                            $default.=' '.$token;
-                          $k++;
-                          if ($k>10)
-                            die();
-                          if ($nroParentesis==0)
-                            break;
+                          $type=5;
+
                         }
 
-                        $type=5;
+                        if (($type==1) || ($type==3) || ($type==5)) {
+                          $default = urlencode($default);
+                          if ($type==1)
+                            $default = unquote($default);
 
-                      }
+                          if ($type==5)
+                            $default = strtolower(unquote($default));
 
-                      if (($type==1) || ($type==3) || ($type==5)) {
-                        $default = urlencode($default);
-                        if ($type==1)
-                          $default = unquote($default);
-
-                        if ($type==5)
-                          $default = strtolower(unquote($default));
-
-                        $funcParam[$paramName]['default']=$default;
-                        $p->get($token, $type);
+                          $funcParam[$paramName]['default']=$default;
+                          $p->get($token, $type);
+                        } else
+                          $funcParam[$paramName]['dummy']='ok';
                       } else
                         $funcParam[$paramName]['dummy']='ok';
-                    } else
-                      $funcParam[$paramName]['dummy']='ok';
 
+                    }
                   }
-                }
 
-                $retData['functions'][$funcNdx]['name']=$funcName;
-                $retData['functions'][$funcNdx]['parameters']=$funcParam;
+                  $retData['functions'][$funcNdx]['name']=$funcName;
+                  $retData['functions'][$funcNdx]['parameters']=$funcParam;
 
-                $p->get($token, $type);
-                $code='';
-                if ($token=='{') {
-                  $p->rewind();
-                  $retData['functions'][$funcNdx]['inner']=(_parseFile($filename, $p, $funcName));
-                  /*
-                  $levelCount=1;
+                  $p->get($token, $type);
                   $code='';
-                  while ((!$p->eof()) && ($levelCount>0)) {
-                    $p->get($token, $type);
-                    if ($token=='{')
-                      $levelCount++;
-                    else if ($token=='}')
-                      $levelCount--;
-                    else
-                      $code.=$token;
+                  if ($token=='{') {
+                    $p->rewind();
+                    $inner=(_parseFile($filename, $p, $funcName));
+                    if (isset($inner['functions']))
+                      $retData['functions'][$funcNdx]['inner']=$inner;
                   }
-                  */
+                  $funcEndLine = $p->line();
+                  if ($verbose) echo " $funcStartLine .. $funcEndLine";
+                  $funcMD5=md5($code);
+                  $retData['functions'][$funcNdx]['code']=array();
+                  $retData['functions'][$funcNdx]['code']['md5']=$funcMD5;
+                  $retData['functions'][$funcNdx]['code']['start']=$funcStartLine;
+                  $retData['functions'][$funcNdx]['code']['end']=$funcEndLine;
+                } else if ($token=='{') {
+                  /* funcNameBase is now the classname */
+                  $funcNameBase=$funcName;
+                  $retData['classes'][$funcNameBase]['name']=$funcName;
+                  $p->rewind();
+                  $inner=(_parseFile($filename, $p, $funcName));
+                  if ((isset($inner['functions'])) || (isset($inner['classes']))) {
+                    $retData['classes'][$funcNameBase]['inner']=$inner;
+                  }
+                  $funcEndLine = $p->line();
+                  if ($verbose) echo " $funcStartLine .. $funcEndLine";
+                  $funcMD5=md5($code);
+                  $retData['classes'][$funcNameBase]['code']=array();
+                  $retData['classes'][$funcNameBase]['code']['md5']=$funcMD5;
+                  $retData['classes'][$funcNameBase]['code']['start']=$funcStartLine;
+                  $retData['classes'][$funcNameBase]['code']['end']=$funcEndLine;
                 }
-                $funcEndLine = $p->line();
-                if ($verbose) echo " $funcStartLine .. $funcEndLine";
-                $funcMD5=md5($code);
-                $retData['functions'][$funcNdx]['code']=array();
-                $retData['functions'][$funcNdx]['code']['md5']=$funcMD5;
-                $retData['functions'][$funcNdx]['code']['start']=$funcStartLine;
-                $retData['functions'][$funcNdx]['code']['end']=$funcEndLine;
               }
             }
           }
