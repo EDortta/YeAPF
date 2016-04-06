@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ydocbuilder
-    YeAPF 0.8.48-42 built on 2016-04-06 11:03 (-3 DST)
+    YeAPF 0.8.48-43 built on 2016-04-06 11:08 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-06 11:02:18 (-3 DST)
+    2016-04-06 11:08:26 (-3 DST)
 */
 
   function _parseFile($filename, $p, $funcNameBase='')
@@ -139,8 +139,15 @@
                   if ($token=='{') {
                     $p->rewind();
                     $inner=(_parseFile($filename, $p, $funcName));
-                    if (isset($inner['functions']))
+                    if (isset($inner['functions'])) {
+                      unset($inner['filename']);
+                      unset($inner['folder']);
+                      if (count($inner['functions'])==0)
+                        unset($inner['functions']);
+                      if (count($inner['classes'])==0)
+                        unset($inner['classes']);
                       $retData['functions'][$funcNdx]['inner']=$inner;
+                    }
                   }
                   $funcEndLine = $p->line();
                   if ($verbose) echo " $funcStartLine .. $funcEndLine";
@@ -159,6 +166,10 @@
                   if ((isset($inner['functions'])) || (isset($inner['classes']))) {
                     unset($inner['filename']);
                     unset($inner['folder']);
+                    if (count($inner['functions'])==0)
+                      unset($inner['functions']);
+                    if (count($inner['classes'])==0)
+                      unset($inner['classes']);
                     $retData['classes'][$funcNameBase]=$inner;
                   }
                   $funcEndLine = $p->line();
