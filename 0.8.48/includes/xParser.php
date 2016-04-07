@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xParser.php
-    YeAPF 0.8.48-44 built on 2016-04-07 11:07 (-3 DST)
+    YeAPF 0.8.48-45 built on 2016-04-07 12:04 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-07 11:07:16 (-3 DST)
+    2016-04-07 11:53:52 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -208,7 +208,7 @@
             if ($this->toDebug) echo "\n$token $type\t";
 
             $this->wordStart=$this->pos;
-            $inComment = $this->isCommentLine($token);
+            $isACommentLine=$inComment = $this->isCommentLine($token);
             if ($inComment)
               $type = 7;
 
@@ -221,65 +221,74 @@
               if (($c>=' ') || ($type==5) || ($type==7)) {
                 if ($c==chr(10)) {
                   $this->addNewLine();
+                  if ($isACommentLine)
+                    $ok=false;
                 }
+                if ($ok) {
 
-                if ( ((($type==3) || ($type==2)) && ($this->isChar($c))) ||
-                     (($type==1) && ($this->isNumber($c))) ||
-                     (($this->isOperator($token)) && (($this->isSymbol($c)) ||
-                      ($this->isOperator($c)))) ||
-                     (($type==6) && ($c=='=')) ||
-                     (($type==5)) ||
-                     ($inComment || $this->isCommentLine("$token$c"))
-                    ) {
-                  if ($this->toDebug) {
-                    echo "\t$c oe".intval($this->isOperator($token));
-                    echo ':s'.intval($this->isSymbol($c));
-                    echo ':oo'.intval($this->isOperator($c)).':c'.intval($inComment).'/'.$this->commentLevel.':t'.$type;
+                  if (($type==4) && ($this->isCommentLine("$token$c"))) {
+                    $type=7;
+                    $isACommentLine=$inComment=true;
                   }
-                  $token.=$c;
-                  if ($this->toDebug) {
-                    echo "[".substr($token,-2)."]\n";
-                  }
-                  if ($type!=5) {
-                    if ($this->isCommentBlockStart($token)) {
-                      $commentStarting=strlen($token)==2;
-                      if ($commentStarting) {
-                        $this->commentLevel++;
-                        if ($this->toDebug)  echo "\n-----Comment Start\n";
-                      }
-                      $inComment = $inComment || $commentStarting || $this->isCommentLine($token);
-                      if ($inComment)
-                        $type=7;
-                    }
-                    if ($this->isCommentBlockEnd($token)) {
-                      $this->commentLevel--;
-                      if ($this->commentLevel<=0) {
-                        $ok=$inComment=false;
-                        if ($this->toDebug)  echo "\n-----Comment Finish\n";
-                      }
-                    }
-                  }
-                  if ($this->toDebug) echo ":cl".intval($this->commentLevel);
 
-                  $this->pos++;
-                  $ok = ($this->pos < strlen($this->code));
-                  if (!$ok)
-                    $dbgEscapeCause = 'pos>code';
-                  if (($ok) && ($type==5)) {
-                    if ($priorC=='\\') {
-                      $c='';
+                  if ( ((($type==3) || ($type==2)) && ($this->isChar($c))) ||
+                       (($type==1) && ($this->isNumber($c))) ||
+                       (($this->isOperator($token)) && (($this->isSymbol($c)) ||
+                        ($this->isOperator($c)))) ||
+                       (($type==6) && ($c=='=')) ||
+                       (($type==5)) ||
+                        ($inComment)
+                      ) {
+                    if ($this->toDebug) {
+                      echo "\t$c oe".intval($this->isOperator($token));
+                      echo ':s'.intval($this->isSymbol($c));
+                      echo ':oo'.intval($this->isOperator($c)).':c'.intval($inComment).'/'.$this->commentLevel.':t'.$type;
+                    }
+                    $token.=$c;
+                    if ($this->toDebug) {
+                      echo "[".substr($token,-2)."]\n";
+                    }
+                    if ($type!=5) {
+                      if ($this->isCommentBlockStart($token)) {
+                        $commentStarting=strlen($token)==2;
+                        if ($commentStarting) {
+                          $this->commentLevel++;
+                          if ($this->toDebug)  echo "\n-----Comment Start\n";
+                        }
+                        $inComment = $inComment || $commentStarting || $this->isCommentLine($token);
+                        if ($inComment)
+                          $type=7;
+                      }
+                      if ($this->isCommentBlockEnd($token)) {
+                        $this->commentLevel--;
+                        if ($this->commentLevel<=0) {
+                          $ok=$inComment=false;
+                          if ($this->toDebug)  echo "\n-----Comment Finish\n";
+                        }
+                      }
+                    }
+                    if ($this->toDebug) echo ":cl".intval($this->commentLevel);
+
+                    $this->pos++;
+                    $ok = ($this->pos < strlen($this->code));
+                    if (!$ok)
+                      $dbgEscapeCause = 'pos>code';
+                    if (($ok) && ($type==5)) {
+                      if ($priorC=='\\') {
+                        $c='';
+                      } else {
+                        if ($c==$this->first) {
+                          $ok=false;
+                          $dbgEscapeCause = 'c==first';
+                        }
+                      }
                     } else {
-                      if ($c==$this->first) {
-                        $ok=false;
-                        $dbgEscapeCause = 'c==first';
-                      }
+                      $dbgEscapeCause = 'type!=5';
                     }
                   } else {
-                    $dbgEscapeCause = 'type!=5';
+                    $ok=false;
+                    $dbgEscapeCause = "end-of-type $type $inComment";
                   }
-                } else {
-                  $ok=false;
-                  $dbgEscapeCause = "end-of-type $type $inComment";
                 }
               } else {
                 $ok=false;
