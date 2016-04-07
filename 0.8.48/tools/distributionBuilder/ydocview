@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ydocview
-    YeAPF 0.8.48-42 built on 2016-04-06 11:03 (-3 DST)
+    YeAPF 0.8.48-44 built on 2016-04-07 11:07 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-06 10:58:37 (-3 DST)
+    2016-04-07 07:14:42 (-3 DST)
 */
 
   $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
@@ -22,7 +22,7 @@
   $filename=$args->getSrc(0);
 
   echo "YeAPF 0.8.48 $myself\nCopyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com\n";
-  if ($args->argValue('h;help')==true) {
+  if (($args->argValue('h;help')==true) || (trim($filename)=='')) {
     die("usage:\n\t$myself <filename>\tfilename is a .xdb created by ydocbuilder\n");
   }
 
@@ -32,61 +32,60 @@
 
   function showXdbInfo($margin, $xml, $type='file')
   {
+    $ret="";
     if (isset($xml)) {
       $xml=object2array($xml);
       $marginStr=str_repeat(" ",$margin*2);
       foreach($xml as $info => $detail) {
         if ($type=='file') {
           if (isset($detail['folder']))
-            echo urldecode("$marginStr$info at ".$detail['folder']."\n");
+            $ret.=urldecode($marginStr."$info at ".$detail['folder']."\n");
         } else if ($type=='func') {
           if (!is_numeric($info)) {
-            echo urldecode("$marginStr$info (");
+            $ret.=urldecode($marginStr."function $info (");
             $pCount=0;
             if (isset($detail['parameters'])) {
               foreach($detail['parameters'] as $paramName=>$dummy) {
                 if ($pCount++>0)
-                  echo ", ";
-                echo $paramName;
+                  $ret.=", ";
+                $ret.=$paramName;
               }
             }
-            echo ")\n";
+            $ret.=")\n";
           }
         } else if ($type=='class') {
           if (!is_numeric($info)) {
-            echo urldecode("$marginStr$info {");
-            viewInside($margin, $detail);
-            echo "}\n";
+            $ret.=urldecode($marginStr."class $info\n");
           }
 
         } else if ($type=='inner') {
-          if (isset($xml['functions']) && count($xml['functions'])>0) {
-            echo "%";
-            viewInside($margin, $xml, 'func');
-          }
+          $ret.="*-*";
         }
-        viewInside($margin, $detail);
+        $ret.=viewInside($margin, $detail);
       }
     }
+    return $ret;
   }
 
   function viewInside($margin, $detail )
   {
-      if (isset($detail['inner'])) {
-        echo "*";
-        showXdbInfo($margin+1, $detail['inner'],'inner');
-      }
-      if (isset($detail['functions'])) {
-        showXdbInfo($margin+1, $detail['functions'],'func');
-      }
-      if (isset($detail['classes'])) {
-        showXdbInfo($margin+1, $detail['classes'],'class');
-      }
+    $ret="";
+    $marginStr=str_repeat(" ",$margin*2);
+    if (isset($detail['inner'])) {
+      $ret.=showXdbInfo($margin+1, $detail['inner'],'inner');
+    }
+    if (isset($detail['classes'])) {
+      $ret.=showXdbInfo($margin+1, $detail['classes'],'class');
+    }
+    if (isset($detail['functions'])) {
+      $ret.=showXdbInfo($margin+1, $detail['functions'],'func');
+    }
+    return $ret;
   }
 
   if (file_exists($filename)) {
     $xml = simplexml_load_file($filename);
-    showXdbInfo(0, $xml);
+    echo showXdbInfo(0, $xml);
   } else
     die("\nfile '$filename' not found\n");
 ?>

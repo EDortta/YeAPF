@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xParser.php
-    YeAPF 0.8.48-39 built on 2016-04-05 11:44 (-3 DST)
+    YeAPF 0.8.48-44 built on 2016-04-07 11:07 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-05 11:41:01 (-3 DST)
+    2016-04-07 11:07:16 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -225,10 +225,11 @@
 
                 if ( ((($type==3) || ($type==2)) && ($this->isChar($c))) ||
                      (($type==1) && ($this->isNumber($c))) ||
-                     (($this->isOperator($token)) && (($this->isSymbol($c)) || ($this->isOperator($c)))) ||
+                     (($this->isOperator($token)) && (($this->isSymbol($c)) ||
+                      ($this->isOperator($c)))) ||
                      (($type==6) && ($c=='=')) ||
                      (($type==5)) ||
-                     ($inComment)
+                     ($inComment || $this->isCommentLine("$token$c"))
                     ) {
                   if ($this->toDebug) {
                     echo "\t$c oe".intval($this->isOperator($token));
