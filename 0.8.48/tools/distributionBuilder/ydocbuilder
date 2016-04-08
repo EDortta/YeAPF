@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ydocbuilder
-    YeAPF 0.8.48-53 built on 2016-04-08 13:07 (-3 DST)
+    YeAPF 0.8.48-54 built on 2016-04-08 16:28 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-08 13:03:38 (-3 DST)
+    2016-04-08 16:23:48 (-3 DST)
 */
 
   function _cleanup(&$inner)
@@ -39,8 +39,6 @@
     if ($verbose) echo $_pm_."----------parsing-------\n";
 
     $retData=array();
-    $retData['filename']=basename($filename);
-    $retData['folder']=urlencode(dirname($filename));
     $retData['functions']=array();
     $retData['classes']=array();
     $funcNdx='';
@@ -259,6 +257,9 @@
     } while ($ok);
 
     _cleanup($retData);
+    $retData['filename']=basename($filename);
+    $retData['folder']=urlencode(dirname($filename));
+
 
     if ($verbose) echo $_pm_."--------finish------\n";
 
