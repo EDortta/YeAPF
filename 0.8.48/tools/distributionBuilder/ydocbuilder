@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ydocbuilder
-    YeAPF 0.8.48-50 built on 2016-04-08 12:37 (-3 DST)
+    YeAPF 0.8.48-51 built on 2016-04-08 12:39 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-08 12:35:51 (-3 DST)
+    2016-04-08 12:39:00 (-3 DST)
 */
 
   function _cleanup(&$inner)
@@ -109,7 +109,7 @@
             if ($ok) {
               if (trim($funcNameBase)>'')
                 $funcName="$funcNameBase.$funcName";
-              $funcOriginalName=htmlentities($funcName, ENT_QUOTES);
+              $funcOriginalName=str_replace("$","_dollar_",htmlentities($funcName, ENT_QUOTES));
               $funcName=str_replace("$","__",$funcName);
               $funcName=str_replace("[",".",$funcName);
               $funcName=str_replace("]","",$funcName);
