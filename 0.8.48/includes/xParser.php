@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xParser.php
-    YeAPF 0.8.48-45 built on 2016-04-07 12:04 (-3 DST)
+    YeAPF 0.8.48-46 built on 2016-04-08 11:10 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-07 11:53:52 (-3 DST)
+    2016-04-08 11:09:34 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -137,14 +137,18 @@
       return ($c=='-') || ($c=='+') || ($c=='*') || ($c=='/') || ($c=='%') || ($c=='\\') || ($c=='#') || ($c=='!');
     }
 
+    function isPrintableASCII($c) {
+      return (ord($c)>=32) || ord($c<=126);
+    }
+
     function isSpecialSymbol($c)
     {
       return ($this->isChar($c) || $this->isMacro($c) || $this->isLiteral($c) || $this->isSymbol($c));
     }
 
-    function getTypeOf($c)
+    function getTypeOf($c, $priorC='')
     {
-      $isLiteral=$this->isSpecialSymbol($c);
+      $isSymbol=$this->isSpecialSymbol($c) || ($priorC=='\\');
       if ($this->isNumber($c))
         $type=1;
       else if ($this->isMacro($c))
@@ -153,7 +157,7 @@
         $type=5;
       else if ($this->isSymbol($c))
         $type=6;
-      else if ($isLiteral)
+      else if ($isSymbol)
         $type=3;
       else
         $type=4;
@@ -186,6 +190,10 @@
         $type=$this->lastGetType;
       } else {
         $r=0;
+        $relPos=0;
+        $regexParCount=0;
+        $token="";
+        $type=-1;
         // echo "pos=$this->pos de '$this->code'<br>";
         if ($this->pos < strlen($this->code)) {
           do {
@@ -203,9 +211,9 @@
             $token=$c;
             $this->first=$c;
             $ok=$this->isSpecialSymbol($c) || $this->isOperator($c);
-            $type=$this->getTypeOf($c);
+            $type=$this->getTypeOf($c, $priorC);
 
-            if ($this->toDebug) echo "\n$token $type\t";
+            if ($this->toDebug) echo "\n\t\t$token type: $type\t";
 
             $this->wordStart=$this->pos;
             $isACommentLine=$inComment = $this->isCommentLine($token);
@@ -218,12 +226,45 @@
               $priorC=$c;
               $c=substr($this->code,$this->pos,1);  $C=strtoupper($c);
 
+              $relPos++;
+              if ($relPos==1) {
+                if (($this->first=='/') && ($c!='*') && ($c!='/')) {
+                  $type = 8;
+                  $inComment=false;
+                  if ($this->toDebug) echo "[ regular expression ]";
+                }
+              }
+
+              if ($type==8) {
+                if ($this->toDebug) echo " $c=".$this->getTypeOf($c, $priorC);
+                if ($c=='(')
+                  $regexParCount++;
+                if ($c==')')
+                  $regexParCount++;
+
+                if ($this->getTypeOf($c, $priorC)==3)
+                  $ok=true;
+                else if ($this->getTypeOf($c, $priorC)==4) {
+                  if (!(($c==';') || ($c==','))) {
+                    if ($regexParCount>0)
+                      $ok=true;
+                    else {
+                      $ok=($c!=')');
+                    }
+                  } else
+                    $ok=false;
+                } else {
+                  $ok=false;
+                }
+              }
+
               if (($c>=' ') || ($type==5) || ($type==7)) {
                 if ($c==chr(10)) {
                   $this->addNewLine();
                   if ($isACommentLine)
                     $ok=false;
                 }
+
                 if ($ok) {
 
                   if (($type==4) && ($this->isCommentLine("$token$c"))) {
@@ -231,16 +272,18 @@
                     $isACommentLine=$inComment=true;
                   }
 
-                  if ( ((($type==3) || ($type==2)) && ($this->isChar($c))) ||
+                  if (
+                       (($type==3) && ($this->isChar($c))) ||
+                       (($type==2) && ($this->isChar($c))) ||
                        (($type==1) && ($this->isNumber($c))) ||
                        (($this->isOperator($token)) && (($this->isSymbol($c)) ||
                         ($this->isOperator($c)))) ||
                        (($type==6) && ($c=='=')) ||
-                       (($type==5)) ||
-                        ($inComment)
+                       (($type==5) || ($inComment)) ||
+                       (($type==8) && (!(($c==',') || ($c==';'))))
                       ) {
                     if ($this->toDebug) {
-                      echo "\t$c oe".intval($this->isOperator($token));
+                      echo "\n\t\t\tc:$c oe".intval($this->isOperator($token));
                       echo ':s'.intval($this->isSymbol($c));
                       echo ':oo'.intval($this->isOperator($c)).':c'.intval($inComment).'/'.$this->commentLevel.':t'.$type;
                     }
@@ -253,7 +296,7 @@
                         $commentStarting=strlen($token)==2;
                         if ($commentStarting) {
                           $this->commentLevel++;
-                          if ($this->toDebug)  echo "\n-----Comment Start\n";
+                          if ($this->toDebug)  echo "\n\t\t-----Comment Start\n";
                         }
                         $inComment = $inComment || $commentStarting || $this->isCommentLine($token);
                         if ($inComment)
@@ -263,11 +306,11 @@
                         $this->commentLevel--;
                         if ($this->commentLevel<=0) {
                           $ok=$inComment=false;
-                          if ($this->toDebug)  echo "\n-----Comment Finish\n";
+                          if ($this->toDebug)  echo "\n\t\t-----Comment Finish\n";
                         }
                       }
                     }
-                    if ($this->toDebug) echo ":cl".intval($this->commentLevel);
+                    if ($this->toDebug) echo "\t\t\t:cl".intval($this->commentLevel);
 
                     $this->pos++;
                     $ok = ($this->pos < strlen($this->code));
@@ -287,7 +330,7 @@
                     }
                   } else {
                     $ok=false;
-                    $dbgEscapeCause = "end-of-type $type $inComment";
+                    $dbgEscapeCause = "end-of-type $type at char $c $inComment";
                   }
                 }
               } else {

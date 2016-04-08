@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ydocbuilder
-    YeAPF 0.8.48-45 built on 2016-04-07 12:04 (-3 DST)
+    YeAPF 0.8.48-46 built on 2016-04-08 11:10 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-07 11:59:50 (-3 DST)
+    2016-04-08 11:09:59 (-3 DST)
 */
 
   function _cleanup(&$inner)
@@ -14,6 +14,10 @@
     if (isset($inner['functions'])) {
       if (count($inner['functions'])==0)
         unset($inner['functions']);
+      else
+        foreach($inner['functions'] as $funcName=>$funcDef)
+          if (substr($funcName,0,21)=="__anonymousFunction__")
+            unset($inner[$funcName]);
     }
     if (isset($inner['classes'])) {
       if (count($inner['classes'])==0)
@@ -21,17 +25,18 @@
     }
   }
 
-  global $_parserMargin;
+  global $_parserMargin, $anonymousFunctionNdx;
   $_parserMargin=-1;
+  $anonymousFunctionNdx=0;
 
   function _parseFile($filename, $p, $funcNameBase='')
   {
-    global $verbose, $_parserMargin;
+    global $verbose, $_parserMargin, $anonymousFunctionNdx;
 
     $_parserMargin++;
-    $_pm_=str_repeat("    ", $_parserMargin);
+    $_pm_="\n".str_repeat("    ", $_parserMargin);
 
-    if ($verbose) echo "\n".$_pm_."----------parsing-------\n";
+    if ($verbose) echo $_pm_."----------parsing-------\n";
 
     $retData=array();
     $retData['filename']=basename($filename);
@@ -44,19 +49,30 @@
     $token='';
     $type=0;
     $nestingLevel=0;
+    $firstToken=true;
+    $dropOnCurly=false;
     do {
       $ok=$p->get($token,$type);
-      // echo "\n".$_pm_."[ $token ] ".$p->commentLevel;
+
+      // echo $_pm_."[ $token ] ".$p->commentLevel;
 
       if ($ok) {
-        if ($token=='{')
+        if ($token=='{') {
           $nestingLevel++;
+          if ($firstToken)
+            $dropOnCurly=true;
+        }
         else if ($token=='}') {
           $nestingLevel--;
-          if ($nestingLevel<=0)
+          if ($nestingLevel<0)
             $ok=false;
+          if ($dropOnCurly)
+            if ($nestingLevel==0)
+              $ok=false;
         }
-        if ($verbose)  echo "\n".$_pm_."[ $token ] TYPE: $type (".$p->commentLevel.")  ";
+        $firstToken=false;
+
+        if ($verbose)  echo $_pm_."[ $token ] TYPE: $type (line: ".$p->line()." col: ".$p->col()." nestingLevel: $nestingLevel ok: ".intval($ok).")  ";
         if ($ok) {
 
           /*
@@ -74,12 +90,28 @@
               $ok=true;
             } else {
               $ok=$p->get($funcName, $type);
-              $ok=$ok && $type==3;
+              if ($verbose) echo $_pm_."funcName=$funcName type=$type ok=$ok ";
+              /* (type==2 || type==3)?identifier    type==4?parentheses */
+              $ok=$ok && ($type==2 ||$type==3 || $type==4);
+              if ($type==4) {
+                if ($verbose) {
+                  echo "\n*************";
+                  echo "\n* ANON FUN";
+                  echo "\n*************\n";
+                }
+                $anonymousFunctionNdx++;
+                $funcName="__anonymousFunction__".$anonymousFunctionNdx;
+                $p->rewind();
+              }
             }
-            if ($funcNameBase>'')
-              $funcName="$funcNameBase.$funcName";
+
+
             if ($ok) {
-              if ($verbose) echo "\n".$_pm_."$methodType: $funcName (type: $type) ";
+              if (trim($funcNameBase)>'')
+                $funcName="$funcNameBase.$funcName";
+              $funcOriginalName=htmlentities($funcName, ENT_QUOTES);
+              $funcName=str_replace("$","__",$funcName);
+              if ($verbose) echo $_pm_."$methodType: $funcName (type: $type) ";
               //if ($verbose) echo "l: ".$p->line()." c:".$p->col().'  ';
               $funcNdx=$funcName;
               if($methodType=='function')
@@ -90,7 +122,7 @@
               $funcStartLine = $p->line();
               // get the first parentheses or curly bracket
               $ok=$p->get($token, $type);
-              if($verbose) echo "$ok [ $token ] (type: $type)";
+              if($verbose) echo $_pm_.intval($ok)." [ $token ] (type: $type)";
               if ($ok) {
                 if ($token=='(') {
                   $funcParam = array();
@@ -99,7 +131,7 @@
                   while (($token!=')') && (!$p->eof())) {
                     // pick parameter name
                     $p->get($token, $type);
-                    if ($verbose) echo "\ttoken: $token type: $type";
+                    if ($verbose) echo $_pm_."\ttoken: $token type: $type";
                     if (($type==2) || ($type==3)) {
                       $paramName=$token;
                       if ($verbose) echo " { $paramName $type } ";
@@ -156,7 +188,7 @@
                     }
                   }
 
-                  $retData['functions'][$funcNdx]['name']=$funcName;
+                  $retData['functions'][$funcNdx]['name']=$funcOriginalName;
                   $retData['functions'][$funcNdx]['parameters']=$funcParam;
 
                   $p->get($token, $type);
@@ -164,10 +196,12 @@
                   if ($token=='{') {
                     $p->rewind();
                     $inner=(_parseFile($filename, $p, $funcNdx));
-                    if ($verbose) echo "\n".$_pm_."incluindo corpo da funcao $funcNdx";
-                    if (isset($inner['functions'])) {
-                      _cleanup($inner);
-                      $retData['functions'][$funcNdx]['inner']=$inner;
+                    if (strpos($funcName, "__anonymousFunction__")===false) {
+                      if ($verbose) echo $_pm_."incluindo corpo da funcao $funcNdx";
+                      if (isset($inner['functions'])) {
+                        _cleanup($inner);
+                        $retData['functions'][$funcNdx]['inner']=$inner;
+                      }
                     }
                   }
                   $funcEndLine = $p->line();
@@ -180,13 +214,13 @@
                 } else if ($token=='{') {
                   /* funcNameBase is now the classname */
                   $funcNameBase=$funcName;
-                  $retData['classes'][$funcNameBase]['name']=$funcName;
+                  $retData['classes'][$funcNameBase]['name']=$funcOriginalName;
                   $p->rewind();
                   $code='';
                   $inner=(_parseFile($filename, $p, $funcName));
                   if ((isset($inner['functions'])) || (isset($inner['classes']))) {
                     _cleanup($inner);
-                    if ($verbose) echo "\n".$_pm_."incluindo corpo da classe $funcNameBase";
+                    if ($verbose) echo $_pm_."incluindo corpo da classe $funcNameBase";
                     $retData['classes'][$funcNameBase]=$inner;
                   }
                   $funcEndLine = $p->line();
@@ -208,7 +242,7 @@
 
     _cleanup($retData);
 
-    if ($verbose) echo "\n".$_pm_."--------finish------\n";
+    if ($verbose) echo $_pm_."--------finish------\n";
 
     $_parserMargin--;
     return $retData;

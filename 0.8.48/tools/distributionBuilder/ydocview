@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ydocview
-    YeAPF 0.8.48-44 built on 2016-04-07 11:07 (-3 DST)
+    YeAPF 0.8.48-46 built on 2016-04-08 11:10 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-07 07:14:42 (-3 DST)
+    2016-04-07 12:11:33 (-3 DST)
 */
 
   $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
@@ -59,7 +59,7 @@
           }
 
         } else if ($type=='inner') {
-          $ret.="*-*";
+
         }
         $ret.=viewInside($margin, $detail);
       }
