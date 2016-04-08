@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ydocbuilder
-    YeAPF 0.8.48-51 built on 2016-04-08 12:39 (-3 DST)
+    YeAPF 0.8.48-52 built on 2016-04-08 12:42 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-08 12:39:00 (-3 DST)
+    2016-04-08 12:41:42 (-3 DST)
 */
 
   function _cleanup(&$inner)
@@ -237,7 +237,9 @@
             }
           }
         }
-        if (($token==';') || ($token=='}') || ($token=='(')) {
+        if (  ($token==';') ||
+              ($token=='}') || ($token=='(') ||
+              ($token=='{') || ($token==')')) {
           $token_minus_1="";
           $token_minus_2="";
         } else {
