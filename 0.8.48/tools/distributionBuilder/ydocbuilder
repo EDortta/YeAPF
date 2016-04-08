@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ydocbuilder
-    YeAPF 0.8.48-46 built on 2016-04-08 11:10 (-3 DST)
+    YeAPF 0.8.48-49 built on 2016-04-08 12:29 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-08 11:09:59 (-3 DST)
+    2016-04-08 12:27:38 (-3 DST)
 */
 
   function _cleanup(&$inner)
@@ -111,6 +111,8 @@
                 $funcName="$funcNameBase.$funcName";
               $funcOriginalName=htmlentities($funcName, ENT_QUOTES);
               $funcName=str_replace("$","__",$funcName);
+              $funcName=str_replace("[",".",$funcName);
+              $funcName=str_replace("]","",$funcName);
               if ($verbose) echo $_pm_."$methodType: $funcName (type: $type) ";
               //if ($verbose) echo "l: ".$p->line()." c:".$p->col().'  ';
               $funcNdx=$funcName;
@@ -235,8 +237,15 @@
             }
           }
         }
-        $token_minus_2=$token_minus_1;
-        $token_minus_1=$token;
+        if ($token==';') {
+          $token_minus_1="";
+          $token_minus_2="";
+        } else {
+          if ($type!=7) {
+            $token_minus_2.=$token_minus_1;
+            $token_minus_1=$token;
+          }
+        }
       }
     } while ($ok);
 
