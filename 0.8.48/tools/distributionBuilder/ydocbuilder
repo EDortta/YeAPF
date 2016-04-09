@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ydocbuilder
-    YeAPF 0.8.48-54 built on 2016-04-08 16:28 (-3 DST)
+    YeAPF 0.8.48-55 built on 2016-04-09 18:11 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-08 16:23:48 (-3 DST)
+    2016-04-09 17:48:09 (-3 DST)
 */
 
   function _cleanup(&$inner)
@@ -29,7 +29,7 @@
   $_parserMargin=-1;
   $anonymousFunctionNdx=0;
 
-  function _parseFile($filename, $p, $funcNameBase='')
+  function _parseFile($filename, $p, $funcNameBase='', $inClass=false)
   {
     global $verbose, $_parserMargin, $anonymousFunctionNdx;
 
@@ -105,12 +105,14 @@
 
 
             if ($ok) {
+              $funcSep=$inClass?'::':'.';
               if (trim($funcNameBase)>'')
-                $funcName="$funcNameBase.$funcName";
+                $funcName="$funcNameBase$funcSep$funcName";
               $funcOriginalName=str_replace("$","_dollar_",htmlentities($funcName, ENT_QUOTES));
               $funcName=str_replace("$","__",$funcName);
               $funcName=str_replace("[",".",$funcName);
               $funcName=str_replace("]","",$funcName);
+              $funcName=str_replace("::",".",$funcName);
               if ($verbose) echo $_pm_."$methodType: $funcName (type: $type) ";
               //if ($verbose) echo "l: ".$p->line()." c:".$p->col().'  ';
               $funcNdx=$funcName;
@@ -220,7 +222,7 @@
                   $retData['classes'][$funcNameBase]['name']=$funcOriginalName;
                   $p->rewind();
                   $code='';
-                  $inner=(_parseFile($filename, $p, $funcName));
+                  $inner=(_parseFile($filename, $p, $funcName, true));
                   if ((isset($inner['functions'])) || (isset($inner['classes']))) {
                     _cleanup($inner);
                     if ($verbose) echo $_pm_."incluindo corpo da classe $funcNameBase";
