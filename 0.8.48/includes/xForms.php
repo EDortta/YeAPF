@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xForms.php
-    YeAPF 0.8.48-30 built on 2016-03-23 12:02 (-3 DST)
+    YeAPF 0.8.48-57 built on 2016-04-15 13:26 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-03-23 12:00:38 (-3 DST)
+    2016-04-14 14:31:08 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
   /*
@@ -1508,9 +1508,9 @@
     /* field list may come as an array of field names or an associative array with values
      * we transform to an associative array */
     foreach($fields as $f=>$v) {
-      if (!db_fieldExists($tableName, $f))
+      if (!db_fieldExists($tableName, $f)) {
         unset($fields[$f]);
-      else {
+      } else {
         _dumpY(64,2,"Learning field source for '$f'");
         if (is_numeric($f)) {
           $fieldName=$v;

@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.48-56 built on 2016-04-14 12:00 (-3 DST)
+  * YeAPF 0.8.48-57 built on 2016-04-15 13:26 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-04-14 12:00:28 (-3 DST)
+  * 2016-04-15 13:26:30 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -4010,6 +4010,11 @@
                  opt.value = xData[j][idFieldName];
                opt.innerHTML = auxHTML;
                opt.id=aElementID+'_'+cNdx;
+               for(c=0;c<aLineSpec.inplaceData.length; c++) {
+                 if (typeof xData[j][aLineSpec.inplaceData[c]] !== "undefined") {
+                   opt.setAttribute("data_"+aLineSpec.inplaceData[c], xData[j][aLineSpec.inplaceData[c]]);
+                 }
+               }
                if (typeof aLineSpec.onNewItem == 'function')
                  aLineSpec.onNewItem(aElementID, opt, xData[j]);
                aElement.appendChild(opt);
