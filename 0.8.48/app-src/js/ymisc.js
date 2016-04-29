@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.48-58 built on 2016-04-15 15:35 (-3 DST)
+ * YeAPF 0.8.48-60 built on 2016-04-29 12:33 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-04-15 15:34:46 (-3 DST)
+ * 2016-04-29 12:30:53 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -881,6 +881,7 @@ function timestamp2time(aTimestamp, seconds) {
 
 /* dd/mm/yyyy hh:mm:ss -> yyyymmddhhmmss */
 function FDate2UDate(a) {
+  a=a || (new Date("1/1/1900")).toFrenchString();
   if (a.indexOf('/')>0)
     a=a.split('/');
   else

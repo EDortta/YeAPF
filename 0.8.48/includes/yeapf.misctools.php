@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misctools.php
-    YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST)
+    YeAPF 0.8.48-60 built on 2016-04-29 12:33 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-02-26 14:46:38 (-3 DST)
+    2016-04-29 12:02:24 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -258,7 +258,7 @@
     if ($valor=='NULL') {
       if ($novoValor>'') {
         if ($toDebug)
-          echo "\n<!-- Não encontrado.  Acrescentando -->\n";
+          echo "\n<!-- Nï¿½o encontrado.  Acrescentando -->\n";
         if ($novoValor>'') {
           if ($novoValor=='NULL')
             $novoValor='';
@@ -304,11 +304,12 @@
 
   function soNumeros($valor)
   {
-    $coisa = '';
-    for ($i=0 ; $i<strlen($valor); $i++)
-      if (($valor[$i]>='0') and ($valor[$i]<='9'))
-        $coisa = $coisa.$valor[$i];
-    return $coisa;
+    return preg_replace("/[^0-9]/", '', $valor);
+  }
+
+  function soNumerosELetras($valor)
+  {
+    return preg_replace("/[^A-Za-z0-9]/", '', $valor);
   }
 
   function y_strip_tags($text, $tags = '') {
@@ -527,11 +528,11 @@
   }
 
   function toUpper($string) {
-    return (strtoupper(strtr($string, 'áéíóúàèìòùâêîôûäëïöüãõçñ','ÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÄËÏÖÜÃÕÇÑ' )));
+    return (strtoupper(strtr($string, 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½','ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½' )));
   };
 
   function toLower($string) {
-    return (strtolower(strtr($string,'ÁÉÍÓÚÀÈÌÒÙÂÊÎÔÛÄËÏÖÜÃÕÇÑ', 'áéíóúàèìòùâêîôûäëïöüãõçñ' )));
+    return (strtolower(strtr($string,'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½', 'ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½' )));
   };
 
   function aName($anyName)
