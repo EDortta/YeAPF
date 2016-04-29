@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.48-61 built on 2016-04-29 13:50 (-3 DST)
+ * YeAPF 0.8.48-62 built on 2016-04-29 16:15 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-04-29 13:50:08 (-3 DST)
+ * 2016-04-29 16:14:34 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -496,6 +496,12 @@ if (!Array.prototype.indexOf) {
     }
     return -1;
   };
+}
+
+if (!Array.prototype.grantedValue) {
+  Array.prototype.grantedValue = function(aIndex) {
+    return this[aIndex] || "";
+  }
 }
 
 /* as the array keys could be used with data camming from
