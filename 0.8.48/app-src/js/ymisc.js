@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.48-64 built on 2016-04-29 16:24 (-3 DST)
+ * YeAPF 0.8.48-65 built on 2016-04-29 16:38 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-04-29 16:23:39 (-3 DST)
+ * 2016-04-29 16:38:31 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -503,6 +503,11 @@ if (!Array.prototype.grantedString) {
     return ((this[aIndex] || "")+"").unquote();
   }
 }
+
+if (!Object.prototype.grantedString) {
+  Object.prototype.grantedString = Array.prototype.grantedString;
+}
+
 
 /* as the array keys could be used with data camming from
  * interbase (UPPERCASE) postgresql (lowercase most of the time)
