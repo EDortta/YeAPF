@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.48-66 built on 2016-04-29 16:42 (-3 DST)
+  * YeAPF 0.8.48-78 built on 2016-05-17 17:01 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-04-29 16:42:58 (-3 DST)
+  * 2016-05-17 17:01:22 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -742,14 +742,8 @@
        };
      }
      
-     if (!Array.prototype.forceStringValue) {
-       Array.prototype.forceStringValue = function(aIndex) {
-         return ((this[aIndex] || "")+"").unquote();
-       }
-     }
-     
-     if (!Object.prototype.forceStringValue) {
-       Object.prototype.forceStringValue = Array.prototype.forceStringValue;
+     var forceStringValue = function(aObjArr, aIndex) {
+       return ((aObjArr[aIndex] || "")+"").unquote();
      }
      
      
@@ -3638,6 +3632,16 @@
        _elem_templates: []
      };
      
+     ycomm.dom.fillInplaceData = function(aElement, aData) {
+       for(var i in aData)
+         if (aData.hasOwnProperty(i))
+           aElement.setAttribute('data_'+i, aData[i])
+     };
+     
+     ycomm.dom.getInplaceData = function(aElement) {
+     
+     };
+     
      /*
       * aElementID - ID do elemento (SELECT ou TABLE)
       * xData - vetor bidimensional associativo que vem do ajax/rest/...
@@ -3761,9 +3765,11 @@
            if (first_time) {
              if (typeof (aLineSpec.columns || aLineSpec.rows || aLineSpec.html) == "undefined") {
                ycomm.dom._elem_templates[aElementID]={};
-               ycomm.dom._elem_templates[aElementID].rows = [];
-               for(i=0; i<oTable.rows.length; i++)
-                 ycomm.dom._elem_templates[aElementID].rows[i]=oTable.rows[i].innerHTML;
+               if (oTable.rows.length>0) {
+                 ycomm.dom._elem_templates[aElementID].rows = [];
+                 for(i=0; i<oTable.rows.length; i++)
+                   ycomm.dom._elem_templates[aElementID].rows[i]=oTable.rows[i].innerHTML;
+               }
              } else {
                ycomm.dom._elem_templates[aElementID]={};
                ycomm.dom._elem_templates[aElementID].columns = aLineSpec.columns;
@@ -4351,7 +4357,10 @@
      /*
       * get all the elements of the form and returns a JSON
       */
-     ycomm.dom.getFormElements = function (aFormId) {
+     ycomm.dom.getFormElements = function (aFormId, aLineSpec) {
+       aLineSpec=aLineSpec || {};
+       var fieldPrefix = aLineSpec.elementPrefixName || '';
+       var fieldPostfix = aLineSpec.elementPostixName || '';
      
        var ret = {},
            aElements = this.selectElements(aFormId),
@@ -4370,51 +4379,58 @@
          fieldType = aElements[i].type.toLowerCase();
          fieldName = aElements[i].name || aElements[i].id;
      
-         if (fieldName>'') {
-           fieldValue = '';
+         if ((fieldName.substr(fieldName.length, -(fieldPostfix.length)) == fieldPostfix) &&
+             (fieldName.substr(0,fieldPrefix.length)==fieldPrefix)) {
      
-           if ( (fieldType=='radio') ||
-                (fieldType=='checkbox')  )  {
-             canChangeRetValue = false;
-             if (typeof ret[fieldName] == 'undefined')
-               ret[fieldName]='';
-           }
+           fieldName=fieldName.substr(fieldPrefix.length);
+           fieldName=fieldName.substr(0,fieldName.length - (fieldPostfix.length));
      
-           switch(fieldType) {
+           if (fieldName>'') {
+             fieldValue = '';
      
-             case "text":
-             case "password":
-             case "textarea":
-             case "email":
-             case "hidden":
-               fieldValue = aElements[i].value.quoteString(true);
+             if ( (fieldType=='radio') ||
+                  (fieldType=='checkbox')  )  {
+               canChangeRetValue = false;
+               if (typeof ret[fieldName] == 'undefined')
+                 ret[fieldName]='';
+             }
      
-               if (fieldValue !== null)
-                 if ((editMask>'') && (storageMask>'')) {
-                   if (valueType.indexOf('date')>=0) {
-                     fieldValue = dateTransform(fieldValue.unquote(), editMask, storageMask);
-                     if (fieldValue)
-                       fieldValue = fieldValue.quoteString();
+             switch(fieldType) {
+     
+               case "text":
+               case "password":
+               case "textarea":
+               case "email":
+               case "hidden":
+                 fieldValue = aElements[i].value.quoteString(true);
+     
+                 if (fieldValue !== null)
+                   if ((editMask>'') && (storageMask>'')) {
+                     if (valueType.indexOf('date')>=0) {
+                       fieldValue = dateTransform(fieldValue.unquote(), editMask, storageMask);
+                       if (fieldValue)
+                         fieldValue = fieldValue.quoteString();
+                     }
                    }
-                 }
-               break;
+                 break;
      
-             case "radio":
-             case "checkbox":
-               fieldValue = aElements[i].checked?aElements[i].value.quoteString(true):'';
-               canChangeRetValue=(fieldValue!=='');
-               break;
+               case "radio":
+               case "checkbox":
+                 fieldValue = aElements[i].checked?aElements[i].value.quoteString(true):'';
+                 canChangeRetValue=(fieldValue!=='');
+                 break;
      
-             case "select-one":
-             case "select-multi":
-               fieldValue = aElements[i].selectedIndex;
-               if (aElements[i].options[fieldValue])
-                 fieldValue = aElements[i].options[fieldValue].value;
-               break;
+               case "select-one":
+               case "select-multi":
+                 fieldValue = aElements[i].selectedIndex;
+                 if (aElements[i].options[fieldValue])
+                   fieldValue = aElements[i].options[fieldValue].value;
+                 break;
+             }
+     
+             if (canChangeRetValue)
+               ret[fieldName] = fieldValue;
            }
-     
-           if (canChangeRetValue)
-             ret[fieldName] = fieldValue;
          }
        }
      

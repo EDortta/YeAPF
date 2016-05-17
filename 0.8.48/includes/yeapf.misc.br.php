@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misc.br.php
-    YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST)
+    YeAPF 0.8.48-75 built on 2016-05-17 16:50 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-01-23 22:00:40 (-3 DST)
+    2016-05-09 13:38:55 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -50,8 +50,9 @@
     return (processFile($fileName, $pegarDadosDaTabela=0, $nomeTabela='', $campoChave='', $valorChave=''));
   }
 
-  function formatarTelefone($fone)
+  function formatarTelefone($fone, $tamanhoBloco=4)
   {
+    $marca=false;
     $fone = ereg_replace("[^0-9]", "", $fone);
     if (substr($fone,0,3)=='800')
       $fone="0$fone";
@@ -59,12 +60,12 @@
       $aux=substr($fone,0,4).'-'.substr($fone,5,3).'-'.substr($fone,8,strlen($fone));
       $marca=(strlen($aux)!=12);
     } else
-      if (strlen($fone)>=4) {
+      if (strlen($fone)>=$tamanhoBloco) {
         $aux2=$fone;
         $partes=array();
         while (strlen($fone)>'') {
-          if (strlen($fone)>4)
-            $pedaco=substr($fone,strlen($fone)-4,4);
+          if (strlen($fone)>$tamanhoBloco)
+            $pedaco=substr($fone,strlen($fone)-$tamanhoBloco,$tamanhoBloco);
           else
             $pedaco=$fone;
           array_push($partes,$pedaco);
@@ -85,6 +86,35 @@
     return $aux;
   }
 
+  function normalizarTelefone($telefoneBruto, &$ddd, &$fone, $dddPadrao)
+  {
+      if (substr($telefoneBruto,0,1)=='0')
+        $telefoneBruto=substr($telefoneBruto,1);
+
+      $fone=trim(strip_tags(formatarTelefone($telefoneBruto,3)));
+
+      if (strlen($fone)==10) {
+        /* 97-985-950 */
+        if (substr($fone,0,1)>="8")
+          $fone=trim(strip_tags(formatarTelefone("9$telefoneBruto",3)));
+        else
+          $fone=trim(strip_tags(formatarTelefone("$telefoneBruto",4)));
+      } else if (strlen($fone)==13) {
+        /* 1-896-576-355 */
+        $telefoneBruto=substr($telefoneBruto,0,2).'9'.substr($telefoneBruto,2);
+        $fone=trim(strip_tags(formatarTelefone("$telefoneBruto",3)));
+      }
+
+      if (strlen($fone)<14) {
+        /* 18-997-079-297 */
+        $fone="18-".$fone;
+      }
+
+      $ddd=substr($fone,0,2);
+      $fone=substr($fone,3);
+
+  }
+
   function formatarCPF($cpf)
   {
     $cpf = ereg_replace("[^0-9]", "", $cpf);
@@ -95,6 +125,45 @@
     else
       $cpf="SEM CPF";
     return $cpf;
+  }
+
+  function _mod_($dividendo, $divisor)
+  {
+    return round($dividendo - (floor($dividendo / $divisor) * $divisor));
+  }
+
+  function inventarCPF($compontos=false)
+  {
+    $n1 = rand(0, 9);
+    $n2 = rand(0, 9);
+    $n3 = rand(0, 9);
+    $n4 = rand(0, 9);
+    $n5 = rand(0, 9);
+    $n6 = rand(0, 9);
+    $n7 = rand(0, 9);
+    $n8 = rand(0, 9);
+    $n9 = rand(0, 9);
+    $d1 = $n9 * 2 + $n8 * 3 + $n7 * 4 + $n6 * 5 + $n5 * 6 + $n4 * 7 + $n3 * 8 + $n2 * 9 + $n1 * 10;
+    $d1 = 11 - (_mod_($d1, 11));
+    if ($d1 >= 10) {
+      $d1 = 0;
+    }
+
+    $d2 = $d1 * 2 + $n9 * 3 + $n8 * 4 + $n7 * 5 + $n6 * 6 + $n5 * 7 + $n4 * 8 + $n3 * 9 + $n2 * 10 + $n1 * 11;
+    $d2 = 11 - (_mod_($d2, 11));
+    if ($d2 >= 10) {
+      $d2 = 0;
+    }
+
+    $retorno = '';
+    if ($compontos == 1) {
+      $retorno = '' . $n1 . $n2 . $n3 . "." . $n4 . $n5 . $n6 . "." . $n7 . $n8 . $n9 . "-" . $d1 . $d2;
+    }
+    else {
+      $retorno = '' . $n1 . $n2 . $n3 . $n4 . $n5 . $n6 . $n7 . $n8 . $n9 . $d1 . $d2;
+    }
+
+    return $retorno;
   }
 
   function formatarRG($rg)
@@ -172,6 +241,43 @@
     else
       $cnpj="SEM CNPJ";
     return $cnpj;
+  }
+
+  function inventarCNPJ($compontos=false)
+  {
+    $n1 = rand(0, 9);
+    $n2 = rand(0, 9);
+    $n3 = rand(0, 9);
+    $n4 = rand(0, 9);
+    $n5 = rand(0, 9);
+    $n6 = rand(0, 9);
+    $n7 = rand(0, 9);
+    $n8 = rand(0, 9);
+    $n9 = 0;
+    $n10 = 0;
+    $n11 = 0;
+    $n12 = 1;
+    $d1 = $n12 * 2 + $n11 * 3 + $n10 * 4 + $n9 * 5 + $n8 * 6 + $n7 * 7 + $n6 * 8 + $n5 * 9 + $n4 * 2 + $n3 * 3 + $n2 * 4 + $n1 * 5;
+    $d1 = 11 - (_mod_($d1, 11));
+    if ($d1 >= 10) {
+      $d1 = 0;
+    }
+
+    $d2 = $d1 * 2 + $n12 * 3 + $n11 * 4 + $n10 * 5 + $n9 * 6 + $n8 * 7 + $n7 * 8 + $n6 * 9 + $n5 * 2 + $n4 * 3 + $n3 * 4 + $n2 * 5 + $n1 * 6;
+    $d2 = 11 - (_mod_($d2, 11));
+    if ($d2 >= 10) {
+      $d2 = 0;
+    }
+
+    $retorno = '';
+    if ($compontos == 1) {
+      $retorno = '' . $n1 . $n2 . "." . $n3 . $n4 . $n5 . "." . $n6 . $n7 . $n8 . "/" . $n9 . $n10 . $n11 . $n12 . "-" . $d1 . $d2;
+    }
+    else {
+      $retorno = '' . $n1 . $n2 . $n3 . $n4 . $n5 . $n6 . $n7 . $n8 . $n9 . $n10 . $n11 . $n12 . $d1 . $d2;
+    }
+
+    return $retorno;
   }
 
   function formatarCEP($cep)
@@ -317,15 +423,25 @@
     }
   }
 
-  function ensinarSobrenome($sobrenome) {
+  function ensinarSobrenome($listaSobrenomes) {
     global $_listaSobrenomes_, $_listaSobrenomes_modificada;
 
-    $sobrenome=mb_strtolower($sobrenome);
-
-    if (!in_array($sobrenome, $_listaSobrenomes_)) {
-      $_listaSobrenomes_[]=$sobrenome;
-      $_listaSobrenomes_modificada=true;
+    if (!is_array($listaSobrenomes)) {
+      if (strpos($listaSobrenomes, ";")!==false)
+        $listaSobrenomes=explode(";",$listaSobrenomes);
+      else
+        $listaSobrenomes=explode(",",$listaSobrenomes);
     }
+
+    foreach($listaSobrenomes as $sobrenome) {
+      $sobrenome=mb_strtolower(trim($sobrenome));
+
+      if (!in_array($sobrenome, $_listaSobrenomes_)) {
+        $_listaSobrenomes_[]=$sobrenome;
+        $_listaSobrenomes_modificada=true;
+      }
+    }
+
 
   }
 
@@ -352,7 +468,10 @@
         }
       }
 
-      for ($i=$min-1; $i>0; $i--)
+      if ($min<1)
+        $min=1;
+
+      for ($i=max(0,$min-2); $i>0; $i--)
       {
         foreach($_listaSobrenomes_ as $umSobrenome)
           if (mb_strtolower($nomes[$i])==$umSobrenome)
@@ -380,7 +499,7 @@
         for ($i=0; $i<$min; $i++)
           $nome.=$nomes[$i].' ';
         for ($i=$min; $i<=$no; $i++)
-          $sobrenome.=$nomes[$i].' ';
+          $sobrenome.=trim(isset($nomes[$i])?$nomes[$i]:'').' ';
       }
     }
     $nome=trim($nome);
