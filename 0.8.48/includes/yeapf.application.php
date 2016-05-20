@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.48-30 built on 2016-03-23 12:02 (-3 DST)
+    YeAPF 0.8.48-81 built on 2016-05-20 11:35 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-03-18 15:02:56 (-3 DST)
+    2016-05-18 16:52:39 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -408,7 +408,7 @@
    *             indique calc_nomeFuncao como nome do campo
    *             e implemente CALC_NOMEFUNCAO() nas suas rotinas
    * 29/out/10 - foi acrescentada xq_produceReturnLinesFromArray para gerar resultados
-   *             a partir de um vetor associativo.  É usada por xq_produceReturnLinesFromSQL
+   *             a partir de um vetor associativo.  ï¿½ usada por xq_produceReturnLinesFromSQL
    * 05/jul/11 - foi acrescentada xq_calculatedField para atender os campos CALC_NOMEFUNCAO()
    *             desde outros comandos db_*.  Veja por exemplo db_fetch_array
    */
@@ -716,7 +716,7 @@
     $xq_return='';
 
     /*
-     * $formID vazio indica primeira solicitação de lista
+     * $formID vazio indica primeira solicitaï¿½ï¿½o de lista
      * de mensagens sendo requirida pelo cliente yeapf.js
      */
     if ($formID=='') {
@@ -726,8 +726,8 @@
 
     //$messages=xq_produceReturnLinesFromArray($xq_return_array,$xq_regCount,true);
 
-    // messages vindos do próprio usuário tem prioridade sobre os enviados pelo resto
-    // então eles não entram no processamento natural da pilha
+    // messages vindos do prï¿½prio usuï¿½rio tem prioridade sobre os enviados pelo resto
+    // entï¿½o eles nï¿½o entram no processamento natural da pilha
 
     if ( ($a=='peekMessage') || ($targetUser==$u) )  {
         $messageList = $userContext->PeekMessages();

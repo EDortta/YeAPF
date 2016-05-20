@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misctools.php
-    YeAPF 0.8.48-60 built on 2016-04-29 12:33 (-3 DST)
+    YeAPF 0.8.48-81 built on 2016-05-20 11:35 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-29 12:02:24 (-3 DST)
+    2016-05-20 11:34:44 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -401,6 +401,12 @@
       }
 
       return $arrayFrom;
+  }
+
+  function renameArrayElement(&$array, $currentKey, $newKey)
+  {
+    $array[$newKey]=$array[$currentKey];
+    unset($array[$currentKey]);
   }
 
   function getArrayValueIfExists($array, $k, $defaultValue=null)

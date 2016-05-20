@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.48-78 built on 2016-05-17 17:01 (-3 DST)
+  * YeAPF 0.8.48-81 built on 2016-05-20 11:35 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-05-17 17:01:22 (-3 DST)
+  * 2016-05-20 11:35:08 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -2067,7 +2067,7 @@
          aLine = unmaskHTML(aLine);
      
          var yPattern = /%[+(\w)]|[]\(/gi;
-         var yFunctions = ',int,integer,intz,intn,decimal,ibdate,tsdate,tstime,date,time,words,image,nl2br,quoted,condLabel';
+         var yFunctions = ',int,integer,intz,intn,decimal,ibdate,tsdate,tstime,date,time,words,image,nl2br,quoted,singleQuoted,condLabel';
          var p;
          var aValue='';
      
@@ -2182,7 +2182,10 @@
      
                break;
              case 'quoted':
-               aValue = '"'+aValue+'"';
+               aValue = ('"'+aValue).trim()+'"';
+               break;
+             case 'singleQuoted':
+               aValue = ("'"+aValue).trim()+"'";
                break;
              case 'condLabel':
      
@@ -2212,7 +2215,6 @@
      
        return aLine;
      }
-     
      
  /* END yanalise.js */
  _dump("yanalise");

@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yanalise.js
- * YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST)
+ * YeAPF 0.8.48-81 built on 2016-05-20 11:35 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-01-23 22:00:19 (-3 DST)
+ * 2016-05-18 19:09:30 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/yanalise.js
@@ -16,7 +16,7 @@ function yAnalise(aLine, aStack)
     aLine = unmaskHTML(aLine);
 
     var yPattern = /%[+(\w)]|[]\(/gi;
-    var yFunctions = ',int,integer,intz,intn,decimal,ibdate,tsdate,tstime,date,time,words,image,nl2br,quoted,condLabel';
+    var yFunctions = ',int,integer,intz,intn,decimal,ibdate,tsdate,tstime,date,time,words,image,nl2br,quoted,singleQuoted,condLabel';
     var p;
     var aValue='';
 
@@ -131,7 +131,10 @@ function yAnalise(aLine, aStack)
 
           break;
         case 'quoted':
-          aValue = '"'+aValue+'"';
+          aValue = ('"'+aValue).trim()+'"';
+          break;
+        case 'singleQuoted':
+          aValue = ("'"+aValue).trim()+"'";
           break;
         case 'condLabel':
 
@@ -161,4 +164,3 @@ function yAnalise(aLine, aStack)
 
   return aLine;
 }
-

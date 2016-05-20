@@ -10,7 +10,7 @@ temp=`php tools/compile-yloader.php`
 new=`echo "$temp"  | cut -d'.' --complement -f2-`
 new="$new.min.js"
 
-echo "Minifying..."
+echo "Minifying... ($temp)"
 echo "    yloader.js"
 java -jar tools/compressors/compiler.jar --js $temp --js_output_file $new
 
