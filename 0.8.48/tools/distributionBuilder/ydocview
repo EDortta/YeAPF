@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ydocview
-    YeAPF 0.8.48-55 built on 2016-04-09 18:11 (-3 DST)
+    YeAPF 0.8.48-91 built on 2016-05-20 17:30 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-09 18:00:57 (-3 DST)
+    2016-05-20 16:54:34 (-3 DST)
 */
 
   if (!function_exists("objet2array")) {
@@ -69,7 +69,11 @@
           }
         } else if ($type=='func') {
           if (!is_numeric($info)) {
-            $funcDeclaration=urldecode($marginStr."function ".$detail['name']." (");
+			if (isset($detail['name']))
+			  $detailName=$detail['name'];
+			 else
+			   $detailName="";
+            $funcDeclaration=urldecode($marginStr."function ".$detailName." (");
             $pCount=0;
             if (isset($detail['parameters'])) {
               foreach($detail['parameters'] as $paramName=>$dummy) {
@@ -131,12 +135,13 @@
   $filename=$args->getSrc(0);
   $toHelp=$args->argValue('help;h',__FALSE__)==__TRUE__;
   $toDestroy=$args->argValue('destroy;d',__FALSE__)==__TRUE__;
+  $quiet=$args->argValue('quiet;q',__FALSE__)==__TRUE__;
   $baseToExport=$args->getSrc(1);
   $toExport=trim($baseToExport)>'';
 
   echo "YeAPF 0.8.48 $myself\nCopyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com\n";
   if (($toHelp) || (trim($filename)=='')) {
-    die("usage:\n\t$myself <filename> [output-folder] [--destroy]\n\t\tfilename\tis a .xdb created by ydocbuilder\n\t\toutput-folder\tis used to write html files\n\t\t--destroy\tclean the output-folder (delete all html files in folder)\n");
+    die("usage:\n\t$myself <filename> [output-folder] [--destroy] [--quiet]\n\t\tfilename\tis a .xdb created by ydocbuilder\n\t\toutput-folder\tis used to write html files\n\t\t--destroy\tclean the output-folder (delete all html files in folder)\n");
   }
 
   if (file_exists($filename)) {
@@ -154,7 +159,10 @@
         if (!mkdir($baseToExport))
           die("\nimpossible to create '$baseToExport'\n");
     }
-    echo showXdbInfo(0, $xml);
+    
+    $xdbInfo=showXdbInfo(0, $xml);
+    if (!$quiet)
+      echo $xdbInfo;
 
     $docMap='';
     ksort($aMap);
