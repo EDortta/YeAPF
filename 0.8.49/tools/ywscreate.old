@@ -1,0 +1,53 @@
+#!/usr/bin/php -q
+<?php
+/*
+    %FILE_NAME%
+    %YEAPF_VERSION_LABEL%
+    %COPYRIGHT_NOTE%
+    %LAST_FILE_MODIFICATION%
+*/
+  if ($argc>1)
+    $wsName=$argv[1];
+  if ($argc>2) {
+    $wsPort=$argv[2];
+    if (strpos($wsPort,':')>0)
+      $wsBindAddress=getNextValue($wsPort,':');
+    else
+      $wsBindAddress='localhost';
+  }
+  echo "\nThis program will update phpwebsocket from google's svn repository, \ninstall a copy in this folder and create a WebSocket initial script called '$wsName' running on port '$wsPort'\n";
+  if ($wsName=='') {
+    echo "\nERROR: You need to indicate WebSocket script name\n";
+  } else {
+    if (intval($wsPort)==0)
+      echo "\nERROR: You need to indicate WebSocket port or bind-addres:port\n";
+    else {
+      if (file_exists("$wsName.php")) {
+        echo "\nERROR: Your file '$wsName.php' already exists\n";
+      } else {
+        (@include_once("yeapf.php")) or die("\n\tYeAPF not well configure on this folder\n\n");
+        $a=getcwd();
+        echo "Granting ~/dev folder\n";
+        shell_exec('mkdir -p ~/dev');
+        echo "Doing 'svn' on phpwebsocket.googlecode.com\n";
+        shell_exec('cd ~/dev; svn checkout http://phpwebsocket.googlecode.com/svn/trunk/ phpwebsocket-read-only');
+        echo "Installing phpwebsocket on $a\n";
+        shell_exec("cp ~/dev/phpwebsocket-read-only/\ phpwebsocket/websocket.class.php $a/websocket.class.php");
+        if (file_exists('websocket.class.php')) {
+          $appSkeleton=dirname($yeapfConfig['yeapfPath']).'/appSkeleton';
+          $empty = "$appSkeleton/WebSocketEmptyImplementation.php";
+          $WebSocketImplementation = _file("$empty");
+
+          $f=fopen("$wsName.php","w");
+          fwrite($f,$WebSocketImplementation);
+          fclose($f);
+
+          echo "\n$wsName.php created\n";
+          $me=$yeapfConfig['wwwBase'];
+          echo "Your script can call it using 'ws://localhost:$wsPort/$me/$wsName.php'\n";
+        } else
+          echo "Error copying websocket.class.php\n";
+      }
+    }
+  }
+?>

@@ -1,0 +1,168 @@
+<!-- skel/webApp/templates/bs3/sampleEvents/f_sampleEvent01.html | YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST) | Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com | 2016-01-23 22:00:41 (-3 DST) -->
+<div class="container tnContainer">
+  <div class="row clearfix tnTab" id='vwTextSample01'>
+    <div class="col-md-12 column">
+      <h2>
+        First Sample Event Page
+      </h2>
+      <p>
+        This is sampleEvent01.<br>
+        Just a piece of HTML code that will be embeded into the main form using &#35;include() YeAPF function.<br>
+        All this stuff is running inside the same context.
+      <hr>
+      All Bootstrap3 tags and classes can be used as you can see in the source code.<br>
+      The only classes you will use to add TAB navigation are: tnContainer and tnTab<br>
+      Each tnContainer is like a book where you can find sheets (tnTab)
+      <hr>
+      This template uses <em>yapp.js</em>.<br>
+      If you want to use yapp, you need to remember that <em>yapp</em> has some mandatory tabs.<br>
+      For this page (<u>sample01</u>), you will need to have this minimal structure in your tab:
+      <style>
+        .asBlock { margin-left: 24px; margin-right: 24px; padding-left: 8px; padding-right: 8px;}
+        .canHL:hover {background: #97B4D0}
+        .withBorder { border: dotted 1px #7F7F7F; background: #E5E5E5 }
+        .leftMargin { margin-left: 8px; margin-right: 8px }
+        b1 { color: #008000; font-weight: 800 }
+        b2 { color: #00468B; font-weight: 800 }
+        em { color: #7F7F7F }
+      </style>
+      <div>
+<pre class="leftMargin withBorder">&lt;div class="<b2>container</b2>"&gt;
+  &lt;div class="<b2>row clearfix</b2>"&gt;
+    &lt;div class="<b2>col-md-12 column</b2>"&gt;
+      &lt;h1&gt;Sample01&lt;/h1&gt;
+      <div class="withBorder asBlock">
+      &lt;div class=<b1>tnContainer</b1>&gt;
+        <div class="withBorder asBlock canHL">
+        &lt;div class=<b1>tnTab</b1> id=<b>vwTblSample01</b>&gt;
+          <em>&lt;!-- Place to browse data --&gt;</em>
+          &lt;table class="<b2>table</b2>" id=<b>tblSample01</b>&gt;
+            &lt;thead&gt;
+            &lt;/thead&gt;
+            &lt;tbody&gt;
+            &lt;/tbody&gt;
+          &lt;/table&gt;
+        &lt;/div&gt;
+        </div>
+        <div class="withBorder asBlock canHL">
+        &lt;div class=<b1>tnTab</b1> id=<b>vwFrmSample01</b>&gt;
+          <em>&lt;!-- Place to edit data --&gt;</em>
+          &lt;form id=<b>frmSample01</b>&gt;&lt;/form&gt;
+        &lt;/div&gt;
+        </div>
+      &lt;/div&gt;
+      </div>
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;        
+</pre>
+      </div>
+      You can identify <b1>YeAPF</b1> tag and <b2>BootStrap3</b2> tags by colour, and, as you can see, the required control elements are in <B>bold</B> and all have the same postfix in the name or id (<b>Sample01</b>)<br>
+      You can appreciate the same structure in <em>f_dummySample.html</em> file
+    </div>
+  </div>
+  <div class="row clearfix tnTab" id=vwTblSample01>
+    <div class="col-md-12 column">
+      <h3>
+        h3. Lorem ipsum dolor sit amet.
+      </h3>
+      <table class="table" id=tblSample01>
+        <thead>
+          <tr>
+            <th>
+              #
+            </th>
+            <th>
+              Product
+            </th>
+            <th>
+              Payment Taken
+            </th>
+            <th>
+              Status
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              1
+            </td>
+            <td>
+              TB - Monthly
+            </td>
+            <td>
+              01/04/2012
+            </td>
+            <td>
+              Default
+            </td>
+          </tr>
+          <tr class="active">
+            <td>
+              1
+            </td>
+            <td>
+              TB - Monthly
+            </td>
+            <td>
+              01/04/2012
+            </td>
+            <td>
+              Approved
+            </td>
+          </tr>
+          <tr class="success">
+            <td>
+              2
+            </td>
+            <td>
+              TB - Monthly
+            </td>
+            <td>
+              02/04/2012
+            </td>
+            <td>
+              Declined
+            </td>
+          </tr>
+          <tr class="warning">
+            <td>
+              3
+            </td>
+            <td>
+              TB - Monthly
+            </td>
+            <td>
+              03/04/2012
+            </td>
+            <td>
+              Pending
+            </td>
+          </tr>
+          <tr class="danger">
+            <td>
+              4
+            </td>
+            <td>
+              TB - Monthly
+            </td>
+            <td>
+              04/04/2012
+            </td>
+            <td>
+              Call in to confirm
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="row clearfix tnTab" id=vwFrmSample01>
+    <!-- this is a dummy tab only to allow yapp.js do it job -->
+    <form name=frmSample01 id=frmSample01>
+    </form>
+  </div>
+</div>
+<!-- remember you're always at your app toplevel -->
+<script src="js/sampleEvent01.js"></script>

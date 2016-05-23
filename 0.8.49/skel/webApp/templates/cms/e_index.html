@@ -1,0 +1,51 @@
+#if(#(aCMSBody)=='',#set(aCMSBody,'e_home.html'))
+<head>
+  <title>#(appName)</title>
+  <link rel="icon" href="images/favicon.gif" type="image/x-icon"/>
+  <!--[if lt IE 9]>
+  <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link rel="shortcut icon" href="images/favicon.gif" type="image/x-icon"/>
+  <link rel="stylesheet" type="text/css" href="css/styles.css"/>
+  <script src='is_cms.js'></script>
+</head>
+<body>
+  <div class="bg">
+    <!--start container-->
+    <div id="container">
+      <!--start header-->
+      <header>
+        <!--start logo-->
+        <a href="./" id="logo"><img src="images/logo-96.png" alt="logo" border=0/></a>
+        <!--end logo-->
+        <!--start menu-->
+        <nav>
+          <ul>
+            #for("select label,s, id from is_menu where enabled='Y' and ancestor=2101 order by o limit 0,4")
+            <li><a href="#menuLink(#(id))">#(label)</a></li>
+            #next
+          </ul>
+        </nav>
+        <!--end menu-->
+        <!--end header-->
+      </header>
+      <!--start intro-->
+      <section id="intro">
+        <hgroup>
+          <h1>#(appSlogan)</h1>
+        </hgroup>
+      </section>
+      <!--end intro-->
+      <!--start holder-->
+      <div class="holder_content">
+        #include(#(aCMSBody))
+      </div>
+    </div>
+    <footer>
+      <div class="container">
+        <div id="FooterTwo"> &copy; 2011 <a href="http://www.marijazaric.com">Minimalism by by marija zaric</a><br><a href='admin/'>admin</a> </div>
+        <div id="FooterTree"> YeAPF &copy; 2004-2013 Esteban Daniel Dortta<br><small><i>Yet Another PHP Framework</i></small></div>
+      </div>
+    </footer>
+  </div>
+</body>

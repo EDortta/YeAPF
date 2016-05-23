@@ -1,0 +1,14 @@
+<script>
+  if (typeof _stopMsgProc == 'function')
+    _stopMsgProc();
+</script>
+
+<frameset rows="*,#int(cc)" frameborder=yes border=4>
+  <frame src="body.php?u=#(u)&s=yeapf&a=buildMainBody" name="mainBody" scrolling=auto>
+  <frame src="body.php?u=#(u)&s=yeapf&a=getAppDataset" name="dataset" scrolling=no>
+</frameset>
+
+<noframes>
+<body>
+</body>
+</noframes>

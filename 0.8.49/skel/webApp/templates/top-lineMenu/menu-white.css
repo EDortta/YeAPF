@@ -1,0 +1,35 @@
+
+#menu
+{
+	background-color: #FDFDFD;
+	border-bottom-color: #0759A9;
+	zoom: 1;
+	filter: alpha(opacity=95);
+	opacity: 0.95;  
+}
+#menu ul li:hover
+{
+	background-color: #BFBFBF;
+}
+#menu ul li a
+{
+	color: #043F79;
+}
+#menu ul li a:hover
+{
+	background-color: #BFBFBF;
+}
+#menu ul li ul
+{
+	background-color: #FDFDFD;
+	box-shadow: 3px 3px 5px 0px rgba(50, 50, 50, 0.75);
+	moz-box-shadow: 3px 3px 5px 0px rgba(50, 50, 50, 0.75);
+	webkit-box-shadow: 3px 3px 5px 0px rgba(50, 50, 50, 0.75);
+}
+#menu ul li ul li ul
+{
+	background-color: #FDFDFD;
+	box-shadow: 3px 3px 5px 0px rgba(50, 50, 50, 0.75);
+	moz-box-shadow: 3px 3px 5px 0px rgba(50, 50, 50, 0.75);
+	webkit-box-shadow: 3px 3px 5px 0px rgba(50, 50, 50, 0.75);
+}
