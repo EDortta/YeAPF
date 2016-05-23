@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.48-77 built on 2016-05-17 16:58 (-3 DST)
+ * YeAPF 0.8.48-99 built on 2016-05-23 11:06 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-05-17 16:58:04 (-3 DST)
+ * 2016-05-23 11:05:25 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -417,9 +417,11 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
             opt.value = xData[j][idFieldName];
           opt.innerHTML = auxHTML;
           opt.id=aElementID+'_'+cNdx;
-          for(c=0;c<aLineSpec.inplaceData.length; c++) {
-            if (typeof xData[j][aLineSpec.inplaceData[c]] !== "undefined") {
-              opt.setAttribute("data_"+aLineSpec.inplaceData[c], xData[j][aLineSpec.inplaceData[c]]);
+          if (aLineSpec.inplaceData) {
+            for(c=0;c<aLineSpec.inplaceData.length; c++) {
+              if (typeof xData[j][aLineSpec.inplaceData[c]] !== "undefined") {
+                opt.setAttribute("data_"+aLineSpec.inplaceData[c], xData[j][aLineSpec.inplaceData[c]]);
+              }
             }
           }
           if (typeof aLineSpec.onNewItem == 'function')
@@ -781,16 +783,14 @@ ycomm.dom.getFormElements = function (aFormId, aLineSpec) {
           case "textarea":
           case "email":
           case "hidden":
-            fieldValue = aElements[i].value.quoteString(true);
-
-            if (fieldValue !== null)
-              if ((editMask>'') && (storageMask>'')) {
-                if (valueType.indexOf('date')>=0) {
-                  fieldValue = dateTransform(fieldValue.unquote(), editMask, storageMask);
-                  if (fieldValue)
-                    fieldValue = fieldValue.quoteString();
-                }
+            fieldValue = aElements[i].value+"";
+            if ((editMask>'') && (storageMask>'')) {
+              if (valueType.indexOf('date')>=0) {
+                fieldValue = dateTransform(fieldValue.unquote(), editMask, storageMask);
+                fieldValue = fieldValue?fieldValue+"":"";
               }
+            }
+            fieldValue = fieldValue.quote();
             break;
 
           case "radio":

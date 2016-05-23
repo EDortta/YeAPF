@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.48-95 built on 2016-05-20 17:37 (-3 DST)
+  * YeAPF 0.8.48-99 built on 2016-05-23 11:06 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-05-20 17:37:20 (-3 DST)
+  * 2016-05-23 11:06:16 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -4049,9 +4049,11 @@
                  opt.value = xData[j][idFieldName];
                opt.innerHTML = auxHTML;
                opt.id=aElementID+'_'+cNdx;
-               for(c=0;c<aLineSpec.inplaceData.length; c++) {
-                 if (typeof xData[j][aLineSpec.inplaceData[c]] !== "undefined") {
-                   opt.setAttribute("data_"+aLineSpec.inplaceData[c], xData[j][aLineSpec.inplaceData[c]]);
+               if (aLineSpec.inplaceData) {
+                 for(c=0;c<aLineSpec.inplaceData.length; c++) {
+                   if (typeof xData[j][aLineSpec.inplaceData[c]] !== "undefined") {
+                     opt.setAttribute("data_"+aLineSpec.inplaceData[c], xData[j][aLineSpec.inplaceData[c]]);
+                   }
                  }
                }
                if (typeof aLineSpec.onNewItem == 'function')
@@ -4413,16 +4415,14 @@
                case "textarea":
                case "email":
                case "hidden":
-                 fieldValue = aElements[i].value.quoteString(true);
-     
-                 if (fieldValue !== null)
-                   if ((editMask>'') && (storageMask>'')) {
-                     if (valueType.indexOf('date')>=0) {
-                       fieldValue = dateTransform(fieldValue.unquote(), editMask, storageMask);
-                       if (fieldValue)
-                         fieldValue = fieldValue.quoteString();
-                     }
+                 fieldValue = aElements[i].value+"";
+                 if ((editMask>'') && (storageMask>'')) {
+                   if (valueType.indexOf('date')>=0) {
+                     fieldValue = dateTransform(fieldValue.unquote(), editMask, storageMask);
+                     fieldValue = fieldValue?fieldValue+"":"";
                    }
+                 }
+                 fieldValue = fieldValue.quote();
                  break;
      
                case "radio":
