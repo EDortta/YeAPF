@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.48-99 built on 2016-05-23 11:06 (-3 DST)
+ * YeAPF 0.8.48-98 built on 2016-05-24 18:24 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-05-23 11:05:25 (-3 DST)
+ * 2016-05-24 18:23:40 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -790,12 +790,12 @@ ycomm.dom.getFormElements = function (aFormId, aLineSpec) {
                 fieldValue = fieldValue?fieldValue+"":"";
               }
             }
-            fieldValue = fieldValue.quote();
+            fieldValue = encodeURIComponent(fieldValue);
             break;
 
           case "radio":
           case "checkbox":
-            fieldValue = aElements[i].checked?aElements[i].value.quoteString(true):'';
+            fieldValue = encodeURIComponent(aElements[i].checked?aElements[i].value:'');
             canChangeRetValue=(fieldValue!=='');
             break;
 

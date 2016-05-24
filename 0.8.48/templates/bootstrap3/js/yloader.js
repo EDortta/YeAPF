@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.48-99 built on 2016-05-23 11:06 (-3 DST)
+  * YeAPF 0.8.48-98 built on 2016-05-24 18:24 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-05-23 11:06:16 (-3 DST)
+  * 2016-05-24 18:24:21 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -4422,12 +4422,12 @@
                      fieldValue = fieldValue?fieldValue+"":"";
                    }
                  }
-                 fieldValue = fieldValue.quote();
+                 fieldValue = encodeURIComponent(fieldValue);
                  break;
      
                case "radio":
                case "checkbox":
-                 fieldValue = aElements[i].checked?aElements[i].value.quoteString(true):'';
+                 fieldValue = encodeURIComponent(aElements[i].checked?aElements[i].value:'');
                  canChangeRetValue=(fieldValue!=='');
                  break;
      
