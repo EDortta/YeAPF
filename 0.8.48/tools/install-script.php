@@ -1,7 +1,7 @@
 <?php
 /*
     tools/install-script.php
-    YeAPF 0.8.48-10 built on 2016-03-10 08:01 (-3 DST)
+    YeAPF 0.8.48-103 built on 2016-05-24 18:54 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
     2014-08-18 17:02:33 (-3 DST)
 */

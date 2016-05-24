@@ -1,7 +1,7 @@
 <?php
   /*
     tools/spread-js.php
-    YeAPF 0.8.48-30 built on 2016-03-23 12:02 (-3 DST)
+    YeAPF 0.8.48-103 built on 2016-05-24 18:54 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
     2016-03-18 13:26:05 (-3 DST)
 
@@ -20,7 +20,7 @@
     if (file_exists($srcFileName)) {
       $auxFile = _file($srcFileName);
       if ($addHeader) {
-        $auxFile = "/* YeAPF 0.8.48-30 built on 2016-03-23 12:02 (-3 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
+        $auxFile = "/* YeAPF 0.8.48-103 built on 2016-05-24 18:54 (-3 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
       }
       if (file_put_contents("$tgtFolder/$srcFileName", $auxFile))
         echo "\t$srcFileName: OK\n";
@@ -83,7 +83,7 @@
   if (file_exists($minJS)) {
     echo "Minified version source: $minJS\n";
     $yeapf_minJS = join("", file($minJS));
-    $yeapf_minJS = "/* YeAPF 0.8.48-30 built on 2016-03-23 12:02 (-3 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
+    $yeapf_minJS = "/* YeAPF 0.8.48-103 built on 2016-05-24 18:54 (-3 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
   }
 
   verifyDirExists("skel/chromeApp/js");
