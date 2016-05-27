@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.48-103 built on 2016-05-24 18:54 (-3 DST)
+ * YeAPF 0.8.48-107 built on 2016-05-26 21:45 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-05-20 13:56:06 (-3 DST)
+ * 2016-05-25 15:36:18 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -512,14 +512,14 @@ var forceStringValue = function(aObjArr, aIndex) {
 }
 
 
-/* as the array keys could be used with data camming from
+/* as the array keys could be used with data coming from
  * interbase (UPPERCASE) postgresql (lowercase most of the time)
  * or mysql (mixed case when configured properly), we need
  * to let the programmer use which one he wants in the data model
  * while keep the array untoched.
  * Not only that, the field names on client side can be prefixed and/or
  * postfixed, so we need to chose the more adequated
- * So this function guess which one is the best */
+ * This function guess which one is the best */
  var suggestKeyName = function (aObj, aKeyName, fieldPrefix, fieldPostfix) {
     var ret = null;
     if (aKeyName) {
