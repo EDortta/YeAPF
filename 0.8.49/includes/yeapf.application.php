@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+    YeAPF 0.8.49-1 built on 2016-05-28 08:48 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-05-18 16:52:39 (-3 DST)
+    2016-05-24 18:39:08 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -236,6 +236,7 @@
 
   function xq_extractValue(&$ret, $aFieldName, $aFieldValue, $asGlobals, $xq_prefix, $xq_postfix, $xq_only_composed_names=false)
   {
+    $aFieldValue=urldecode($aFieldValue);
     $reserverWords = array('u', 's', 'a', 'fieldName', 'fieldValue');
     if (!in_array(strtolower($aFieldName), $reserverWords)) {
       _dumpY(16,0,"A: $aFieldName");

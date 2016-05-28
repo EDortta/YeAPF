@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+ * YeAPF 0.8.49-1 built on 2016-05-28 08:48 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-05-23 11:05:25 (-3 DST)
+ * 2016-05-25 16:08:06 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -464,7 +464,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
             fieldName = suggestKeyName(yData, aElements[i].name || aElements[i].id, fieldPrefix, fieldPostfix);
 
             /* column name defined by the programmer on client side */
-            colName = (aLineSpec.columns && suggestKeyName(aLineSpec.columns, aElements[i].id)) || null;
+            colName = (aLineSpec.columns && suggestKeyName(aLineSpec.columns, aElements[i].name || aElements[i].id)) || null;
 
             if (typeof yData[fieldName] != 'undefined') {
               fieldValue = unmaskHTML(yData[fieldName]);
@@ -786,16 +786,15 @@ ycomm.dom.getFormElements = function (aFormId, aLineSpec) {
             fieldValue = aElements[i].value+"";
             if ((editMask>'') && (storageMask>'')) {
               if (valueType.indexOf('date')>=0) {
-                fieldValue = dateTransform(fieldValue.unquote(), editMask, storageMask);
+                fieldValue = dateTransform(fieldValue, editMask, storageMask);
                 fieldValue = fieldValue?fieldValue+"":"";
               }
             }
-            fieldValue = fieldValue.quote();
             break;
 
           case "radio":
           case "checkbox":
-            fieldValue = aElements[i].checked?aElements[i].value.quoteString(true):'';
+            fieldValue = aElements[i].checked?aElements[i].value:'';
             canChangeRetValue=(fieldValue!=='');
             break;
 
@@ -805,6 +804,10 @@ ycomm.dom.getFormElements = function (aFormId, aLineSpec) {
             if (aElements[i].options[fieldValue])
               fieldValue = aElements[i].options[fieldValue].value;
             break;
+        }
+        if (typeof fieldValue=='string') {
+          if (fieldValue.indexOf(',')>=0)
+            fieldValue = encodeURIComponent(fieldValue);
         }
 
         if (canChangeRetValue)

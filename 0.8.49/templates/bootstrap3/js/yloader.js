@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+  * YeAPF 0.8.49-1 built on 2016-05-28 08:48 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-05-23 14:38:17 (-3 DST)
+  * 2016-05-28 08:48:19 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -756,14 +756,14 @@
      }
      
      
-     /* as the array keys could be used with data camming from
+     /* as the array keys could be used with data coming from
       * interbase (UPPERCASE) postgresql (lowercase most of the time)
       * or mysql (mixed case when configured properly), we need
       * to let the programmer use which one he wants in the data model
       * while keep the array untoched.
       * Not only that, the field names on client side can be prefixed and/or
       * postfixed, so we need to chose the more adequated
-      * So this function guess which one is the best */
+      * This function guess which one is the best */
       var suggestKeyName = function (aObj, aKeyName, fieldPrefix, fieldPostfix) {
          var ret = null;
          if (aKeyName) {
@@ -4096,7 +4096,7 @@
                  fieldName = suggestKeyName(yData, aElements[i].name || aElements[i].id, fieldPrefix, fieldPostfix);
      
                  /* column name defined by the programmer on client side */
-                 colName = (aLineSpec.columns && suggestKeyName(aLineSpec.columns, aElements[i].id)) || null;
+                 colName = (aLineSpec.columns && suggestKeyName(aLineSpec.columns, aElements[i].name || aElements[i].id)) || null;
      
                  if (typeof yData[fieldName] != 'undefined') {
                    fieldValue = unmaskHTML(yData[fieldName]);
@@ -4418,16 +4418,15 @@
                  fieldValue = aElements[i].value+"";
                  if ((editMask>'') && (storageMask>'')) {
                    if (valueType.indexOf('date')>=0) {
-                     fieldValue = dateTransform(fieldValue.unquote(), editMask, storageMask);
+                     fieldValue = dateTransform(fieldValue, editMask, storageMask);
                      fieldValue = fieldValue?fieldValue+"":"";
                    }
                  }
-                 fieldValue = fieldValue.quote();
                  break;
      
                case "radio":
                case "checkbox":
-                 fieldValue = aElements[i].checked?aElements[i].value.quoteString(true):'';
+                 fieldValue = aElements[i].checked?aElements[i].value:'';
                  canChangeRetValue=(fieldValue!=='');
                  break;
      
@@ -4437,6 +4436,10 @@
                  if (aElements[i].options[fieldValue])
                    fieldValue = aElements[i].options[fieldValue].value;
                  break;
+             }
+             if (typeof fieldValue=='string') {
+               if (fieldValue.indexOf(',')>=0)
+                 fieldValue = encodeURIComponent(fieldValue);
              }
      
              if (canChangeRetValue)
