@@ -1,0 +1,35 @@
+<div class='container-fluid tnTab' id='vw_#(dbTable)'>
+  <div class='row'>
+    <div class='col-md-12'>
+	  <div class='tnContainer'>
+	    <div class='tnTab' id='list_#(dbTable)'>
+	      <table class="table" id="tbl_#(dbTable)">
+	        <thead>
+	            #(tHead)
+	        </thead>
+	        <tbody>	        	
+	        </tbody>
+	      </table>
+	    </div>
+
+	    <div class='tnTab' id='form_#(dbTable)'>
+	      <form role='form' id='frm_#(dbTable)' name='frm_#(dbTable)' onsubmit='javascript:void(0)'>
+	        <div class="row">
+	          <div class="col-md-12">
+	            #(frmBody)
+	          </div>
+	        </div>
+	        <div class="row">
+	          <div class="col-md-12">
+	            <a class="btn btn-default" id="btnCancel_#(dbTable)">Cancelar</a>
+	            <a class="btn btn-warning" id="btnSave_#(dbTable)">Salvar</a>
+	          </div>
+	        </div>
+	      </form>
+	    </div>
+	  </div>
+    </div>
+  </div>
+</div>
+
+<script src='js/#(dbName).js'></script>

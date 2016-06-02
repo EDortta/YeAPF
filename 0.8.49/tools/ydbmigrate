@@ -3,9 +3,9 @@
   /*
    * tools
    * tools/ydbmigrate
-   * YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+   * YeAPF 0.8.49-9 built on 2016-06-02 18:06 (-3 DST)
    * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2016-01-23 22:00:43 (-3 DST)
+   * 2016-06-02 15:13:44 (-3 DST)
    *
    * Purpose: to export/import data to/from a .csv file
    */
@@ -34,6 +34,7 @@
   (@include_once "$mydir/yclilib.php") or die("yclilib.php not found\n");
   if (file_exists('ydbmigrate.functions.php'))
     (@include_once "ydbmigrate.functions.php") or die("ydbmigrate.functions.php cannot be loaded\n");
+  (@include_once "$mydir/ydblib.php") or die("ydblib.php not found\n");
 
   $cwd=getcwd();
   $args = new ArgumentsProcessor();
@@ -89,38 +90,11 @@
     if ($doCreateBS3Form==__TRUE__)
       displayError("ERROR: You need to supply a form name");
 
+  $relFileName=$args->argValue('generate-glue');
   // check db connection details
-  if ($args->argValue('db')) {
-    $db=explode(':',$args->argValue('db'));
-    if (count($db)==1) {
-      $dbName=trim($db[0]);
-      $dbHost='';
-      if ($dbName==__TRUE__)
-        $dbName='';
-      if ($dbName>'')
-        $dbHost='127.0.0.1';
-    } else {
-      $dbHost=trim($db[0]);
-      $dbName=trim($db[1]);
-    }
-    $dbUser=$args->argValue('user');
-    $dbPass=$args->argValue('pass');
-    $dbType=$args->argValue('type');
-    $relFileName=$args->argValue('generate-glue');
-
-    $dbDef="$dbHost$dbName$dbUser$dbPass$dbType";
-
-    if ($dbDef=='')
-      displayError("ERROR: You need to describe you database connection");
-    else if ($dbType=='')
-      displayError("ERROR: You need to set database connection type");
-
-  } else
-    $dbDef='';
+  getDBArgs($args);
 
   if (($dbDef>'') && ($args->argValue('help')==false)) {
-    $dbSQL=$args->argValue('sql');
-    $dbTable=$args->argValue('table');
     if (($dbSQL>'') && ($dbTable>'')) {
       displayError("ERROR: You cannot use sql and table at the same time");
     } else {
