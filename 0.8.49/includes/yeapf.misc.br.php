@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misc.br.php
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+    YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-05-09 13:38:55 (-3 DST)
+    2016-05-30 09:45:48 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -304,7 +304,7 @@
     if( in_array($cpf, $nulos) )
       return false;
 
-    /*Calcula o penúltimo dígito verificador*/
+    /*Calcula o penÃºltimo dÃ­gito verificador*/
     $acum=0;
     for($i=0; $i<9; $i++)
       $acum+= $cpf[$i]*(10-$i);
@@ -315,7 +315,7 @@
     if ($acum != $cpf[9])
       return false;
 
-    /*Calcula o último dígito verificador*/
+    /*Calcula o Ãºltimo dÃ­gito verificador*/
     $acum=0;
     for ($i=0; $i<10; $i++)
       $acum+= $cpf[$i]*(11-$i);
@@ -451,7 +451,7 @@
       $nomes = explode(" ",$nome);
       $no = count($nomes);
       $min = $no;
-      // procurar separadores típicos de nomes compostos brasileiros
+      // procurar separadores tÃ­picos de nomes compostos brasileiros
       for ($i=$no-1; $i>=0; $i--) {
         $aux=mb_strtolower($nomes[$i]);
         if (($aux=='do') ||
@@ -519,7 +519,7 @@
 
   function soCaracteresValidosTitulo($valor)
   {
-    $caracteresValidos = 'qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM_ !@#$%¨&*()-+=[]{}<>.,:;/?';
+    $caracteresValidos = 'qwertyuiopasdfghjklzxcvbnm0123456789QWERTYUIOPASDFGHJKLZXCVBNM_ !@#$%Â¨&*()-+=[]{}<>.,:;/?';
     $i=0;  $r=0;
     for ($i=0; $i<strlen($valor); $i++)
       if (strpos($caracteresValidos, substr($valor, $i, 1))===false)

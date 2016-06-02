@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.csvTools.php
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+    YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-01-23 22:00:40 (-3 DST)
+    2016-05-30 09:45:48 (-3 DST)
    */
 
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -162,7 +162,7 @@
                   if (!in_array($nomeCampo,$campos)) {
                     array_push($campos,$nomeCampo);
                     array_push($tamanho,120);
-                    array_push($tipos,-1);     // o melhor tipo será definido na volta completa
+                    array_push($tipos,-1);     // o melhor tipo serÃ¡ definido na volta completa
                     array_push($tamMax,0);
                     array_push($mediaTamanho,0);
                     array_push($importar,true);

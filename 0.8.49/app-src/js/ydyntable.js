@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ydyntable.js
- * YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+ * YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-02-24 16:27:23 (-3 DST)
+ * 2016-05-30 09:45:48 (-3 DST)
  * First Version (C) 2009 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ydyntable.js
@@ -193,7 +193,7 @@ function dynCleanChilds(e, aDOMObject, aCleanAll, aChangeVisibility)
             dynSetElementDisplay(allElements[i].id, e.id, e.value);
 
           if ((auxID=='*.') || (!e.checked)) {
-            // limpar conteúdo dos campos dependentes
+            // limpar conteÃºdo dos campos dependentes
             // caso esteja ocultando
             if (allElements[i].type=='checkbox')
               allElements[i].checked=false;
@@ -783,8 +783,8 @@ function dynSetCellValue(aCellName, aCellValue)
           y$(nextCellName).click();
       }
     } else {
-      console.log("O Valor não pode ser lançado por não cumprir condições de existência");
-      window.alert("O valor não é consistente.\nRevise valores do campo pai e o próprio valor lançado\nTente novamente");
+      console.log("O Valor nÃ£o pode ser lanÃ§ado por nÃ£o cumprir condiÃ§Ãµes de existÃªncia");
+      window.alert("O valor nÃ£o Ã© consistente.\nRevise valores do campo pai e o prÃ³prio valor lanÃ§ado\nTente novamente");
       y$(aCellName).click();
     }
   }
@@ -1116,7 +1116,7 @@ function __dynOnChange__(e)
 
 function __cbOnChange__(e, saving)
 {
-  // procurar elemento que chamou esta função
+  // procurar elemento que chamou esta funÃ§Ã£o
   if (e==undefined)
     var e = window.event || arguments.callee.caller.arguments[0];
   if (e.target)
@@ -1129,7 +1129,7 @@ function __cbOnChange__(e, saving)
 
   if (e.dynOnChange != undefined)
     e.dynOnChange();
-  // salvar informação
+  // salvar informaÃ§Ã£o
   if (saving)
     __saveFormInfo(e);
 /*
@@ -1140,7 +1140,7 @@ function __cbOnChange__(e, saving)
           ccDependents++;
         }
  */
-  // corrigir visualização dos elementos dependentes do clicado
+  // corrigir visualizaÃ§Ã£o dos elementos dependentes do clicado
   dynCleanChilds(e, document);
 
 }

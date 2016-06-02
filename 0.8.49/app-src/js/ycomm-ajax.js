@@ -1,14 +1,14 @@
   /********************************************************************
    * app-src/js/ycomm-ajax.js
-   * YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+   * YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
    * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2016-02-24 16:25:46 (-3 DST)
+   * 2016-05-30 09:45:48 (-3 DST)
    *
    * Com o advento do WebSocket, precisamos de novas formas para
    * provocar o servidor.
    * Este primeiro passo pretende melhorar o Ajax
-   * Depois, vir„o funÁıes genericas
-   * Caso esteja usando prototype, ele usar· o mesmo, se n„o se virar·
+   * Depois, vir√£o fun√ß√µes genericas
+   * Caso esteja usando prototype, ele usar√° o mesmo, se n√£o se virar√°
    * para criar uma interface
    *
    * verificar ServerSentEvents

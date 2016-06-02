@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xForms.php
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+    YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-14 14:31:08 (-3 DST)
+    2016-05-30 09:45:48 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
   /*
@@ -95,23 +95,23 @@
 
         $errTable = array ('100' => 'Sentencia desconhecida',
                            '101' => 'Identificador desconhecido',
-                           '103' => 'Erro de sintaxis na definiÁ„o do formul·rio',
+                           '103' => 'Erro de sintaxis na defini√ß√£o do formul√°rio',
                            '104' => 'Erro de sintaxis no HTML',
                            '105' => 'Indicador FORM dentro de outro',
                            '106' => 'FORM fechado sem ter sido aberto',
                            '107' => 'INPUT fora de um FORM',
                            '108' => 'Era esperado um \'=\'',
-                           '109' => 'Era esperado um sÌmbolo ou etiqueta',
-                           '110' => 'Estado do bot„o definido de forma errada',
+                           '109' => 'Era esperado um s√≠mbolo ou etiqueta',
+                           '110' => 'Estado do bot√£o definido de forma errada',
                            '111' => 'SCRIPT dentro de outro SCRIPT',
-                           '112' => 'SCRIPT n„o fechado corretamente',
-                           '113' => 'SCRIPT n„o aberto',
+                           '112' => 'SCRIPT n√£o fechado corretamente',
+                           '113' => 'SCRIPT n√£o aberto',
                            '114' => 'SELECT fora de um FORM',
                            '115' => 'TEXTAREA fora de um FORM',
-                           '200' => 'Arquivo n„o localizado',
-                           '201' => 'DefiniÁ„o incompleta (tabela, colunas, campo-chave)',
+                           '200' => 'Arquivo n√£o localizado',
+                           '201' => 'Defini√ß√£o incompleta (tabela, colunas, campo-chave)',
                            '202' => 'FORM sem nome',
-                           '203' => 'Ao analizar uma instruÁ„o QUERY, n„o encontramos uma express„o v·lida',
+                           '203' => 'Ao analizar uma instru√ß√£o QUERY, n√£o encontramos uma express√£o v√°lida',
                            '204' => 'DATALIST fora de um FORM');
 
     function doDebug($minLevel, $msg)
@@ -142,7 +142,7 @@
 
     function checkSyntax($statement,$lineState)
     {
-      $r=-1;                  // est· incorrecto
+      $r=-1;                  // est√° incorrecto
       $ok=false;
       $s=$this->syntax[$statement];
       $this->doDebug(3,"syntax=$s<br>");
@@ -163,7 +163,7 @@
         do {
           if ($n>=strlen($lineState)) {
             $ok=true;
-            $r=0;        // est· bien pero le falta
+            $r=0;        // est√° bien pero le falta
             break;
           }
           $canAnalise=false;
@@ -185,7 +185,7 @@
 
           if ($canAnalise) {
             if (substr($s,$n,1)==';') {
-              $r=1;        // est· completa
+              $r=1;        // est√° completa
               break;
             }
             $n++;
@@ -198,7 +198,7 @@
 
     function checkSyntax_XXXXX($statement,$lineState, &$curSyntax, &$n)
     {
-      $r=-1;                  // est· incorrecto
+      $r=-1;                  // est√° incorrecto
       $ok=false;
       if ($curSyntax=='') {
         $s=$this->syntax[$statement];
@@ -258,7 +258,7 @@
         do {
           if ($n>=strlen($lineState)) {
             $ok=true;
-            $r=0;        // est· bien pero le falta
+            $r=0;        // est√° bien pero le falta
             break;
           }
 
@@ -287,7 +287,7 @@
                 } else
                   $bestSlice=$tempSlice;
               } else
-                $this->doDebug(3," n„o<br>");
+                $this->doDebug(3," n√£o<br>");
 
             }
             $this->doDebug(3,"Escolhido: $bestSlice</ul>");
@@ -306,7 +306,7 @@
               $this->addedSyntax++;
             } else {
               // buscamos un pedazo que pueda substituir lo que ya analizamos
-              // pero que est· errado justo en este punto.
+              // pero que est√° errado justo en este punto.
               $this->doDebug(3,"Testando slices substitutos<ul>s=$s<br>slice=$slice<br>");
               $bestSlice=-1;
               $usedCound=99;
@@ -322,9 +322,9 @@
                     $usedCount=$slices[$tempSlice][5];
                     $this->doDebug(3," sim<br>");
                   } else
-                    $this->doDebug(3," n„o<br>");
+                    $this->doDebug(3," n√£o<br>");
                 } else
-                  $this->doDebug(3," n„o<br>");
+                  $this->doDebug(3," n√£o<br>");
               }
               $this->doDebug(3,"</ul>");
               if ($bestSlice>0) {
@@ -344,7 +344,7 @@
 
           if ($canAnalise) {
             if (substr($s,$n,1)==';') {
-              $r=1;        // est· completa
+              $r=1;        // est√° completa
               break;
             }
             $n++;
@@ -624,7 +624,7 @@
         _dumpY(64,1,"END OF $aFormName");
 
       } else
-        showDebugBackTrace("$aFormName n„o foi localizado", true);
+        showDebugBackTrace("$aFormName n√£o foi localizado", true);
       return $r;
     }
 
@@ -1066,7 +1066,7 @@
       return $myLine;
     }
 
-    // analise do HTML para montar o formul·rio
+    // analise do HTML para montar o formul√°rio
     function buildForm(&$r, $pegarDadosDaTabela=0, $nomeTabela='', $campoChave='', $valorChave='', $valores=array())
     {
         $ret_code=false;
@@ -1242,7 +1242,7 @@
           }
 
           if  ((strtolower($fieldType)=='intz') || (strtolower($fieldType)=='intn')) {
-            // na hora de salvar, os dois v„o para null
+            // na hora de salvar, os dois v√£o para null
             $auxInt=intval($GLOBALS[$fieldName]);
             if ($auxInt==0)
               $auxInt='';
@@ -1276,7 +1276,7 @@
           $fieldList[$fieldName]=$fieldValue;
         } else {
           if ($forgiveUnknowedFields==false) {
-            $errorMSG = "$this->xfTableName.$fieldName n„o existe";
+            $errorMSG = "$this->xfTableName.$fieldName n√£o existe";
             _recordError($errorMSG);
             _dumpY(64,0,$errorMSG);
             $erros++;
@@ -1359,7 +1359,7 @@
 
           }
         }
-        /* vers„o antiga (uma ˙nica chave)
+        /* vers√£o antiga (uma √∫nica chave)
         $auxID=$GLOBALS[$this->xfKey];
         if ($auxID>'')
           $cc=db_sql("select count(*) from $this->xfTableName where $this->xfKey='$auxID'");
@@ -1441,7 +1441,7 @@
       return $GLOBALS[$this->xfKey];
     }
 
-    // atÈ 2012-09-18 as chaves eram de um sÛ campo
+    // at√© 2012-09-18 as chaves eram de um s√≥ campo
     // com o advento do metaForms,as chaves precisam ter duas entradas
     function keyTypes()
     {
@@ -1699,7 +1699,7 @@
         }
 
         if ($CreateUniqueID) {
-          //***REVISAR GERA«√O DE CHAVE M⁄LTIPLA
+          //***REVISAR GERA√á√ÉO DE CHAVE M√öLTIPLA
           /*
           if ((!$idCreated) || (trim(unquote($newID))==''))
             $newID="$auxSeed".y_uniqid();

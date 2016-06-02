@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xPhonetize.php
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+    YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-01-23 22:00:40 (-3 DST)
+    2016-05-30 09:45:48 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -57,13 +57,13 @@
       array('%ia%',       2, 2, '?ya'),
       array('~ele',       2, 2, 'hele'),
       array('ao@',        0, 0, 'an'),
-      array('ão',         0, 0, 'an'),
-      array('ã@',         0, 0, 'an'),
+      array('Ã£o',         0, 0, 'an'),
+      array('Ã£@',         0, 0, 'an'),
       array('w',          0, 0, 'v'),
       array('k',          0, 0, 'c'),
       array('y',          0, 0, 'i'),
-      array('ç',          0, 0, 'c'),
-      array('Ç',          0, 0, 'c'),
+      array('Ã§',          0, 0, 'c'),
+      array('Ã‡',          0, 0, 'c'),
       array('ss',         0, 0, 'c')
     );
 
@@ -288,7 +288,7 @@
 
     function eliminarAcentuadas()
     {
-      $a=' áéíóúàèìòùãõâêîôûäëïöü';
+      $a=' Ã¡Ã©Ã­Ã³ÃºÃ Ã¨Ã¬Ã²Ã¹Ã£ÃµÃ¢ÃªÃ®Ã´Ã»Ã¤Ã«Ã¯Ã¶Ã¼';
       $b=' aeiouaeiouaoaeiouaeiou';
 
       $res='';
@@ -304,20 +304,20 @@
 
     function doPhonetize()
     {
-      // pegamos só as minusculas
+      // pegamos sÃ³ as minusculas
       $this->aWord=strtolower($this->aWord);
-      // eliminamos acentuações
+      // eliminamos acentuaÃ§Ãµes
       $this->eliminarAcentuadas();
-      // pegamos só as letras
+      // pegamos sÃ³ as letras
       $this->aWord=ereg_replace("[^A-Z,^a-z]", "", $this->aWord);
       if ($this->aWord>'') {
         $this->passNDX=0;
-        // erros de digitação mais comuns
+        // erros de digitaÃ§Ã£o mais comuns
         $this->substPhonems();
         $this->eliminarLetrasDuplicadas();
-        // simplificação de erros menos comuns e sobra da simplificação anterior
+        // simplificaÃ§Ã£o de erros menos comuns e sobra da simplificaÃ§Ã£o anterior
         $this->substPhonems();
-        // elimino fonemas após redução
+        // elimino fonemas apÃ³s reduÃ§Ã£o
         $this->substPhonems();
       }
       return $this->aWord;
@@ -348,7 +348,7 @@
   function testarFonetizador()
   {
     $palavra='rosiclaire chico alexandre alessandro alezandra';
-    $palavra='ÔNIBUS ÓNIBUS ONIBUS';
+    $palavra='Ã”NIBUS Ã“NIBUS ONIBUS';
 
     $teste = new phonetize($palavra,$encoded,true);
 

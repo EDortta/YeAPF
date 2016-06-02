@@ -1,16 +1,16 @@
 <?php
 /*
     includes/yeapf.sql.php
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+    YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-01-23 22:00:40 (-3 DST)
+    2016-05-30 09:56:43 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
   function dateSQL2timestamp($dd, $forceInternalFormat=false)
   {
 
-    $dd=ereg_replace("[^0-9]", "", $dd);
+    $dd=preg_replace("/[^0-9]/", "", $dd);
     // echo ".:$dd:.<br>";
     while (strlen($dd)<14)
       $dd.='0';
@@ -255,7 +255,7 @@
             echo "<br>Separando '$dados[0]' por $splitting<br>";
           // $aux=ereg_replace("[^A-Z],\$splitting", " ",$dados[0]);
           // $aux=preg_replace('/[\W]/',' ',$dados[0]);
-          $aux=preg_replace("/[^a-zA-Z«√’¡…Õ”⁄¿»Ã“ŸÁ„ı·ÈÌÛ˙‡ËÏÚ˘\-0-9]/",' ',$dados[0]);
+          $aux=preg_replace("/[^a-zA-Z√á√É√ï√Å√â√ç√ì√ö√Ä√à√å√í√ô√ß√£√µ√°√©√≠√≥√∫√†√®√¨√≤√π\-0-9]/",' ',$dados[0]);
           $values=explode($splitting,$aux);
         } else
           $values=array($dados[0]);
@@ -480,7 +480,7 @@
         $r.="$c='$$c'";
       }
     } else
-      die("$verbo n„o È um verbo reconhecido no SQL");
+      die("$verbo n√£o √© um verbo reconhecido no SQL");
 
     return $r;
   }

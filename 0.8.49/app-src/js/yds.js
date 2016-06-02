@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yds.js
- * YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+ * YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-01-23 22:00:19 (-3 DST)
+ * 2016-05-30 09:45:48 (-3 DST)
  * First Version (C) 2010 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/yds.js
@@ -493,7 +493,7 @@
     if (mutexCellContent == 0) {
       // incrementar o indicador de bloqueio
       mutexCellContent++;
-      // rodar sÛ se estou sozinho neste pedaÁo
+      // rodar s√≥ se estou sozinho neste peda√ßo
 
       try {
         if (mutexCellContent==1) {
@@ -910,7 +910,7 @@
       offY = Math.abs(rulerIMG.offsetHeight - rulerBallIMG.offsetHeight) / 2;
       rulerBallIMG.style.top = (rulerIMG.offsetTop + offY)+'px';
       rulerBallIMG.style.display = 'block';
-      // calcul·mos el centro del puntero
+      // calcul√°mos el centro del puntero
       var w = rulerIMG.offsetWidth;
       var x = Math.min(Math.round(_dsCache[dsName]['curPage'] * w / _dsCache[dsName]['pageCount'] ), w);
       x -= rulerBallIMG.offsetWidth / 2;
@@ -918,7 +918,7 @@
       rulerBallIMG.style.left = x + 'px';
     }
 
-    // c·lculo de los tÌtulos
+    // c√°lculo de los t√≠tulos
 
     _dsCache[dsName]['groupTitlesValues']=new Array();
     var navButtons = _dsCache[dsName]['navButtons'];
@@ -950,7 +950,7 @@
       }
     }
 
-    // limpieza del contenÌdo de la tabla
+    // limpieza del conten√≠do de la tabla
 
     for (var r=rowEnd - rowStart ; r < rowsPerPage; r++) {
       var rNdx = rowEnd - rowStart + 1;
@@ -983,7 +983,7 @@
 
     navButtons.style.display = navButtonsVisible ? 'block' : 'none';
     navButtons.style.zIndex=10;
-    _dump("Botıes: "+navButtons.style.display);
+    _dump("Bot√µes: "+navButtons.style.display);
     _dump(getX(navButtons));
     if (rulerBallIMG)
       rulerBallIMG.style.display = navButtons.style.display;

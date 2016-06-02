@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.txtTools.php
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+    YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-01-23 22:00:40 (-3 DST)
+    2016-05-30 09:45:48 (-3 DST)
    */
 
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -119,7 +119,7 @@
         if ($fOut) {
           set_time_limit(0);
 
-          // reconhecer a definição das colunas
+          // reconhecer a definiÃ§Ã£o das colunas
           $columnDefinition=array();
           $colDescription=fgets($f);
           $lastCol='';
@@ -154,7 +154,7 @@
           $columnDefinition[$lastCol][1]=-1;
 
           // percorrer o arquivo
-          // reconhecer um registro (a presença da primeira coluna é o start do registro)
+          // reconhecer um registro (a presenÃ§a da primeira coluna Ã© o start do registro)
           $textLine='';
           $data=array();
           $firstGroupLine=true;

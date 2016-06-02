@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.pre-processor.php
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+    YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-01-23 22:00:40 (-3 DST)
+    2016-05-28 09:16:43 (-3 DST)
    */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -32,7 +32,7 @@
            $intoFormFile;
     $i=0;
 
-    $s=' '.$s;  // desfarÁar o errinho de calculo do parser
+    $s=' '.$s;  // desfar√ßar o errinho de calculo do parser
 
     $s = str_replace('&quot;', '"', $s);
     $substituicoes = 0;
@@ -40,6 +40,7 @@
       $autoDocLevel=0;
 
       $i=seguinteToken($s,$_token);
+      // echo "<div>$i $_token</div>";
       //$xLength=largoToken($s,$i);
       $xLength=strlen($_token);
       $substituicoes=0;
@@ -242,7 +243,7 @@
               if (substr($s,$n,1)!=')')
                 $abreviacao=unquote(pegaValor($s, $n, $t));
               $valorCampo= ereg_replace("[^0-9]", "", $valorCampo);
-              $meses = array ('Janeiro','Fevereiro','MarÁo','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro');
+              $meses = array ('Janeiro','Fevereiro','Mar√ßo','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro');
               $mesesAbreviados = array ('Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez');
               if (strlen($valorCampo)>4) {
                 if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)))
@@ -257,7 +258,7 @@
                 $valorCampo = $meses[$m-1];
 
             } else if ((tokenValido($s, '#campoNomeDia(',$i)) || (tokenValido($s, '#dayName(',$i))) {
-              $dias = array ('Domingo', 'Segunda', 'TerÁa', 'Quarta', 'Quinta', 'Sexta', 'S·bado');
+              $dias = array ('Domingo', 'Segunda', 'Ter√ßa', 'Quarta', 'Quinta', 'Sexta', 'S√°bado');
               $valorCampo= ereg_replace("[^0-9]", "", $valorCampo);
               $dataAux=dateSQL2timestamp($valorCampo);
               $valorCampo = $dias[date('w',$dataAux)];
@@ -474,8 +475,8 @@
                     $valorCampo.='...';
                 }
                 $valorCampo=nl2br($valorCampo);
-                // algumas coisas n„o s„o legais com o nl2br()
-                // por exmeplo, apÛs <TR> ou <TD> n„o pode vir um <br>
+                // algumas coisas n√£o s√£o legais com o nl2br()
+                // por exmeplo, ap√≥s <TR> ou <TD> n√£o pode vir um <br>
                 // nl2br() produz <br />\n
                 $valorCampo=str_ireplace("</td><br />","<td>",$valorCampo);
                 $valorCampo=str_ireplace("<thead><br />","<thead>",$valorCampo);
@@ -922,7 +923,7 @@
           $sql = 'select '.$campoResultado.' from '.$nomeTabela;
           $sql.= ' where '.$campoChave.'='.$valorCampoChave;
           if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_))) {
-            $rs = mysql_query($sql, $ydb_conn) or _die ('ImpossÌvel fazer <strong>'.$sql.'</strong>');
+            $rs = mysql_query($sql, $ydb_conn) or _die ('Imposs√≠vel fazer <strong>'.$sql.'</strong>');
             $dados = mysql_fetch_row($rs);
           } else if (db_connectionTypeIs(_FIREBIRD_)) {
             $rs = ibase_query($sql);
@@ -1027,7 +1028,7 @@
             $sql=str_replace("\r", " ",$sql);
 
             /*
-             * cachedQuery = 0 - n„o utiliza cache em disco
+             * cachedQuery = 0 - n√£o utiliza cache em disco
              * cachedQuery = 1 - utiliza cache em disco
              * cachedQuery = 2 - recria o cache em disco (refresh)
              */
@@ -1190,9 +1191,9 @@
                   $preprocessed=false;
                   if ($cachedQuery) {
                     if ($_SQL_doCacheOnTable) {
-                      $po=intval($auxData['O']);         // indice para substituir o conte˙do precompliado
-                      $auxComp=$auxData['COMP'];         // conte˙do precompilado
-                      $auxContent=$auxData['CONTENT'];   // conte˙do
+                      $po=intval($auxData['O']);         // indice para substituir o conte√∫do precompliado
+                      $auxComp=$auxData['COMP'];         // conte√∫do precompilado
+                      $auxContent=$auxData['CONTENT'];   // conte√∫do
                     } else {
                       $auxComp='';
                       $auxContent=$auxData;
@@ -2242,7 +2243,7 @@
           $firstD  = unquote(analisarString(pegaValor($s, $n, $tokenType),$pegarDadosDaTabela, $nomeTabela, $campoChave, $valorChave, $valores));
           $lastD   = unquote(analisarString(pegaValor($s, $n, $tokenType),$pegarDadosDaTabela, $nomeTabela, $campoChave, $valorChave, $valores));
 
-          // o incremento È opcional e indicado em D, M, Y  (Dias, meses e anos)
+          // o incremento √© opcional e indicado em D, M, Y  (Dias, meses e anos)
           if (substr($s,$n,1)!=')')
             $aInc = unquote(analisarString(pegaValor($s, $n, $tokenType),$pegarDadosDaTabela, $nomeTabela, $campoChave, $valorChave, $valores));
           else
@@ -2308,7 +2309,7 @@
           if(strlen($lastD)==4)
             $lastD="19710419$lastD";
 
-          // o incremento È opcional e indicado em minutos
+          // o incremento √© opcional e indicado em minutos
           if (substr($s,$n,1)!=')')
             $dateInc = unquote(analisarString(pegaValor($s, $n, $tokenType),$pegarDadosDaTabela, $nomeTabela, $campoChave, $valorChave, $valores));
           else

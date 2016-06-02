@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbText.php
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+    YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-01-23 22:00:40 (-3 DST)
+    2016-05-30 09:45:48 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -11,7 +11,7 @@
     ==================================================================
     dbText - acesso a tabelas em formato texto
                 a primeira linha define o nome dos campos
-          cada campo é separado por ';' e pode estar contido entre aspas (duplas ou simples)
+          cada campo Ã© separado por ';' e pode estar contido entre aspas (duplas ou simples)
 
     ==================================================================
   */
@@ -93,7 +93,7 @@
         $this->fileName=$fileName;
 
         if (!$db_creationEnabled_)
-          die("EM LUGAR DE CHAMAR DIRETAMENTE ESTA FUNÇÃO, UTILIZE createDBText('$fileName', createNewFile=false)");
+          die("EM LUGAR DE CHAMAR DIRETAMENTE ESTA FUNÃ‡ÃƒO, UTILIZE createDBText('$fileName', createNewFile=false)");
 
         if (!file_exists($fileName))
           if ($createNewFile)
@@ -103,7 +103,7 @@
 
       function loadData()
       {
-        $localAppCharset='ISO-88'.'59-1';  // esta cortada para evitar que o parser do ycharsetconvert a reconheça
+        $localAppCharset='ISO-88'.'59-1';  // esta cortada para evitar que o parser do ycharsetconvert a reconheÃ§a
 
         $this->fieldsName=array();
         $this->data=array();

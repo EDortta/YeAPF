@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.debug.php
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+    YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-02-02 16:37:52 (-3 DST)
+    2016-05-30 09:45:48 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -472,20 +472,20 @@
             $result=0;
         }
         if ($logOutput<0)
-          $debugOutput.="\nNotificaÁ„o online - ";
+          $debugOutput.="\nNotifica√ß√£o online - ";
         else if ($logOutput==1)
           $debugOutput.='<br><font size=-1>';
 
         if ($result==0) {
           if ($logOutput<0)
-            $debugOutput.="N√O enviada";
+            $debugOutput.="N√ÉO enviada";
           else if ($logOutput==1)
-            $debugOutput.="<font color=#dd0000>NotificaÁ„o online N√O enviada</font>";
+            $debugOutput.="<font color=#dd0000>Notifica√ß√£o online N√ÉO enviada</font>";
         } else {
           if ($logOutput<0)
             $debugOutput.="$dbgEmail";
           else if ($logOutput==1)
-            $debugOutput.="NotificaÁ„o online enviada para <b>$dbgEmail</b>";
+            $debugOutput.="Notifica√ß√£o online enviada para <b>$dbgEmail</b>";
         }
         if ($logOutput<0)
           $debugOutput.="\n";

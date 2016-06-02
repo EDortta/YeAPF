@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.userContext.php
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+    YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-01-23 22:00:40 (-3 DST)
+    2016-05-30 09:45:48 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -725,32 +725,32 @@
         if (($auxInsecureEvents>'') || ($sua>'') || (file_exists('flags/flag.develop'))) {
           /*
            * ARQUIVO DE CONFIG: appFolderName.def
-           * A terceira linha contÈm uma lista de "sujeito.acao" separados por ','
-           * que passam por cima da verificaÁ„o de seguranÁa.
-           * AlÈm de esses eventos terem que estar ali declarados,
-           * deve existir uma vari·vel global 'sua' (super user authentication)
-           * que È o md5(s.a)... a liberaÁ„o sÛ È possÌvel se o evento for
-           * declarado como inseguro, existir 'sua' compatÌvel com o evento
-           * e N√O existir 'u'
-           * A exceÁ„o È ter a constante '3db6003ce6c1725a9edb9d0e99a9ac3d'
-           * definida na listal j· que '3db6003ce6c1725a9edb9d0e99a9ac3d' È
-           * md5('*.') e permite a entrada de todos os eventos sem seguranÁa.
+           * A terceira linha cont√©m uma lista de "sujeito.acao" separados por ','
+           * que passam por cima da verifica√ß√£o de seguran√ßa.
+           * Al√©m de esses eventos terem que estar ali declarados,
+           * deve existir uma vari√°vel global 'sua' (super user authentication)
+           * que √© o md5(s.a)... a libera√ß√£o s√≥ √© poss√≠vel se o evento for
+           * declarado como inseguro, existir 'sua' compat√≠vel com o evento
+           * e N√ÉO existir 'u'
+           * A exce√ß√£o √© ter a constante '3db6003ce6c1725a9edb9d0e99a9ac3d'
+           * definida na listal j√° que '3db6003ce6c1725a9edb9d0e99a9ac3d' √©
+           * md5('*.') e permite a entrada de todos os eventos sem seguran√ßa.
            * 2012-09-25 - Aos efeitos de simplificar o desenvolvimento, os
-           * eventos indicados no appFolderDef podem estar sem codificaÁ„o,
+           * eventos indicados no appFolderDef podem estar sem codifica√ß√£o,
            * mas nesse caso a bandeira de desenvolvimento (development.debug)
            * deve estar ligada mesmo que com valor '0'
-           * 2013-02-26 - Quando um evento est· marcado como inseguro, ele
-           * deve ter garantido o acesso aos eventos do yeapf.  Isto È, se
-           * um evento permitido È provocado para o index ou o body, deve
+           * 2013-02-26 - Quando um evento est√° marcado como inseguro, ele
+           * deve ter garantido o acesso aos eventos do yeapf.  Isto √©, se
+           * um evento permitido √© provocado para o index ou o body, deve
            * existir uma forma de liberar os eventos 'yeapf' como se de um
-           * logon v·lido se tratasse.  Isso È assim para poder usar o
+           * logon v√°lido se tratasse.  Isso √© assim para poder usar o
            * 'dataset' por exemplo e outros que de outra forma acabam sendo
            * bloqueados.
-           * FALTA IMPLEMENTAR UMA SOLU«√O.  Simplesmente liberar 'yeapf'
-           * n„o È bom pois abre as pernas para todo o sistema.
+           * FALTA IMPLEMENTAR UMA SOLU√á√ÉO.  Simplesmente liberar 'yeapf'
+           * n√£o √© bom pois abre as pernas para todo o sistema.
            * 2013-12-28 - Os eventos 'yeapf:develop.'
            * ('bd7b5ca48f3bfda678c90d7945910ecf') devem ser liberados
-           * quando a bandeira 'flags/flag.develop' est· ligada.  Caso
+           * quando a bandeira 'flags/flag.develop' est√° ligada.  Caso
            * queira liberar sempre, tem que estar anotado no arquivo
            * appFolderName.def
           */
@@ -824,7 +824,7 @@
             $cc=db_sql("select count(*) from $usrTableName where $usrSessionIDField=$qu");
             if ($cc>0) {
               if ($difTime>6000000) {
-                _recordError("Usu·rio desconectado por inatividade ($difTime segundos)");
+                _recordError("Usu√°rio desconectado por inatividade ($difTime segundos)");
               }
               else {
                 $ret=true;
@@ -836,7 +836,7 @@
                 }
               }
             } else
-               _recordError("Usu·rio conectado em outra sess„o");
+               _recordError("Usu√°rio conectado em outra sess√£o");
           }
 
           _dumpY(8,0,"difTime=$difTime");
@@ -1035,8 +1035,8 @@
         $res=false;
         if (($newAncestor=='') || ($newAncestor=='/')) {
           // a pergunta parece tola, mas se o yMenuRoot estiver mal definido, o menu ficaria pendurado do nada
-          // deste jeito, se estiver errado, o menu vi continuar exatamente onde est·
-          // ah, sim, vai ter que pensar um pouco mais para entender, mas continue nadando. vc chega l·
+          // deste jeito, se estiver errado, o menu vi continuar exatamente onde est√°
+          // ah, sim, vai ter que pensar um pouco mais para entender, mas continue nadando. vc chega l√°
           $newAncestorID=intval(db_sql("select ID from is_menu where ID=$yMenuRoot"));
           if ($newAncestorID!=$yMenuRoot) {
             _recordError("A 'System' tag was created under '$yMenuRoot' ID");
@@ -1089,7 +1089,7 @@
             fclose($f);
             chmod($slotFileName,0777);
           } else
-            die("ImpossÌvel escrever em $slotFileName");
+            die("Imposs√≠vel escrever em $slotFileName");
         } else
           die("Direitos insuficientes para criar $slotFileName");
 
@@ -1109,9 +1109,9 @@
     /*
      * menuFooter()
      * Cria um pequeno menu de ajuda ao desenvolvimento
-     * SÛ aparece se ele estiver rodando no '127.0.0.1' ou '::1' ou
+     * S√≥ aparece se ele estiver rodando no '127.0.0.1' ou '::1' ou
      * se o IP do servidor coincidir com a global aDebugIP.
-     * Para aparecer o menu para criaÁ„o de menu de entrada e de implementaÁıes
+     * Para aparecer o menu para cria√ß√£o de menu de entrada e de implementa√ß√µes
      * deve a bandeira 'flags/flag.develop' estar criada (mesmo que zerada)
      */
 
@@ -1130,9 +1130,9 @@
         echo "<span id='_ydbg_container_relocator' style='color:#900; font-weight:800'><B>@</B></span>";
         echo "<span id='_ydbg_container_closer' style='color:#900; font-weight:800'><B>X</B></span>";
         if (file_exists('flags/flag.develop')) {
-          echo "  <table><tr><td valign=top><b>CriaÁ„o</b>";
+          echo "  <table><tr><td valign=top><b>Cria√ß√£o</b>";
           echo "  <form action='$myself' method=post>";
-          echo "    <small>CriaÁ„o r·pida de submenu sob <em><u>$s</u></em><br>";
+          echo "    <small>Cria√ß√£o r√°pida de submenu sob <em><u>$s</u></em><br>";
           echo "    Label: <input type=text name=newLabel id=newLabel size=20><br>";
           echo "    Subject: <input type=text name=newS id=newS size=20><br>";
           echo "    attrMask: <input type=text name=newAttr id=newAttr size=4>";
@@ -1142,7 +1142,7 @@
           echo "    <input type=hidden name='s' value='$s'>";
           echo "    <input type=submit name='createSubMenu' value='Ok'>";
           echo "    </small>";
-          echo "  </form><div style='font-size:8px'>md5($s.)='".md5("$s.")."'<br>Para appFolderName.def</div></td><td valign=top><b>EdiÁ„o</b>";
+          echo "  </form><div style='font-size:8px'>md5($s.)='".md5("$s.")."'<br>Para appFolderName.def</div></td><td valign=top><b>Edi√ß√£o</b>";
           if (($_Ys_!='modifyMenuEntry') && (db_tableExists('is_menu'))) {
             $menuData=valorSQL("select label, ancestor, rights, ID, attr from is_menu where s='$s'");
             $label=$menuData[0];
@@ -1152,7 +1152,7 @@
             $attr=$menuData[4];
             $ancestorS=valorSQL("select s from is_menu where id='$ancestor'");
             echo "  <form action='$myself' method=post style='border: 1px solid #4D4D4D'>";
-            echo "    <small>ModificaÁ„o de entrada de menu<br>";
+            echo "    <small>Modifica√ß√£o de entrada de menu<br>";
             echo "    Label: <input type=text name=newLabel id=newLabel size=20 value='$label'><br>";
             echo "    Subject: <input type=text name=newS id=newS size=20 value='$s'><br>";
             echo "    Parent Subject: <input type=text name=newAncestor id=newAncestor size=20 value='$ancestorS'><br>";
@@ -1165,7 +1165,7 @@
             echo "  </form>";
           }
           echo "  </td>";
-          echo "  <td valign=top><b>DocumentaÁ„o</b><br>";
+          echo "  <td valign=top><b>Documenta√ß√£o</b><br>";
           echo "  <form action='$myself' method=post>";
           echo "    <small>Descreva o realizado em termos atemporais<br>";
           echo "    <textarea name=description cols=60 rows=4></textarea><br>";
@@ -1216,12 +1216,12 @@
           }
           if (!$yImplementedAction) {
             echo "  <div style='background-color: #52A1D4; border-color: #3A84AB; border-width: 2px; border-style: solid; font-size:1.1em; margin: 8px; padding: 8px'>
-              <b>N„o h· implementaÁ„o para '$s'</b><br>&nbsp;
+              <b>N√£o h√° implementa√ß√£o para '$s'</b><br>&nbsp;
               Deseja criar um script esqueleto para este slot?
               <a href='?_Ys_=createSkeletonImplementation&u=$u&s=$s'>Sim!</a>
             </div>";
           }
-          echo "  <big><a href='?_Ys_=deleteMenuEntry&u=$u&s=$s'>Eliminar <B>$s</B> de Men˙</a></big><br>";
+          echo "  <big><a href='?_Ys_=deleteMenuEntry&u=$u&s=$s'>Eliminar <B>$s</B> de Men√∫</a></big><br>";
         }
         echo "  aBody: $aBody | s: $s | a: $a<br>";
         echo "</div>";

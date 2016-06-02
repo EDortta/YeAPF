@@ -1,9 +1,9 @@
 <?php
 /*
     includes/cXFormInterface.php
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+    YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-03-23 11:03:34 (-3 DST)
+    2016-05-30 09:45:48 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -199,8 +199,8 @@
         }
       }
     } else {
-      _recordError("Atualização já feita no formulário $supportSqueleton");
-      _recordError("Provavelmente o usuário está enviando o formulário duas vezes ou usando um navegador incompativel");
+      _recordError("AtualizaÃ§Ã£o jÃ¡ feita no formulÃ¡rio $supportSqueleton");
+      _recordError("Provavelmente o usuÃ¡rio estÃ¡ enviando o formulÃ¡rio duas vezes ou usando um navegador incompativel");
       _recordError("Recomendamos usar Mozilla, Google Chrome ou Safari");
     }
     return $sql;

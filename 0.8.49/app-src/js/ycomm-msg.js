@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-msg.js
- * YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+ * YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-02-24 16:27:07 (-3 DST)
+ * 2016-05-30 09:45:48 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * These routines were written in order to help interprocess process messages
  * but as an remote process messages implementation.
@@ -26,9 +26,9 @@ var ycommMsgBase = function() {
 
   that.grantMsgProc = function(aInterval)
   {
-    /* caso venha sem par·mtros, calcular um tempo prudente de no m·ximo 20 segs
+    /* caso venha sem par√°mtros, calcular um tempo prudente de no m√°ximo 20 segs
      * Isso acontece quando o servidor devolveu uma resposta errada
-     * e queremos que o sistema de mensagens continue em operaÁ„o. */
+     * e queremos que o sistema de mensagens continue em opera√ß√£o. */
     if ((aInterval===undefined) || (aInterval<=0))
       aInterval = Math.min(20000,messagePeekerInterval * 2);
 

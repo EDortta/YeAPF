@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+    YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-01-23 22:00:40 (-3 DST)
+    2016-06-02 11:06:57 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -538,6 +538,33 @@
         $setupIni->setValue('currentDBVersion',$currentDBVersion);
         $setupIni->commit();
 
+      }
+
+      if(_db_upd_canReviewVersion(12)) {
+        _recordWastedTime("checking v12");
+        if (!db_tableExists('is_tasks')) {
+          $sql="CREATE TABLE  `is_tasks` (
+                              `id` INT NOT NULL AUTO_INCREMENT,
+                              `creation_ts` INT,
+                              `finalization_ts` INT NULL,
+                              `iteraction_ts` INT NULL,
+                              `iteraction_ttl` INT DEFAULT 480,
+                              `stage` INT NULL,
+                              `priority` INT NULL,
+                              `mru` INT DEFAULT 0,
+                              `s` VARCHAR(48) NULL,
+                              `a` VARCHAR(48) NULL,
+                              `xq_start` INT NULL,
+                              `xq_target` INT NULL,
+                              `j_params` VARCHAR(512) NULL,
+                              PRIMARY KEY (`id`))";
+          db_sql($sql);
+          db_commit();
+        }
+        $currentDBVersion=12;
+        _db_grantSetupIni();
+        $setupIni->setValue('currentDBVersion',$currentDBVersion);
+        $setupIni->commit();        
       }
     }
 

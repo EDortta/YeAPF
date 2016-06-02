@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.cache.php
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+    YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-01-23 22:00:40 (-3 DST)
+    2016-05-30 09:45:48 (-3 DST)
 */
 
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -35,9 +35,9 @@
       $cacheRebuildTime=20;
 
     $cachedBody="cached/$aBody";
-    // Quando A é igual a 'flushCache', o cache é eliminado de forma forçada
+    // Quando A Ã© igual a 'flushCache', o cache Ã© eliminado de forma forÃ§ada
     // Isso foi feito para que o script script/calcularSituacao.sh pudesse
-    // forçar a limpeza do cache e como resultado, o recálculo da situação
+    // forÃ§ar a limpeza do cache e como resultado, o recÃ¡lculo da situaÃ§Ã£o
     if (lock("caching_$s", true)) {
       $cacheFlushLimit=intval($sysTimeStamp)  - $cacheFlushTimeout*60;
       $lastUpdate=$cacheFlushLimit;

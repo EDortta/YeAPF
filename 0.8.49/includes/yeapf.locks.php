@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.locks.php
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+    YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-03-17 11:16:36 (-3 DST)
+    2016-05-30 09:45:48 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -267,7 +267,7 @@
 
     } else {
       /*
-       * OBSOLETO em 05/MarÁo/2012 para permitir uso de semaforos SystemV ou sua emulaÁ„o
+       * OBSOLETO em 05/Mar√ßo/2012 para permitir uso de semaforos SystemV ou sua emula√ß√£o
        */
       $waitingFlag=1;
       while ((file_exists("$LOCK_DIR/$lockName.lck")) and ($waitingFlag<=8)) {
@@ -275,8 +275,8 @@
         if ($lastLock) {
           $lastLock=$lastLock[9];
           $diff=(intval(date("U")) - $lastLock);
-          // caso a trava exista h· mais de 30 segundos, È provavel que quem travou o sistema
-          // tenha caido, ent„o, eliminamos a trava e esperamos um tempo prudencial
+          // caso a trava exista h√° mais de 30 segundos, √© provavel que quem travou o sistema
+          // tenha caido, ent√£o, eliminamos a trava e esperamos um tempo prudencial
           if ($diff>30) {
             unlink("$LOCK_DIR/$lockName.lck");
             $waitingFlag=5;
@@ -292,8 +292,8 @@
       if (file_exists("$LOCK_DIR/$lockName.lck")) {
         if (!$abortOnLocked) {
           if (LOCK_DEBUG) _dumpY(2,0,"LOCK ABORTED ($LOCK_DIR/$lockName.lck)");
-          _recordError("Erro ao travar o sistema de seguranÁa.");
-          _recordError("A trava '$LOCK_DIR/$lockName.lck' est· aberta h· mais de $diff segundos.");
+          _recordError("Erro ao travar o sistema de seguran√ßa.");
+          _recordError("A trava '$LOCK_DIR/$lockName.lck' est√° aberta h√° mais de $diff segundos.");
           _recordError("Tente novamente e informe este erro ao pessoal de suporte.");
         }
       } else {

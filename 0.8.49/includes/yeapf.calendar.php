@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.calendar.php
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+    YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2012-07-04 09:23:44 (-3 DST)
+    2016-05-30 09:45:48 (-3 DST)
 */
 
   function negaCor($cor)
@@ -26,7 +26,7 @@
   {
     global $sysDate;
 
-    $mNames = array("","<b>J</b>aneiro", "<b>F</b>evereiro","<b>M</b>arço","<b>A</b>bril","<b>M</b>aio","<b>J</b>unho","<b>J</b>ulho","<b>A</b>gosto","<b>S</b>etembro","<b>O</b>utubro","<b>N</b>ovembro","dezembro");
+    $mNames = array("","<b>J</b>aneiro", "<b>F</b>evereiro","<b>M</b>arÃ§o","<b>A</b>bril","<b>M</b>aio","<b>J</b>unho","<b>J</b>ulho","<b>A</b>gosto","<b>S</b>etembro","<b>O</b>utubro","<b>N</b>ovembro","dezembro");
 
     $aDate=substr($aDate,0,8);
 

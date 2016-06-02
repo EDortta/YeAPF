@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xSyntax.php
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+    YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2012-07-04 12:13:06 (-3 DST)
+    2016-05-30 09:45:48 (-3 DST)
 */
 
   class xSyntax {
@@ -58,7 +58,7 @@
 
     function checkSyntax($statement,$lineState)
     {
-      $r=-1;                  // est· incorrecto
+      $r=-1;                  // est√° incorrecto
       $ok=false;
       $s=$this->syntax[$statement];
       $this->doDebug(3,"syntax=$s<br>");
@@ -75,11 +75,11 @@
 
       if ($s>'') {
         $n=0;
-        $this->doDebug(3,"comparando `$lineState` com  definiÁ„o `$s` ");
+        $this->doDebug(3,"comparando `$lineState` com  defini√ß√£o `$s` ");
         do {
           if ($n>=strlen($lineState)) {
             $ok=true;
-            $r=0;        // est· bien pero le falta
+            $r=0;        // est√° bien pero le falta
             break;
           }
 
@@ -102,7 +102,7 @@
 
           if ($canAnalise) {
             if (substr($s,$n,1)==';') {
-              $r=1;        // est· completa
+              $r=1;        // est√° completa
               break;
             }
             $n++;

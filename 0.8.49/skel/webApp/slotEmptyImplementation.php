@@ -4,9 +4,9 @@
  *      slotEmptyImplementation.php
  *      This file is part of YeAPF
  *      (Yet Another PHP Framework)
- *      YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+ *      YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)
  *      Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- *      2016-02-25 15:08:33 (-3 DST)
+ *      2016-06-02 10:59:55 (-3 DST)
  *
  *
  *      The MIT License (MIT)
@@ -128,7 +128,7 @@
     // your code goes here as in the example below
     switch($a) {
       case 'getVersion':
-        $ret='YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)';
+        $ret='YeAPF 0.8.49-6 built on 2016-06-02 11:41 (-3 DST)';
         break;
     }
 
@@ -147,6 +147,45 @@
   {
     $jsonRet=w#(s)($a);
     echo produceRestOutput($jsonRet);
+  }
+
+  function t#(s)($a)
+  {
+    global $sysDate, $ytasker, $xq_start;
+
+    /* publish the task context as local variables:
+       xq_start, xq_target, j_params */
+    extract($ytasker->getTaskContext());
+
+    /* grants xq_start is a positive integer value */
+    $xq_start=isset($xq_start)?intval($xq_start):0;
+
+    switch($a)
+    {
+      case 'exportTable':
+        /*  For example, let's say you need to export a big table called 'invoices'
+            When you create the task, you set j_params with 'startDate' and 'endDate'
+            All task functionallity depends on $ytasker->taskCanRun() so you need to
+            build a loop starting in xq_start and checking $ytasker->taskCanRun()
+
+            $sql="select * from invoices where dueDate>='$startDate' and dueDate<='$endDate' offset $xq_start";
+            $q=db_query($sql);
+            while (($ytasker->taskCanRun()) && ($d=db_fetch_array($q))) {
+              ...
+              $xq_start++;
+              $ytasker->advanceTo($xq_start);
+            }
+        */
+        break;
+
+      case 'buildList':
+        break;
+
+      case 'sendEmail':
+        break;
+    }
+
+
   }
 
   /*
