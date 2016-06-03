@@ -1,9 +1,9 @@
 <?php
 /*
     tools/install-script.php
-    YeAPF 0.8.49-12 built on 2016-06-03 16:28 (-3 DST)
+    YeAPF 0.8.49-13 built on 2016-06-03 16:46 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-06-03 16:25:51 (-3 DST)
+    2016-06-03 16:46:12 (-3 DST)
 */
 
   function installFile($entry)
@@ -35,15 +35,14 @@
 
   $onWinOS=(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
 
-  $targetPath=$onWinOS?"C:\Windows":"/usr/bin";
+  $php = $argv[2];
   $targetTemp=sys_get_temp_dir();
+  $targetPath=dirname($php);
 
   $chmodScript='';
   if ($argv[1]=='Cygwin') {
-    $targetPath="/cygdrive/c/Windows";
     $targetTemp="/cygdrive/c/Windows/Temp";
 
-    $php = $argv[2];
     if (!file_exists('/usr/bin/php')) {
       echo "Creating PHP alias\n";
       $aux = join('',file('cygwinPHP.sh'));
@@ -55,9 +54,11 @@
         $chmodScript.="chmod +x /usr/bin/php\n";
       }
     }
-  }  
+  } else {
+    $targetPath=$onWinOS?"C:\Windows":"/usr/bin";
+  }
 
-  $yeapfPath=dirname(getcwd());
+  $yeapfPath=dirname(getcwd());  
 
   echo "YeAPF base folder = '$yeapfPath'\n";
   if (file_exists("$targetTemp/chmod-YeAPF-tools.sh"))
