@@ -1,7 +1,7 @@
 <?php
 /*
     tools/yDoc/configure.php
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)
+    YeAPF 0.8.49-10 built on 2016-06-03 13:09 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
     2014-06-12 08:11:31 (-3 DST)
 */
@@ -179,7 +179,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.49-10 built on 2016-06-03 13:09 (-3 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -240,7 +240,7 @@
   echo "<style>body{padding:8px; font-size:12px; font-family: arial; } .info{margin:2px; padding-bottom:8px; width: 800px} .warn{border-top:dotted 1px #900; border-bottom:dotted 1px #900; color:#A86D00;  font-weight:800; margin:2px; padding:8px; background-color:#FFEAC0} .cpyrght{font-size:14px; border-bottom:solid 2px #BFBFBF; padding-bottom:4px} .code { font-family:Consolas,monospace;  background-color: #E5E5E5;  margin: 8px;  padding: 4px;  border: dotted 1px #7F7F7F} .err {background-color:#FFC0CB;  border-style:solid;  border-width:2px;  border-color:#FF0000; margin:32px; padding:32px; border-radius:4px} .errItem {border-bottom: dotted 1px #FF0000;  margin-bottom:4px; }</style>";
 
   echo "<div class=cpyrght><strong><big><I>tools/yDoc/configure.php</I></big></strong><br>
-    YeAPF 0.8.49-1 built on 2016-05-23 14:38 (-3 DST)<br>
+    YeAPF 0.8.49-10 built on 2016-06-03 13:09 (-3 DST)<br>
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com<br>
     2014-06-12 08:11:31 (-3 DST)</div>";
 
