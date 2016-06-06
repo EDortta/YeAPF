@@ -1,4 +1,4 @@
-var #(dbName)Base = function () {
+var #(dbTable)Base = function () {
 	var that={};
 
 	that._loadContext = {
@@ -7,12 +7,12 @@ var #(dbName)Base = function () {
 
 	that._pullData = function() {
     	ycomm.invoke(
-    		"#(dbName)",
+    		"#(dbTable)",
     		"getTable",
     		that._loadContext,
     		function(status, error, data, userMsg, context) {
     			ycomm.dom.fillElement(
-    				"tbl_#(dbName)",
+    				"tbl_#(dbTable)",
     				data,
     				{
     					inplaceData : ['#(primaryKey)'], 
@@ -104,9 +104,9 @@ var #(dbName)Base = function () {
 	return that.init();
 }
 
-var #(dbName)=null;
+var #(dbTable)=null;
 addOnLoadManager(
   function() {
-	#(dbName)=#(dbName)Base();
+	#(dbTable)=#(dbTable)Base();
   }
 )
