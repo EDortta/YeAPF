@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.49-14 built on 2016-06-06 15:10 (-3 DST)
+  * YeAPF 0.8.49-15 built on 2016-06-18 12:26 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-06-06 15:10:06 (-3 DST)
+  * 2016-06-18 12:26:14 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -2484,19 +2484,19 @@
        var that = {};
      
        if (isOnMobile()) {
-         var tabchangeEvent = document.createEvent('Events');
-         tabchangeEvent.initEvent('tabchange');
+         that.tabchangeEvent = document.createEvent('Events');
+         that.tabchangeEvent.initEvent('tabchange');
      
-         var tabblurEvent = document.createEvent('Events');
-         tabblurEvent.initEvent('tabblur');
+         that.tabblurEvent = document.createEvent('Events');
+         that.tabblurEvent.initEvent('tabblur');
      
-         var tabfocusEvent = document.createEvent('Events');
-         tabfocusEvent.initEvent('tabfocus');
+         that.tabfocusEvent = document.createEvent('Events');
+         that.tabfocusEvent.initEvent('tabfocus');
        } else {
          if (typeof Event=='function') {
-           var tabchangeEvent = new Event('tabchange');
-           var tabblurEvent = new Event('tabblur');
-           var tabfocusEvent = new Event('tabfocus');
+           that.tabchangeEvent = new Event('tabchange');
+           that.tabblurEvent = new Event('tabblur');
+           that.tabfocusEvent = new Event('tabfocus');
          }
        }
      
@@ -2754,7 +2754,7 @@
                  _dumpy(64,1,"displayTab "+aTab.id);
                  var canChange = true,
                      i = 0;
-                 canChange = aTab.dispatchEvent(tabchangeEvent) || canChange;
+                 canChange = aTab.dispatchEvent(that.tabchangeEvent) || canChange;
                  /*
                  if (that.ontabchange != undefined)
                    canChange = that.ontabchange(aTab);
@@ -2777,7 +2777,7 @@
                      if (!freeze) {
                        that.setCurrentContainer(that.getContainerNdx(theContainer));
                        theContainer.currentTabNdx = aNdx;
-                       aTab.dispatchEvent(tabfocusEvent);
+                       aTab.dispatchEvent(that.tabfocusEvent);
                        /*
                        if (that.ontabfocus != undefined)
                          that.ontabfocus(aTab);
@@ -2852,7 +2852,7 @@
            var theContainer = that.getContainerFromParam(aContainer);
            if (theContainer) {
              if (theContainer.childs.indexOf(aTab) == theContainer.currentTabNdx) {
-               ret = aTab.dispatchEvent(tabblurEvent) || ret;
+               ret = aTab.dispatchEvent(that.tabblurEvent) || ret;
                /*
                if (that.ontabblur != undefined)
                  ret = that.ontabblur(aTab, aTabToBeShowed);

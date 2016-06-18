@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ytabnav.js
- * YeAPF 0.8.49-10 built on 2016-06-03 13:09 (-3 DST)
+ * YeAPF 0.8.49-15 built on 2016-06-18 12:26 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-02-24 16:58:13 (-3 DST)
+ * 2016-06-18 12:25:04 (-3 DST)
  * First Version (C) 2012 - esteban daniel dortta - dortta@yahoo.com
  * Purpose: to control multiple tabs in a only-one-page application
  *          this is specially useful when building web mobile applications
@@ -12,19 +12,19 @@ var tabNavBase = function () {
   var that = {};
 
   if (isOnMobile()) {
-    var tabchangeEvent = document.createEvent('Events');
-    tabchangeEvent.initEvent('tabchange');
+    that.tabchangeEvent = document.createEvent('Events');
+    that.tabchangeEvent.initEvent('tabchange');
 
-    var tabblurEvent = document.createEvent('Events');
-    tabblurEvent.initEvent('tabblur');
+    that.tabblurEvent = document.createEvent('Events');
+    that.tabblurEvent.initEvent('tabblur');
 
-    var tabfocusEvent = document.createEvent('Events');
-    tabfocusEvent.initEvent('tabfocus');
+    that.tabfocusEvent = document.createEvent('Events');
+    that.tabfocusEvent.initEvent('tabfocus');
   } else {
     if (typeof Event=='function') {
-      var tabchangeEvent = new Event('tabchange');
-      var tabblurEvent = new Event('tabblur');
-      var tabfocusEvent = new Event('tabfocus');
+      that.tabchangeEvent = new Event('tabchange');
+      that.tabblurEvent = new Event('tabblur');
+      that.tabfocusEvent = new Event('tabfocus');
     }
   }
 
@@ -282,7 +282,7 @@ var tabNavBase = function () {
             _dumpy(64,1,"displayTab "+aTab.id);
             var canChange = true,
                 i = 0;
-            canChange = aTab.dispatchEvent(tabchangeEvent) || canChange;
+            canChange = aTab.dispatchEvent(that.tabchangeEvent) || canChange;
             /*
             if (that.ontabchange != undefined)
               canChange = that.ontabchange(aTab);
@@ -305,7 +305,7 @@ var tabNavBase = function () {
                 if (!freeze) {
                   that.setCurrentContainer(that.getContainerNdx(theContainer));
                   theContainer.currentTabNdx = aNdx;
-                  aTab.dispatchEvent(tabfocusEvent);
+                  aTab.dispatchEvent(that.tabfocusEvent);
                   /*
                   if (that.ontabfocus != undefined)
                     that.ontabfocus(aTab);
@@ -380,7 +380,7 @@ var tabNavBase = function () {
       var theContainer = that.getContainerFromParam(aContainer);
       if (theContainer) {
         if (theContainer.childs.indexOf(aTab) == theContainer.currentTabNdx) {
-          ret = aTab.dispatchEvent(tabblurEvent) || ret;
+          ret = aTab.dispatchEvent(that.tabblurEvent) || ret;
           /*
           if (that.ontabblur != undefined)
             ret = that.ontabblur(aTab, aTabToBeShowed);

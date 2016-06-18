@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.49-10 built on 2016-06-03 13:09 (-3 DST)
+    YeAPF 0.8.49-15 built on 2016-06-18 12:26 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-06-02 11:06:57 (-3 DST)
+    2016-06-07 16:42:18 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -52,7 +52,7 @@
         try {
           if (!db_tableExists('is_context')) {
             $sql = "CREATE TABLE is_context (";
-            $sql.= "  userID int  DEFAULT NULL,";
+            $sql.= "  userID int NOT NULL,";
             $sql.= "  varName varchar(120) DEFAULT NULL,";
             $sql.= "  varValue varchar(254) DEFAULT NULL,";
             $sql.= "  PRIMARY KEY (userID)";
@@ -296,7 +296,7 @@
               $newID=intval(db_sql("select max(ID) from is_menu"))+1;
               if (($newID)<2100)
                 $newID=2100;
-              db_sql("INSERT INTO is_menu (ID, enabled, attr, o, ancestor, label, d, rights, a, s, implementation, explanation, ativo, app, permiteAtivacao, permiteCriarItems, lnkNewWindow, lnkNewWindowWidth, lnkNewWindowHeight, lnkAllWide, lnkWOHeader, clickCounter, lnkNewWindowLeft, lnkNewWindowTop, lnkCacheable, hasImplementation) VALUES ($newID, 'Y', '2', '0', '-1', 'Navegação', '', '2', NULL, 'menus', NULL, NULL, 'N', '65535', '1', '0', '0', '600', '480', '1', '1', '0', '20', '40', '0', '0')");
+              db_sql("INSERT INTO is_menu (ID, enabled, attr, o, ancestor, label, d, rights, a, s, implementation, explanation, ativo, app, permiteAtivacao, permiteCriarItems, lnkNewWindow, lnkNewWindowWidth, lnkNewWindowHeight, lnkAllWide, lnkWOHeader, clickCounter, lnkNewWindowLeft, lnkNewWindowTop, lnkCacheable, hasImplementation) VALUES ($newID, 'Y', '2', '0', '-1', 'Navegaï¿½ï¿½o', '', '2', NULL, 'menus', NULL, NULL, 'N', '65535', '1', '0', '0', '600', '480', '1', '1', '0', '20', '40', '0', '0')");
             }
             if (valorSQL("select count(*) from is_menu where s='menuSuperior'")==0) {
               $newID=intval(db_sql("select max(ID) from is_menu"))+1;
@@ -339,7 +339,7 @@
               $newID=intval(db_sql("select max(ID) from is_menu"))+1;
               if (($newID)<4001)
                 $newID=4001;
-              db_sql("INSERT INTO is_menu (ID, enabled, attr, o, ancestor, label, d, rights, a, s, implementation, explanation, ativo, app, permiteAtivacao, permiteCriarItems, lnkNewWindow, lnkNewWindowWidth, lnkNewWindowHeight, lnkAllWide, lnkWOHeader, clickCounter, lnkNewWindowLeft, lnkNewWindowTop, lnkCacheable, hasImplementation) VALUES ($newID, 'Y', '2', '0', '-1', 'Sessões', '', '2', NULL, 'sessoes', NULL, NULL, 'S', '128', '1', '1', '0', '600', '480', '1', '1', '0', '20', '40', '0', '0')");
+              db_sql("INSERT INTO is_menu (ID, enabled, attr, o, ancestor, label, d, rights, a, s, implementation, explanation, ativo, app, permiteAtivacao, permiteCriarItems, lnkNewWindow, lnkNewWindowWidth, lnkNewWindowHeight, lnkAllWide, lnkWOHeader, clickCounter, lnkNewWindowLeft, lnkNewWindowTop, lnkCacheable, hasImplementation) VALUES ($newID, 'Y', '2', '0', '-1', 'Sessï¿½es', '', '2', NULL, 'sessoes', NULL, NULL, 'S', '128', '1', '1', '0', '600', '480', '1', '1', '0', '20', '40', '0', '0')");
             }
           }
           _db_upd_newVersion(6);
@@ -564,7 +564,7 @@
         $currentDBVersion=12;
         _db_grantSetupIni();
         $setupIni->setValue('currentDBVersion',$currentDBVersion);
-        $setupIni->commit();        
+        $setupIni->commit();
       }
     }
 
