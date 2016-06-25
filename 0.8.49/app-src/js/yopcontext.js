@@ -1,8 +1,8 @@
 /***********************************************************************
  * app-src/js/yopcontext.js
- * YeAPF 0.8.49-16 built on 2016-06-18 12:41 (-3 DST)
+ * YeAPF 0.8.49-32 built on 2016-06-25 10:34 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-06-18 12:41:08 (-3 DST)
+ * 2016-06-23 12:11:10 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * This is a set of function that helps to recognize operational context
@@ -28,14 +28,21 @@ function getInternetExplorerVersion() {
 
 function isInternetExplorer() {
   return (getInternetExplorerVersion() >= 0);
-}
+};
+
+function getAndroidVersion(ua) {
+    ua = (ua || navigator.userAgent).toLowerCase(); 
+    var match = ua.match(/android\s([0-9\.]*)/);
+    return match ? match[1] : false;
+};
  
 function isOnMobile() {
   var ret=false;
+  _dump(navigator.userAgent);
   if (typeof mosync != 'undefined') {
     ret = mosync.isAndroid || mosync.isIOS || mosync.isWindowsPhone;
   } else
     ret=/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   return ret;
-}
+};
 

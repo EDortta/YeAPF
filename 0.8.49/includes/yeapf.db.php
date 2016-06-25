@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.49-10 built on 2016-06-03 13:09 (-3 DST)
+    YeAPF 0.8.49-32 built on 2016-06-25 10:34 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-14 14:31:05 (-3 DST)
+    2016-06-18 14:26:15 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -254,7 +254,7 @@
       else
         $dbDef="$dbName";
       if ((!function_exists('ibase_connect')) || (!function_exists('ibase_pconnect')))
-        _yLoaderDie(false, "Cannot connect to Interbase/Firebird library.", "Is php-interbase installed?","(function ibase_pconnect() does not exists)");
+        _yLoaderDie(false, "Cannot connect to Interbase/Firebird library.", "Is php-interbase installed?","(neither function ibase_pconnect() nor ibase_connect() exists)");
 
       // php defines the name of ISO8859_1 as ISO-8859-1
       // so we need to change this.

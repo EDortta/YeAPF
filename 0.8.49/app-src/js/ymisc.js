@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.49-10 built on 2016-06-03 13:09 (-3 DST)
+ * YeAPF 0.8.49-32 built on 2016-06-25 10:34 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-05-25 15:36:18 (-3 DST)
+ * 2016-06-23 12:13:01 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -158,18 +158,23 @@ function getElementsByAttribute(oRootElem, strTagName, strAttributeName, strAttr
   return arrReturnElements;
 }
 
-function getElementsByClassName(oRootElem, strTagName, aClassName) {
-  console.log("getElementsByClassName()");
-  var arrElements = oRootElem.getElementsByTagName(strTagName);
-  var arrReturnElements = [];
-  var oCurrent;
-  for(var i=0; i<arrElements.length; i++) {
-    oCurrent = arrElements[i];
-    if ((oCurrent) && (typeof oCurrent.hasClass == 'function'))
-      if (oCurrent.hasClass(aClassName))
-        arrReturnElements.push(oCurrent);
+if (typeof getElementsByClassName=="undefined") {
+  console.log("Using own 'getElementsByClassName()' function");
+  function getElementsByClassName(oRootElem, strTagName, aClassName) {
+    console.log("getElementsByClassName('"+strTagName+"', '"+aClassName+"')");
+    var arrElements = oRootElem.getElementsByTagName(strTagName);
+    var arrReturnElements = [];
+    var oCurrent;
+    for(var i=0; i<arrElements.length; i++) {
+      oCurrent = arrElements[i];
+      if ((oCurrent) && (typeof oCurrent.hasClass == 'function'))
+        if (oCurrent.hasClass(aClassName))
+          arrReturnElements.push(oCurrent);
+    }
+    if (arrReturnElements==null)
+      arrReturnElements=document.getElementsByClassName(aClassName);
+    return arrReturnElements;
   }
-  return arrReturnElements;
 }
 
 var getClientSize = function () {
@@ -210,7 +215,16 @@ if (typeof resizeIframe == 'undefined') {
 /*
  * HTMLElement prototype extensions
  */
-if (typeof HTMLElement=='function') {
+var _expectedType;
+if ((isOnMobile()) && (parseInt(getAndroidVersion(), 10)<3)) {
+  /* gingerbread uses an object instead of function */
+  _expectedType="object";
+} else
+  _expectedType="function";
+_dump("ExpectedType="+_expectedType);
+_dump("typeof HTMLElement = "+typeof HTMLElement);
+
+if (typeof HTMLElement==_expectedType) {
   HTMLElement.prototype.hasClass = function (aClassName) {
     var ret = false;
     if (this.className) {

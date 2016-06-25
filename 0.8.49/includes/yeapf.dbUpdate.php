@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.49-15 built on 2016-06-18 12:26 (-3 DST)
+    YeAPF 0.8.49-32 built on 2016-06-25 10:34 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-06-07 16:42:18 (-3 DST)
+    2016-06-18 16:36:56 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -543,21 +543,21 @@
       if(_db_upd_canReviewVersion(12)) {
         _recordWastedTime("checking v12");
         if (!db_tableExists('is_tasks')) {
-          $sql="CREATE TABLE  `is_tasks` (
-                              `id` INT NOT NULL AUTO_INCREMENT,
-                              `creation_ts` INT,
-                              `finalization_ts` INT NULL,
-                              `iteraction_ts` INT NULL,
-                              `iteraction_ttl` INT DEFAULT 480,
-                              `stage` INT NULL,
-                              `priority` INT NULL,
-                              `mru` INT DEFAULT 0,
-                              `s` VARCHAR(48) NULL,
-                              `a` VARCHAR(48) NULL,
-                              `xq_start` INT NULL,
-                              `xq_target` INT NULL,
-                              `j_params` VARCHAR(512) NULL,
-                              PRIMARY KEY (`id`))";
+          $sql="CREATE TABLE  is_tasks (
+                              id INT NOT NULL ,
+                              creation_ts INT,
+                              finalization_ts INT ,
+                              iteraction_ts INT ,
+                              iteraction_ttl INT DEFAULT 480,
+                              stage INT ,
+                              priority INT ,
+                              mru INT DEFAULT 0,
+                              s VARCHAR(48) ,
+                              a VARCHAR(48) ,
+                              xq_start INT ,
+                              xq_target INT ,
+                              j_params VARCHAR(512) ,
+                              PRIMARY KEY (id))";
           db_sql($sql);
           db_commit();
         }

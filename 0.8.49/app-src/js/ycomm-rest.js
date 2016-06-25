@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-rest.js
- * YeAPF 0.8.49-10 built on 2016-06-03 13:09 (-3 DST)
+ * YeAPF 0.8.49-32 built on 2016-06-25 10:34 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-02-24 16:27:14 (-3 DST)
+ * 2016-06-25 10:30:37 (-3 DST)
  *
  * ycomm-rest.js is a set of prototyped functions
  * build in order to use REST protocol
@@ -10,8 +10,9 @@
  *********************************************/
 //# sourceURL=app-src/js/ycomm-rest.js
 
-  ycomm.setDataLocation = function(dataLocation) {
+  ycomm.setDataLocation = function(dataLocation, deviceId) {
     this._dataLocation_=dataLocation;
+    this._deviceId_=deviceId || guid();
   };
 
   ycomm.getDataLocation = function () {
@@ -120,7 +121,7 @@
         ycomm._load++;
 
         var aURL=this.buildCommonURL(s || '', a || '', limits || {}, localU);
-        aURL="{0}?{1}&callback={2}&callbackId={3}&scriptSequence={4}".format(this._dataLocation_, aURL, callbackFunctionName, callbackId, ycomm._scriptSequence);
+        aURL="{0}?{1}&callback={2}&callbackId={3}&scriptSequence={4}&deviceId={5}".format(this._dataLocation_, aURL, callbackFunctionName, callbackId, ycomm._scriptSequence,this._deviceId_);
         if (ycomm.getLoad()<=ycomm._maxDirectCall)
           ycomm.bring(aURL);
         else

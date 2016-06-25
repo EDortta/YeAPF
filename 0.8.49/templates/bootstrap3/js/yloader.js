@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.49-16 built on 2016-06-18 12:41 (-3 DST)
+  * YeAPF 0.8.49-32 built on 2016-06-25 10:34 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-06-18 12:41:43 (-3 DST)
+  * 2016-06-25 10:34:04 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,6 +26,7 @@
      }
    }
  )();
+ console.log("YeAPF 0.8.49-32 built on 2016-06-25 10:34 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -53,16 +54,23 @@
      
      function isInternetExplorer() {
        return (getInternetExplorerVersion() >= 0);
-     }
+     };
+     
+     function getAndroidVersion(ua) {
+         ua = (ua || navigator.userAgent).toLowerCase(); 
+         var match = ua.match(/android\s([0-9\.]*)/);
+         return match ? match[1] : false;
+     };
       
      function isOnMobile() {
        var ret=false;
+       _dump(navigator.userAgent);
        if (typeof mosync != 'undefined') {
          ret = mosync.isAndroid || mosync.isIOS || mosync.isWindowsPhone;
        } else
          ret=/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
        return ret;
-     }
+     };
      
      
  /* END yopcontext.js */
@@ -80,7 +88,7 @@
      };
      
      function __dump__(aLineConsole) {
-       if (isOnMobile())
+       if (typeof mosync == "object")
          mosync.rlog(aLineConsole);
        else
          console.log(aLineConsole);
@@ -403,18 +411,23 @@
        return arrReturnElements;
      }
      
-     function getElementsByClassName(oRootElem, strTagName, aClassName) {
-       console.log("getElementsByClassName()");
-       var arrElements = oRootElem.getElementsByTagName(strTagName);
-       var arrReturnElements = [];
-       var oCurrent;
-       for(var i=0; i<arrElements.length; i++) {
-         oCurrent = arrElements[i];
-         if ((oCurrent) && (typeof oCurrent.hasClass == 'function'))
-           if (oCurrent.hasClass(aClassName))
-             arrReturnElements.push(oCurrent);
+     if (typeof getElementsByClassName=="undefined") {
+       console.log("Using own 'getElementsByClassName()' function");
+       function getElementsByClassName(oRootElem, strTagName, aClassName) {
+         console.log("getElementsByClassName('"+strTagName+"', '"+aClassName+"')");
+         var arrElements = oRootElem.getElementsByTagName(strTagName);
+         var arrReturnElements = [];
+         var oCurrent;
+         for(var i=0; i<arrElements.length; i++) {
+           oCurrent = arrElements[i];
+           if ((oCurrent) && (typeof oCurrent.hasClass == 'function'))
+             if (oCurrent.hasClass(aClassName))
+               arrReturnElements.push(oCurrent);
+         }
+         if (arrReturnElements==null)
+           arrReturnElements=document.getElementsByClassName(aClassName);
+         return arrReturnElements;
        }
-       return arrReturnElements;
      }
      
      var getClientSize = function () {
@@ -455,7 +468,16 @@
      /*
       * HTMLElement prototype extensions
       */
-     if (typeof HTMLElement=='function') {
+     var _expectedType;
+     if ((isOnMobile()) && (parseInt(getAndroidVersion(), 10)<3)) {
+       /* gingerbread uses an object instead of function */
+       _expectedType="object";
+     } else
+       _expectedType="function";
+     _dump("ExpectedType="+_expectedType);
+     _dump("typeof HTMLElement = "+typeof HTMLElement);
+     
+     if (typeof HTMLElement==_expectedType) {
        HTMLElement.prototype.hasClass = function (aClassName) {
          var ret = false;
          if (this.className) {
@@ -2485,6 +2507,7 @@
        var that = {};
      
        if (isOnMobile()) {
+         _dump("Loading mobile tabs");
          that.tabchangeEvent = document.createEvent('Events');
          that.tabchangeEvent.initEvent('tabchange');
      
@@ -2495,10 +2518,12 @@
          that.tabfocusEvent.initEvent('tabfocus');
        } else {
          if (typeof Event=='function') {
+           _dump("Loading desktop tabs");
            that.tabchangeEvent = new Event('tabchange');
            that.tabblurEvent = new Event('tabblur');
            that.tabfocusEvent = new Event('tabfocus');
-         }
+         } else 
+           _dump("Tabs are not supported");    
        }
      
        that.currentTabNdx = -1;
@@ -2683,9 +2708,11 @@
      
        that.init = function (aDivContainer) {
          if (that.initialized < 0) {
+           _dump("Initializing tabs");
+     
            that.initialized = 0;
      
-           var allContainers = y$('.tnContainer'),
+           var allContainers = document.getElementsByClassName('tnContainer'),
                firstTab = null, aDiv = null,
                i = 0;
            if (allContainers) {
@@ -2693,13 +2720,15 @@
                aDiv=allContainers[i];
                that.addContainer(aDiv);
              }
-           }
+           } else 
+             _dump("ERROR: No containers defined. Use 'tnContainer' class on a DIV");
      
-           var allTabs = y$('.tnTab');
+           var allTabs = document.getElementsByClassName('tnTab');
            if (allTabs) {
              for(var i=0; i<allTabs.length; i++)
                that.hideTab(allTabs[i]);
-           }
+           } else
+             _dump("ERROR: No tabs defined. Use 'tnTab' class on a DIV");
      
            if (that.containerList.length>0) {
              firstTab=that.containerList[0].childs[0];
@@ -2714,7 +2743,7 @@
          return that;
        };
      
-       that.currentTab = function (aDiv) {
+       that.currentTab = function () {
          var theContainer = that.getCurrentContainer();
          if (theContainer.currentTabNdx>-1) {
            return theContainer.childs[theContainer.currentTabNdx];
@@ -3502,8 +3531,9 @@
       *********************************************/
      
      
-       ycomm.setDataLocation = function(dataLocation) {
+       ycomm.setDataLocation = function(dataLocation, deviceId) {
          this._dataLocation_=dataLocation;
+         this._deviceId_=deviceId || guid();
        };
      
        ycomm.getDataLocation = function () {
@@ -3612,7 +3642,7 @@
              ycomm._load++;
      
              var aURL=this.buildCommonURL(s || '', a || '', limits || {}, localU);
-             aURL="{0}?{1}&callback={2}&callbackId={3}&scriptSequence={4}".format(this._dataLocation_, aURL, callbackFunctionName, callbackId, ycomm._scriptSequence);
+             aURL="{0}?{1}&callback={2}&callbackId={3}&scriptSequence={4}&deviceId={5}".format(this._dataLocation_, aURL, callbackFunctionName, callbackId, ycomm._scriptSequence,this._deviceId_);
              if (ycomm.getLoad()<=ycomm._maxDirectCall)
                ycomm.bring(aURL);
              else

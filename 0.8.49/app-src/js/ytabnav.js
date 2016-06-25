@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ytabnav.js
- * YeAPF 0.8.49-15 built on 2016-06-18 12:26 (-3 DST)
+ * YeAPF 0.8.49-32 built on 2016-06-25 10:34 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-06-18 12:25:04 (-3 DST)
+ * 2016-06-23 17:55:11 (-3 DST)
  * First Version (C) 2012 - esteban daniel dortta - dortta@yahoo.com
  * Purpose: to control multiple tabs in a only-one-page application
  *          this is specially useful when building web mobile applications
@@ -12,6 +12,7 @@ var tabNavBase = function () {
   var that = {};
 
   if (isOnMobile()) {
+    _dump("Loading mobile tabs");
     that.tabchangeEvent = document.createEvent('Events');
     that.tabchangeEvent.initEvent('tabchange');
 
@@ -22,10 +23,12 @@ var tabNavBase = function () {
     that.tabfocusEvent.initEvent('tabfocus');
   } else {
     if (typeof Event=='function') {
+      _dump("Loading desktop tabs");
       that.tabchangeEvent = new Event('tabchange');
       that.tabblurEvent = new Event('tabblur');
       that.tabfocusEvent = new Event('tabfocus');
-    }
+    } else 
+      _dump("Tabs are not supported");    
   }
 
   that.currentTabNdx = -1;
@@ -210,9 +213,11 @@ var tabNavBase = function () {
 
   that.init = function (aDivContainer) {
     if (that.initialized < 0) {
+      _dump("Initializing tabs");
+
       that.initialized = 0;
 
-      var allContainers = y$('.tnContainer'),
+      var allContainers = document.getElementsByClassName('tnContainer'),
           firstTab = null, aDiv = null,
           i = 0;
       if (allContainers) {
@@ -220,13 +225,15 @@ var tabNavBase = function () {
           aDiv=allContainers[i];
           that.addContainer(aDiv);
         }
-      }
+      } else 
+        _dump("ERROR: No containers defined. Use 'tnContainer' class on a DIV");
 
-      var allTabs = y$('.tnTab');
+      var allTabs = document.getElementsByClassName('tnTab');
       if (allTabs) {
         for(var i=0; i<allTabs.length; i++)
           that.hideTab(allTabs[i]);
-      }
+      } else
+        _dump("ERROR: No tabs defined. Use 'tnTab' class on a DIV");
 
       if (that.containerList.length>0) {
         firstTab=that.containerList[0].childs[0];
@@ -241,7 +248,7 @@ var tabNavBase = function () {
     return that;
   };
 
-  that.currentTab = function (aDiv) {
+  that.currentTab = function () {
     var theContainer = that.getCurrentContainer();
     if (theContainer.currentTabNdx>-1) {
       return theContainer.childs[theContainer.currentTabNdx];

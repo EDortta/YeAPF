@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.tasks.php
-    YeAPF 0.8.49-10 built on 2016-06-03 13:09 (-3 DST)
+    YeAPF 0.8.49-32 built on 2016-06-25 10:34 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-06-02 11:40:19 (-3 DST)
+    2016-06-18 16:32:53 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -38,14 +38,20 @@
           $retTaskId=intval(db_sql($sqlTask));
           if ($retTaskId<=0) {
             $ts=date('U');
-            /* all tasks starts with stage=0 (disabled) */
-            $sql="insert into is_tasks(stage, s, a, j_params, 
-                                       xq_start, xq_target, 
-                                       mru, priority, 
-                                       creation_ts, iteraction_ttl) 
-                  values (0, '$s', '$a', '$j_params', 0, -1, 0, $priority, $ts, $iteraction_ttl)";
-            db_sql($sql);
-           $retTaskId=db_sql($sqlTask);
+            if (lock("newTaskId")) {
+              $newId=intval(db_sql("select max(id) from is_tasks"));
+              $newId++;
+              
+              /* all tasks starts with stage=0 (disabled) */
+              $sql="insert into is_tasks(id, stage, s, a, j_params, 
+                                         xq_start, xq_target, 
+                                         mru, priority, 
+                                         creation_ts, iteraction_ttl) 
+                    values ($newId, 0, '$s', '$a', '$j_params', 0, -1, 0, $priority, $ts, $iteraction_ttl)";
+              db_sql($sql);
+              unlock("newTaskId");
+            }
+            $retTaskId=db_sql($sqlTask);
           }
           $this->setTaskId($retTaskId);
         } catch (Exception $e) {
