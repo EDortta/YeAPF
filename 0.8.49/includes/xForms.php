@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xForms.php
-    YeAPF 0.8.49-10 built on 2016-06-03 13:09 (-3 DST)
+    YeAPF 0.8.49-34 built on 2016-06-27 10:46 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-05-30 09:45:48 (-3 DST)
+    2016-06-27 10:45:31 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
   /*
@@ -1535,7 +1535,7 @@
           $fieldsSourceMap[$fieldName]='fields';
         }
 
-        $fields[$fieldName] = escapeString($v);
+        $fields[$fieldName] = urldecode(escapeString($v));
       }
 
     }
