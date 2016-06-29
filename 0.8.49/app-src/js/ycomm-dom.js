@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.49-10 built on 2016-06-03 13:09 (-3 DST)
+ * YeAPF 0.8.49-39 built on 2016-06-29 06:53 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-05-25 16:08:06 (-3 DST)
+ * 2016-06-29 06:52:57 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -14,7 +14,7 @@ ycomm.dom = {
 ycomm.dom.fillInplaceData = function(aElement, aData) {
   for(var i in aData)
     if (aData.hasOwnProperty(i))
-      aElement.setAttribute('data_'+i, aData[i])
+      aElement.setAttribute('data_'+i, aData[i]);
 };
 
 ycomm.dom.getInplaceData = function(aElement) {
@@ -72,26 +72,35 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
 
   idFieldName = aLineSpec.idFieldName || 'id';
 
+  var getDataFromXData = function(xDataItem) {
+    /* this function extract the pouchdb data from xDataItem if exists. otherwise, return xDataItem */
+    if ((xDataItem.doc) && (xDataItem.id) && (xDataItem.value))
+      xDataItem=xDataItem.doc;
+    return xDataItem;
+  };
+
   var setNewRowAttributes = function (aNewRow) {
     var auxIdSequence,
-        auxInplaceData;
+        auxInplaceData,
+        xDataItem=getDataFromXData(xData[j]);
+
     cNdx = 0;
     if (aNewRow.nodeName=='TR')
       aNewRow.style.backgroundColor=rowColorSpec.suggestRowColor(rowGroup);
-    if (xData[j][idFieldName]) {
-      if (y$(xData[j][idFieldName])) {
+    if (xDataItem[idFieldName]) {
+      if (y$(xDataItem[idFieldName])) {
         auxIdSequence = 0;
-        while (y$(xData[j][idFieldName]+'_'+auxIdSequence))
+        while (y$(xDataItem[idFieldName]+'_'+auxIdSequence))
           auxIdSequence++;
-        aNewRow.id = xData[j][idFieldName]+'_'+auxIdSequence;
+        aNewRow.id = xDataItem[idFieldName]+'_'+auxIdSequence;
       } else
-        aNewRow.id = xData[j][idFieldName];
+        aNewRow.id = xDataItem[idFieldName];
     }
 
     if (typeof aLineSpec.inplaceData != 'undefined') {
       for(var i=0; i<aLineSpec.inplaceData.length; i++) {
         colName = aLineSpec.inplaceData[i];
-        auxInplaceData = xData[j][colName] || '';
+        auxInplaceData = xDataItem[colName] || '';
         aNewRow.setAttribute('data_'+colName, auxInplaceData);
       }
     }
@@ -104,7 +113,8 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
   var addCell = function(colName) {
     if (colName != idFieldName) {
       var newCell  = newRow.insertCell(cNdx),
-          aNewCellValue = colName!==null?unmaskHTML(xData[j][colName]):unmaskHTML(xData[j]);
+          xDataItem=getDataFromXData(xData[j]),
+          aNewCellValue = colName!==null?unmaskHTML(xDataItem[colName]):unmaskHTML(xDataItem);
       if ((aLineSpec.columns) && (aLineSpec.columns[colName])) {
         if (aLineSpec.columns[colName].align)
           newCell.style.textAlign=aLineSpec.columns[colName].align;
@@ -123,12 +133,12 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
       newCell.id=aElementID+'_'+cNdx+'_'+oTable.rows.length;
       newCell.setAttribute('colName', colName);
       if (typeof aLineSpec.onNewItem == 'function')
-        aLineSpec.onNewItem(aElementID, newCell, xData[j]);
+        aLineSpec.onNewItem(aElementID, newCell, xDataItem);
       cNdx = cNdx + 1;
     }
   };
 
-  var oTable, auxHTML, j, c, cNdx, i, newCell, internalRowId=(new Date()).getTime()-1447265735470;
+  var oTable, auxHTML, j, c, cNdx, i, newCell, internalRowId=(new Date()).getTime()-1447265735470, xDataItem;
 
   if (aElement) {
     if (aElement.nodeName=='TABLE') {
@@ -169,18 +179,19 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
       cNdx = null;
       for (j in xData) {
         if (xData.hasOwnProperty(j)) {
+          xDataItem=getDataFromXData(xData[j]);
           rowGroup++;
 
           canCreateRow = true;
           if (!aDeleteRows) {
-            if (xData[j][idFieldName]) {
+            if (xDataItem[idFieldName]) {
               for(i=0; ((canCreateRow) && (i<oTable.rows.length)); i++) {
-                if (oTable.rows[i].id == xData[j][idFieldName]) {
+                if (oTable.rows[i].id == xDataItem[idFieldName]) {
                   newRow = oTable.rows[i];
                   while (newRow.cells.length>0)
                     newRow.deleteCell(0);
                   canCreateRow = false;
-                  xData[j].rowid = i;
+                  xDataItem.rowid = i;
                 }
               }
             }
@@ -190,10 +201,10 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
             newRow = oTable.insertRow(oTable.rows.length);
           }
 
-          // xData[j]['rowid'] = parseInt(xData[j]['rowid']) + rowIdOffset + '';
+          // xDataItem['rowid'] = parseInt(xDataItem['rowid']) + rowIdOffset + '';
           internalRowId++;
-          xData[j].rowid = (typeof newRow.rowIndex !== "undefined" )?newRow.rowIndex:internalRowId + '';
-          xData[j]._elementid_ = aElementID;
+          xDataItem.rowid = (typeof newRow.rowIndex !== "undefined" )?newRow.rowIndex:internalRowId + '';
+          xDataItem._elementid_ = aElementID;
 
           setNewRowAttributes(newRow);
 
@@ -201,11 +212,11 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
           if ((typeof aLineSpec.html == 'undefined') &&
               (typeof aLineSpec.rows == 'undefined') &&
               (typeof aLineSpec.columns == 'undefined')) {
-            if (typeof xData[j]=='string') {
+            if (typeof xDataItem=='string') {
               addCell(null);
             } else {
-              for(colName in xData[j]) {
-                if ((xData[j].hasOwnProperty(colName)) &&
+              for(colName in xDataItem) {
+                if ((xDataItem.hasOwnProperty(colName)) &&
                     (colName!=idFieldName) &&
                     (colName!='rowid') &&
                     (colName!='_elementid_')) {
@@ -232,11 +243,11 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
             } else if (typeof aLineSpec.html != 'undefined'){
               /* html parser is enabled */
               newCell  = newRow.insertCell(0);
-              newCell.innerHTML = yAnalise(aLineSpec.html,xData[j]);
+              newCell.innerHTML = yAnalise(aLineSpec.html,xDataItem);
               newCell.style.verticalAlign='top';
               newCell.id=aElementID+'_'+cNdx+'_'+oTable.rows.length;
               if (typeof aLineSpec.onNewItem == 'function')
-                aLineSpec.onNewItem(aElementID, newCell, xData[j]);
+                aLineSpec.onNewItem(aElementID, newCell, xDataItem);
 
             } else if (typeof aLineSpec.rows != 'undefined') {
               var firstRow = true;
@@ -245,13 +256,13 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
                   newRow = oTable.insertRow(oTable.rows.length);
                   setNewRowAttributes(newRow);
                 }
-                newRow.innerHTML = yAnalise(aLineSpec.rows[r],xData[j]);
+                newRow.innerHTML = yAnalise(aLineSpec.rows[r],xDataItem);
                 if (!canCreateRow) {
                   for(c=0; c<newRow.cells.length; c++)
                     newRow.cells[c].style.borderLeft = 'solid 1px red';
                 }
                 if (typeof aLineSpec.onNewItem == 'function')
-                  aLineSpec.onNewItem(aElementID, newRow, xData[j]);
+                  aLineSpec.onNewItem(aElementID, newRow, xDataItem);
                 firstRow = false;
               }
             }
@@ -276,25 +287,26 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
 
       for (j in xData) {
         if (xData.hasOwnProperty(j)) {
+          xDataItem=getDataFromXData(xData[j]);
           var entry = document.createElement('li');
           var innerText = '',
               asHTML=false;
           if (typeof aLineSpec.rows=='object') {
             for(r=0; r < aLineSpec.rows.length; r++) {
-              innerText=innerText+yAnalise(aLineSpec.rows[r],xData[j])+"";
+              innerText=innerText+yAnalise(aLineSpec.rows[r],xDataItem)+"";
             }
             asHTML=true;
           } else if (typeof aLineSpec.html=='string') {
-            innerText=innerText+yAnalise(aLineSpec.html,xData[j])+"";
+            innerText=innerText+yAnalise(aLineSpec.html,xDataItem)+"";
             asHTML=true;
           } else {
-            for(colName in xData[j]) {
+            for(colName in xDataItem) {
               if (innerText==='') {
-                if ((xData[j].hasOwnProperty(colName)) &&
+                if ((xDataItem.hasOwnProperty(colName)) &&
                     (colName!=idFieldName) &&
                     (colName!='rowid') &&
                     (colName!='_elementid_')) {
-                      innerText=innerText+xData[j][colName];
+                      innerText=innerText+xDataItem[colName];
                     }
               }
             }
@@ -313,7 +325,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
             oUL.appendChild(entry);
 
           if (typeof aLineSpec.onNewItem == 'function')
-            aLineSpec.onNewItem(aElementID, entry, xData[j]);
+            aLineSpec.onNewItem(aElementID, entry, xDataItem);
         }
       }
 
@@ -327,24 +339,25 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
 
       for (j in xData) {
         if (xData.hasOwnProperty(j)) {
-          xData[j]._elementid_ = aElementID;
+          xDataItem=getDataFromXData(xData[j]);
+          xDataItem._elementid_ = aElementID;
           newRow   = document.createElement('listitem');
           cNdx = 0;
 
           if (typeof aLineSpec.columns == 'undefined') {
-            if (typeof xData[j] == 'string') {
+            if (typeof xDataItem == 'string') {
               _dumpy(2,1,"ERRO: yeapf-dom.js - string cell not implemented");
             } else {
-              for(colName in xData[j]) {
-                if ((xData[j].hasOwnProperty(colName)) &&
+              for(colName in xDataItem) {
+                if ((xDataItem.hasOwnProperty(colName)) &&
                     (colName!=idFieldName) &&
                     (colName!='rowid') &&
                     (colName!='_elementid_')) {
                   newCell  = document.createElement('listcell');
-                  newCell.innerHTML = xData[j][colName];
+                  newCell.innerHTML = xDataItem[colName];
                   newCell.id=aElementID+'_'+cNdx+'_'+cRow;
                   if (typeof aLineSpec.onNewItem == 'function')
-                    aLineSpec.onNewItem(aElementID, newCell, xData[j]);
+                    aLineSpec.onNewItem(aElementID, newCell, xDataItem);
                   cNdx = cNdx + 1;
                   newRow.appendChild(newCell);
                 }
@@ -354,10 +367,10 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
             for(colName in aLineSpec.columns) {
               if (colName != idFieldName) {
                 newCell  = document.createElement('listcell');
-                newCell.innerHTML = xData[j][colName];
+                newCell.innerHTML = xDataItem[colName];
                 newCell.id=aElementID+'_'+cNdx+'_'+cRow;
                 if (typeof aLineSpec.onNewItem == 'function')
-                  aLineSpec.onNewItem(aElementID, newCell, xData[j]);
+                  aLineSpec.onNewItem(aElementID, newCell, xDataItem);
                 cNdx = cNdx + 1;
                 newRow.appendChild(newCell);
               }
@@ -380,52 +393,53 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
       for (j in xData) {
 
         if (xData.hasOwnProperty(j)) {
-          xData[j]._elementid_ = aElementID;
+          xDataItem=getDataFromXData(xData[j]);
+          xDataItem._elementid_ = aElementID;
           auxHTML = '';
           if (typeof aLineSpec.columns == 'undefined') {
-            if (typeof xData[j] == 'string') {
+            if (typeof xDataItem == 'string') {
               _dumpy(2,1,"ERRO: yeapf-dom.js - string cell not implemented");
             } else {
-              for(colName in xData[j]) {
-                if ((xData[j].hasOwnProperty(colName)) &&
+              for(colName in xDataItem) {
+                if ((xDataItem.hasOwnProperty(colName)) &&
                     (colName!=idFieldName) &&
                     (colName!='rowid') &&
                     (colName!='_elementid_')) {
-                  auxHTML = auxHTML + xData[j][colName];
+                  auxHTML = auxHTML + xDataItem[colName];
                 }
               }
             }
           } else {
             if (isArray(aLineSpec.columns)) {
               for (c=0; c<aLineSpec.columns.length; c++) {
-                auxHTML = auxHTML + xData[j][aLineSpec.columns[c]] + ' ';
+                auxHTML = auxHTML + xDataItem[aLineSpec.columns[c]] + ' ';
               }
             } else {
-              if (typeof xData[j] == 'string') {
+              if (typeof xDataItem == 'string') {
                 _dumpy(2,1,"ERRO: yeapf-dom.js - string cell not implemented");
               } else {
                 for(colName in aLineSpec.columns) {
                   if (colName != idFieldName)
-                    auxHTML = auxHTML + xData[j][colName];
+                    auxHTML = auxHTML + xDataItem[colName];
                 }
               }
             }
           }
 
           var opt =  document.createElement('option');
-          if (typeof xData[j][idFieldName] != 'undefined')
-            opt.value = xData[j][idFieldName];
+          if (typeof xDataItem[idFieldName] != 'undefined')
+            opt.value = xDataItem[idFieldName];
           opt.innerHTML = auxHTML;
           opt.id=aElementID+'_'+cNdx;
           if (aLineSpec.inplaceData) {
             for(c=0;c<aLineSpec.inplaceData.length; c++) {
-              if (typeof xData[j][aLineSpec.inplaceData[c]] !== "undefined") {
-                opt.setAttribute("data_"+aLineSpec.inplaceData[c], xData[j][aLineSpec.inplaceData[c]]);
+              if (typeof xDataItem[aLineSpec.inplaceData[c]] !== "undefined") {
+                opt.setAttribute("data_"+aLineSpec.inplaceData[c], xDataItem[aLineSpec.inplaceData[c]]);
               }
             }
           }
           if (typeof aLineSpec.onNewItem == 'function')
-            aLineSpec.onNewItem(aElementID, opt, xData[j]);
+            aLineSpec.onNewItem(aElementID, opt, xDataItem);
           aElement.appendChild(opt);
           cNdx++;
         }
@@ -450,7 +464,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
 
       if (xData)
         if ((typeof xData=='object') || (xData.length === 1)) {
-          var yData=xData[0] || xData;
+          var yData=getDataFromXData(xData[0] || xData);
 
           fieldPrefix = aLineSpec.elementPrefixName || '';
           fieldPostfix = aLineSpec.elementPostixName || '';
@@ -534,14 +548,15 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
     } else if (aElement.nodeName=='DIV') {
       if (xData)
         if (xData.length === 1) {
+          xDataItem=getDataFromXData(xData[0]);
           auxHTML='';
           if (aDeleteRows)
             aElement.innerHTML='';
           else
             auxHTML=aElement.innerHTML;
-          for(colName in xData[0])
-            if (xData[0].hasOwnProperty(colName)) {
-              auxHTML+='<div><div class=tnFieldName><b><small>{0}</small></b></div>{1}'.format(colName, xData[0][colName]);
+          for(colName in xDataItem)
+            if (xDataItem.hasOwnProperty(colName)) {
+              auxHTML+='<div><div class=tnFieldName><b><small>{0}</small></b></div>{1}'.format(colName, xDataItem[colName]);
             }
           aElement.innerHTML=auxHTML;
         }
