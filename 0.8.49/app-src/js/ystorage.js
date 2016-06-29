@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ystorage.js
- * YeAPF 0.8.49-40 built on 2016-06-29 07:09 (-3 DST)
+ * YeAPF 0.8.49-42 built on 2016-06-29 07:25 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-06-29 07:07:56 (-3 DST)
+ * 2016-06-29 07:25:20 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *********************************************/
 //# sourceURL=app-src/js/ystorage.js
@@ -70,47 +70,50 @@ if (!window.ystorage) {
   })());
 }
 
-var ySingleDb = function (dbTag) {
-  var that={};
-  that.dbAux = window.localStorage;
+if (!window.ySingleDb) {
+  console.log("Creating ySingleDb");
+  window.ySingleDb = function (dbTag) {
+    var that={};
+    that.dbAux = window.localStorage;
 
-  that.setItem = function(id, jData) {
-    localStorage.setItem(that._dbTag_+"_item_"+id, JSON.stringify(jData));
-    var lista=that.getList();
-    if (lista.indexOf(id)==-1) {
-      lista[lista.length]=String(id);
-      localStorage.setItem(that._dbTag_+"_list", JSON.stringify(lista));
-    }      
-  }
+    that.setItem = function(id, jData) {
+      localStorage.setItem(that._dbTag_+"_item_"+id, JSON.stringify(jData));
+      var lista=that.getList();
+      if (lista.indexOf(id)==-1) {
+        lista[lista.length]=String(id);
+        localStorage.setItem(that._dbTag_+"_list", JSON.stringify(lista));
+      }      
+    };
 
-  that.getItem = function(id) {
-    var ret=localStorage.getItem(that._dbTag_+"_item_"+id);
-    ret=JSON.parse(ret);
-    return ret;
-  }
+    that.getItem = function(id) {
+      var ret=localStorage.getItem(that._dbTag_+"_item_"+id);
+      ret=JSON.parse(ret);
+      return ret;
+    };
 
-  that.getList = function () {
-    var lista=localStorage.getItem(that._dbTag_+"_list");
-    if (typeof lista=="string")
-      lista=((JSON) && JSON.parse(lista)) || [];
-    lista=lista || [];
-    return lista;
-  }
+    that.getList = function () {
+      var lista=localStorage.getItem(that._dbTag_+"_list");
+      if (typeof lista=="string")
+        lista=((JSON) && JSON.parse(lista)) || [];
+      lista=lista || [];
+      return lista;
+    };
 
-  that.removeItem = function(id) {
-    localStorage.removeItem(that._dbTag_+"_item_"+id);
-    var lista=that.getList();
-    var ndx=lista.indexOf(String(id));
-    if (ndx>-1) {
-      lista.splice(ndx,1);
-      localStorage.setItem(that._dbTag_+"_list", JSON.stringify(lista));
-    }
-  }
+    that.removeItem = function(id) {
+      localStorage.removeItem(that._dbTag_+"_item_"+id);
+      var lista=that.getList();
+      var ndx=lista.indexOf(String(id));
+      if (ndx>-1) {
+        lista.splice(ndx,1);
+        localStorage.setItem(that._dbTag_+"_list", JSON.stringify(lista));
+      }
+    };
 
-  that.init = function(dbTag) {
-    that._dbTag_=dbTag;
-    return that;
-  }
+    that.init = function(dbTag) {
+      that._dbTag_=dbTag;
+      return that;
+    };
 
-  return that.init(dbTag);
+    return that.init(dbTag);
+  };
 }
