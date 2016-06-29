@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.49-10 built on 2016-06-03 13:09 (-3 DST)
+    YeAPF 0.8.49-38 built on 2016-06-29 06:13 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-05-24 18:39:08 (-3 DST)
+    2016-06-29 06:12:35 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -603,6 +603,28 @@
         $xq_return=xq_produceReturnLinesFromSQL($returnSet, $xq_regCount, $xq_usingColNames, $xq_countLimit, '', $xq_prefix, $xq_postfix);
     }
     return $xq_return;
+  }
+
+  function jr_produceReturnLines($returnSet) {
+    if (is_string($returnSet)) {
+      $auxSet=$returnSet;
+      $auxSet=strtolower(getNextValue($auxSet,' '));
+      if (($auxSet=="select") || ($auxSet=="insert") || ($auxSet=="delete") || ($auxSet=="update") || ($auxSet=="replace")) {
+        
+        $auxSet=db_queryAndFillArray($returnSet);
+        $returnSet=array();
+
+        foreach($auxSet as $d) {
+          $auxLine=array();
+          foreach($d as $k=>$v)
+            if (strtoupper($k)==$k)
+              if ($k!="__COUNT__")
+                $auxLine[$k]=$v;
+          $returnSet[count($returnSet)] = $auxLine;
+        }
+      }
+    }
+    return json_encode($returnSet);
   }
 
 

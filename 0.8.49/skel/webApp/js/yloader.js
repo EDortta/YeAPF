@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.49-34 built on 2016-06-27 10:46 (-3 DST)
+  * YeAPF 0.8.49-38 built on 2016-06-29 06:13 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-06-27 10:46:39 (-3 DST)
+  * 2016-06-29 06:13:42 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.49-34 built on 2016-06-27 10:46 (-3 DST)");
+ console.log("YeAPF 0.8.49-38 built on 2016-06-29 06:13 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -2042,16 +2042,20 @@
      
        document.addEventListener(
            "DOMContentLoaded",
-           function(event) {
+           function(event) {        
              if (mTabNav) mTabNav.init();
            }
        );
      
-       window.addEventListener("load", function() {
+       window.addEventListener("load", function() {    
          for(var i=0; i<_onLoadMethods.length; i++)
            if (_onLoadMethods.hasOwnProperty(i))
              if (_onLoadMethods[i]!==undefined)
                _onLoadMethods[i]();
+         if (!isOnMobile()) {
+           var event = new Event('deviceready');
+           document.dispatchEvent(event);      
+         }
        }, false);
      
      
