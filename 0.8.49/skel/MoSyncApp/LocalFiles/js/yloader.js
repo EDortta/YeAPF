@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.49-10 built on 2016-06-03 13:09 (-3 DST)
+  * YeAPF 0.8.49-57 built on 2016-06-30 16:23 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-03-07 13:46:13 (-3 DST)
+  * 2016-06-30 16:23:42 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,6 +26,7 @@
      }
    }
  )();
+ console.log("YeAPF 0.8.49-57 built on 2016-06-30 16:23 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -53,15 +54,23 @@
      
      function isInternetExplorer() {
        return (getInternetExplorerVersion() >= 0);
-     }
+     };
+     
+     function getAndroidVersion(ua) {
+         ua = (ua || navigator.userAgent).toLowerCase(); 
+         var match = ua.match(/android\s([0-9\.]*)/);
+         return match ? match[1] : false;
+     };
       
      function isOnMobile() {
        var ret=false;
+       _dump(navigator.userAgent);
        if (typeof mosync != 'undefined') {
          ret = mosync.isAndroid || mosync.isIOS || mosync.isWindowsPhone;
-       }
+       } else
+         ret=/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
        return ret;
-     }
+     };
      
      
  /* END yopcontext.js */
@@ -79,7 +88,7 @@
      };
      
      function __dump__(aLineConsole) {
-       if (isOnMobile())
+       if (typeof mosync == "object")
          mosync.rlog(aLineConsole);
        else
          console.log(aLineConsole);
@@ -259,7 +268,7 @@
       */
      
      ( function () {
-       y$ = function (aElementId) {
+       y$ = function (aElementId, aTagName, aIndex) {
          var ret=null, auxRet;
          if (aElementId>'') {
            if (aElementId.substr(0,1)=='#')
@@ -273,6 +282,15 @@
              auxRet = getElementsByClassName(document, '*', aElementId);
              if (auxRet.length>0)
                ret=auxRet;
+           } else {
+             if (typeof aTagName !== 'undefined') {
+               aIndex = 0+aIndex;
+               if (ret.getElementsByTagName) {
+                 var innerElements=ret.getElementsByTagName(aTagName);
+                 if (innerElements.length>0)
+                   ret=innerElements[aIndex];
+               }
+             }
            }
          }
          return ret;
@@ -393,18 +411,23 @@
        return arrReturnElements;
      }
      
-     function getElementsByClassName(oRootElem, strTagName, aClassName) {
-       console.log("getElementsByClassName()");
-       var arrElements = oRootElem.getElementsByTagName(strTagName);
-       var arrReturnElements = [];
-       var oCurrent;
-       for(var i=0; i<arrElements.length; i++) {
-         oCurrent = arrElements[i];
-         if ((oCurrent) && (typeof oCurrent.hasClass == 'function'))
-           if (oCurrent.hasClass(aClassName))
-             arrReturnElements.push(oCurrent);
+     if (typeof getElementsByClassName=="undefined") {
+       console.log("Using own 'getElementsByClassName()' function");
+       function getElementsByClassName(oRootElem, strTagName, aClassName) {
+         console.log("getElementsByClassName('"+strTagName+"', '"+aClassName+"')");
+         var arrElements = oRootElem.getElementsByTagName(strTagName);
+         var arrReturnElements = [];
+         var oCurrent;
+         for(var i=0; i<arrElements.length; i++) {
+           oCurrent = arrElements[i];
+           if ((oCurrent) && (typeof oCurrent.hasClass == 'function'))
+             if (oCurrent.hasClass(aClassName))
+               arrReturnElements.push(oCurrent);
+         }
+         if (arrReturnElements==null)
+           arrReturnElements=document.getElementsByClassName(aClassName);
+         return arrReturnElements;
        }
-       return arrReturnElements;
      }
      
      var getClientSize = function () {
@@ -445,7 +468,16 @@
      /*
       * HTMLElement prototype extensions
       */
-     if (typeof HTMLElement=='function') {
+     var _expectedType;
+     if ((isOnMobile()) && (parseInt(getAndroidVersion(), 10)<3)) {
+       /* gingerbread uses an object instead of function */
+       _expectedType="object";
+     } else
+       _expectedType="function";
+     _dump("ExpectedType="+_expectedType);
+     _dump("typeof HTMLElement = "+typeof HTMLElement);
+     
+     if (typeof HTMLElement==_expectedType) {
        HTMLElement.prototype.hasClass = function (aClassName) {
          var ret = false;
          if (this.className) {
@@ -742,14 +774,19 @@
        };
      }
      
-     /* as the array keys could be used with data camming from
+     var forceStringValue = function(aObjArr, aIndex) {
+       return ((aObjArr[aIndex] || "")+"").unquote();
+     }
+     
+     
+     /* as the array keys could be used with data coming from
       * interbase (UPPERCASE) postgresql (lowercase most of the time)
       * or mysql (mixed case when configured properly), we need
       * to let the programmer use which one he wants in the data model
       * while keep the array untoched.
       * Not only that, the field names on client side can be prefixed and/or
       * postfixed, so we need to chose the more adequated
-      * So this function guess which one is the best */
+      * This function guess which one is the best */
       var suggestKeyName = function (aObj, aKeyName, fieldPrefix, fieldPostfix) {
          var ret = null;
          if (aKeyName) {
@@ -1125,11 +1162,12 @@
      
      /* dd/mm/yyyy hh:mm:ss -> yyyymmddhhmmss */
      function FDate2UDate(a) {
+       a=a || (new Date("1/1/1900")).toFrenchString();
        if (a.indexOf('/')>0)
          a=a.split('/');
        else
          a=a.split('-');
-       var h=a[2];
+       var h=a[2] || '';
        h=h.split(' ');
        a[2]=h[0];
        h=h[1];
@@ -1231,23 +1269,27 @@
      var dateTransform = function (aStrDate, srcFormat, destFormat) {
        if (aStrDate) {
          var tmpDate = extractDateValues(aStrDate, srcFormat);
-         var auxMap={};
-         var emptyDate = extractDateValues("111111111111", destFormat, auxMap);
-         var ret=destFormat;
-         for(var i=0; i<auxMap.elems.length; i++) {
-           /* e is a shortcut to the array map */
-           var e = auxMap.elems[i];
-           if (e[0] !== null) {
-             /* pos 2 is the date index (y,m,d,H,M,S)
-              * pos 3 is the target length */
-             var value = pad(tmpDate[e[2]],e[3]);
+         if (tmpDate) {
+           var auxMap={};
+           var emptyDate = extractDateValues("111111111111", destFormat, auxMap);
+           var ret=destFormat;
      
-             /* pos 0 is the start of the date element
-              * we expect to have enough space in date return */
-             while (ret.length < e[0] + e[3])
-               ret = ret+' ';
-             ret=ret.substr(0,e[0]) + value + ret.substr(e[0]+e[3], ret.length);
+           for(var i=0; i<auxMap.elems.length; i++) {
+             /* e is a shortcut to the array map */
+             var e = auxMap.elems[i];
+             if (e[0] !== null) {
+               /* pos 2 is the date index (y,m,d,H,M,S)
+                * pos 3 is the target length */
+               var value = pad(tmpDate[e[2]],e[3]);
+     
+               /* pos 0 is the start of the date element
+                * we expect to have enough space in date return */
+               while (ret.length < e[0] + e[3])
+                 ret = ret+' ';
+               ret=ret.substr(0,e[0]) + value + ret.substr(e[0]+e[3], ret.length);
+             }
            }
+     
          }
          return ret;
        } else
@@ -1761,6 +1803,16 @@
          return uuid;
      }
      
+     function guid() {
+       function s4() {
+         return Math.floor((1 + Math.random()) * 0x10000)
+           .toString(16)
+           .substring(1);
+       }
+       return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+         s4() + '-' + s4() + s4() + s4();
+     }
+     
      var md5=function (str) {
        //  discuss at: http://phpjs.org/functions/md5/
        // original by: Webtoolkit.info (http://www.webtoolkit.info/)
@@ -1990,16 +2042,20 @@
      
        document.addEventListener(
            "DOMContentLoaded",
-           function(event) {
+           function(event) {        
              if (mTabNav) mTabNav.init();
            }
        );
      
-       window.addEventListener("load", function() {
+       window.addEventListener("load", function() {    
          for(var i=0; i<_onLoadMethods.length; i++)
            if (_onLoadMethods.hasOwnProperty(i))
              if (_onLoadMethods[i]!==undefined)
                _onLoadMethods[i]();
+         if (!isOnMobile()) {
+           var event = new Event('deviceready');
+           document.dispatchEvent(event);      
+         }
        }, false);
      
      
@@ -2047,7 +2103,7 @@
          aLine = unmaskHTML(aLine);
      
          var yPattern = /%[+(\w)]|[]\(/gi;
-         var yFunctions = ',int,integer,intz,intn,decimal,ibdate,tsdate,tstime,date,time,words,image,nl2br,quoted,condLabel';
+         var yFunctions = ',int,integer,intz,intn,decimal,ibdate,tsdate,tstime,date,time,words,image,nl2br,quoted,singleQuoted,condLabel';
          var p;
          var aValue='';
      
@@ -2162,7 +2218,10 @@
      
                break;
              case 'quoted':
-               aValue = '"'+aValue+'"';
+               aValue = ('"'+aValue).trim()+'"';
+               break;
+             case 'singleQuoted':
+               aValue = ("'"+aValue).trim()+"'";
                break;
              case 'condLabel':
      
@@ -2192,7 +2251,6 @@
      
        return aLine;
      }
-     
      
  /* END yanalise.js */
  _dump("yanalise");
@@ -2453,20 +2511,23 @@
        var that = {};
      
        if (isOnMobile()) {
-         var tabchangeEvent = document.createEvent('Events');
-         tabchangeEvent.initEvent('tabchange');
+         _dump("Loading mobile tabs");
+         that.tabchangeEvent = document.createEvent('Events');
+         that.tabchangeEvent.initEvent('tabchange');
      
-         var tabblurEvent = document.createEvent('Events');
-         tabblurEvent.initEvent('tabblur');
+         that.tabblurEvent = document.createEvent('Events');
+         that.tabblurEvent.initEvent('tabblur');
      
-         var tabfocusEvent = document.createEvent('Events');
-         tabfocusEvent.initEvent('tabfocus');
+         that.tabfocusEvent = document.createEvent('Events');
+         that.tabfocusEvent.initEvent('tabfocus');
        } else {
          if (typeof Event=='function') {
-           var tabchangeEvent = new Event('tabchange');
-           var tabblurEvent = new Event('tabblur');
-           var tabfocusEvent = new Event('tabfocus');
-         }
+           _dump("Loading desktop tabs");
+           that.tabchangeEvent = new Event('tabchange');
+           that.tabblurEvent = new Event('tabblur');
+           that.tabfocusEvent = new Event('tabfocus');
+         } else 
+           _dump("Tabs are not supported");    
        }
      
        that.currentTabNdx = -1;
@@ -2651,9 +2712,11 @@
      
        that.init = function (aDivContainer) {
          if (that.initialized < 0) {
+           _dump("Initializing tabs");
+     
            that.initialized = 0;
      
-           var allContainers = y$('.tnContainer'),
+           var allContainers = document.getElementsByClassName('tnContainer'),
                firstTab = null, aDiv = null,
                i = 0;
            if (allContainers) {
@@ -2661,13 +2724,15 @@
                aDiv=allContainers[i];
                that.addContainer(aDiv);
              }
-           }
+           } else 
+             _dump("ERROR: No containers defined. Use 'tnContainer' class on a DIV");
      
-           var allTabs = y$('.tnTab');
+           var allTabs = document.getElementsByClassName('tnTab');
            if (allTabs) {
              for(var i=0; i<allTabs.length; i++)
                that.hideTab(allTabs[i]);
-           }
+           } else
+             _dump("ERROR: No tabs defined. Use 'tnTab' class on a DIV");
      
            if (that.containerList.length>0) {
              firstTab=that.containerList[0].childs[0];
@@ -2682,7 +2747,7 @@
          return that;
        };
      
-       that.currentTab = function (aDiv) {
+       that.currentTab = function () {
          var theContainer = that.getCurrentContainer();
          if (theContainer.currentTabNdx>-1) {
            return theContainer.childs[theContainer.currentTabNdx];
@@ -2723,7 +2788,7 @@
                  _dumpy(64,1,"displayTab "+aTab.id);
                  var canChange = true,
                      i = 0;
-                 canChange = aTab.dispatchEvent(tabchangeEvent) || canChange;
+                 canChange = aTab.dispatchEvent(that.tabchangeEvent) || canChange;
                  /*
                  if (that.ontabchange != undefined)
                    canChange = that.ontabchange(aTab);
@@ -2746,7 +2811,7 @@
                      if (!freeze) {
                        that.setCurrentContainer(that.getContainerNdx(theContainer));
                        theContainer.currentTabNdx = aNdx;
-                       aTab.dispatchEvent(tabfocusEvent);
+                       aTab.dispatchEvent(that.tabfocusEvent);
                        /*
                        if (that.ontabfocus != undefined)
                          that.ontabfocus(aTab);
@@ -2821,7 +2886,7 @@
            var theContainer = that.getContainerFromParam(aContainer);
            if (theContainer) {
              if (theContainer.childs.indexOf(aTab) == theContainer.currentTabNdx) {
-               ret = aTab.dispatchEvent(tabblurEvent) || ret;
+               ret = aTab.dispatchEvent(that.tabblurEvent) || ret;
                /*
                if (that.ontabblur != undefined)
                  ret = that.ontabblur(aTab, aTabToBeShowed);
@@ -3470,8 +3535,9 @@
       *********************************************/
      
      
-       ycomm.setDataLocation = function(dataLocation) {
+       ycomm.setDataLocation = function(dataLocation, deviceId) {
          this._dataLocation_=dataLocation;
+         this._deviceId_=deviceId || guid();
        };
      
        ycomm.getDataLocation = function () {
@@ -3580,7 +3646,7 @@
              ycomm._load++;
      
              var aURL=this.buildCommonURL(s || '', a || '', limits || {}, localU);
-             aURL="{0}?{1}&callback={2}&callbackId={3}&scriptSequence={4}".format(this._dataLocation_, aURL, callbackFunctionName, callbackId, ycomm._scriptSequence);
+             aURL="{0}?{1}&callback={2}&callbackId={3}&scriptSequence={4}&deviceId={5}".format(this._dataLocation_, aURL, callbackFunctionName, callbackId, ycomm._scriptSequence,this._deviceId_);
              if (ycomm.getLoad()<=ycomm._maxDirectCall)
                ycomm.bring(aURL);
              else
@@ -3608,7 +3674,19 @@
      **********************************************/
      
      
-     ycomm.dom = {};
+     ycomm.dom = {
+       _elem_templates: []
+     };
+     
+     ycomm.dom.fillInplaceData = function(aElement, aData) {
+       for(var i in aData)
+         if (aData.hasOwnProperty(i))
+           aElement.setAttribute('data_'+i, aData[i]);
+     };
+     
+     ycomm.dom.getInplaceData = function(aElement) {
+     
+     };
      
      /*
       * aElementID - ID do elemento (SELECT ou TABLE)
@@ -3656,30 +3734,40 @@
      
        var idFieldName, colName, newRow, canCreateRow,
            aElement = y$(aElementID),
-           rowIdOffset=0;
+           rowIdOffset=0,
+           first_time = typeof ycomm.dom._elem_templates[aElementID] == "undefined";
      
        idFieldName = aLineSpec.idFieldName || 'id';
      
+       var getDataFromXData = function(xDataItem) {
+         /* this function extract the pouchdb data from xDataItem if exists. otherwise, return xDataItem */
+         if ((xDataItem.doc) && (xDataItem.id) && (xDataItem.value))
+           xDataItem=xDataItem.doc;
+         return xDataItem;
+       };
+     
        var setNewRowAttributes = function (aNewRow) {
          var auxIdSequence,
-             auxInplaceData;
+             auxInplaceData,
+             xDataItem=getDataFromXData(xData[j]);
+     
          cNdx = 0;
          if (aNewRow.nodeName=='TR')
            aNewRow.style.backgroundColor=rowColorSpec.suggestRowColor(rowGroup);
-         if (xData[j][idFieldName]) {
-           if (y$(xData[j][idFieldName])) {
+         if (xDataItem[idFieldName]) {
+           if (y$(xDataItem[idFieldName])) {
              auxIdSequence = 0;
-             while (y$(xData[j][idFieldName]+'_'+auxIdSequence))
+             while (y$(xDataItem[idFieldName]+'_'+auxIdSequence))
                auxIdSequence++;
-             aNewRow.id = xData[j][idFieldName]+'_'+auxIdSequence;
+             aNewRow.id = xDataItem[idFieldName]+'_'+auxIdSequence;
            } else
-             aNewRow.id = xData[j][idFieldName];
+             aNewRow.id = xDataItem[idFieldName];
          }
      
          if (typeof aLineSpec.inplaceData != 'undefined') {
            for(var i=0; i<aLineSpec.inplaceData.length; i++) {
              colName = aLineSpec.inplaceData[i];
-             auxInplaceData = xData[j][colName] || '';
+             auxInplaceData = xDataItem[colName] || '';
              aNewRow.setAttribute('data_'+colName, auxInplaceData);
            }
          }
@@ -3692,7 +3780,8 @@
        var addCell = function(colName) {
          if (colName != idFieldName) {
            var newCell  = newRow.insertCell(cNdx),
-               aNewCellValue = colName!==null?unmaskHTML(xData[j][colName]):unmaskHTML(xData[j]);
+               xDataItem=getDataFromXData(xData[j]),
+               aNewCellValue = colName!==null?unmaskHTML(xDataItem[colName]):unmaskHTML(xDataItem);
            if ((aLineSpec.columns) && (aLineSpec.columns[colName])) {
              if (aLineSpec.columns[colName].align)
                newCell.style.textAlign=aLineSpec.columns[colName].align;
@@ -3711,12 +3800,12 @@
            newCell.id=aElementID+'_'+cNdx+'_'+oTable.rows.length;
            newCell.setAttribute('colName', colName);
            if (typeof aLineSpec.onNewItem == 'function')
-             aLineSpec.onNewItem(aElementID, newCell, xData[j]);
+             aLineSpec.onNewItem(aElementID, newCell, xDataItem);
            cNdx = cNdx + 1;
          }
        };
      
-       var oTable, auxHTML, j, c, cNdx, i, newCell, internalRowId=(new Date()).getTime()-1447265735470;
+       var oTable, auxHTML, j, c, cNdx, i, newCell, internalRowId=(new Date()).getTime()-1447265735470, xDataItem;
      
        if (aElement) {
          if (aElement.nodeName=='TABLE') {
@@ -3726,6 +3815,25 @@
              oTable = aElement;
            if (oTable.getElementsByTagName('tbody').length>0)
              oTable = oTable.getElementsByTagName('tbody')[0];
+     
+           /* 1) if this is the first time, pull the template from the table itself
+            * 2) the 'aLineSpec' has higher priority */
+           if (first_time) {
+             if (typeof (aLineSpec.columns || aLineSpec.rows || aLineSpec.html) == "undefined") {
+               ycomm.dom._elem_templates[aElementID]={};
+               if (oTable.rows.length>0) {
+                 ycomm.dom._elem_templates[aElementID].rows = [];
+                 for(i=0; i<oTable.rows.length; i++)
+                   ycomm.dom._elem_templates[aElementID].rows[i]=oTable.rows[i].innerHTML;
+               }
+             } else {
+               ycomm.dom._elem_templates[aElementID]={};
+               ycomm.dom._elem_templates[aElementID].columns = aLineSpec.columns;
+               ycomm.dom._elem_templates[aElementID].rows    = aLineSpec.rows;
+               ycomm.dom._elem_templates[aElementID].html    = aLineSpec.html;
+             }
+           }
+           mergeObject(ycomm.dom._elem_templates[aElementID], aLineSpec, true);
      
            if (aDeleteRows) {
              while(oTable.rows.length>0)
@@ -3738,18 +3846,19 @@
            cNdx = null;
            for (j in xData) {
              if (xData.hasOwnProperty(j)) {
+               xDataItem=getDataFromXData(xData[j]);
                rowGroup++;
      
                canCreateRow = true;
                if (!aDeleteRows) {
-                 if (xData[j][idFieldName]) {
+                 if (xDataItem[idFieldName]) {
                    for(i=0; ((canCreateRow) && (i<oTable.rows.length)); i++) {
-                     if (oTable.rows[i].id == xData[j][idFieldName]) {
+                     if (oTable.rows[i].id == xDataItem[idFieldName]) {
                        newRow = oTable.rows[i];
                        while (newRow.cells.length>0)
                          newRow.deleteCell(0);
                        canCreateRow = false;
-                       xData[j].rowid = i;
+                       xDataItem.rowid = i;
                      }
                    }
                  }
@@ -3759,10 +3868,10 @@
                  newRow = oTable.insertRow(oTable.rows.length);
                }
      
-               // xData[j]['rowid'] = parseInt(xData[j]['rowid']) + rowIdOffset + '';
+               // xDataItem['rowid'] = parseInt(xDataItem['rowid']) + rowIdOffset + '';
                internalRowId++;
-               xData[j].rowid = newRow.rowIndex || internalRowId + '';
-               xData[j]._elementid_ = aElementID;
+               xDataItem.rowid = (typeof newRow.rowIndex !== "undefined" )?newRow.rowIndex:internalRowId + '';
+               xDataItem._elementid_ = aElementID;
      
                setNewRowAttributes(newRow);
      
@@ -3770,11 +3879,11 @@
                if ((typeof aLineSpec.html == 'undefined') &&
                    (typeof aLineSpec.rows == 'undefined') &&
                    (typeof aLineSpec.columns == 'undefined')) {
-                 if (typeof xData[j]=='string') {
+                 if (typeof xDataItem=='string') {
                    addCell(null);
                  } else {
-                   for(colName in xData[j]) {
-                     if ((xData[j].hasOwnProperty(colName)) &&
+                   for(colName in xDataItem) {
+                     if ((xDataItem.hasOwnProperty(colName)) &&
                          (colName!=idFieldName) &&
                          (colName!='rowid') &&
                          (colName!='_elementid_')) {
@@ -3801,11 +3910,11 @@
                  } else if (typeof aLineSpec.html != 'undefined'){
                    /* html parser is enabled */
                    newCell  = newRow.insertCell(0);
-                   newCell.innerHTML = yAnalise(aLineSpec.html,xData[j]);
+                   newCell.innerHTML = yAnalise(aLineSpec.html,xDataItem);
                    newCell.style.verticalAlign='top';
                    newCell.id=aElementID+'_'+cNdx+'_'+oTable.rows.length;
                    if (typeof aLineSpec.onNewItem == 'function')
-                     aLineSpec.onNewItem(aElementID, newCell, xData[j]);
+                     aLineSpec.onNewItem(aElementID, newCell, xDataItem);
      
                  } else if (typeof aLineSpec.rows != 'undefined') {
                    var firstRow = true;
@@ -3814,13 +3923,13 @@
                        newRow = oTable.insertRow(oTable.rows.length);
                        setNewRowAttributes(newRow);
                      }
-                     newRow.innerHTML = yAnalise(aLineSpec.rows[r],xData[j]);
+                     newRow.innerHTML = yAnalise(aLineSpec.rows[r],xDataItem);
                      if (!canCreateRow) {
                        for(c=0; c<newRow.cells.length; c++)
                          newRow.cells[c].style.borderLeft = 'solid 1px red';
                      }
                      if (typeof aLineSpec.onNewItem == 'function')
-                       aLineSpec.onNewItem(aElementID, newRow, xData[j]);
+                       aLineSpec.onNewItem(aElementID, newRow, xDataItem);
                      firstRow = false;
                    }
                  }
@@ -3845,25 +3954,26 @@
      
            for (j in xData) {
              if (xData.hasOwnProperty(j)) {
+               xDataItem=getDataFromXData(xData[j]);
                var entry = document.createElement('li');
                var innerText = '',
                    asHTML=false;
                if (typeof aLineSpec.rows=='object') {
                  for(r=0; r < aLineSpec.rows.length; r++) {
-                   innerText=innerText+yAnalise(aLineSpec.rows[r],xData[j])+"";
+                   innerText=innerText+yAnalise(aLineSpec.rows[r],xDataItem)+"";
                  }
                  asHTML=true;
                } else if (typeof aLineSpec.html=='string') {
-                 innerText=innerText+yAnalise(aLineSpec.html,xData[j])+"";
+                 innerText=innerText+yAnalise(aLineSpec.html,xDataItem)+"";
                  asHTML=true;
                } else {
-                 for(colName in xData[j]) {
+                 for(colName in xDataItem) {
                    if (innerText==='') {
-                     if ((xData[j].hasOwnProperty(colName)) &&
+                     if ((xDataItem.hasOwnProperty(colName)) &&
                          (colName!=idFieldName) &&
                          (colName!='rowid') &&
                          (colName!='_elementid_')) {
-                           innerText=innerText+xData[j][colName];
+                           innerText=innerText+xDataItem[colName];
                          }
                    }
                  }
@@ -3882,7 +3992,7 @@
                  oUL.appendChild(entry);
      
                if (typeof aLineSpec.onNewItem == 'function')
-                 aLineSpec.onNewItem(aElementID, entry, xData[j]);
+                 aLineSpec.onNewItem(aElementID, entry, xDataItem);
              }
            }
      
@@ -3896,24 +4006,25 @@
      
            for (j in xData) {
              if (xData.hasOwnProperty(j)) {
-               xData[j]._elementid_ = aElementID;
+               xDataItem=getDataFromXData(xData[j]);
+               xDataItem._elementid_ = aElementID;
                newRow   = document.createElement('listitem');
                cNdx = 0;
      
                if (typeof aLineSpec.columns == 'undefined') {
-                 if (typeof xData[j] == 'string') {
+                 if (typeof xDataItem == 'string') {
                    _dumpy(2,1,"ERRO: yeapf-dom.js - string cell not implemented");
                  } else {
-                   for(colName in xData[j]) {
-                     if ((xData[j].hasOwnProperty(colName)) &&
+                   for(colName in xDataItem) {
+                     if ((xDataItem.hasOwnProperty(colName)) &&
                          (colName!=idFieldName) &&
                          (colName!='rowid') &&
                          (colName!='_elementid_')) {
                        newCell  = document.createElement('listcell');
-                       newCell.innerHTML = xData[j][colName];
+                       newCell.innerHTML = xDataItem[colName];
                        newCell.id=aElementID+'_'+cNdx+'_'+cRow;
                        if (typeof aLineSpec.onNewItem == 'function')
-                         aLineSpec.onNewItem(aElementID, newCell, xData[j]);
+                         aLineSpec.onNewItem(aElementID, newCell, xDataItem);
                        cNdx = cNdx + 1;
                        newRow.appendChild(newCell);
                      }
@@ -3923,10 +4034,10 @@
                  for(colName in aLineSpec.columns) {
                    if (colName != idFieldName) {
                      newCell  = document.createElement('listcell');
-                     newCell.innerHTML = xData[j][colName];
+                     newCell.innerHTML = xDataItem[colName];
                      newCell.id=aElementID+'_'+cNdx+'_'+cRow;
                      if (typeof aLineSpec.onNewItem == 'function')
-                       aLineSpec.onNewItem(aElementID, newCell, xData[j]);
+                       aLineSpec.onNewItem(aElementID, newCell, xDataItem);
                      cNdx = cNdx + 1;
                      newRow.appendChild(newCell);
                    }
@@ -3949,45 +4060,53 @@
            for (j in xData) {
      
              if (xData.hasOwnProperty(j)) {
-               xData[j]._elementid_ = aElementID;
+               xDataItem=getDataFromXData(xData[j]);
+               xDataItem._elementid_ = aElementID;
                auxHTML = '';
                if (typeof aLineSpec.columns == 'undefined') {
-                 if (typeof xData[j] == 'string') {
+                 if (typeof xDataItem == 'string') {
                    _dumpy(2,1,"ERRO: yeapf-dom.js - string cell not implemented");
                  } else {
-                   for(colName in xData[j]) {
-                     if ((xData[j].hasOwnProperty(colName)) &&
+                   for(colName in xDataItem) {
+                     if ((xDataItem.hasOwnProperty(colName)) &&
                          (colName!=idFieldName) &&
                          (colName!='rowid') &&
                          (colName!='_elementid_')) {
-                       auxHTML = auxHTML + xData[j][colName];
+                       auxHTML = auxHTML + xDataItem[colName];
                      }
                    }
                  }
                } else {
                  if (isArray(aLineSpec.columns)) {
                    for (c=0; c<aLineSpec.columns.length; c++) {
-                     auxHTML = auxHTML + xData[j][aLineSpec.columns[c]] + ' ';
+                     auxHTML = auxHTML + xDataItem[aLineSpec.columns[c]] + ' ';
                    }
                  } else {
-                   if (typeof xData[j] == 'string') {
+                   if (typeof xDataItem == 'string') {
                      _dumpy(2,1,"ERRO: yeapf-dom.js - string cell not implemented");
                    } else {
                      for(colName in aLineSpec.columns) {
                        if (colName != idFieldName)
-                         auxHTML = auxHTML + xData[j][colName];
+                         auxHTML = auxHTML + xDataItem[colName];
                      }
                    }
                  }
                }
      
                var opt =  document.createElement('option');
-               if (typeof xData[j][idFieldName] != 'undefined')
-                 opt.value = xData[j][idFieldName];
+               if (typeof xDataItem[idFieldName] != 'undefined')
+                 opt.value = xDataItem[idFieldName];
                opt.innerHTML = auxHTML;
                opt.id=aElementID+'_'+cNdx;
+               if (aLineSpec.inplaceData) {
+                 for(c=0;c<aLineSpec.inplaceData.length; c++) {
+                   if (typeof xDataItem[aLineSpec.inplaceData[c]] !== "undefined") {
+                     opt.setAttribute("data_"+aLineSpec.inplaceData[c], xDataItem[aLineSpec.inplaceData[c]]);
+                   }
+                 }
+               }
                if (typeof aLineSpec.onNewItem == 'function')
-                 aLineSpec.onNewItem(aElementID, opt, xData[j]);
+                 aLineSpec.onNewItem(aElementID, opt, xDataItem);
                aElement.appendChild(opt);
                cNdx++;
              }
@@ -4012,7 +4131,7 @@
      
            if (xData)
              if ((typeof xData=='object') || (xData.length === 1)) {
-               var yData=xData[0] || xData;
+               var yData=getDataFromXData(xData[0] || xData);
      
                fieldPrefix = aLineSpec.elementPrefixName || '';
                fieldPostfix = aLineSpec.elementPostixName || '';
@@ -4026,7 +4145,7 @@
                  fieldName = suggestKeyName(yData, aElements[i].name || aElements[i].id, fieldPrefix, fieldPostfix);
      
                  /* column name defined by the programmer on client side */
-                 colName = (aLineSpec.columns && suggestKeyName(aLineSpec.columns, aElements[i].id)) || null;
+                 colName = (aLineSpec.columns && suggestKeyName(aLineSpec.columns, aElements[i].name || aElements[i].id)) || null;
      
                  if (typeof yData[fieldName] != 'undefined') {
                    fieldValue = unmaskHTML(yData[fieldName]);
@@ -4096,14 +4215,15 @@
          } else if (aElement.nodeName=='DIV') {
            if (xData)
              if (xData.length === 1) {
+               xDataItem=getDataFromXData(xData[0]);
                auxHTML='';
                if (aDeleteRows)
                  aElement.innerHTML='';
                else
                  auxHTML=aElement.innerHTML;
-               for(colName in xData[0])
-                 if (xData[0].hasOwnProperty(colName)) {
-                   auxHTML+='<div><div class=tnFieldName><b><small>{0}</small></b></div>{1}'.format(colName, xData[0][colName]);
+               for(colName in xDataItem)
+                 if (xDataItem.hasOwnProperty(colName)) {
+                   auxHTML+='<div><div class=tnFieldName><b><small>{0}</small></b></div>{1}'.format(colName, xDataItem[colName]);
                  }
                aElement.innerHTML=auxHTML;
              }
@@ -4300,7 +4420,10 @@
      /*
       * get all the elements of the form and returns a JSON
       */
-     ycomm.dom.getFormElements = function (aFormId) {
+     ycomm.dom.getFormElements = function (aFormId, aLineSpec) {
+       aLineSpec=aLineSpec || {};
+       var fieldPrefix = aLineSpec.elementPrefixName || '';
+       var fieldPostfix = aLineSpec.elementPostixName || '';
      
        var ret = {},
            aElements = this.selectElements(aFormId),
@@ -4319,51 +4442,59 @@
          fieldType = aElements[i].type.toLowerCase();
          fieldName = aElements[i].name || aElements[i].id;
      
-         if (fieldName>'') {
-           fieldValue = '';
+         if ((fieldName.substr(fieldName.length, -(fieldPostfix.length)) == fieldPostfix) &&
+             (fieldName.substr(0,fieldPrefix.length)==fieldPrefix)) {
      
-           if ( (fieldType=='radio') ||
-                (fieldType=='checkbox')  )  {
-             canChangeRetValue = false;
-             if (typeof ret[fieldName] == 'undefined')
-               ret[fieldName]='';
-           }
+           fieldName=fieldName.substr(fieldPrefix.length);
+           fieldName=fieldName.substr(0,fieldName.length - (fieldPostfix.length));
      
-           switch(fieldType) {
+           if (fieldName>'') {
+             fieldValue = '';
      
-             case "text":
-             case "password":
-             case "textarea":
-             case "email":
-             case "hidden":
-               fieldValue = aElements[i].value.quoteString(true);
+             if ( (fieldType=='radio') ||
+                  (fieldType=='checkbox')  )  {
+               canChangeRetValue = false;
+               if (typeof ret[fieldName] == 'undefined')
+                 ret[fieldName]='';
+             }
      
-               if (fieldValue !== null)
+             switch(fieldType) {
+     
+               case "text":
+               case "password":
+               case "textarea":
+               case "email":
+               case "hidden":
+                 fieldValue = aElements[i].value+"";
                  if ((editMask>'') && (storageMask>'')) {
                    if (valueType.indexOf('date')>=0) {
-                     fieldValue = dateTransform(fieldValue.unquote(), editMask, storageMask);
-                     if (fieldValue)
-                       fieldValue = fieldValue.quoteString();
+                     fieldValue = dateTransform(fieldValue, editMask, storageMask);
+                     fieldValue = fieldValue?fieldValue+"":"";
                    }
                  }
-               break;
+                 break;
      
-             case "radio":
-             case "checkbox":
-               fieldValue = aElements[i].checked?aElements[i].value.quoteString(true):'';
-               canChangeRetValue=(fieldValue!=='');
-               break;
+               case "radio":
+               case "checkbox":
+                 fieldValue = aElements[i].checked?aElements[i].value:'';
+                 canChangeRetValue=(fieldValue!=='');
+                 break;
      
-             case "select-one":
-             case "select-multi":
-               fieldValue = aElements[i].selectedIndex;
-               if (aElements[i].options[fieldValue])
-                 fieldValue = aElements[i].options[fieldValue].value;
-               break;
+               case "select-one":
+               case "select-multi":
+                 fieldValue = aElements[i].selectedIndex;
+                 if (aElements[i].options[fieldValue])
+                   fieldValue = aElements[i].options[fieldValue].value;
+                 break;
+             }
+             if (typeof fieldValue=='string') {
+               if (fieldValue.indexOf(',')>=0)
+                 fieldValue = encodeURIComponent(fieldValue);
+             }
+     
+             if (canChangeRetValue)
+               ret[fieldName] = fieldValue;
            }
-     
-           if (canChangeRetValue)
-             ret[fieldName] = fieldValue;
          }
        }
      

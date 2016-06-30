@@ -4,9 +4,9 @@
  *      slotEmptyImplementation.php
  *      This file is part of YeAPF
  *      (Yet Another PHP Framework)
- *      YeAPF 0.8.49-39 built on 2016-06-29 06:53 (-3 DST)
+ *      YeAPF 0.8.49-57 built on 2016-06-30 16:23 (-3 DST)
  *      Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- *      2016-06-29 06:18:37 (-3 DST)
+ *      2016-06-29 10:45:36 (-3 DST)
  *
  *
  *      The MIT License (MIT)
@@ -118,6 +118,8 @@
   {
     global $devSession;
 
+    $countLimit=20;
+
     extract(xq_extractValuesFromQuery());
     $xq_start=isset($xq_start)?intval($xq_start):0;
 
@@ -128,7 +130,7 @@
     // your code goes here as in the example below
     switch($a) {
       case 'getVersion':
-        $ret='YeAPF 0.8.49-39 built on 2016-06-29 06:53 (-3 DST)';
+        $ret='YeAPF 0.8.49-57 built on 2016-06-30 16:23 (-3 DST)';
         break;
     }
 
