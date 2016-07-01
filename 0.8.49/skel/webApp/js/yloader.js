@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.49-57 built on 2016-06-30 16:23 (-3 DST)
+  * YeAPF 0.8.49-58 built on 2016-07-01 17:03 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-06-30 16:23:42 (-3 DST)
+  * 2016-07-01 17:03:27 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.49-57 built on 2016-06-30 16:23 (-3 DST)");
+ console.log("YeAPF 0.8.49-58 built on 2016-07-01 17:03 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -3647,9 +3647,10 @@
      
              var aURL=this.buildCommonURL(s || '', a || '', limits || {}, localU);
              aURL="{0}?{1}&callback={2}&callbackId={3}&scriptSequence={4}&deviceId={5}".format(this._dataLocation_, aURL, callbackFunctionName, callbackId, ycomm._scriptSequence,this._deviceId_);
-             if (ycomm.getLoad()<=ycomm._maxDirectCall)
+             if (ycomm.getLoad()<=ycomm._maxDirectCall) {
+               console.log(aURL);
                ycomm.bring(aURL);
-             else
+             } else
                setTimeout("ycomm.bring('"+aURL+"');", 250 + (ycomm.getLoad() - ycomm._maxDirectCall) * 500);
            }
      
