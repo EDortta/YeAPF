@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.49-10 built on 2016-06-03 13:09 (-3 DST)
+    YeAPF 0.8.49-82 built on 2016-07-07 18:24 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-06-02 08:30:48 (-3 DST)
+    2016-07-07 09:22:52 (-3 DST)
    */
 
   /*
@@ -144,7 +144,7 @@
     $dbCharset='ISO-8859-1';
 
   if ((!isset($appCharset)) || (trim("$appCharset")==''))
-    $appCharset='ISO-8859-1';
+    $appCharset='UTF-8';
 
   $toDebug = isset($toDebug)?$toDebug:false;
 
@@ -1108,7 +1108,7 @@
      * This function require to this file be saved in ISO-8859-1
      */
     $strCharset=detect_encoding($str);
-    $str=iconv($strCharset, 'ISO-8859-1', $str);
+    $str=iconv($strCharset, 'UTF-8', $str);
     $str1="áéíóúàèìòùãõâêîôûäëïöüçÁÉÍÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÏÖÜÇ";
     $str2="aeiouaeiouaoaeiouaeioucAEIOUAEIOUAOAEIOUAEIOUC";
 

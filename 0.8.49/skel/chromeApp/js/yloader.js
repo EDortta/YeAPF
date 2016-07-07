@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.49-63 built on 2016-07-02 21:03 (-3 DST)
+  * YeAPF 0.8.49-82 built on 2016-07-07 18:24 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-07-02 21:03:53 (-3 DST)
+  * 2016-07-07 18:24:14 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.49-63 built on 2016-07-02 21:03 (-3 DST)");
+ console.log("YeAPF 0.8.49-82 built on 2016-07-07 18:24 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -3158,8 +3158,8 @@
                  that.pinger.pingerWatchdog = setTimeout(that.pinger.ping, that.pinger.pingInterleave);
              },
              /*
-              * apÛs um tempo de 60 segundos (pingTimeout)
-              * sem resposta, ele cai nesta funÁ„o e
+              * ap√≥s um tempo de 60 segundos (pingTimeout)
+              * sem resposta, ele cai nesta fun√ß√£o e
               * volta a tentar em 1/2 pingInterleave
               */
              notAnswer: function () {
@@ -3169,7 +3169,7 @@
                  that.pinger.onError();
                else
                  _dumpy(4,1,"Not 'onError' event");
-               // sayStatusBar("Servidor n„o localizado "+that.pinger.pingCount+'...<br>Tentando novamente');
+               // sayStatusBar("Servidor n√£o localizado "+that.pinger.pingCount+'...<br>Tentando novamente');
                if (that.pinger.canPing)
                  that.pinger.pingerWatchdog=setTimeout(that.pinger.ping, that.pinger.pingInterleave / 2);
              },
@@ -3213,8 +3213,8 @@
         * Com o advento do WebSocket, precisamos de novas formas para
         * provocar o servidor.
         * Este primeiro passo pretende melhorar o Ajax
-        * Depois, vir„o funÁıes genericas
-        * Caso esteja usando prototype, ele usar· o mesmo, se n„o se virar·
+        * Depois, vir√£o fun√ß√µes genericas
+        * Caso esteja usando prototype, ele usar√° o mesmo, se n√£o se virar√°
         * para criar uma interface
         *
         * verificar ServerSentEvents
@@ -3568,14 +3568,17 @@
          var scriptID = "rest_"+scriptSequence;
          var script = document.getElementById(scriptID);
          if ((head!==undefined) && (script!==undefined)) {
+           clearTimeout(script._whatchdog_);
+           script.abort();
            head.removeChild(script);
            _dumpy(4,1,'Clean '+scriptID+' after call to '+callback+'()');
+     
          } else
            _dumpy(4,1,'Script not found: '+scriptID+' adressed to '+callback+'()');
          _dumpy(4,1,ycomm.getStatus());
        };
      
-       ycomm.rest_timeout = 3500;
+       ycomm.rest_timeout = 15000;
      
        ycomm.bring =  function (url) {
          var head = document.head;
@@ -3583,7 +3586,7 @@
          _dumpy(4,1,url);
          // extrair o scriptSequence e o callback para depuracao
          var scriptSequence=null;
-         var callback=null;
+         var callbackFunctionName=null;
          var aux = url.substr(url.indexOf('?')+1).split('&');
          for(var i in aux) {
            if (aux.hasOwnProperty(i)) {
@@ -3591,22 +3594,47 @@
              if (v[0]=='scriptSequence')
                scriptSequence=v[1];
              if (v[0]=='callback')
-               callback=v[1];
+               callbackFunctionName=v[1];
            }
          }
      
          ycomm._maxScriptSequenceReceived = Math.max(ycomm._maxScriptSequenceReceived, scriptSequence);
      
+         script.UUID = generateUUID();
+         script.maxWaitCount=(ycomm.rest_timeout / 250)+2;
+         script.callbackFunctionName=callbackFunctionName;
          script.onload=function() {
            if (ycomm._load>0)
              ycomm._load--;
          };
+     
+         script.abort = function () {
+             console.warn("Calling {0}(404);".format(callbackFunctionName));
+             /* https://pt.wikipedia.org/wiki/Lista_de_c√≥digos_de_status_HTTP#404_N.C3.A3o_encontrado */
+             setTimeout("{0}(404,{message: 'Server do not respond'}, {})".format(callbackFunctionName), 100);
+         };
+     
+         script.pool=function() {
+           console.log(this.UUID+ " : "+this.maxWaitCount);
+           this.maxWaitCount--;
+           if (this.maxWaitCount>0) {
+             this._whatchdog_=setTimeout(this.id+".pool()", 250);
+           } else {
+             this.abort();
+           }
+         };
+     
          script.setAttribute("src", url);
          script.id='rest_'+scriptSequence;
      
-         head.appendChild(script);
+         try {
+           head.appendChild(script);
+           setTimeout(script.id+".pool()", 250);
+         } catch(e) {
+           console.log(e.message)
+         }
      
-         setTimeout("ycomm._removeJSONP("+scriptSequence+",'"+callback+"');", ycomm.rest_timeout);
+         setTimeout("ycomm._removeJSONP("+scriptSequence+",'"+callbackFunctionName+"');", ycomm.rest_timeout);
      
        };
      
@@ -4620,9 +4648,9 @@
      
        that.grantMsgProc = function(aInterval)
        {
-         /* caso venha sem par·mtros, calcular um tempo prudente de no m·ximo 20 segs
+         /* caso venha sem par√°mtros, calcular um tempo prudente de no m√°ximo 20 segs
           * Isso acontece quando o servidor devolveu uma resposta errada
-          * e queremos que o sistema de mensagens continue em operaÁ„o. */
+          * e queremos que o sistema de mensagens continue em opera√ß√£o. */
          if ((aInterval===undefined) || (aInterval<=0))
            aInterval = Math.min(20000,messagePeekerInterval * 2);
      
@@ -5443,7 +5471,7 @@
                  dynSetElementDisplay(allElements[i].id, e.id, e.value);
      
                if ((auxID=='*.') || (!e.checked)) {
-                 // limpar conte˙do dos campos dependentes
+                 // limpar conte√∫do dos campos dependentes
                  // caso esteja ocultando
                  if (allElements[i].type=='checkbox')
                    allElements[i].checked=false;
@@ -6033,8 +6061,8 @@
                y$(nextCellName).click();
            }
          } else {
-           console.log("O Valor n„o pode ser lanÁado por n„o cumprir condiÁıes de existÍncia");
-           window.alert("O valor n„o È consistente.\nRevise valores do campo pai e o prÛprio valor lanÁado\nTente novamente");
+           console.log("O Valor n√£o pode ser lan√ßado por n√£o cumprir condi√ß√µes de exist√™ncia");
+           window.alert("O valor n√£o √© consistente.\nRevise valores do campo pai e o pr√≥prio valor lan√ßado\nTente novamente");
            y$(aCellName).click();
          }
        }
@@ -6366,7 +6394,7 @@
      
      function __cbOnChange__(e, saving)
      {
-       // procurar elemento que chamou esta funÁ„o
+       // procurar elemento que chamou esta fun√ß√£o
        if (e==undefined)
          var e = window.event || arguments.callee.caller.arguments[0];
        if (e.target)
@@ -6379,7 +6407,7 @@
      
        if (e.dynOnChange != undefined)
          e.dynOnChange();
-       // salvar informaÁ„o
+       // salvar informa√ß√£o
        if (saving)
          __saveFormInfo(e);
      /*
@@ -6390,7 +6418,7 @@
                ccDependents++;
              }
       */
-       // corrigir visualizaÁ„o dos elementos dependentes do clicado
+       // corrigir visualiza√ß√£o dos elementos dependentes do clicado
        dynCleanChilds(e, document);
      
      }

@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-rest.js
- * YeAPF 0.8.49-58 built on 2016-07-01 17:03 (-3 DST)
+ * YeAPF 0.8.49-82 built on 2016-07-07 18:24 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-07-01 17:03:01 (-3 DST)
+ * 2016-07-07 14:29:30 (-3 DST)
  *
  * ycomm-rest.js is a set of prototyped functions
  * build in order to use REST protocol
@@ -43,14 +43,17 @@
     var scriptID = "rest_"+scriptSequence;
     var script = document.getElementById(scriptID);
     if ((head!==undefined) && (script!==undefined)) {
+      clearTimeout(script._whatchdog_);
+      script.abort();
       head.removeChild(script);
       _dumpy(4,1,'Clean '+scriptID+' after call to '+callback+'()');
+
     } else
       _dumpy(4,1,'Script not found: '+scriptID+' adressed to '+callback+'()');
     _dumpy(4,1,ycomm.getStatus());
   };
 
-  ycomm.rest_timeout = 3500;
+  ycomm.rest_timeout = 15000;
 
   ycomm.bring =  function (url) {
     var head = document.head;
@@ -58,7 +61,7 @@
     _dumpy(4,1,url);
     // extrair o scriptSequence e o callback para depuracao
     var scriptSequence=null;
-    var callback=null;
+    var callbackFunctionName=null;
     var aux = url.substr(url.indexOf('?')+1).split('&');
     for(var i in aux) {
       if (aux.hasOwnProperty(i)) {
@@ -66,22 +69,47 @@
         if (v[0]=='scriptSequence')
           scriptSequence=v[1];
         if (v[0]=='callback')
-          callback=v[1];
+          callbackFunctionName=v[1];
       }
     }
 
     ycomm._maxScriptSequenceReceived = Math.max(ycomm._maxScriptSequenceReceived, scriptSequence);
 
+    script.UUID = generateUUID();
+    script.maxWaitCount=(ycomm.rest_timeout / 250)+2;
+    script.callbackFunctionName=callbackFunctionName;
     script.onload=function() {
       if (ycomm._load>0)
         ycomm._load--;
     };
+
+    script.abort = function () {
+        console.warn("Calling {0}(404);".format(callbackFunctionName));
+        /* https://pt.wikipedia.org/wiki/Lista_de_códigos_de_status_HTTP#404_N.C3.A3o_encontrado */
+        setTimeout("{0}(404,{message: 'Server do not respond'}, {})".format(callbackFunctionName), 100);
+    };
+
+    script.pool=function() {
+      console.log(this.UUID+ " : "+this.maxWaitCount);
+      this.maxWaitCount--;
+      if (this.maxWaitCount>0) {
+        this._whatchdog_=setTimeout(this.id+".pool()", 250);
+      } else {
+        this.abort();
+      }
+    };
+
     script.setAttribute("src", url);
     script.id='rest_'+scriptSequence;
 
-    head.appendChild(script);
+    try {
+      head.appendChild(script);
+      setTimeout(script.id+".pool()", 250);
+    } catch(e) {
+      console.log(e.message)
+    }
 
-    setTimeout("ycomm._removeJSONP("+scriptSequence+",'"+callback+"');", ycomm.rest_timeout);
+    setTimeout("ycomm._removeJSONP("+scriptSequence+",'"+callbackFunctionName+"');", ycomm.rest_timeout);
 
   };
 
