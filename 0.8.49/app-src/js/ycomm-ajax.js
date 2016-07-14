@@ -1,8 +1,8 @@
   /********************************************************************
    * app-src/js/ycomm-ajax.js
-   * YeAPF 0.8.49-10 built on 2016-06-03 13:09 (-3 DST)
+   * YeAPF 0.8.49-91 built on 2016-07-14 06:53 (-3 DST)
    * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2016-05-30 09:45:48 (-3 DST)
+   * 2016-07-11 09:59:48 (-3 DST)
    *
    * Com o advento do WebSocket, precisamos de novas formas para
    * provocar o servidor.
@@ -80,11 +80,41 @@
     };
   }
 
+  ycomm._comm_timeout = 120000;  /* defaults to 120seconds */
+  ycomm._whatchdog_interleave = 250;
+
   ycomm.scriptName = yloader.isWorker?'../query.php':'query.php';
 
   ycomm.defaultMethod = 'post';
   ycomm.canReceiveMessages = true;
 
+  Object.defineProperty(
+    ycomm,
+    "timeout",
+    {
+      get:  function () { return ycomm._comm_timeout; },
+      set:  function (newTimeout) { 
+              newTimeout = parseInt(newTimeout || 0); 
+              /* it only accepts values between 125ms and 5minutes */ 
+              ycomm._comm_timeout = Math.min(5*60*60*1000, Math.max(125, newTimeout));
+              _dumpy(4,0,"Adjusting timeout to {0}ms".format(ycomm._comm_timeout));
+            }
+    }
+  );
+
+  Object.defineProperty(
+    ycomm,
+    "wd_interval",
+    {
+      get: function() { return ycomm._whatchdog_interleave; },
+      set: function (newInterval) {
+            newInterval = parseInt(newInterval || 0);
+            /* only accepts values between 1ms and 2500ms */
+            ycomm._whatchdog_interleave = Math.min(2500, Math.max(1, newInterval));
+            _dumpy(4,0,"Adjusting watchdog interleave to {0}ms".format(ycomm._whatchdog_interleave));
+      }
+    }
+  );
   /* receive the xml envelope and split it in parts in order
    * to feed ycomm-dom functions */
   ycomm.explodeData = function(xmlDoc) {
@@ -258,6 +288,8 @@
             parameters: aURL,
             onTimeout: function() {
               console.log('XMLHttpRequest timeout');
+              ycomm.waitIconControl(false);
+              callbackFunction(404, {}, [{}], null, null, null);
             },
             onComplete: function(r) {
                 var retData = {
@@ -304,7 +336,7 @@
                   if (yloader.isWorker)
                     callbackFunction(r.responseText);
                   else
-                    callbackFunction(r.status, retData.error, retData.data, retData.userMsg, retData.dataContext, retData.geometry);
+                    callbackFunction(r.status, retData.error, retData.data, retData.userMsg, retData.dataContext, retData.geometry);                    
                 }
 
               }

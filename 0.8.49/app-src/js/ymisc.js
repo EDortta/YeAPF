@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.49-38 built on 2016-06-29 06:13 (-3 DST)
+ * YeAPF 0.8.49-91 built on 2016-07-14 06:53 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-06-28 06:34:50 (-3 DST)
+ * 2016-07-14 06:52:41 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -160,8 +160,7 @@ function getElementsByAttribute(oRootElem, strTagName, strAttributeName, strAttr
 
 if (typeof getElementsByClassName=="undefined") {
   console.log("Using own 'getElementsByClassName()' function");
-  function getElementsByClassName(oRootElem, strTagName, aClassName) {
-    console.log("getElementsByClassName('"+strTagName+"', '"+aClassName+"')");
+  function getElementsByClassName(oRootElem, strTagName, aClassName) {    
     var arrElements = oRootElem.getElementsByTagName(strTagName);
     var arrReturnElements = [];
     var oCurrent;

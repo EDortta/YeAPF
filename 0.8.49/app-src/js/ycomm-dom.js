@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.49-39 built on 2016-06-29 06:53 (-3 DST)
+ * YeAPF 0.8.49-91 built on 2016-07-14 06:53 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-06-29 06:52:57 (-3 DST)
+ * 2016-07-11 07:20:13 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -544,7 +544,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
 
           }
         } else if (xData.length > 1)
-          console.log("There are more than one record returning from the server");
+          _dump("There are more than one record returning from the server");
     } else if (aElement.nodeName=='DIV') {
       if (xData)
         if (xData.length === 1) {

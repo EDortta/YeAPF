@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.49-82 built on 2016-07-07 18:24 (-3 DST)
+  * YeAPF 0.8.49-91 built on 2016-07-14 06:53 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-07-07 18:24:14 (-3 DST)
+  * 2016-07-14 06:53:56 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.49-82 built on 2016-07-07 18:24 (-3 DST)");
+ console.log("YeAPF 0.8.49-91 built on 2016-07-14 06:53 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -413,8 +413,7 @@
      
      if (typeof getElementsByClassName=="undefined") {
        console.log("Using own 'getElementsByClassName()' function");
-       function getElementsByClassName(oRootElem, strTagName, aClassName) {
-         console.log("getElementsByClassName('"+strTagName+"', '"+aClassName+"')");
+       function getElementsByClassName(oRootElem, strTagName, aClassName) {    
          var arrElements = oRootElem.getElementsByTagName(strTagName);
          var arrReturnElements = [];
          var oCurrent;
@@ -3286,11 +3285,41 @@
          };
        }
      
+       ycomm._comm_timeout = 120000;  /* defaults to 120seconds */
+       ycomm._whatchdog_interleave = 250;
+     
        ycomm.scriptName = yloader.isWorker?'../query.php':'query.php';
      
        ycomm.defaultMethod = 'post';
        ycomm.canReceiveMessages = true;
      
+       Object.defineProperty(
+         ycomm,
+         "timeout",
+         {
+           get:  function () { return ycomm._comm_timeout; },
+           set:  function (newTimeout) { 
+                   newTimeout = parseInt(newTimeout || 0); 
+                   /* it only accepts values between 125ms and 5minutes */ 
+                   ycomm._comm_timeout = Math.min(5*60*60*1000, Math.max(125, newTimeout));
+                   _dumpy(4,0,"Adjusting timeout to {0}ms".format(ycomm._comm_timeout));
+                 }
+         }
+       );
+     
+       Object.defineProperty(
+         ycomm,
+         "wd_interval",
+         {
+           get: function() { return ycomm._whatchdog_interleave; },
+           set: function (newInterval) {
+                 newInterval = parseInt(newInterval || 0);
+                 /* only accepts values between 1ms and 2500ms */
+                 ycomm._whatchdog_interleave = Math.min(2500, Math.max(1, newInterval));
+                 _dumpy(4,0,"Adjusting watchdog interleave to {0}ms".format(ycomm._whatchdog_interleave));
+           }
+         }
+       );
        /* receive the xml envelope and split it in parts in order
         * to feed ycomm-dom functions */
        ycomm.explodeData = function(xmlDoc) {
@@ -3464,6 +3493,8 @@
                  parameters: aURL,
                  onTimeout: function() {
                    console.log('XMLHttpRequest timeout');
+                   ycomm.waitIconControl(false);
+                   callbackFunction(404, {}, [{}], null, null, null);
                  },
                  onComplete: function(r) {
                      var retData = {
@@ -3510,7 +3541,7 @@
                        if (yloader.isWorker)
                          callbackFunction(r.responseText);
                        else
-                         callbackFunction(r.status, retData.error, retData.data, retData.userMsg, retData.dataContext, retData.geometry);
+                         callbackFunction(r.status, retData.error, retData.data, retData.userMsg, retData.dataContext, retData.geometry);                    
                      }
      
                    }
@@ -3551,6 +3582,7 @@
        ycomm._load = 0;
        ycomm._queue = 0;
        ycomm._maxDirectCall = 10;
+     
        ycomm._dataLocation_ = (
          function() {
            var a = (typeof document=='object' && document.location && document.location.href)?document.location.href:'';
@@ -3561,7 +3593,7 @@
      
        ycomm.getLoad = function () {
          return this._load;
-       };
+       };  
      
        ycomm._removeJSONP = function (scriptSequence, callback) {
          var head = document.head;
@@ -3577,8 +3609,6 @@
            _dumpy(4,1,'Script not found: '+scriptID+' adressed to '+callback+'()');
          _dumpy(4,1,ycomm.getStatus());
        };
-     
-       ycomm.rest_timeout = 15000;
      
        ycomm.bring =  function (url) {
          var head = document.head;
@@ -3601,7 +3631,7 @@
          ycomm._maxScriptSequenceReceived = Math.max(ycomm._maxScriptSequenceReceived, scriptSequence);
      
          script.UUID = generateUUID();
-         script.maxWaitCount=(ycomm.rest_timeout / 250)+2;
+         script.maxWaitCount=(ycomm.timeout / ycomm.wd_interval)+2;
          script.callbackFunctionName=callbackFunctionName;
          script.onload=function() {
            if (ycomm._load>0)
@@ -3609,16 +3639,16 @@
          };
      
          script.abort = function () {
-             console.warn("Calling {0}(404);".format(callbackFunctionName));
+             _dumpy(4,1,"Calling {0}(404);".format(callbackFunctionName));
              /* https://pt.wikipedia.org/wiki/Lista_de_códigos_de_status_HTTP#404_N.C3.A3o_encontrado */
              setTimeout("{0}(404,{message: 'Server do not respond'}, {})".format(callbackFunctionName), 100);
          };
      
          script.pool=function() {
-           console.log(this.UUID+ " : "+this.maxWaitCount);
+           _dumpy(4,5,this.UUID+ " : "+this.maxWaitCount);
            this.maxWaitCount--;
            if (this.maxWaitCount>0) {
-             this._whatchdog_=setTimeout(this.id+".pool()", 250);
+             this._whatchdog_=setTimeout(this.id+".pool()", ycomm.wd_interval);
            } else {
              this.abort();
            }
@@ -3628,13 +3658,14 @@
          script.id='rest_'+scriptSequence;
      
          try {
+           _dumpy(4,2,"Creating {0} as {1}".format(script.UUID, script.src));
            head.appendChild(script);
-           setTimeout(script.id+".pool()", 250);
+           setTimeout(script.id+".pool()", ycomm.wd_interval);
          } catch(e) {
-           console.log(e.message)
+           _dumpy(4,0,"Exception: {0}".format(e.message));
          }
      
-         setTimeout("ycomm._removeJSONP("+scriptSequence+",'"+callbackFunctionName+"');", ycomm.rest_timeout);
+         setTimeout("ycomm._removeJSONP("+scriptSequence+",'"+callbackFunctionName+"');", ycomm.timeout);
      
        };
      
@@ -3662,7 +3693,7 @@
      
              window[callbackFunctionName]=function(status, error, data, userMsg, context, geometry) {
                callbackFunction(status, error, data, userMsg, context, geometry);
-               console.log(callbackFunctionName);
+               _dumpy(4,1,callbackFunctionName);
              };
            } else if (typeof callbackFunction=='string') {
              callbackFunctionName=callbackFunction;
@@ -3676,10 +3707,10 @@
              var aURL=this.buildCommonURL(s || '', a || '', limits || {}, localU);
              aURL="{0}?{1}&callback={2}&callbackId={3}&scriptSequence={4}&deviceId={5}".format(this._dataLocation_, aURL, callbackFunctionName, callbackId, ycomm._scriptSequence,this._deviceId_);
              if (ycomm.getLoad()<=ycomm._maxDirectCall) {
-               console.log(aURL);
+               _dumpy(4,1,aURL);
                ycomm.bring(aURL);
              } else
-               setTimeout("ycomm.bring('"+aURL+"');", 250 + (ycomm.getLoad() - ycomm._maxDirectCall) * 500);
+               setTimeout("ycomm.bring('"+aURL+"');", (0.5 + abs(ycomm.getLoad() - ycomm._maxDirectCall)) * ycomm.wd_interval * 2);
            }
      
          }
@@ -3692,8 +3723,6 @@
        ycomm.getStatus = function () {
          return "isIdle() = {0} getLoad() = {1}".format(this.isIdle(), this.getLoad());
        };
-     
-     
      
  /* END ycomm-rest.js */
  _dump("ycomm-rest");
@@ -4240,7 +4269,7 @@
      
                }
              } else if (xData.length > 1)
-               console.log("There are more than one record returning from the server");
+               _dump("There are more than one record returning from the server");
          } else if (aElement.nodeName=='DIV') {
            if (xData)
              if (xData.length === 1) {
