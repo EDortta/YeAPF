@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ystorage.js
- * YeAPF 0.8.49-63 built on 2016-07-02 21:03 (-3 DST)
+ * YeAPF 0.8.49-92 built on 2016-07-14 08:17 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-07-02 18:13:29 (-3 DST)
+ * 2016-07-14 08:16:45 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *********************************************/
 if (!window.ystorage) {
@@ -108,7 +108,7 @@ if (!window.ySingleDb) {
     that.getItem = function(id) {
       id=String(id);
       var ret=localStorage.getItem(that._dbTag_+"_item_"+id);
-      ret=JSON.parse(ret || {});
+      ret=JSON.parse(ret || "{}");
       return ret;
     };
 
