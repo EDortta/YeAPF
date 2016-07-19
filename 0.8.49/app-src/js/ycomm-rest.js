@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-rest.js
- * YeAPF 0.8.49-94 built on 2016-07-19 08:12 (-3 DST)
+ * YeAPF 0.8.49-95 built on 2016-07-19 08:18 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-07-19 08:11:21 (-3 DST)
+ * 2016-07-19 08:17:27 (-3 DST)
  *
  * ycomm-rest.js is a set of prototyped functions
  * build in order to use REST protocol
@@ -96,7 +96,8 @@
       if (this.maxWaitCount>0) {
         this._whatchdog_=setTimeout(this.id+".pool()", ycomm.wd_interval);
       } else {
-        this.abort();
+        if (typeof this.abort == "function")
+          this.abort();
       }
     };
 
