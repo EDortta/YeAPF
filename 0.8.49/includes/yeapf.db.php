@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.49-96 built on 2016-07-28 10:03 (-3 DST)
+    YeAPF 0.8.49-97 built on 2016-07-28 11:00 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-07-28 10:02:26 (-3 DST)
+    2016-07-28 10:41:15 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -362,7 +362,7 @@
             $v=str_replace($var_names[0][$i], $envValue, $v);
           }
         }
-        $GLOBALS[$k]=$v;
+        $GLOBALS[$k]=unquote($v);
       }
     }
   }
@@ -414,11 +414,10 @@
       if (isset($dbINI[$appRegistry])) {
         //$setupIni->populateValues(false, 'SQLDieOnError', true);
         db_populateDBConfig($dbINI[$appRegistry], 'SQLDieOnError');
-        $dbConnect=(($dbConnect==1) || (strtoupper($dbConnect)=='TRUE')|| (strtoupper($dbConnect)=='YES'))?'yes':'no';
-        _recordWastedTime("...populating values ($dbConnect)");
+        $dbConnect=strtolower(trim((($dbConnect==1) || (strtoupper($dbConnect)=='TRUE')|| (strtoupper($dbConnect)=='YES'))?'yes':'no'));
+        _recordWastedTime("...populating values (dbConnect: $dbConnect)");
         // after this point, dbConnect could be redefined
 
-        $dbConnect=strtolower(trim($dbConnect));
         $dontUpdate=intval($dontUpdate);
       } else {
         $cwd=getcwd();
