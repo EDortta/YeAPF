@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.49-99 built on 2016-07-28 11:45 (-3 DST)
+  * YeAPF 0.8.49-100 built on 2016-07-28 17:26 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-07-28 11:45:35 (-3 DST)
+  * 2016-07-28 17:26:28 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.49-99 built on 2016-07-28 11:45 (-3 DST)");
+ console.log("YeAPF 0.8.49-100 built on 2016-07-28 17:26 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -2099,6 +2099,31 @@
          }
      
        };
+     
+       var removeEvent = function(elem, eventName, eventHandler) {
+         if (typeof elem == 'string') elem=y$(elem);
+         if ((elem === null) || (typeof elem === 'undefined')) return;
+     
+         var i;
+     
+         if (isArray(elem)) {
+           for(i=0; i<elem.length; i++)
+             removeEvent(elem[i], eventHandler);
+         } else {
+           var eventList=eventName.split(" "), aEventName;
+           for(i=0; i<eventList.length; i++) {
+             aEventName=eventList[i];
+             if ( elem.addEventListener ) {
+               elem.removeEventListener( aEventName, eventHandler, false );
+             } else if ( elem.detachEvent ) {
+               elem.detachEvent( "on" + aEventName, eventHandler );
+             } else {
+               elem["on"+aEventName]=null;
+             }
+           }
+         }
+     
+       }
      
      }
      

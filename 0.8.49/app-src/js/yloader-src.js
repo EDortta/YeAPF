@@ -1,6 +1,6 @@
 /*********************************************
  * app-src/js/yloader-src.js
- * YeAPF 0.8.49-32 built on 2016-06-25 10:34 (-3 DST)
+ * YeAPF 0.8.49-100 built on 2016-07-28 17:26 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
  * 2016-06-23 12:06:15 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -29,7 +29,7 @@ if (typeof console === 'undefined')
   }
 )();
 
-console.log("YeAPF 0.8.49-32 built on 2016-06-25 10:34 (-3 DST)");
+console.log("YeAPF 0.8.49-100 built on 2016-07-28 17:26 (-3 DST)");
 
 #include('yopcontext.js')
 #include('ydebug.js')
