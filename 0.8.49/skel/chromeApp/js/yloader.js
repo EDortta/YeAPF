@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.49-97 built on 2016-07-28 11:00 (-3 DST)
+  * YeAPF 0.8.49-98 built on 2016-07-28 11:34 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-07-28 11:00:08 (-3 DST)
+  * 2016-07-28 11:34:56 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.49-97 built on 2016-07-28 11:00 (-3 DST)");
+ console.log("YeAPF 0.8.49-98 built on 2016-07-28 11:34 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -735,6 +735,20 @@
        };
      }
      
+     if (!String.prototype.toFloat) {
+       String.prototype.toFloat = function () {
+         n=this;
+         n=n.replace(":", "");
+         var p=n.indexOf('.'),
+             c=n.indexOf(',');
+         if (p<c) {
+           n=n.replace(".", "");
+         }
+         n=n.replace(",", ".");    
+         return n;
+       }
+     }
+     
      Function.prototype.method = function (name, func) {
        this.prototype[name] = func;
        return this;
@@ -1304,6 +1318,9 @@
      }
      
      function isNumber(n) {
+       if (typeof n === 'string') {
+         n=n.toFloat();
+       }
        return !isNaN(parseFloat(n)) && isFinite(n);
      }
      
@@ -4549,8 +4566,12 @@
                  break;
              }
              if (typeof fieldValue=='string') {
-               if (fieldValue.indexOf(',')>=0)
-                 fieldValue = encodeURIComponent(fieldValue);
+               if (isNumber(fieldValue))
+                 fieldValue=fieldValue.toFloat();
+               else { 
+                 if (fieldValue.indexOf(',')>=0)
+                   fieldValue = encodeURIComponent(fieldValue);
+               }
              }
      
              if (canChangeRetValue)

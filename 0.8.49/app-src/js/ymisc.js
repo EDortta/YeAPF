@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.49-91 built on 2016-07-14 06:53 (-3 DST)
+ * YeAPF 0.8.49-98 built on 2016-07-28 11:34 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-07-14 06:52:41 (-3 DST)
+ * 2016-07-28 11:30:59 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -480,6 +480,20 @@ if (!String.prototype.isCNPJ) {
       if(c[13] != (((n %= 11) < 2) ? 0 : 11 - n)) return false;
       return true;
   };
+}
+
+if (!String.prototype.toFloat) {
+  String.prototype.toFloat = function () {
+    n=this;
+    n=n.replace(":", "");
+    var p=n.indexOf('.'),
+        c=n.indexOf(',');
+    if (p<c) {
+      n=n.replace(".", "");
+    }
+    n=n.replace(",", ".");    
+    return n;
+  }
 }
 
 Function.prototype.method = function (name, func) {
@@ -1051,6 +1065,9 @@ function isInfinity(aValue) {
 }
 
 function isNumber(n) {
+  if (typeof n === 'string') {
+    n=n.toFloat();
+  }
   return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
