@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.49-82 built on 2016-07-07 18:24 (-3 DST)
+    YeAPF 0.8.49-96 built on 2016-07-28 10:03 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-07-05 19:13:55 (-3 DST)
+    2016-07-28 10:02:26 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -480,7 +480,7 @@
         }
         // echo "$horaSistema<BR>$dontWorkUntil<BR>";
         $workHourLimit=(trim($dontWorkUntil)>'');
-        _recordWastedTime("workable hours: $workHourLimit");
+        _recordWastedTime("are there workable hours?: $workHourLimit");
 
         if (($workHourLimit) && ($horaSistema<$dontWorkUntil)) {
           function d2secs($d)
