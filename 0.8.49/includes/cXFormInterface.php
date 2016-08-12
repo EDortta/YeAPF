@@ -1,9 +1,9 @@
 <?php
 /*
     includes/cXFormInterface.php
-    YeAPF 0.8.49-111 built on 2016-08-12 15:45 (-3 DST)
+    YeAPF 0.8.49-114 built on 2016-08-12 16:10 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-08-12 15:42:48 (-3 DST)
+    2016-08-12 16:05:43 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -227,7 +227,32 @@
           $sql="";
       }
     }
+    return $sql;
+  }
 
+  function getFormContent($supportSqueleton, $executeImmediately=true, $forgiveUnknowedFields=false, $acceptMetaDataFields=false , $fieldFixMask=1, $fieldPrefix='', $fieldPostfix='') {
+    global $jailID, $u, $auditID;
+
+    $formProcessor=new xForm(bestName($supportSqueleton));
+
+    $sql=$formProcessor->doGetFormContent($fieldFixMask, $fieldPrefix, $fieldPostfix,$forgiveUnknowedFields, $acceptMetaDataFields);
+
+    if ($sql>'')  {
+      // if the table is subjet of audition, then create an auditID with the state prior to update/insert
+      $auditID = at_createEntry($formProcessor->tableName(), $formProcessor->keyName(), $formProcessor->keyValue());
+      if ($executeImmediately) {
+
+        $res=do_sql($sql);
+
+        at_closeEntry($auditID, strtoupper(substr($sql,0,6)));
+        $auditID='';
+
+        if (!$res)
+          $sql="";
+      }
+    }
+
+    return $sql;
   }
 
   function cleanFormContent($supportSqueleton, $exceptionList='')

@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xForms.php
-    YeAPF 0.8.49-111 built on 2016-08-12 15:45 (-3 DST)
+    YeAPF 0.8.49-114 built on 2016-08-12 16:10 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-08-12 15:43:54 (-3 DST)
+    2016-08-12 16:09:30 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
   /*
@@ -1391,6 +1391,29 @@
 
         if ($cc>0)
           $sql="delete from $this->xfTableName where $whereSQL";
+      }
+      return $sql;
+    }
+
+    function doGetFormContent($fieldFixMask=1, $fieldPrefix='', $fieldPostfix='', $forgiveUnknowedFields=false, $acceptMetaDataFields=false, $quoteFieldValues=true)
+    {
+      $sql="";
+      $erros = $this->prepareFieldsToBeSaved($campos, $unknowedFields,
+                                             $forgiveUnknowedFields,
+                                             $acceptMetaDataFields,
+                                             $fieldPrefix, $fieldPostfix);
+
+      if ($erros==0) {
+        list($auxKey, $whereSQL) = $this->prepareKeyFields();
+        
+        if ($auxKey>'') {
+          $sql="select count(*) from $this->xfTableName where $whereSQL";
+          _dumpY(64,1,$sql);
+          $cc=db_sql($sql);
+        }
+
+        if ($cc>0)
+          $sql="select * from $this->xfTableName where $whereSQL";
       }
       return $sql;
     }
