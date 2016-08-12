@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.49-110 built on 2016-08-12 15:24 (-3 DST)
+ * YeAPF 0.8.49-112 built on 2016-08-12 15:49 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-08-12 15:21:39 (-3 DST)
+ * 2016-08-12 15:48:35 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -67,6 +67,8 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
 
   if (typeof aFlags=="boolean")
     aFlags={deleteRows: aFlags};
+
+  aFlags=aFlags || {};
 
   if (typeof aFlags.deleteRows=='undefined')
     aFlags.deleteRows=true;
