@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xForms.php
-    YeAPF 0.8.49-100 built on 2016-07-28 17:26 (-3 DST)
+    YeAPF 0.8.49-111 built on 2016-08-12 15:45 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-06-27 10:45:31 (-3 DST)
+    2016-08-12 15:43:54 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
   /*
@@ -1294,6 +1294,38 @@
       return $erros;
     }
 
+    function prepareKeyFields() 
+    {
+      $keyValues=$this->keyValues();
+      $keyTypes=$this->keyTypes();
+      $auxKey='';
+      $whereSQL='';
+      foreach($keyTypes as $k=>$t) {
+        $v=$keyValues[$k];
+        $t=strtolower($t);
+
+        $keyDef="$k:$t";
+        _dumpY(64,1,$keyDef);
+
+        addWord($auxKey,$keyDef);
+        // ( auto, numeric, unique, uniquemd5, user_defined )
+        switch($t)
+        {
+          case 'integer':
+          case 'numeric':
+            $v=intval($v);
+            break;
+          case 'unique':
+          case 'uniquemd5':
+          case 'unique40':
+            $v="'$v'";
+            break;
+        }
+        addWord($whereSQL, "$k=$v",' and ');
+      }
+      return array($auxKey, $whereSQL);
+    }
+
     function doSaveFormContent($fieldFixMask=1, $fieldPrefix='', $fieldPostfix='', $forgiveUnknowedFields=false, $acceptMetaDataFields=false, $quoteFieldValues=true)
     {
       $erros = $this->prepareFieldsToBeSaved($campos, $unknowedFields,
@@ -1302,33 +1334,7 @@
                                              $fieldPrefix, $fieldPostfix);
 
       if ($erros==0) {
-        $keyValues=$this->keyValues();
-        $keyTypes=$this->keyTypes();
-        $auxKey='';
-        $whereSQL='';
-        foreach($keyTypes as $k=>$t) {
-          $v=$keyValues[$k];
-          $t=strtolower($t);
-
-          $keyDef="$k:$t";
-          _dumpY(64,1,$keyDef);
-
-          addWord($auxKey,$keyDef);
-          // ( auto, numeric, unique, uniquemd5, user_defined )
-          switch($t)
-          {
-            case 'integer':
-            case 'numeric':
-              $v=intval($v);
-              break;
-            case 'unique':
-            case 'uniquemd5':
-            case 'unique40':
-              $v="'$v'";
-              break;
-          }
-          addWord($whereSQL, "$k=$v",' and ');
-        }
+        list($auxKey, $whereSQL) = $this->prepareKeyFields();
 
         if ($auxKey>'') {
           $sql="select count(*) from $this->xfTableName where $whereSQL";
@@ -1359,25 +1365,33 @@
 
           }
         }
-        /* versão antiga (uma única chave)
-        $auxID=$GLOBALS[$this->xfKey];
-        if ($auxID>'')
-          $cc=db_sql("select count(*) from $this->xfTableName where $this->xfKey='$auxID'");
-        if (($auxID=='') || ($cc==0)) {
-          switch (strtolower(trim($this->xfKeyType)))
-          {
-            case 'integer':
-              $auxID=intval(db_sql("select max($this->xfKey) from $this->xfTableName"))+1;
-              $GLOBALS[$this->xfKey]=$auxID;
-              break;
-          }
-        }
-        $auxKey=$this->xfKey.':'.strtolower(trim($this->xfKeyType));
-        */
         $sql=save_form_sql($campos,$this->xfTableName, $auxKey, true, '*', $fieldFixMask, $fieldPrefix, $fieldPostfix, $quoteFieldValues);
       } else
         _dumpY(64,0,"ERRO: Campos indefinidos na tabela '$this->xfTableName' ($unknowedFields)");
 
+      return $sql;
+    }
+
+    function doDeleteFormContent($fieldFixMask=1, $fieldPrefix='', $fieldPostfix='', $forgiveUnknowedFields=false, $acceptMetaDataFields=false, $quoteFieldValues=true)
+    {
+      $sql="";
+      $erros = $this->prepareFieldsToBeSaved($campos, $unknowedFields,
+                                             $forgiveUnknowedFields,
+                                             $acceptMetaDataFields,
+                                             $fieldPrefix, $fieldPostfix);
+
+      if ($erros==0) {
+        list($auxKey, $whereSQL) = $this->prepareKeyFields();
+        
+        if ($auxKey>'') {
+          $sql="select count(*) from $this->xfTableName where $whereSQL";
+          _dumpY(64,1,$sql);
+          $cc=db_sql($sql);
+        }
+
+        if ($cc>0)
+          $sql="delete from $this->xfTableName where $whereSQL";
+      }
       return $sql;
     }
 
