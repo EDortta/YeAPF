@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.49-112 built on 2016-08-12 15:49 (-3 DST)
+ * YeAPF 0.8.49-113 built on 2016-08-12 15:52 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-08-12 15:48:35 (-3 DST)
+ * 2016-08-12 15:52:29 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -62,7 +62,7 @@ ycomm.dom.getInplaceData = function(aElement) {
  *          paintRows  (true by default) 
  */
 ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
-  if (aLineSpec === undefined)
+  if ((aLineSpec === undefined) || (aLineSpec==null))
     aLineSpec = {};
 
   if (typeof aFlags=="boolean")

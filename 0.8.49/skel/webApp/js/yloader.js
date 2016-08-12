@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.49-112 built on 2016-08-12 15:49 (-3 DST)
+  * YeAPF 0.8.49-113 built on 2016-08-12 15:52 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-08-12 15:49:03 (-3 DST)
+  * 2016-08-12 15:52:52 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.49-112 built on 2016-08-12 15:49 (-3 DST)");
+ console.log("YeAPF 0.8.49-113 built on 2016-08-12 15:52 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -3832,7 +3832,7 @@
       *          paintRows  (true by default) 
       */
      ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
-       if (aLineSpec === undefined)
+       if ((aLineSpec === undefined) || (aLineSpec==null))
          aLineSpec = {};
      
        if (typeof aFlags=="boolean")
