@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.49-100 built on 2016-07-28 17:26 (-3 DST)
+  * YeAPF 0.8.49-110 built on 2016-08-12 15:24 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-07-28 17:26:28 (-3 DST)
+  * 2016-08-12 15:24:12 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.49-100 built on 2016-07-28 17:26 (-3 DST)");
+ console.log("YeAPF 0.8.49-110 built on 2016-08-12 15:24 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -3827,13 +3827,21 @@
       *             onBeforeItemAdd(aElementID, id, dataLine)
       *             onItemAdd(aElementID, id)
       *             onReady(aElementID)
+      * aFlags - JSON
+      *          deleteRows (true by default)
+      *          paintRows  (true by default) 
       */
-     ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aDeleteRows) {
+     ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
        if (aLineSpec === undefined)
          aLineSpec = {};
      
-       if (aDeleteRows === undefined)
-         aDeleteRows = true;
+       if (typeof aFlags=="boolean")
+         aFlags={deleteRows: aFlags};
+     
+       if (typeof aFlags.deleteRows=='undefined')
+         aFlags.deleteRows=true;
+       if (typeof aFlags.paintRows=='undefined')
+         aFlags.paintRows=true;
      
        var idFieldName, colName, newRow, canCreateRow,
            aElement = y$(aElementID),
@@ -3855,8 +3863,10 @@
              xDataItem=getDataFromXData(xData[j]);
      
          cNdx = 0;
-         if (aNewRow.nodeName=='TR')
-           aNewRow.style.backgroundColor=rowColorSpec.suggestRowColor(rowGroup);
+         if (aNewRow.nodeName=='TR') {
+           if (aFlags.paintRows)
+             aNewRow.style.backgroundColor=rowColorSpec.suggestRowColor(rowGroup);
+         }
          if (xDataItem[idFieldName]) {
            if (y$(xDataItem[idFieldName])) {
              auxIdSequence = 0;
@@ -3938,7 +3948,7 @@
            }
            mergeObject(ycomm.dom._elem_templates[aElementID], aLineSpec, true);
      
-           if (aDeleteRows) {
+           if (aFlags.deleteRows) {
              while(oTable.rows.length>0)
                oTable.deleteRow(oTable.rows.length-1);
            } else {
@@ -3953,7 +3963,7 @@
                rowGroup++;
      
                canCreateRow = true;
-               if (!aDeleteRows) {
+               if (!aFlags.deleteRows) {
                  if (xDataItem[idFieldName]) {
                    for(i=0; ((canCreateRow) && (i<oTable.rows.length)); i++) {
                      if (oTable.rows[i].id == xDataItem[idFieldName]) {
@@ -4049,7 +4059,7 @@
          } else if (aElement.nodeName=='UL') {
            var oUL = aElement;
      
-           if (aDeleteRows) {
+           if (aFlags.deleteRows) {
              while (oUL.firstChild) {
                oUL.removeChild(oUL.firstChild);
              }
@@ -4101,7 +4111,7 @@
      
          } else if (aElement.nodeName=='LISTBOX') {
            var oListBox = aElement;
-           if (aDeleteRows) {
+           if (aFlags.deleteRows) {
              while(oListBox.childElementCount>0)
                oListBox.childNodes[0].remove();
            }
@@ -4154,7 +4164,7 @@
          } else if ((aElement.nodeName=='SELECT') || (aElement.nodeName=='DATALIST')) {
      
            /* Clean options */
-           if (aDeleteRows){
+           if (aFlags.deleteRows){
              while (aElement.options.length>0)
                aElement.options.remove(0);
            }
@@ -4227,7 +4237,7 @@
                fieldPrefix, fieldPostfix,
                aElements;
      
-           if (aDeleteRows)
+           if (aFlags.deleteRows)
              aElements = this.cleanForm(aElementID);
            else
              aElements = this.selectElements(aElementID);
@@ -4320,7 +4330,7 @@
              if (xData.length === 1) {
                xDataItem=getDataFromXData(xData[0]);
                auxHTML='';
-               if (aDeleteRows)
+               if (aFlags.deleteRows)
                  aElement.innerHTML='';
                else
                  auxHTML=aElement.innerHTML;
@@ -4432,6 +4442,7 @@
                case "checkbox":
                case "select-one":
                case "select-multi":
+               case "file":
                  knownFieldType = true;
              }
      
@@ -4523,7 +4534,7 @@
      /*
       * get all the elements of the form and returns a JSON
       */
-     ycomm.dom.getFormElements = function (aFormId, aLineSpec) {
+     ycomm.dom.getFormElements = function (aFormId, aLineSpec, aOnReady) {
        aLineSpec=aLineSpec || {};
        var fieldPrefix = aLineSpec.elementPrefixName || '';
        var fieldPostfix = aLineSpec.elementPostixName || '';
@@ -4534,12 +4545,19 @@
            editMask,
            storageMask,
            valueType,
+           busyCount=0,
            canChangeRetValue;
      
        for (var i=0; i<aElements.length; i++) {
-         editMask = aElements[i].getAttribute('editMask') || '';
-         storageMask = aElements[i].getAttribute('storageMask') || '';
-         valueType = aElements[i].getAttribute('valueType') || 'text';
+         if (aElements[i].getAttribute) {
+           editMask = aElements[i].getAttribute('editMask') || '';
+           storageMask = aElements[i].getAttribute('storageMask') || '';
+           valueType = aElements[i].getAttribute('valueType') || 'text';
+         } else {
+           editMask='';
+           storageMask='';
+           valueType='text';
+         }
          canChangeRetValue = true;
      
          fieldType = aElements[i].type.toLowerCase();
@@ -4588,6 +4606,30 @@
                  fieldValue = aElements[i].selectedIndex;
                  if (aElements[i].options[fieldValue])
                    fieldValue = aElements[i].options[fieldValue].value;
+                 break;
+     
+               case "file":
+                 if (typeof aOnReady=='function') {
+                   /*
+                   http://stackoverflow.com/questions/12090996/waiting-for-a-file-to-load-onload-javascript
+                   http://stackoverflow.com/questions/6978156/get-base64-encode-file-data-from-input-form
+                   http://igstan.ro/posts/2009-01-11-ajax-file-upload-with-pure-javascript.html
+                   https://developer.tizen.org/dev-guide/web/2.3.0/org.tizen.mobile.web.appprogramming/html/tutorials/w3c_tutorial/comm_tutorial/upload_ajax.htm
+                   */
+                   var reader=new FileReader();
+                   busyCount++;
+                   reader._fieldName=fieldName;
+                   reader.addEventListener("load", function() {
+                     ret[this._fieldName]=this.result;
+                     busyCount--;
+                     if (busyCount<=0) {
+                       aOnReady(ret);
+                     }
+                   });
+                   reader.readAsDataURL(aElements[i].files[0]); 
+                   canChangeRetValue=false;           
+                 } else
+                   fieldValue="aOnReady() not present in js call to getFormElements()";
                  break;
              }
              if (typeof fieldValue=='string') {

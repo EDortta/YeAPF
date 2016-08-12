@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.pre-processor.php
-    YeAPF 0.8.49-100 built on 2016-07-28 17:26 (-3 DST)
+    YeAPF 0.8.49-110 built on 2016-08-12 15:24 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-05-28 09:16:43 (-3 DST)
+    2016-08-12 08:43:20 (-3 DST)
    */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -2022,7 +2022,7 @@
 
           $_TH_='td';
 
-          $r="<table id='$tableName' $tableHeader>\n\t<tr>\n\t\t<td bgcolor='#ffffff'></td>";
+          $r="<table class='table' id='$tableName' $tableHeader>\n\t<tr>\n\t\t<td bgcolor='#ffffff'></td>";
           for ($xx=0; $xx<$cCols; $xx++) {
             $curCol=$xx;
             $ndx="col_$xx";
