@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.49-113 built on 2016-08-12 15:52 (-3 DST)
+ * YeAPF 0.8.49-115 built on 2016-08-16 14:22 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-08-12 15:52:29 (-3 DST)
+ * 2016-08-16 14:21:19 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -58,8 +58,9 @@ ycomm.dom.getInplaceData = function(aElement) {
  *             onItemAdd(aElementID, id)
  *             onReady(aElementID)
  * aFlags - JSON
- *          deleteRows (true by default)
- *          paintRows  (true by default) 
+ *          deleteRows  (true by default)
+ *          paintRows   (true by default) 
+ *          insertAtTop (applies to TR. false by default)
  */
 ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
   if ((aLineSpec === undefined) || (aLineSpec==null))
@@ -210,12 +211,15 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
           }
 
           if (canCreateRow) {
-            newRow = oTable.insertRow(oTable.rows.length);
+            if (aFlags.insertAtTop)
+              newRow = oTable.insertRow(0);
+            else
+              newRow = oTable.insertRow(oTable.rows.length);
           }
 
           // xDataItem['rowid'] = parseInt(xDataItem['rowid']) + rowIdOffset + '';
           internalRowId++;
-          xDataItem.rowid = (typeof newRow.rowIndex !== "undefined" )?newRow.rowIndex:internalRowId + '';
+          xDataItem.rowid = ((!aFlags.insertAtTop) && (typeof newRow.rowIndex !== "undefined" ))?newRow.rowIndex:internalRowId + '';
           xDataItem._elementid_ = aElementID;
 
           setNewRowAttributes(newRow);

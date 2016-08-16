@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.49-114 built on 2016-08-12 16:10 (-3 DST)
+  * YeAPF 0.8.49-115 built on 2016-08-16 14:22 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-08-12 16:10:39 (-3 DST)
+  * 2016-08-16 14:22:39 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.49-114 built on 2016-08-12 16:10 (-3 DST)");
+ console.log("YeAPF 0.8.49-115 built on 2016-08-16 14:22 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -3828,8 +3828,9 @@
       *             onItemAdd(aElementID, id)
       *             onReady(aElementID)
       * aFlags - JSON
-      *          deleteRows (true by default)
-      *          paintRows  (true by default) 
+      *          deleteRows  (true by default)
+      *          paintRows   (true by default) 
+      *          insertAtTop (applies to TR. false by default)
       */
      ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
        if ((aLineSpec === undefined) || (aLineSpec==null))
@@ -3980,12 +3981,15 @@
                }
      
                if (canCreateRow) {
-                 newRow = oTable.insertRow(oTable.rows.length);
+                 if (aFlags.insertAtTop)
+                   newRow = oTable.insertRow(0);
+                 else
+                   newRow = oTable.insertRow(oTable.rows.length);
                }
      
                // xDataItem['rowid'] = parseInt(xDataItem['rowid']) + rowIdOffset + '';
                internalRowId++;
-               xDataItem.rowid = (typeof newRow.rowIndex !== "undefined" )?newRow.rowIndex:internalRowId + '';
+               xDataItem.rowid = ((!aFlags.insertAtTop) && (typeof newRow.rowIndex !== "undefined" ))?newRow.rowIndex:internalRowId + '';
                xDataItem._elementid_ = aElementID;
      
                setNewRowAttributes(newRow);

@@ -1,8 +1,8 @@
 /*********************************************
  * skel/MoSyncApp/LocalFiles/js/ystorage.js
- * YeAPF 0.8.49-114 built on 2016-08-12 16:10 (-3 DST)
+ * YeAPF 0.8.49-115 built on 2016-08-16 14:22 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-08-12 16:10:39 (-3 DST)
+ * 2016-08-16 14:22:39 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *********************************************/
 if (!window.ystorage) {
