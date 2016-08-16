@@ -3714,7 +3714,7 @@
 </aLine><aStack><dummy>ok</dummy>
 </aStack></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>15</start>
-<end>170</end>
+<end>178</end>
 </code></yAnalise></functions><filename>yanalise.js</filename>
 <folder>app-src%2Fjs</folder>
 </yanalise.js><yapp.js><functions><objYeapfApp><name>objYeapfApp</name>
