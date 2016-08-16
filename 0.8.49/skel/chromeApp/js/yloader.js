@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.49-118 built on 2016-08-16 18:18 (-3 DST)
+  * YeAPF 0.8.49-119 built on 2016-08-16 18:22 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-08-16 18:18:56 (-3 DST)
+  * 2016-08-16 18:22:31 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.49-118 built on 2016-08-16 18:18 (-3 DST)");
+ console.log("YeAPF 0.8.49-119 built on 2016-08-16 18:22 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -2287,14 +2287,14 @@
      
            aLine = aLine.slice(0,p) + aValue + aLine.slice(p + p2 + 1);
      
-           var needEval=false;
-           var ops=['<', '>', '==', '!=', '<=', '>='];
-           for(var i=0; i<ops.length; i++) {
-             needEval|=aLine.indexOf(ops[i])>=0;
-           }
-           if (needEval)
-             aLine=eval(aLine);
          }
+         var needEval=false;
+         var ops=['<', '>', '==', '!=', '<=', '>='];
+         for(var i=0; i<ops.length; i++) {
+           needEval|=(aLine.indexOf(ops[i])>=0);
+         }
+         if (needEval)
+           aLine=eval(aLine);
        } else
          aLine='';
      

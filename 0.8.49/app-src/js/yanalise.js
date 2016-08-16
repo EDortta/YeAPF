@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yanalise.js
- * YeAPF 0.8.49-118 built on 2016-08-16 18:18 (-3 DST)
+ * YeAPF 0.8.49-119 built on 2016-08-16 18:22 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-08-16 18:18:36 (-3 DST)
+ * 2016-08-16 18:22:11 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/yanalise.js
@@ -159,14 +159,14 @@ function yAnalise(aLine, aStack)
 
       aLine = aLine.slice(0,p) + aValue + aLine.slice(p + p2 + 1);
 
-      var needEval=false;
-      var ops=['<', '>', '==', '!=', '<=', '>='];
-      for(var i=0; i<ops.length; i++) {
-        needEval|=aLine.indexOf(ops[i])>=0;
-      }
-      if (needEval)
-        aLine=eval(aLine);
     }
+    var needEval=false;
+    var ops=['<', '>', '==', '!=', '<=', '>='];
+    for(var i=0; i<ops.length; i++) {
+      needEval|=(aLine.indexOf(ops[i])>=0);
+    }
+    if (needEval)
+      aLine=eval(aLine);
   } else
     aLine='';
 
