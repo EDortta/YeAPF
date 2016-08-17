@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.49-115 built on 2016-08-16 14:22 (-3 DST)
+ * YeAPF 0.8.49-122 built on 2016-08-17 12:12 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-08-16 14:21:19 (-3 DST)
+ * 2016-08-17 12:11:23 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -680,6 +680,21 @@ ycomm.dom.selectElements = function (aElementId, aFieldListFilter) {
           case "select-multi":
           case "file":
             knownFieldType = true;
+
+          case "color":
+          case "date":
+          case "datetime":
+          case "datetime-local":
+          case "month":
+          case "number":
+          case "range":
+          case "search":
+          case "tel":
+          case "time":
+          case "url":
+          case "week":
+            console.warn(aElementId+"."+allElements[i].id+" of an insecure/not supported type");
+            knownFieldType = true;
         }
 
         if (knownFieldType)
@@ -822,6 +837,18 @@ ycomm.dom.getFormElements = function (aFormId, aLineSpec, aOnReady) {
           case "textarea":
           case "email":
           case "hidden":
+          case "color":
+          case "date":
+          case "datetime":
+          case "datetime-local":
+          case "month":
+          case "number":
+          case "range":
+          case "search":
+          case "tel":
+          case "time":
+          case "url":
+          case "week":
             fieldValue = aElements[i].value+"";
             if ((editMask>'') && (storageMask>'')) {
               if (valueType.indexOf('date')>=0) {

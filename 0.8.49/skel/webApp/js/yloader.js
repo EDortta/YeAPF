@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.49-121 built on 2016-08-17 11:59 (-3 DST)
+  * YeAPF 0.8.49-122 built on 2016-08-17 12:12 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-08-17 11:59:25 (-3 DST)
+  * 2016-08-17 12:12:22 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.49-121 built on 2016-08-17 11:59 (-3 DST)");
+ console.log("YeAPF 0.8.49-122 built on 2016-08-17 12:12 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -4469,6 +4469,21 @@
                case "select-multi":
                case "file":
                  knownFieldType = true;
+     
+               case "color":
+               case "date":
+               case "datetime":
+               case "datetime-local":
+               case "month":
+               case "number":
+               case "range":
+               case "search":
+               case "tel":
+               case "time":
+               case "url":
+               case "week":
+                 console.warn(aElementId+"."+allElements[i].id+" of an insecure/not supported type");
+                 knownFieldType = true;
              }
      
              if (knownFieldType)
@@ -4611,6 +4626,18 @@
                case "textarea":
                case "email":
                case "hidden":
+               case "color":
+               case "date":
+               case "datetime":
+               case "datetime-local":
+               case "month":
+               case "number":
+               case "range":
+               case "search":
+               case "tel":
+               case "time":
+               case "url":
+               case "week":
                  fieldValue = aElements[i].value+"";
                  if ((editMask>'') && (storageMask>'')) {
                    if (valueType.indexOf('date')>=0) {
