@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.49-100 built on 2016-07-28 17:26 (-3 DST)
+ * YeAPF 0.8.49-121 built on 2016-08-17 11:59 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-07-28 17:25:30 (-3 DST)
+ * 2016-08-17 11:58:32 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -1066,9 +1066,20 @@ function isInfinity(aValue) {
 
 function isNumber(n) {
   if (typeof n === 'string') {
-    n=n.toFloat();
+    var f=n.toFloat();
+    if (f==n)
+      n=f;      
   }
   return !isNaN(parseFloat(n)) && isFinite(n);
+}
+
+function isOperator(n) {
+  var ret=false;
+  if (typeof n == 'string') {
+    ret = ((n=='<') || (n=='>') || (n=='!') || (n=='!==') || (n=='!=') || 
+           (n=='>') || (n=='<=') || (n=='>=') || (n=='=='));
+  }
+  return ret;
 }
 
 var isArray = function (value) {
