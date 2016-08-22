@@ -1,0 +1,53 @@
+<title>#(appName) - New User</title>
+<link rel="stylesheet" type="text/css" href='yeapf.css' />
+<!--
+    skel/webApp/f_create_user.html
+    YeAPF 0.8.50-1 built on 2016-08-22 17:09 (-3 DST)
+    Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
+    2013-02-16 17:52:46 (-3 DST)
+-->
+
+
+<div align=center>
+  <div align=left class=formBox>
+    <form action="index.php" method="post" enctype="multipart/form-data" name="fLogon" target="_parent" id="fLogon">
+
+      <h3>
+        <b>#(appTitle)</b><br>
+        <font size=-1 color=#ADD8E6>appName: #(appName) | dbName: #(dbName) |  #timestamp2date(sysTimeStamp)</font>
+      </h3>
+
+      <div style='padding: 40px'>
+
+        <div>
+          Nickname:<br>
+          <input name="q2" type="text" id="q2" size="20" value='#(q2)'>
+        </div>
+
+        <div>
+          email:<br>
+          <input name="q4" type="text" id="q4" size="30" value='#(q4)'>
+        </div>
+
+        <div>
+          Password:<br>
+          <input name="q1" type="password" id="q1" size="15">
+        </div>
+
+        <div>
+          Confirmation:<br>
+          <input name="q3" type="password" id="q3" size="15">
+        </div>
+
+        <input type=hidden name='s' id='s' value='createUser'>
+
+
+        <input type='button' onclick="javascript:fLogon.submit()" value="Entrar">
+
+        <div style='color:#d11; font-size:12px; font-weight:800'>
+          #nl2br(lastError)
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

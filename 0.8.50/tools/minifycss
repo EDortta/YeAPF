@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# http://developer.yahoo.com/yui/compressor/
+YUI_COMPRESSOR=/usr/local/bin/yuicompressor-2.4.8.jar
+
+case "$1" in
+""|"-h"|"--help")
+    echo "Usage: minifycss path/to/css/file.css"
+    exit 1;
+    ;;
+esac
+
+cssDir=`dirname $1`
+cssFile=`basename $1`
+
+if [ ! -d "$1" ]; then
+
+  mincssFile=`echo $cssFile | rev | cut -d"." -f2- | rev`.min.css
+
+  cssFilePath=$cssDir/$cssFile
+  mincssFilePath=$cssDir/$mincssFile
+
+
+  java -jar $YUI_COMPRESSOR --type=css -o $mincssFilePath $cssFilePath
+  echo "$cssFilePath minified. Now located at $mincssFilePath"
+fi
