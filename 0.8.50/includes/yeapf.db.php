@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.50-1 built on 2016-08-22 17:09 (-3 DST)
+    YeAPF 0.8.50-9 built on 2016-08-23 14:51 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-07-28 10:41:15 (-3 DST)
+    2016-08-23 06:35:49 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -125,10 +125,6 @@
 
   function db_die($errorMsg, $className = 'dbErr')
   {
-    global $logOutput;
-
-    if ($logOutput<=1)
-      $errorMsg="<div class=$className>$errorMsg</div>";
     _die("$errorMsg");
   }
 

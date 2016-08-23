@@ -1,19 +1,20 @@
 <?php
 /*
     skel/webApp/query.php
-    YeAPF 0.8.50-1 built on 2016-08-22 17:09 (-3 DST)
+    YeAPF 0.8.50-9 built on 2016-08-23 14:51 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-01-23 22:00:41 (-3 DST)
+    2016-08-23 06:46:59 (-3 DST)
 */
 /*
 * Sistema de mensagens entre processos do YeAPF
 */
 
 
-  # header("Content-Type:text/xml;  charset=ISO-8859-1",true);
   header('Content-Type: application/xml; charset=ISO-8859-1', true);
   header("Cache-Control: no-cache, must-revalidate");
   header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+  // logOutput = -1: Arquivo, 0: silencio, 1: tela, 2: xml
+  $logOutput=2; /* XML */
 
   $dbConnect='no';
   (@include_once "yeapf.php") or die("<?xml version='1.0' encoding='ISO-8859-1'?>\n<root><error>yeapf not configured</error><sgug><timestamp>0</timestamp><devSession>null</devSession></sgug></root>");
@@ -26,7 +27,6 @@
   $developBase=$yeapfConfig['yeapfPath']."/../develop";
   (@include_once "$developBase/yeapf.develop.php") or die ("Error loading 'yeapf.develop.php'");
 
-  $logOutput=2;
   _dumpY(1,1,"appFolderRights=$appFolderRights");
 
   $callBackFunction = isset($callBackFunction)?$callBackFunction:'';

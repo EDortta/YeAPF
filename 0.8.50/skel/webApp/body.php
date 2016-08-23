@@ -1,14 +1,20 @@
 <?php
 /*
     skel/webApp/body.php
-    YeAPF 0.8.50-1 built on 2016-08-22 17:09 (-3 DST)
+    YeAPF 0.8.50-9 built on 2016-08-23 14:51 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-01-23 22:00:41 (-3 DST)
+    2016-08-23 06:46:26 (-3 DST)
 
     skel/webApp / body.php
     This file cannot be modified within skel/webApp
     folder, but it can be copied and changed outside it.
 */
+
+  header('Content-type: text/html', true);
+  header("Cache-Control: no-cache, must-revalidate");
+  header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+  // logOutput = -1: Arquivo, 0: silencio, 1: tela, 2: xml
+  $logOutput=-1;
 
   if (file_exists('flags/flag.dbgphp')) {
     ini_set('display_errors','1');
@@ -28,8 +34,6 @@
   }
 
   try {
-    // logOutput = -1: Arquivo, 0: silencio, 1: tela, 2: xml
-    $logOutput=-1;
     if (!isset($withoutHeader))
       $withoutHeader=(isset($e)?($e==1):false);
 

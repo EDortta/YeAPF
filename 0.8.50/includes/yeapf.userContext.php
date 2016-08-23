@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.userContext.php
-    YeAPF 0.8.50-1 built on 2016-08-22 17:09 (-3 DST)
+    YeAPF 0.8.50-9 built on 2016-08-23 14:51 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-05-30 09:45:48 (-3 DST)
+    2016-08-23 06:35:12 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -412,7 +412,7 @@
                                $tableName='',
                                $IDFieldName='')
     {
-      global $sysTimeStamp, $logOutput,
+      global $sysTimeStamp,
              $usrNicknameField, $usrTableName, $usrUniqueIDField,
              $usrUniqueIDFieldType, $usrSessionIDField;
 
@@ -427,9 +427,6 @@
 
         $this->validUser=false;
         $this->logonRights=$logonRights;
-
-        if ($logOutput<2)
-          $logOutput=1;
 
         _dump("INVALID VALUE FOR 'logonRights' PARAMETER");
         showDebugBackTrace("Invalid value for 'logonRights' parameter",true);

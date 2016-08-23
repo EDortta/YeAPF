@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.50-1 built on 2016-08-22 17:09 (-3 DST)
+  * YeAPF 0.8.50-9 built on 2016-08-23 14:51 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-08-22 17:09:52 (-3 DST)
+  * 2016-08-23 14:51:57 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.50-1 built on 2016-08-22 17:09 (-3 DST)");
+ console.log("YeAPF 0.8.50-9 built on 2016-08-23 14:51 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -2325,9 +2325,9 @@
      /* YeAPF lexical analyser and parser  - Javascript implementation */
      var yLexObj = function(aString) {
        "use strict";
-       var self = {};
+       var that = {};
      
-       self.optable = {
+       that.optable = {
          '!': 'EXCLAMATION',
          '"': 'DOUBLE_QUOTE',
          '#': 'NUMBER_SIGN',
@@ -2364,7 +2364,7 @@
          '<=': 'LESS_EQUALS2'
        };
      
-       self.opprecedence = {
+       that.opprecedence = {
          'LIKE':  5,
          'AND':  5,
          'OR':   5,
@@ -2381,170 +2381,170 @@
          '-':  1
        };
      
-       self._ALPHA = 1;
-       self._ALPHA_NUM = 2;
-       self._NEW_LINE = 4;
-       self._DIGIT = 8;
-       self._QUOTE = 16;
+       that._ALPHA = 1;
+       that._ALPHA_NUM = 2;
+       that._NEW_LINE = 4;
+       that._DIGIT = 8;
+       that._QUOTE = 16;
      
-       self.void = {
+       that.voidToken = {
            type: null,
            token: null,
            token_string: null,
            pos: null
        };
      
-       self.error = function() {
-         var ret=JSON.parse(JSON.stringify(self.void));
+       that.error = function() {
+         var ret=that.voidToken.extend();
          ret.type = 'ERROR';
-         ret.pos = self.pos;
+         ret.pos = that.pos;
          return ret;
        };
      
      
-       self.char = function(offset) {
+       that.oneChar = function(offset) {
          offset = offset || 0;
-         return self.buf.charAt(self.pos + offset);
+         return that.buf.charAt(that.pos + offset);
        };
      
-       self._isnewline = function(c) {
-         c = self.char();
-         return (c === '\r' || c === '\n') ? self._NEW_LINE : 0;
+       that._isnewline = function(c) {
+         c = that.oneChar();
+         return (c === '\r' || c === '\n') ? that._NEW_LINE : 0;
        };
      
-       self._isdigit = function(c) {
-         return (c >= '0' && c <= '9') ? self._DIGIT : 0;
+       that._isdigit = function(c) {
+         return (c >= '0' && c <= '9') ? that._DIGIT : 0;
        };
      
-       self._isalpha = function(c) {
+       that._isalpha = function(c) {
          return ((c >= 'a' && c <= 'z') ||
            (c >= 'A' && c <= 'Z') ||
-           (c === '_') || (c === '$')) ? self._ALPHA : 0;
+           (c === '_') || (c === '$')) ? that._ALPHA : 0;
        };
      
-       self._isalphanum = function(c) {
-         return self._isdigit(c) | self._isalpha(c);
+       that._isalphanum = function(c) {
+         return that._isdigit(c) | that._isalpha(c);
        };
      
-       self._isquote = function(c) {
-         return ((c == "'") || (c == '"')) ? self._QUOTE : 0;
+       that._isquote = function(c) {
+         return ((c == "'") || (c == '"')) ? that._QUOTE : 0;
        };
      
-       self._whatis = function(c) {
-         return self._isalpha(c) | self._isdigit(c) | self._isquote(c);
+       that._whatis = function(c) {
+         return that._isalpha(c) | that._isdigit(c) | that._isquote(c);
        };
      
-       self._process_quote = function() {
-         var quote = self.char(),
-           lq_pos = self.buf.indexOf(quote, self.pos + 1),
-           ret = self.error();
-         if (lq_pos > self.pos) {
+       that._process_quote = function() {
+         var quote = that.oneChar(),
+           lq_pos = that.buf.indexOf(quote, that.pos + 1),
+           ret = that.error();
+         if (lq_pos > that.pos) {
            ret = {
              type: 'LITERAL',
-             token: self.buf.substring(self.pos + 1, lq_pos),
-             pos: self.pos
+             token: that.buf.substring(that.pos + 1, lq_pos),
+             pos: that.pos
            };
            ret.token_string=ret.token;
-           self.pos = lq_pos + 1;
+           that.pos = lq_pos + 1;
          }
          return ret;
        };
      
-       self._process_identifier = function() {
+       that._process_identifier = function() {
          var lq_pos = 1,
-           ret = self.error();
-         while ((self.pos + lq_pos < self.buf.length) &&
-           (self._isalpha(self.char(lq_pos))))
+           ret = that.error();
+         while ((that.pos + lq_pos < that.buf.length) &&
+           (that._isalpha(that.oneChar(lq_pos))))
            lq_pos++;
          ret = {
            type: 'IDENTIFIER',
-           token: self.buf.substring(self.pos, self.pos + lq_pos),
-           pos: self.pos
+           token: that.buf.substring(that.pos, that.pos + lq_pos),
+           pos: that.pos
          };
          ret.token_string=ret.token;
-         self.pos = self.pos + lq_pos;
+         that.pos = that.pos + lq_pos;
          return ret;
        };
      
-       self._process_number = function() {
+       that._process_number = function() {
          var lq_pos = 1,
-           ret = self.error();
-         while ((self.pos + lq_pos < self.buf.length) &&
-           (self._isdigit(self.char(lq_pos))))
+           ret = that.error();
+         while ((that.pos + lq_pos < that.buf.length) &&
+           (that._isdigit(that.oneChar(lq_pos))))
            lq_pos++;
          ret = {
            type: 'NUMBER',
-           token: self.buf.substring(self.pos, self.pos + lq_pos),
-           pos: self.pos
+           token: that.buf.substring(that.pos, that.pos + lq_pos),
+           pos: that.pos
          };
          ret.token_string=ret.token;
-         self.pos = self.pos + lq_pos;
+         that.pos = that.pos + lq_pos;
          return ret;
        };
      
-       self.getToken = function() {
+       that.getToken = function() {
          var c,
-           ret = self.error(),
+           ret = that.error(),
            sep = ' \t\r\n';
      
-         /* jump to next valid char */
-         while (self.pos < self.buf.length) {
-           c = self.char();
+         /* jump to next valid oneChar */
+         while (that.pos < that.buf.length) {
+           c = that.oneChar();
            if (sep.indexOf(c) > -1) {
-             self.pos++;
+             that.pos++;
            } else {
              break;
            }
          }
      
          /* if still into string */
-         if (self.pos < self.buf.length) {
+         if (that.pos < that.buf.length) {
            var canProcessOp=true;
            if (c == '/') {
-             if (self.char(1) == '*') {
+             if (that.oneChar(1) == '*') {
      
-             } else if (self.char(1) == '/') {
+             } else if (that.oneChar(1) == '/') {
      
              }
            }
      
            if (canProcessOp) {
-             var op = self.optable[c];
+             var op = that.optable[c];
              if (op === undefined) {
-               switch (self._whatis(c)) {
-                 case (self._ALPHA):
-                   ret = self._process_identifier();
+               switch (that._whatis(c)) {
+                 case (that._ALPHA):
+                   ret = that._process_identifier();
                    var auxToken=String(ret.token_string).toUpperCase()
                    if ((auxToken=='AND') || (auxToken=='OR') || (auxToken=='LIKE')) {
                      ret.token_string=auxToken;
                      ret.type='OPERATOR';
                    }
                    break;
-                 case (self._DIGIT):
-                   ret = self._process_number();
+                 case (that._DIGIT):
+                   ret = that._process_number();
                    break;
-                 case (self._QUOTE):
-                   ret = self._process_quote();
+                 case (that._QUOTE):
+                   ret = that._process_quote();
                    break;
                }
              } else {
                var _type='OPERATOR',
                    _token_string = c,
-                   c1   = self.char(1),
-                   r1   = self.void,
-                   _pos = self.pos;
-               if (self.optable[c + c1]) {
+                   c1   = that.oneChar(1),
+                   r1   = that.voidToken,
+                   _pos = that.pos;
+               if (that.optable[c + c1]) {
                  c = c + c1;
-                 op = self.optable[c];
+                 op = that.optable[c];
                  _token_string = c;
                } else if ('-+'.indexOf(c)>=0)  {
-                 var ptt=self.priorToken.type;
-                 if ((ptt===null) || ((ptt=='OPERATOR') && (self.priorToken.token=="L_PAREN"))) {
-                   var c1t=self._whatis(c1);
-                   if (c1t==self._DIGIT) {
-                     r1 = self._process_number();
-                   } else if (c1t==self._ALPHA)
-                     r1 = self._process_identifier();
+                 var ptt=that.priorToken.type;
+                 if ((ptt===null) || ((ptt=='OPERATOR') && (that.priorToken.token=="L_PAREN"))) {
+                   var c1t=that._whatis(c1);
+                   if (c1t==that._DIGIT) {
+                     r1 = that._process_number();
+                   } else if (c1t==that._ALPHA)
+                     r1 = that._process_identifier();
                  }
                }
                
@@ -2554,60 +2554,60 @@
                  pos: _pos,
                  token_string: r1.token_string || _token_string
                };
-               self.pos += c.length;
+               that.pos += c.length;
              }
            }
          } else {
            ret.type = 'EOF',
              ret.token = null;
          }
-         self.priorToken=ret;
+         that.priorToken=ret;
          return ret;
        };
      
-       self.tokenTypeIs = function(token, expectedTypes) {
+       that.tokenTypeIs = function(token, expectedTypes) {
          expectedTypes=','+expectedTypes+',';
          return  (expectedTypes.indexOf(','+token.type+',')>=0);
        };
      
-       self.getExpectedToken = function(expectedTypes) {
-         var priorPos=self.pos;
-         var token=self.getToken();
-         if (self.tokenTypeIs(token, expectedTypes))  {
+       that.getExpectedToken = function(expectedTypes) {
+         var priorPos=that.pos;
+         var token=that.getToken();
+         if (that.tokenTypeIs(token, expectedTypes))  {
            return token;
          } else {
-           self.pos=priorPos;
+           that.pos=priorPos;
            return false;
          }
        };
      
-       self._analiseText = function () {
-         var token, lastSym=self.void, pct, ppt, itemSolved;
+       that._analiseText = function () {
+         var token, lastSym=that.voidToken, pct, ppt, itemSolved;
          do {
            itemSolved=false;
-           token=self.getToken();
+           token=that.getToken();
            if (token && token.type!="EOF") {
-             if (self.symStack.length>0)
-               lastSym=self.symStack[self.symStack.length-1];
-             lastSym=lastSym || self.void;
+             if (that.symStack.length>0)
+               lastSym=that.symStack[that.symStack.length-1];
+             lastSym=lastSym || that.voidToken;
      
              if (token.type=='OPERATOR') {
-               pct=self.opprecedence[token.token_string] || 99;
-               ppt=self.opprecedence[lastSym.token_string] || 10;
+               pct=that.opprecedence[token.token_string] || 99;
+               ppt=that.opprecedence[lastSym.token_string] || 10;
                if (pct<=ppt) {
-                 lastSym=self.symStack.pop();
-                 self.symStack.push(token);
+                 lastSym=that.symStack.pop();
+                 that.symStack.push(token);
                  if (lastSym)
                    if (lastSym.token_string!='(')
-                     self.postFixStack.push(lastSym);
+                     that.postFixStack.push(lastSym);
                  itemSolved=true;
                
                } else if (token.token_string==')') {
                  do {
-                   lastSym=self.symStack.pop();
+                   lastSym=that.symStack.pop();
                    if (lastSym) {
                      if (lastSym.token_string!='(')
-                       self.postFixStack.push(lastSym);
+                       that.postFixStack.push(lastSym);
                    }
                  } while ((lastSym) && (lastSym.token_string!='('));
                  itemSolved=true;
@@ -2617,9 +2617,9 @@
              if (!itemSolved) {
                if (token) {
                  if (token.type=='OPERATOR') {
-                   self.symStack.push(token);
+                   that.symStack.push(token);
                  } else {
-                   self.postFixStack.push(token);
+                   that.postFixStack.push(token);
                  }
                }
              }
@@ -2628,39 +2628,42 @@
          } while (!((token.type=='ERROR') || (token.type=='EOF')));
      
          do {
-           lastSym=self.symStack.pop();
+           lastSym=that.symStack.pop();
            if ((lastSym) && (lastSym.type!='EOF'))
-             self.postFixStack.push(lastSym);
+             that.postFixStack.push(lastSym);
          } while ((lastSym) && (lastSym.type!='EOF'));
      
          if (false) {
            console.log("postFixStack:");
-           self.showStack(self.postFixStack);
+           that.showStack(that.postFixStack);
            console.log("symStack:");
-           self.showStack(self.symStack);
+           that.showStack(that.symStack);
          }
        };
      
-       self.solve = function(data) {
-         var i, stack=[], token, aux, canPush, op1, op2, ret;
-         for (i=0; i<self.postFixStack.length; i++) {
+       that.solve = function(data) {
+         var i, stack=[], token, aux, canPush, op1, op2, ret, noErrors=true;;
+         for (i=0; (i<that.postFixStack.length) && (noErrors); i++) {
            canPush=false;
      
-           token=self.postFixStack[i];
+           token=that.postFixStack[i];
            if (token) {
              if ((token.type=='NUMBER') || (token.type=='LITERAL')) {
-               aux=String(token.token_string).toUpperCase();
+               aux=token.token_string;
+               aux=String(aux).toUpperCase();
                canPush=true;
              }
              if (token.type=='IDENTIFIER') {
-               aux=String(data[token.token_string]).toUpperCase();
+               aux=data[token.token_string];
                if (typeof aux=='undefined') {
                  var errorMessage="'"+token.token_string + "' is not defined on data";
                  console.error(errorMessage);
-                 throw new Error(errorMessage)
+                 aux=false;
                }
-               else
+               else {
+                 aux=String(aux).toUpperCase();
                  canPush=true;
+               }
              }
      
              if (canPush) {
@@ -2710,8 +2713,8 @@
                    break;
      
                  case 'LIKE':
-                   op1=String(op1);
-                   op2=String(op2);
+                   op1=String(op1).toUpperCase();
+                   op2=String(op2).toUpperCase();
                    var cleanFilter=op2.replace(/\%/g,'');
                    if (op2.substr(0,1)!='%') {
                      if (op2.substr(op2.length-1)!='%') {
@@ -2750,33 +2753,33 @@
          return ret;
        };
      
-       self.showStack = function (s) {
+       that.showStack = function (s) {
          var stackString="\t";
          for(var i=0; i<s.length; i++)
            stackString+=(s[i].token_string)+' ';
          console.log(stackString);
        };
      
-       self.parse = function() {
-         self.reset();
-         self._analiseText();
-         return self.stack;
+       that.parse = function() {
+         that.reset();
+         that._analiseText();
+         return that.stack;
        };
      
-       self.reset = function () {
-         self.pos = 0;
-         self.symStack = [];
-         self.postFixStack = [];
-         self.priorToken=self.void;
+       that.reset = function () {
+         that.pos = 0;
+         that.symStack = [];
+         that.postFixStack = [];
+         that.priorToken=that.voidToken;
        };
      
-       self.init = function(aString) {
-         self.buf = aString || self.buf || "";
-         self.reset();
-         return self;
+       that.init = function(aString) {
+         that.buf = aString || that.buf || "";
+         that.reset();
+         return that;
        };
      
-       return self.init(aString);
+       return that.init(aString);
      }
      
  /* END yanalise.js */

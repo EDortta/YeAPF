@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.50-1 built on 2016-08-22 17:09 (-3 DST)
+    YeAPF 0.8.50-9 built on 2016-08-23 14:51 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-07-07 09:22:52 (-3 DST)
+    2016-08-23 06:56:27 (-3 DST)
    */
 
   /*
@@ -186,8 +186,6 @@
   }
   setMySelf($_MYSELF_);
 
-  // indica se um dos arquivos processados é um XML e muda o cabeçalho
-  $xmlOutput=0;
   // -1 = arquivo yeapf.loader.log, 0 = nul, 1 = html output, 2 = xml output
   if (!isset($logOutput))
     $logOutput=$isCLI?-1:1;
@@ -626,7 +624,7 @@
   $lastAccess = 0;  // so aos efeitos que seja global $yeapfLogFlags,.  o valor mesmo sera colocado por usuario valido
 
   function __extractInputValues__ () {
-    global $user_IP, $xmlOutput;
+    global $user_IP;
 
     /*
     $qs = getenv("QUERY_STRING").'&';
@@ -683,12 +681,9 @@
       _recordSuspiciousIP($user_IP);
       unset($GLOBALS['s']);
       unset($GLOBALS['u']);
-      unset($GLOBALS['a']);
-      if (!$xmlOutput) {
+      unset($GLOBALS['a']);      
+      if (!outIsXML()) {
         http_response_code(404);
-        header("HTTP/1.0 404 Not Found", true);
-        echo "<h1>404 Not Found</h1>";
-        echo "The page that you have requested could not be found.";
         exit();
       }
     }
@@ -3324,7 +3319,7 @@
 
   function processFile($fileName, $pegarDadosDaTabela=0, $nomeTabela='', $campoChave='', $valorChave='')
   {
-    global $xmlOutput, $_CurrentFileName, $user_IP, $aDebugIP, $yeapfConfig, $sessionCWD;
+    global $_CurrentFileName, $user_IP, $aDebugIP, $yeapfConfig, $sessionCWD;
 
     // echo "*$fileName<br>";
     _dumpY(1,1,"looking for $fileName");
@@ -3335,13 +3330,12 @@
 
       $_CurrentFileName=$auxFileName;
 
-      if (strpos($auxFileName,".xml")>0) {
-        $xmlOutput=1;
+      if (strpos($auxFileName,".xml")>0) {        
         header("Content-Type: text/xml;  charset=ISO-8859-1", true);
       }
 
       if ($canIncludeDebugInfo == 1)
-        echo "\n\n<!-- START $auxFileName -->\n\n\t\t";
+        _echo("\n\n<!-- START $auxFileName -->\n\n\t\t");
       _dumpY(1,1,"LOADING $auxFileName");
 
       $oldSessionCWD=isset($sessionCWD)?$sessionCWD:getcwd();
@@ -3367,11 +3361,11 @@
       $_CurrentFileName=$aux;
 
       if ($canIncludeDebugInfo == 1)
-        echo "\n\n<!-- END $auxFileName -->\n\n";
+        _echo("\n\n<!-- END $auxFileName -->\n\n");
     } else {
       _dumpY(1,1,"$fileName not found");
       if ($canIncludeDebugInfo == 1) {
-        echo "\n\n<!-- $fileName not found -->\n\n";
+        _echo("\n\n<!-- $fileName not found -->\n\n");
       }
     }
   }

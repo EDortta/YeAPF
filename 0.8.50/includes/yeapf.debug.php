@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.debug.php
-    YeAPF 0.8.50-1 built on 2016-08-22 17:09 (-3 DST)
+    YeAPF 0.8.50-9 built on 2016-08-23 14:51 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-05-30 09:45:48 (-3 DST)
+    2016-08-23 06:34:15 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -123,7 +123,7 @@
 
   function _die()
   {
-    global $logOutput, $user_IP, $sysDate, $isCLI;
+    global $user_IP, $sysDate, $isCLI;
 
     _minimalCSS();
 
