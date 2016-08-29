@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.50-10 built on 2016-08-29 09:16 (-3 DST)
+  * YeAPF 0.8.50-11 built on 2016-08-29 10:29 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-08-29 09:16:28 (-3 DST)
+  * 2016-08-29 10:29:23 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.50-10 built on 2016-08-29 09:16 (-3 DST)");
+ console.log("YeAPF 0.8.50-11 built on 2016-08-29 10:29 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -1405,7 +1405,10 @@
      }
      
      function trim(str) {
-       return str.replace(/^\s+|\s+$/g,"");
+       if (typeof str=="string")
+         return str.replace(/^\s+|\s+$/g,"")
+       else
+         return "";
      }
      
      function unparentesis(v) {
@@ -4848,7 +4851,9 @@
                    auxHTML=auxHTML+yAnalise(aLineSpec.html, xDataItem);
                  } else {
                    for(colName in xDataItem) {
-                     auxHTML+='<div><div class=tnFieldName><b><small>{0}</small></b></div>{1}'.format(colName, xDataItem[colName]);
+                     if (xDataItem.hasOwnProperty(colName)) {
+                       auxHTML+='<div><div class=tnFieldName><b><small>{0}</small></b></div>{1}'.format(colName, xDataItem[colName]);
+                     }
                    }
                  }
                }
