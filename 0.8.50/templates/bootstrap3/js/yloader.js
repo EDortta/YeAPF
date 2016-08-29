@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.50-12 built on 2016-08-29 17:01 (-3 DST)
+  * YeAPF 0.8.50-13 built on 2016-08-29 17:08 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-08-29 17:01:04 (-3 DST)
+  * 2016-08-29 17:08:24 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.50-12 built on 2016-08-29 17:01 (-3 DST)");
+ console.log("YeAPF 0.8.50-13 built on 2016-08-29 17:08 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -768,7 +768,9 @@
      }
      
      if (typeof Object.extend !== 'function') {
-       Object.prototype.extend = function() { return (JSON.parse(JSON.stringify(this))) };
+       Object.prototype.extend = function() { 
+         return (JSON.parse(JSON.stringify(this))) 
+       };
      }
      
      if (!Array.prototype.indexOf) {
@@ -2305,19 +2307,24 @@
            aLine = aLine.slice(0,p) + aValue + aLine.slice(p + p2 + 1);
      
          }
+     
+         /* disabled until we can recognize quickly if is an HTML code */
+     
+         /*
          var needEval=false;
          var ops=['<', '>', '==', '!=', '<=', '>='];
          for(var i=0; i<ops.length; i++) {
            needEval|=(aLine.indexOf(ops[i])>=0);
          }
-         /* disabled until we can recognize quickly if is an HTML code */
-         if ((needEval) && (true)) {
+         
+         if ((needEval) && (false)) {
            try{
              aLine=eval(aLine);
            } catch(err) {
      
            }
          }
+         */ 
      
        } else
          aLine='';

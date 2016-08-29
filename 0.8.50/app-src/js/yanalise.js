@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yanalise.js
- * YeAPF 0.8.50-10 built on 2016-08-29 09:16 (-3 DST)
+ * YeAPF 0.8.50-13 built on 2016-08-29 17:08 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-08-23 14:50:56 (-3 DST)
+ * 2016-08-29 17:07:34 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yLexObj introduced in 2016-08-22 0.8.50-0
 **********************************************/
@@ -159,19 +159,24 @@ function yAnalise(aLine, aStack)
       aLine = aLine.slice(0,p) + aValue + aLine.slice(p + p2 + 1);
 
     }
+
+    /* disabled until we can recognize quickly if is an HTML code */
+
+    /*
     var needEval=false;
     var ops=['<', '>', '==', '!=', '<=', '>='];
     for(var i=0; i<ops.length; i++) {
       needEval|=(aLine.indexOf(ops[i])>=0);
     }
-    /* disabled until we can recognize quickly if is an HTML code */
-    if ((needEval) && (true)) {
+    
+    if ((needEval) && (false)) {
       try{
         aLine=eval(aLine);
       } catch(err) {
 
       }
     }
+    */ 
 
   } else
     aLine='';
