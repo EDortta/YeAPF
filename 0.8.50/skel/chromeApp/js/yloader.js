@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.50-9 built on 2016-08-23 14:51 (-3 DST)
+  * YeAPF 0.8.50-10 built on 2016-08-29 09:16 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-08-23 14:51:57 (-3 DST)
+  * 2016-08-29 09:16:28 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.50-9 built on 2016-08-23 14:51 (-3 DST)");
+ console.log("YeAPF 0.8.50-10 built on 2016-08-29 09:16 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -4303,8 +4303,10 @@
       *             inplaceData: []    - string array with the columns that need to be placed
       *                                  inside de TR definition.  ie. the id is the user code
       *                                  and the inplaceData are the name and email.
-      *             elementPrefixName  - string to be added before each target (element) form fields
-      *             elementPostfixName - string to be added after each target (element) form fields
+      *             elementPrefixName OR
+                    prefix             - string to be added before each target (element) form fields
+      *             elementPostfixName OR
+                    postfix            - string to be added after each target (element) form fields
       *
       *             beforeElement      - string with LI element id indicating new elements will be added before it
       *
@@ -4322,7 +4324,7 @@
       *          insertAtTop (applies to TR. false by default)
       */
      ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
-       if ((aLineSpec === undefined) || (aLineSpec==null))
+       if ((aLineSpec === undefined) || (aLineSpec===null))
          aLineSpec = {};
      
        if (typeof aFlags=="boolean")
@@ -4741,8 +4743,8 @@
              if ((typeof xData=='object') || (xData.length === 1)) {
                var yData=getDataFromXData(xData[0] || xData);
      
-               fieldPrefix = aLineSpec.elementPrefixName || '';
-               fieldPostfix = aLineSpec.elementPostixName || '';
+               fieldPrefix = aLineSpec.elementPrefixName || aLineSpec.prefix || '';
+               fieldPostfix = aLineSpec.elementPostixName || aLineSpec.postfix || '';
                for (i=0; i < aElements.length; i++) {
                  /* the less prioritary MASK comes from the html form */
                  editMask = aElements[i].getAttribute('editMask');
@@ -4833,20 +4835,26 @@
              } else if (xData.length > 1)
                _dump("There are more than one record returning from the server");
          } else if (aElement.nodeName=='DIV') {
-           if (xData)
-             if (xData.length === 1) {
-               xDataItem=getDataFromXData(xData[0]);
-               auxHTML='';
-               if (aFlags.deleteRows)
-                 aElement.innerHTML='';
-               else
-                 auxHTML=aElement.innerHTML;
-               for(colName in xDataItem)
-                 if (xDataItem.hasOwnProperty(colName)) {
-                   auxHTML+='<div><div class=tnFieldName><b><small>{0}</small></b></div>{1}'.format(colName, xDataItem[colName]);
+           if (aFlags.deleteRows)
+             aElement.innerHTML='';
+           
+           auxHTML=aElement.innerHTML; 
+     
+           if (xData) {
+             for (j in xData) {
+               if (xData.hasOwnProperty(j)) {
+                 xDataItem=getDataFromXData(xData[j]);
+                 if (aLineSpec.html) {
+                   auxHTML=auxHTML+yAnalise(aLineSpec.html, xDataItem);
+                 } else {
+                   for(colName in xDataItem) {
+                     auxHTML+='<div><div class=tnFieldName><b><small>{0}</small></b></div>{1}'.format(colName, xDataItem[colName]);
+                   }
                  }
-               aElement.innerHTML=auxHTML;
+               }
              }
+             aElement.innerHTML=auxHTML;
+           }
          }
        }
      };
@@ -4951,6 +4959,7 @@
                case "select-multi":
                case "file":
                  knownFieldType = true;
+                 break;
      
                case "color":
                case "date":
@@ -4964,8 +4973,8 @@
                case "time":
                case "url":
                case "week":
-                 console.warn(aElementId+"."+allElements[i].id+" of an insecure/not supported type");
                  knownFieldType = true;
+                 break;
              }
      
              if (knownFieldType)
@@ -5067,11 +5076,14 @@
      
      /*
       * get all the elements of the form and returns a JSON
+      * https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Forms/Data_form_validation
+      * http://www.the-art-of-web.com/html/html5-form-validation/
+      
       */
      ycomm.dom.getFormElements = function (aFormId, aLineSpec, aOnReady) {
        aLineSpec=aLineSpec || {};
-       var fieldPrefix = aLineSpec.elementPrefixName || '';
-       var fieldPostfix = aLineSpec.elementPostixName || '';
+       var fieldPrefix = aLineSpec.elementPrefixName || aLineSpec.prefix || '';
+       var fieldPostfix = aLineSpec.elementPostixName || aLineSpec.postfix || '';
      
        var ret = {},
            aElements = this.selectElements(aFormId),
