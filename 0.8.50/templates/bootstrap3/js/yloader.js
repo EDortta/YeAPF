@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.50-13 built on 2016-08-29 17:08 (-3 DST)
+  * YeAPF 0.8.50-14 built on 2016-08-29 17:23 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-08-29 17:08:24 (-3 DST)
+  * 2016-08-29 17:23:05 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.50-13 built on 2016-08-29 17:08 (-3 DST)");
+ console.log("YeAPF 0.8.50-14 built on 2016-08-29 17:23 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -767,8 +767,8 @@
          };
      }
      
-     if (typeof Object.extend !== 'function') {
-       Object.prototype.extend = function() { 
+     if (typeof Object.copyObj !== 'function') {
+       Object.prototype.copyObj = function() { 
          return (JSON.parse(JSON.stringify(this))) 
        };
      }
@@ -2405,7 +2405,7 @@
        };
      
        that.error = function() {
-         var ret=that.voidToken.extend();
+         var ret=that.voidToken.copyObj();
          ret.type = 'ERROR';
          ret.pos = that.pos;
          return ret;

@@ -5611,11 +5611,11 @@
 </code></Object.create.F></functions></inner><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>792</start>
 <end>796</end>
-</code></Object.create><Object.prototype.extend><name>Object.prototype.extend</name>
+</code></Object.create><Object.prototype.copyObj><name>Object.prototype.copyObj</name>
 <parameters></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>800</start>
 <end>802</end>
-</code></Object.prototype.extend><Array.prototype.indexOf><name>Array.prototype.indexOf</name>
+</code></Object.prototype.copyObj><Array.prototype.indexOf><name>Array.prototype.indexOf</name>
 <parameters><elt><dummy>ok</dummy>
 </elt></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>806</start>
@@ -6036,11 +6036,11 @@
 </code></Object.create.F></functions></inner><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>524</start>
 <end>528</end>
-</code></Object.create><Object.prototype.extend><name>Object.prototype.extend</name>
+</code></Object.create><Object.prototype.copyObj><name>Object.prototype.copyObj</name>
 <parameters></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>532</start>
 <end>534</end>
-</code></Object.prototype.extend><Array.prototype.indexOf><name>Array.prototype.indexOf</name>
+</code></Object.prototype.copyObj><Array.prototype.indexOf><name>Array.prototype.indexOf</name>
 <parameters><elt><dummy>ok</dummy>
 </elt></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>538</start>

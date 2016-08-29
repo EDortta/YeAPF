@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yanalise.js
- * YeAPF 0.8.50-13 built on 2016-08-29 17:08 (-3 DST)
+ * YeAPF 0.8.50-14 built on 2016-08-29 17:23 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-08-29 17:07:34 (-3 DST)
+ * 2016-08-29 17:22:28 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yLexObj introduced in 2016-08-22 0.8.50-0
 **********************************************/
@@ -257,7 +257,7 @@ var yLexObj = function(aString) {
   };
 
   that.error = function() {
-    var ret=that.voidToken.extend();
+    var ret=that.voidToken.copyObj();
     ret.type = 'ERROR';
     ret.pos = that.pos;
     return ret;
