@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.50-10 built on 2016-08-29 09:16 (-3 DST)
+    YeAPF 0.8.50-18 built on 2016-08-30 14:35 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-08-25 09:54:48 (-3 DST)
+    2016-08-30 14:34:53 (-3 DST)
    */
 
   /*
@@ -267,12 +267,13 @@
 
   $user_IP=serverSafeVarValue("REMOTE_ADDR");
   $server_IP=serverSafeVarValue("SERVER_ADDR");
+  $safe_user_IP=str_replace(":", "", $user_IP);
 
   if (file_exists("flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." 0.8.50 ".": loading $user_IP config file\n",3,"logs/yeapf.loader.log");
 
 
-  if (file_exists(".config/yeapf.config.files.$user_IP"))
-    include_once ".config/yeapf.config.files.$user_IP";
+  if (file_exists(".config/yeapf.config.files.$safe_user_IP"))
+    include_once ".config/yeapf.config.files.$safe_user_IP";
 
   if (!isset($yeapfConfig))
     $yeapfConfig = array();
@@ -624,7 +625,7 @@
   $lastAccess = 0;  // so aos efeitos que seja global $yeapfLogFlags,.  o valor mesmo sera colocado por usuario valido
 
   function __extractInputValues__ () {
-    global $user_IP;
+    global $user_IP, $safe_user_IP;
 
     /*
     $qs = getenv("QUERY_STRING").'&';
@@ -703,7 +704,7 @@
       https://wadl.java.net
       https://en.wikipedia.org/wiki/Web_Application_Description_Language 
       */
-      error_log(date("YmdHis ").$GLOBALS['_debugTag']." "."$url\n", 3, "logs/access.$user_IP.log");
+      error_log(date("YmdHis ").$GLOBALS['_debugTag']." "."$url\n", 3, "logs/access.$safe_user_IP.log");
     }
   };
 
@@ -1159,11 +1160,11 @@
 
   function _saveConfigFile()
   {
-    global $yeapfConfig, $user_IP;
+    global $yeapfConfig, $user_IP, $safe_user_IP;
 
     if (lock('yeapfConfig')) {
       asort($yeapfConfig['files']);
-      $f=fopen(".config/yeapf.config.files.$user_IP",'w');
+      $f=fopen(".config/yeapf.config.files.$safe_user_IP",'w');
       if ($f) {
         $date=date("Y-m-d");
         $time=date("G:i:s");
@@ -1184,14 +1185,14 @@
         fputs($f,"\n?>");
         fclose($f);
       } else
-        die("Impossible to create .config/yeapf.config.files.$user_IP in current dir");
+        die("Impossible to create .config/yeapf.config.files.$safe_user_IP in current dir");
       unlock('yeapfConfig');
     }
   }
 
   function saveBestName($formFile, $protocolIdentifier, $attemp)
   {
-    global $yeapfConfig, $user_IP;
+    global $yeapfConfig;
 
 
     $yeapfConfig['files'][intval($protocolIdentifier).':'.$formFile]=$attemp;
@@ -1250,7 +1251,7 @@
           if (!isset($searchPath))
             $searchPath=array('./');
 
-          $auxSearchPath=explode(',',"$appName,$appName/$s,$s,".join(',',$searchPath));
+          $auxSearchPath=explode(',',"$appName,$appName/$s,$s,js/".join(',',$searchPath));
 
           $auxSearchPath = array_unique($auxSearchPath);
 

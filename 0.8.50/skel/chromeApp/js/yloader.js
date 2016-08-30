@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.50-15 built on 2016-08-29 17:33 (-3 DST)
+  * YeAPF 0.8.50-18 built on 2016-08-30 14:35 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-08-29 17:33:32 (-3 DST)
+  * 2016-08-30 14:35:59 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.50-15 built on 2016-08-29 17:33 (-3 DST)");
+ console.log("YeAPF 0.8.50-18 built on 2016-08-30 14:35 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -4447,7 +4447,7 @@
                if (oTable.rows.length>0) {
                  ycomm.dom._elem_templates[aElementID].rows = [];
                  for(i=0; i<oTable.rows.length; i++)
-                   ycomm.dom._elem_templates[aElementID].rows[i]=oTable.rows[i].innerHTML;
+                   ycomm.dom._elem_templates[aElementID].rows[i]=trim(oTable.rows[i].innerHTML+"").replace(/\ \s+/g,'');
                }
              } else {
                ycomm.dom._elem_templates[aElementID]={};

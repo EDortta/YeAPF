@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.50-11 built on 2016-08-29 10:29 (-3 DST)
+ * YeAPF 0.8.50-18 built on 2016-08-30 14:35 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-08-29 10:28:27 (-3 DST)
+ * 2016-08-29 17:46:47 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -172,7 +172,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
           if (oTable.rows.length>0) {
             ycomm.dom._elem_templates[aElementID].rows = [];
             for(i=0; i<oTable.rows.length; i++)
-              ycomm.dom._elem_templates[aElementID].rows[i]=oTable.rows[i].innerHTML;
+              ycomm.dom._elem_templates[aElementID].rows[i]=trim(oTable.rows[i].innerHTML+"").replace(/\ \s+/g,'');
           }
         } else {
           ycomm.dom._elem_templates[aElementID]={};
