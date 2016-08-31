@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ystorage.js
- * YeAPF 0.8.50-10 built on 2016-08-29 09:16 (-3 DST)
+ * YeAPF 0.8.50-19 built on 2016-08-31 16:07 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-08-22 16:48:24 (-3 DST)
+ * 2016-08-31 16:06:15 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -96,6 +96,10 @@ if (!window.ySingleDb) {
 
     that.setItem = function(id, jData) {
       id=String(id);
+      
+      jData._id = generateUUID() || jData._id;
+      jData._ts_update = (new Date()).getTime() / 1000;
+
       localStorage.setItem(that._dbTag_+"_item_"+id, JSON.stringify(jData));      
       if (that._list.indexOf(id)==-1) {
         that._list[that._list.length]=id;
@@ -139,6 +143,9 @@ if (!window.ySingleDb) {
     };
 
     that.removeItem = function(id) {
+      if (typeof that.onremove == "function") {
+        that.onremove(that.getItem(id));
+      }
       localStorage.removeItem(that._dbTag_+"_item_"+id);      
       var ndx=that._list.indexOf(String(id));
       if (ndx>-1) {
@@ -220,13 +227,22 @@ if (!window.yServerWatcherObj) {
 if (!window.yInfoObj) {
   window.yInfoObj=function(restServer, aDBName, aKeyName) {
     var that = {};
+
     that.cfg={
       db: ySingleDb(aDBName),
+      garbage: ySingleDb(aDBName+"_garbage"),
       dbName: aDBName,
       keyName: aKeyName,
+      dataModified: 0, 
       onrecordcount: null,
       onprogress:null,
       oncomplete: null
+    };
+
+    that.onremove = function(item) {
+      item._ts_deletion = (new Date()).getTime()/1000;
+      that.cfg.garbage.setItem(item._id, item);
+      that.cfg.dataModified++;
     };
 
     that.isbusy = function () {
@@ -238,6 +254,7 @@ if (!window.yInfoObj) {
     };
 
     that.setItem = function (itemNdx, itemJData) {
+      that.cfg.dataModified++;
       return that.cfg.db.setItem(itemNdx, itemJData);
     };
 
@@ -429,14 +446,9 @@ if (!window.yInfoObj) {
           function() {
             that.each(
               function(d) {
-                var callContext = {
-                  ID: d.ID,
-                  LATITUDE: d.LATITUDE,
-                  LONGITUDE: d.LONGITUDE,
-                  ACCURACY: d.ACCURACY,
-                  last_change: d.last_change,
-                  device: y$('deviceUUID').innerHTML
-                };
+                var callContext = d;
+                d._ts_upload = (new Date(d)).getTime()/1000;
+
                 mergeObject(that.cfg.condition, callContext);
                 ycomm.crave(
                   "sync",
@@ -473,6 +485,7 @@ if (!window.yInfoObj) {
     };
 
     that.init = function () {
+      db.onremove=that.onremove;
       that.server=yServerWatcherObj(restServer); 
       that.cleanCondition();   
       return that;
