@@ -1,14 +1,14 @@
 /*********************************************
  * app-src/js/ystorage.js
- * YeAPF 0.8.50-24 built on 2016-09-01 11:59 (-3 DST)
+ * YeAPF 0.8.50-25 built on 2016-09-01 12:26 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-09-01 11:58:36 (-3 DST)
+ * 2016-09-01 12:26:19 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
 "use strict";
 if (!window.ystorage) {
-  Object.defineProperty(window, "ystorage", (function() {
+  Object.defineProperty(window, "ystorage", new (function() {
 
     var aKeys = [],
       oStorage = {};
