@@ -1,8 +1,8 @@
 /*********************************************
  * skel/chromeApp/js/ystorage.js
- * YeAPF 0.8.50-19 built on 2016-08-31 16:07 (-3 DST)
+ * YeAPF 0.8.50-20 built on 2016-09-01 09:20 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-08-31 16:07:19 (-3 DST)
+ * 2016-09-01 09:20:57 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -225,7 +225,7 @@ if (!window.yServerWatcherObj) {
 }
 
 if (!window.yInfoObj) {
-  window.yInfoObj=function(restServer, aDBName, aKeyName) {
+  window.yInfoObj=function(restServer, aDBName, aKeyName, aDataTemplate) {
     var that = {};
 
     that.cfg={
@@ -371,16 +371,19 @@ if (!window.yInfoObj) {
 
     that._retrieveFromServer = function () {
       var condition={
-          xq_start: that.cfg.xq_start
-        };
+            xq_start: that.cfg.xq_start,
+            xq_collectionName: that.cfg.dbName
+          }, t1 = (new Date()).getTime();
       mergeObject(that.cfg.condition, condition);
 
       ycomm.crave(
         "sync",
-        "getRecordInfo_"+that.cfg.dbName,
+        "getDocumentInSequence",   /* @TO-DO*/
         condition,
         function(status, error, data) {
           if (data.length>0) {
+            that.cfg.interleave.adjustRestTime(t1);
+
             for(var i=0; i<data.length; i++) {
               that.setItem(data[i][that.cfg.keyName], data[i]);
               if (typeof that.cfg.onprogress == 'function')
@@ -388,7 +391,7 @@ if (!window.yInfoObj) {
             }
             that.cfg.xq_start+=data.length;
 
-            setTimeout(that._retrieveFromServer, 500);
+            setTimeout(that._retrieveFromServer, that.cfg.interleave.restTime);
           } else {
             if (typeof that.cfg.oncomplete == 'function')
               that.cfg.oncomplete(that.cfg.dbName);
@@ -409,7 +412,7 @@ if (!window.yInfoObj) {
           function() {        
             ycomm.crave(
               "sync",
-              "getRecordCount_"+that.cfg.dbName,
+              "getRecordCount",  /* @TO-DO*/
               that.cfg.condition,
               function(satus, error, data) {
                 data=data || [];
@@ -433,6 +436,19 @@ if (!window.yInfoObj) {
       }
     };
 
+    that.templatedData = function (data) {
+      var ret;
+      if (!that.cfg.dataTemplateEmpty) {
+        ret={};
+        for(var i in that.cfg.dataTemplate) {
+          if (that.cfg.dataTemplate.hasOwnProperty(i))
+            ret[i]=data[i];
+        }
+      } else
+        ret=data;
+      return ret;
+    };
+
     that.sendToServer = function(aoncomplete, aonprogress) {
       if (!that.busy) {
         that.busy=true;
@@ -446,13 +462,14 @@ if (!window.yInfoObj) {
           function() {
             that.each(
               function(d) {
-                var callContext = d;
+                var callContext = that.templatedData(d);
+
                 d._ts_upload = (new Date(d)).getTime()/1000;
 
                 mergeObject(that.cfg.condition, callContext);
                 ycomm.crave(
                   "sync",
-                  "setRecordInfo_"+that.cfg.dbName,
+                  "setDocument", /* @TO-DO*/
                   callContext,
                   function(status,error,data) {
                     if (status==200) {
@@ -468,7 +485,7 @@ if (!window.yInfoObj) {
                   that.cfg.oncomplete(that.cfg.dbName);
                 that.busy=false;
               },
-              that.cfg.condition
+              
             );
             
           },
@@ -484,13 +501,30 @@ if (!window.yInfoObj) {
       }
     };
 
-    that.init = function () {
+    that.init = function (aDataTemplate) {
+      /* interleave time */
+      that.cfg.interleave = yRestTimeControl(500);
+
+      /* data template */
+      if (typeof aDataTemplate==="undefined") {
+        that.cfg.dataTemplateEmpty=true;
+      } else {
+        that.cfg.dataTemplateEmpty=false;
+      }
+      that.cfg.dataTemplate=aDataTemplate || {};
+
+      /* garbage colector */
       db.onremove=that.onremove;
+
+      /* data server */
       that.server=yServerWatcherObj(restServer); 
+
+      /* initial condition status */
       that.cleanCondition();   
+
       return that;
     };
 
-    return that.init();
+    return that.init(aDataTemplate);
   };
 }

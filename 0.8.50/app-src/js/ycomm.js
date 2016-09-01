@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm.js
- * YeAPF 0.8.50-10 built on 2016-08-29 09:16 (-3 DST)
+ * YeAPF 0.8.50-20 built on 2016-09-01 09:20 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-02-25 10:18:45 (-3 DST)
+ * 2016-09-01 06:56:23 (-3 DST)
  * First Version (C) 2010 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm.js
@@ -25,6 +25,38 @@
 
     return 'Err #'+errNo+'\n-------- '+errMsg+'\n-------- '+errDetail;
   }
+
+
+  var yRestTimeControl = function (initialRestTime) {
+    var that = { };
+
+    that.setRestTime = function (aValue) {
+      that._restTime = min( max(125, aValue), 240 * 60 * 1000);
+    };
+
+    that.adjustRestTime = function (t1) {
+      var t2, tDif, interleaveDif, aux;
+      t2 = (new Date()).getTime();
+      tDif = t2 - t1;
+      aux = that._restTime - (that._restTime - tDif) / 2;
+      that.setRestTime(aux);
+    };
+
+    that.init = function () {
+      that.setRestTime(initialRestTime);
+      Object.defineProperty(
+        that,
+        "restTime",
+        {
+          get: function () { return that._restTime; },
+          set: that.setRestTime
+        }
+      );
+      return that;
+    };
+
+    return that.init();
+  };
 
   var ycommBase = function () {
     var that = {};
