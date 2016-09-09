@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ystorage.js
- * YeAPF 0.8.50-25 built on 2016-09-01 12:26 (-3 DST)
+ * YeAPF 0.8.50-27 built on 2016-09-09 17:07 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-09-01 12:26:19 (-3 DST)
+ * 2016-09-09 17:07:33 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -524,7 +524,7 @@ if (!window.yInfoObj) {
       that.cfg.dataTemplate = aDataTemplate || {};
 
       /* garbage colector */
-      db.onremove = that.onremove;
+      that.cfg.db.onremove = that.onremove;
 
       /* data server */
       that.server = yServerWatcherObj(restServer);
