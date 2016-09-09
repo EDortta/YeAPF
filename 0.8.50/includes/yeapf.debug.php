@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.debug.php
-    YeAPF 0.8.50-10 built on 2016-08-29 09:16 (-3 DST)
+    YeAPF 0.8.50-26 built on 2016-09-09 17:05 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-08-23 06:34:15 (-3 DST)
+    2016-09-09 13:04:09 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -134,7 +134,7 @@
         $argList.=' ';
       if (is_array($a)) {
         foreach($a as $v)
-          $argList.=$v;
+          $argList.="$v ";
       } else
         $argList.=$a;
     }

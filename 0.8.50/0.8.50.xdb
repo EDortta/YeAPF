@@ -3708,7 +3708,7 @@
 </code></__anonymousFunction__1096></functions><filename>jquery.min.js</filename>
 <folder>templates%2Fbootstrap3%2Fjs</folder>
 </jquery.min.js><npm.js><filename>npm.js</filename>
-<folder>skel%2FwebApp%2Fjs</folder>
+<folder>app-src%2Fi_configure%2Fjs</folder>
 </npm.js><yanalise.js><functions><yAnalise><name>yAnalise</name>
 <parameters><aLine><dummy>ok</dummy>
 </aLine><aStack><dummy>ok</dummy>
