@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.50-29 built on 2016-09-16 17:56 (-3 DST)
+  * YeAPF 0.8.50-30 built on 2016-09-16 18:00 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-09-16 17:56:39 (-3 DST)
+  * 2016-09-16 18:00:46 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.50-29 built on 2016-09-16 17:56 (-3 DST)");
+ console.log("YeAPF 0.8.50-30 built on 2016-09-16 18:00 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -5187,6 +5187,8 @@
                fieldValue=genString(ycomm.dom._scratch.t,1,15);
                break;
              case "email":
+               fieldValue=genString(ycomm.dom._scratch.mn,1,2)+"@"+genString(ycomm.dom._scratch.d, 1, 1);
+               break;
              case "color":
              case "date":
              case "datetime":
