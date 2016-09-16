@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.50-28 built on 2016-09-09 18:35 (-3 DST)
+  * YeAPF 0.8.50-29 built on 2016-09-16 17:56 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-09-09 18:35:35 (-3 DST)
+  * 2016-09-16 17:56:39 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.50-28 built on 2016-09-09 18:35 (-3 DST)");
+ console.log("YeAPF 0.8.50-29 built on 2016-09-16 17:56 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -5135,11 +5135,91 @@
        return aElements;
      };
      
+     ycomm.dom._scratch = {
+       t:  ['Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
+            'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.',
+            'Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.',
+            'Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.',
+            'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.',
+            'At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. ',
+            'Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'],
+       d:  [ 'yahu.com', 'hotmayl.com', 'jmail.com'],
+       p:  [ 'http://', 'https://', 'ws://', 'wss://', 'ftp://'],
+       mn: [ 'James', 'John', 'Robert', 'Michael', 'William', 'David', 'Richard', 'Charles'],
+       fn: [ 'Mary', 'Patricia', 'Linda', 'Barbara', 'Elizabeth', 'Jennifer', 'Maria', 'Susan'],
+       sn: [ 'Smith', 'Jones', 'Taylor', 'Williams', 'Brown', 'Davies', 'Evans', 'Wilson'],
+       ch: 'qwertyuiopasdfghjklzxcvbnmQAZWSXEDCRFVTGBYHNUJMIKOLP0123456789'
+     };
+     
+     ycomm.dom.testFormWithJunk = function(aFormId) {
+     
+       var genString = function(base, minLen, maxLen) {
+         var ret='', n;
+         maxLen=Math.floor((Math.random() * maxLen) + minLen);
+         while (ret.length<maxLen) {
+           n=Math.floor((Math.random() * base.length));
+           ret+=base[n];
+         }
+         return ret;
+       };
+     
+       var genNumber = function(min, max) {
+         return Math.floor((Math.random() * max) + min);
+       }
+     
+       var aElements = this.selectElements(aFormId), 
+           i, fieldType, fieldId, fieldValue;
+     
+       for(i=0; i<aElements.length; i++) {
+         fieldType  = aElements[i].type.toLowerCase();
+         fieldId    = aElements[i].id;
+         fieldValue = '';
+         if (fieldId) {
+           switch(fieldType) {
+             case "password":
+               fieldValue=genString(ycomm.dom._scratch.ch,6,15);
+               break;
+             case "hidden":
+             case "text":
+               fieldValue=genString(ycomm.dom._scratch.t,1,1);
+               break;
+             case "textarea":
+               fieldValue=genString(ycomm.dom._scratch.t,1,15);
+               break;
+             case "email":
+             case "color":
+             case "date":
+             case "datetime":
+             case "datetime-local":
+             case "month":
+             case "number":
+             case "range":
+             case "search":
+             case "tel":
+             case "time":
+             case "week":
+               fieldValue=genNumber(1,52);
+               break;
+             case "url":
+               fieldValue=genString(ycomm.dom._scratch.p, 1, 1)+genString(ycomm.dom._scratch.d, 1, 1)+".xyz";
+               break;        
+             case "radio":
+             case "checkbox":
+               break;
+             case "select-one":
+             case "select-multi":
+              break;
+           }
+     
+           y$(fieldId).value=fieldValue;
+         }
+       }
+     };
+     
      /*
       * get all the elements of the form and returns a JSON
       * https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Forms/Data_form_validation
       * http://www.the-art-of-web.com/html/html5-form-validation/
-      
       */
      ycomm.dom.getFormElements = function (aFormId, aLineSpec, aOnReady) {
        aLineSpec=aLineSpec || {};

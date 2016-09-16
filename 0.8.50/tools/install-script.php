@@ -1,9 +1,9 @@
 <?php
 /*
     tools/install-script.php
-    YeAPF 0.8.50-10 built on 2016-08-29 09:16 (-3 DST)
+    YeAPF 0.8.50-29 built on 2016-09-16 17:56 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-06-03 16:46:12 (-3 DST)
+    2016-09-12 12:03:10 (-3 DST)
 */
 
   function installFile($entry)
@@ -36,24 +36,15 @@
   $onWinOS=(strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
 
   $php = $argv[2];
-  $targetTemp=sys_get_temp_dir();
+  $targetTemp=$argv[3];
   $targetPath=dirname($php);
+
+  echo "TEMP at $targetTemp\n";
+  echo "Windows? = $onWinOS\n";
 
   $chmodScript='';
   if ($argv[1]=='Cygwin') {
-    $targetTemp="/cygdrive/c/Windows/Temp";
-
-    if (!file_exists('/usr/bin/php')) {
-      echo "Creating PHP alias\n";
-      $aux = join('',file('cygwinPHP.sh'));
-      $aux = str_replace('%PHP%', $php, $aux);
-      $f=fopen("/usr/bin/php","w");
-      if ($f) {
-        fwrite($f, $aux);
-        fclose($f);
-        $chmodScript.="chmod +x /usr/bin/php\n";
-      }
-    }
+    //
   } else {
     $targetPath=$onWinOS?"C:\Windows":"/usr/bin";
   }
@@ -82,6 +73,6 @@
   fclose($f);
 
   $ret=shell_exec("chmod +x $scriptName");
-  shell_exec("$scriptName");
+  shell_exec("bash $scriptName");
   echo "\nRun as root:\n$scriptName\n";
 ?>
