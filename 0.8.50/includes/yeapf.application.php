@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.50-32 built on 2016-09-17 15:35 (-3 DST)
+    YeAPF 0.8.50-34 built on 2016-09-17 17:59 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-09-17 15:15:45 (-3 DST)
+    2016-09-17 17:58:39 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -268,6 +268,16 @@
     }
   }
 
+  function xq_varValue($arrayOfValues, $varName)
+  {
+    $ret=null;
+    if (isset($arrayOfValues[$varName]))
+      $ret=$arrayOfValues[$varName];
+    else if (isset($GLOBALS[$varName]))
+      $ret=$GLOBALS[$varName];
+    return $ret;
+  }
+
   function xq_extractValuesFromQuery($asGlobals=false, $xq_prefix='', $xq_postfix='', $xq_only_composed_names=false)
   {
     $ret=array();
@@ -277,13 +287,11 @@
       foreach($_REQUEST as $k=>$v)
         xq_extractValue($ret, $k, $v, $asGlobals, $xq_prefix, $xq_postfix, $xq_only_composed_names);
     }
-
-    $fieldName=unparentesis(isset($ret['fieldName'])?$ret['fieldName']:$GLOBALS['fieldName']);
-    $fieldValue=unparentesis(isset($ret['fieldValue'])?$ret['fieldValue']:$GLOBALS['fieldValue']);
-
-    // echo("$fieldName / $fieldValue\n\n");
-
-    while ($fieldName>'') {
+    
+    $fieldName  = unparentesis(xq_varValue($ret, 'fieldName'));
+    $fieldValue = unparentesis(xq_varValue($ret, 'fieldValue'));
+    
+    while ($fieldName>'') {      
       $aFieldName=unquote(getNextValue($fieldName,','));
       $aFieldValue=unquote(getNextValue($fieldValue,','));
       xq_extractValue($ret, $aFieldName, $aFieldValue, $asGlobals, $xq_prefix, $xq_postfix, $xq_only_composed_names);
