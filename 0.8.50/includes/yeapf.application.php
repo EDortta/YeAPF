@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.50-10 built on 2016-08-29 09:16 (-3 DST)
+    YeAPF 0.8.50-32 built on 2016-09-17 15:35 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-07-28 10:59:42 (-3 DST)
+    2016-09-17 15:15:45 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -840,7 +840,6 @@
     $ret=array();
 
     if ($a=='ping') {
-      $ret['pingCount'] = $pingCount;
       $ret['serverTime'] = date('U');
     } else if ($a=='serverTime') {
       $ret['serverTime'] = date('Y-m-d H:i:s');
