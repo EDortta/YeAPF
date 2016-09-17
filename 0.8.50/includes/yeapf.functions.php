@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.50-18 built on 2016-08-30 14:35 (-3 DST)
+    YeAPF 0.8.50-33 built on 2016-09-17 15:50 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-08-30 14:34:53 (-3 DST)
+    2016-09-17 15:49:40 (-3 DST)
    */
 
   /*
@@ -1600,7 +1600,7 @@
     } else
       $page='';
 
-    if ($page=='')
+    if ((!isset($page)) || ($page==''))
       $page=$s;
     // multiplexed events comes in the following form:  <main>:<secondary>
     // but, ':' is not a good splitter name for a function or
