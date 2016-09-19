@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yanalise.js
- * YeAPF 0.8.50-23 built on 2016-09-01 11:52 (-3 DST)
+ * YeAPF 0.8.50-35 built on 2016-09-19 16:59 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-09-01 11:52:08 (-3 DST)
+ * 2016-09-19 16:56:25 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yLexObj introduced in 2016-08-22 0.8.50-0
 **********************************************/
@@ -16,7 +16,7 @@ function yAnalise(aLine, aStack)
     aLine = unmaskHTML(aLine);
 
     var yPattern = /%[+(\w)]|[]\(/gi;
-    var yFunctions = ',int,integer,intz,intn,decimal,ibdate,tsdate,tstime,date,time,words,image,nl2br,quoted,singleQuoted,condLabel';
+    var yFunctions = ',int,integer,intz,intn,decimal,ibdate,tsdate,tstime,date,time,lat2deg,lon2deg,words,image,nl2br,quoted,singleQuoted,condLabel';
     var p,p1,p2,c1,c2,p3;
     var aValue='';
 
@@ -86,6 +86,12 @@ function yAnalise(aLine, aStack)
           var aDecimals = Math.max(0,parseInt(funcParams[1]));
           aValue = parseFloat(aValue);
           aValue = aValue.toFixed(aDecimals);
+          break;
+        case 'lon2deg':
+          aValue=dec2deg(aValue,false);
+          break;
+        case 'lat2deg':
+          aValue=dec2deg(aValue,true);
           break;
         case 'ibdate':
           aValue = IBDate2Date(aValue);

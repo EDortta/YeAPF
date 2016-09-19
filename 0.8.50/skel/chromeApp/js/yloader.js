@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.50-34 built on 2016-09-17 17:59 (-3 DST)
+  * YeAPF 0.8.50-35 built on 2016-09-19 16:59 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-09-17 17:59:06 (-3 DST)
+  * 2016-09-19 16:59:37 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.50-34 built on 2016-09-17 17:59 (-3 DST)");
+ console.log("YeAPF 0.8.50-35 built on 2016-09-19 16:59 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -1452,6 +1452,27 @@
        return ret;
      }
      
+     function dec2deg(dec, asLatitude) {
+       asLatitude = asLatitude || true;
+       var positive = Math.sign(dec) > 0,
+           gpsdeg = parseInt(dec),
+           r = dec - (gpsdeg * 1.0),
+           gpsmin = r * 60.0,
+           D, M, S, suffix;
+       
+       r = gpsmin - (parseInt(gpsmin)*1.0);
+       D = gpsdeg;
+       M = parseInt(gpsmin);
+       S = parseInt(r*60.0);
+     
+       if (asLatitude) {
+         suffix=positive?'N':'S';
+       } else {
+         suffix=positive?'E':'W';
+       }
+       return D+"&deg; "+M+"' "+S+"'' "+suffix;  
+     }
+     
      function str2double(aStr) {
        if (aStr === undefined)
          aStr = '0';
@@ -2173,7 +2194,7 @@
          aLine = unmaskHTML(aLine);
      
          var yPattern = /%[+(\w)]|[]\(/gi;
-         var yFunctions = ',int,integer,intz,intn,decimal,ibdate,tsdate,tstime,date,time,words,image,nl2br,quoted,singleQuoted,condLabel';
+         var yFunctions = ',int,integer,intz,intn,decimal,ibdate,tsdate,tstime,date,time,lat2deg,lon2deg,words,image,nl2br,quoted,singleQuoted,condLabel';
          var p,p1,p2,c1,c2,p3;
          var aValue='';
      
@@ -2243,6 +2264,12 @@
                var aDecimals = Math.max(0,parseInt(funcParams[1]));
                aValue = parseFloat(aValue);
                aValue = aValue.toFixed(aDecimals);
+               break;
+             case 'lon2deg':
+               aValue=dec2deg(aValue,false);
+               break;
+             case 'lat2deg':
+               aValue=dec2deg(aValue,true);
                break;
              case 'ibdate':
                aValue = IBDate2Date(aValue);
