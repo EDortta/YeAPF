@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.50-35 built on 2016-09-19 16:59 (-3 DST)
+ * YeAPF 0.8.50-36 built on 2016-09-19 17:04 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-09-19 16:53:30 (-3 DST)
+ * 2016-09-19 17:04:05 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -1203,10 +1203,11 @@ function dec2deg(dec, asLatitude) {
   asLatitude = asLatitude || true;
   var positive = Math.sign(dec) > 0,
       gpsdeg = parseInt(dec),
-      r = dec - (gpsdeg * 1.0),
-      gpsmin = r * 60.0,
+      r, gpsmin,
       D, M, S, suffix;
-  
+  dec=Math.abs(dec);
+  r = dec - (gpsdeg * 1.0);
+  gpsmin = r * 60.0;
   r = gpsmin - (parseInt(gpsmin)*1.0);
   D = gpsdeg;
   M = parseInt(gpsmin);

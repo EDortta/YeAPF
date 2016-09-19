@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.50-35 built on 2016-09-19 16:59 (-3 DST)
+  * YeAPF 0.8.50-36 built on 2016-09-19 17:04 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-09-19 16:59:37 (-3 DST)
+  * 2016-09-19 17:04:27 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.50-35 built on 2016-09-19 16:59 (-3 DST)");
+ console.log("YeAPF 0.8.50-36 built on 2016-09-19 17:04 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -1456,10 +1456,11 @@
        asLatitude = asLatitude || true;
        var positive = Math.sign(dec) > 0,
            gpsdeg = parseInt(dec),
-           r = dec - (gpsdeg * 1.0),
-           gpsmin = r * 60.0,
+           r, gpsmin,
            D, M, S, suffix;
-       
+       dec=Math.abs(dec);
+       r = dec - (gpsdeg * 1.0);
+       gpsmin = r * 60.0;
        r = gpsmin - (parseInt(gpsmin)*1.0);
        D = gpsdeg;
        M = parseInt(gpsmin);

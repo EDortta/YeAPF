@@ -5877,7 +5877,7 @@
 <parameters><email><dummy>ok</dummy>
 </email></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>1425</start>
-<end>2390</end>
+<end>2391</end>
 </code></isEmail></functions><classes><on></on></classes><filename>yloader.js</filename>
 <folder>templates%2Fbootstrap3%2Fjs</folder>
 </yloader.js><ymisc.js><functions><__anonymousFunction__188><name>__anonymousFunction__188</name>
@@ -6298,7 +6298,7 @@
 <parameters><email><dummy>ok</dummy>
 </email></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>1157</start>
-<end>1973</end>
+<end>1974</end>
 </code></isEmail></functions><filename>ymisc.js</filename>
 <folder>app-src%2Fjs</folder>
 </ymisc.js><yopcontext.js><functions><getInternetExplorerVersion><name>getInternetExplorerVersion</name>
