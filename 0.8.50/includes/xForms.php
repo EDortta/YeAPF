@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xForms.php
-    YeAPF 0.8.50-10 built on 2016-08-29 09:16 (-3 DST)
+    YeAPF 0.8.50-41 built on 2016-09-23 17:05 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-08-12 16:09:30 (-3 DST)
+    2016-09-23 14:13:32 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
   /*
@@ -447,6 +447,8 @@
 
     function xForm($aFormName)
     {
+      $origFormName=$aFormName;
+      
       $r=false;
       $err=0;
       $this->xfFormName=$aFormName;
@@ -624,7 +626,7 @@
         _dumpY(64,1,"END OF $aFormName");
 
       } else
-        showDebugBackTrace("$aFormName não foi localizado", true);
+        showDebugBackTrace("$origFormName não foi localizado", true);
       return $r;
     }
 
