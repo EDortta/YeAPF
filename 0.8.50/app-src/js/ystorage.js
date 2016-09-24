@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ystorage.js
- * YeAPF 0.8.50-39 built on 2016-09-20 16:54 (-3 DST)
+ * YeAPF 0.8.50-42 built on 2016-09-24 10:34 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-09-20 16:53:19 (-3 DST)
+ * 2016-09-24 10:34:07 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -161,9 +161,10 @@ if (!window.ySingleDb) {
     };
 
     that.cleanList = function() {
+      var _id;
       for (var i in that._list) {
-        id = that._list[i];
-        that.removeItem(id);
+        _id = that._list[i];
+        that.removeItem(_id);
       }
     };
 
