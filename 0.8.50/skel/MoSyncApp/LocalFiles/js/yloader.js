@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.50-46 built on 2016-10-03 11:33 (-3 DST)
+  * YeAPF 0.8.50-47 built on 2016-10-03 11:50 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-10-03 11:33:05 (-3 DST)
+  * 2016-10-03 11:50:01 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.50-46 built on 2016-10-03 11:33 (-3 DST)");
+ console.log("YeAPF 0.8.50-47 built on 2016-10-03 11:50 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -882,19 +882,23 @@
      }
      
      if (typeof Date.prototype.nextMonth == 'undefined')
-       Date.prototype.nextMonth = function () {
-         var thisMonth = this.getMonth();
-         this.setMonth(thisMonth+1);
-         if(this.getMonth() != thisMonth+1 && this.getMonth() !== 0)
-           this.setDate(0);
+       Date.prototype.nextMonth = function (aDate) {
+         var auxDate = new Date((aDate || this).getTime());
+         var thisMonth = auxDate.getMonth();
+         auxDate.setMonth(thisMonth+1);
+         if(auxDate.getMonth() != thisMonth+1 && auxDate.getMonth() !== 0)
+           auxDate.setDate(0);
+         return auxDate;
        };
      
      if (typeof Date.prototype.prevMonth == 'undefined')
-       Date.prototype.prevMonth = function () {
-         var thisMonth = this.getMonth();
-         this.setMonth(thisMonth-1);
-         if(this.getMonth() != thisMonth-1 && (this.getMonth() != 11 || (thisMonth == 11 && this.getDate() == 1)))
-           this.setDate(0);
+       Date.prototype.prevMonth = function (aDate) {
+         var auxDate = new Date((aDate || this).getTime());
+         var thisMonth = auxDate.getMonth();
+         auxDate.setMonth(thisMonth-1);
+         if(auxDate.getMonth() != thisMonth-1 && (auxDate.getMonth() != 11 || (thisMonth == 11 && auxDate.getDate() == 1)))
+           auxDate.setDate(0);
+         return auxDate;
        };
      
      if (typeof Date.prototype.incMonth == 'undefined')
@@ -906,23 +910,23 @@
            this.setDate(0);
        };
      
-     if (typeof Date.prototype.nextDay == 'undefined')
-       Date.prototype.nextDay = function () {
+     if (typeof Date.prototype.incDay == 'undefined')
+       Date.prototype.incDay = function () {
          this.setTime(this.getTime() + 24 * 60 * 60 * 1000);
        };
      
-     if (typeof Date.prototype.prevDay == 'undefined')
-       Date.prototype.prevDay = function () {
+     if (typeof Date.prototype.decDay == 'undefined')
+       Date.prototype.decDay = function () {
          this.setTime(this.getTime() - 24 * 60 * 60 * 1000);
        };
      
-     if (typeof Date.prototype.nextWeek == 'undefined')
-       Date.prototype.nextWeek = function () {
+     if (typeof Date.prototype.incWeek == 'undefined')
+       Date.prototype.incWeek = function () {
          this.setTime(this.getTime() + 24 * 60 * 60 * 1000 * 7);
        };
      
-     if (typeof Date.prototype.prevWeek == 'undefined')
-       Date.prototype.prevWeek = function () {
+     if (typeof Date.prototype.decWeek == 'undefined')
+       Date.prototype.decWeek = function () {
          this.setTime(this.getTime() - 24 * 60 * 60 * 1000 * 7);
        };
      
