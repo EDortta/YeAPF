@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.50-43 built on 2016-09-27 14:13 (-3 DST)
+  * YeAPF 0.8.50-44 built on 2016-10-03 11:28 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-09-27 14:13:54 (-3 DST)
+  * 2016-10-03 11:28:26 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.50-43 built on 2016-09-27 14:13 (-3 DST)");
+ console.log("YeAPF 0.8.50-44 built on 2016-10-03 11:28 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -858,6 +858,29 @@
       };
      
      /* date extensions */
+     if (typeof Date.prototype.monthFirstDOW == 'undefined') {
+       Date.prototype.monthFirstDOW = function(aDate) {
+         var auxDate = new Date((aDate || this).getTime());
+         auxDate.setDate(1);
+         return auxDate.getDay();    
+       };
+     }
+     
+     if (typeof Date.prototype.monthLastDay == 'undefined') {
+       Date.prototype.monthLastDay = function(aDate) {
+         var auxDate = new Date((aDate || this).getTime());
+         return new Date(auxDate.getYear(), auxDate.getMonth()+1, 0).getDate();
+       };
+     }
+     
+     if (typeof Date.prototype.monthLastDOW == 'undefined') {
+       Date.prototype.monthLastDOW = function(aDate) {
+         var auxDate = new Date((aDate || this).getTime());
+         auxDate.setDate(that.lastDay(auxDate));
+         return auxDate.getDay();
+       };
+     }
+     
      if (typeof Date.prototype.nextMonth == 'undefined')
        Date.prototype.nextMonth = function () {
          var thisMonth = this.getMonth();
@@ -2682,12 +2705,14 @@
              that.postFixStack.push(lastSym);
          } while ((lastSym) && (lastSym.type!='EOF'));
      
+         /*
          if (false) {
            console.log("postFixStack:");
            that.showStack(that.postFixStack);
            console.log("symStack:");
            that.showStack(that.symStack);
          }
+         */
        };
      
        that.solve = function(data) {
@@ -2790,7 +2815,10 @@
                    break;
                }
      
-               if (false) console.log("{0} = {1} {2} {3}".format(ret, op1, token.token_string, op2));
+               /*
+               if (false) 
+                 console.log("{0} = {1} {2} {3}".format(ret, op1, token.token_string, op2));
+               */
      
                if (ret!==null)
                  stack.push(ret);
@@ -2798,7 +2826,9 @@
            }
          }
          ret=stack.pop();
-         if (false) console.log(JSON.stringify(ret));
+         /*
+           if (false) console.log(JSON.stringify(ret));
+         */
          return ret;
        };
      

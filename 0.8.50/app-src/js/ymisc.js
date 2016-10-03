@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.50-37 built on 2016-09-19 17:05 (-3 DST)
+ * YeAPF 0.8.50-44 built on 2016-10-03 11:28 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-09-19 17:05:34 (-3 DST)
+ * 2016-10-03 11:27:51 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -605,6 +605,29 @@ var forceStringValue = function(aObjArr, aIndex) {
  };
 
 /* date extensions */
+if (typeof Date.prototype.monthFirstDOW == 'undefined') {
+  Date.prototype.monthFirstDOW = function(aDate) {
+    var auxDate = new Date((aDate || this).getTime());
+    auxDate.setDate(1);
+    return auxDate.getDay();    
+  };
+}
+
+if (typeof Date.prototype.monthLastDay == 'undefined') {
+  Date.prototype.monthLastDay = function(aDate) {
+    var auxDate = new Date((aDate || this).getTime());
+    return new Date(auxDate.getYear(), auxDate.getMonth()+1, 0).getDate();
+  };
+}
+
+if (typeof Date.prototype.monthLastDOW == 'undefined') {
+  Date.prototype.monthLastDOW = function(aDate) {
+    var auxDate = new Date((aDate || this).getTime());
+    auxDate.setDate(that.lastDay(auxDate));
+    return auxDate.getDay();
+  };
+}
+
 if (typeof Date.prototype.nextMonth == 'undefined')
   Date.prototype.nextMonth = function () {
     var thisMonth = this.getMonth();

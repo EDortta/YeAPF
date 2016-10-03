@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yanalise.js
- * YeAPF 0.8.50-35 built on 2016-09-19 16:59 (-3 DST)
+ * YeAPF 0.8.50-44 built on 2016-10-03 11:28 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-09-19 16:56:25 (-3 DST)
+ * 2016-09-27 14:14:48 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yLexObj introduced in 2016-08-22 0.8.50-0
 **********************************************/
@@ -502,12 +502,14 @@ var yLexObj = function(aString) {
         that.postFixStack.push(lastSym);
     } while ((lastSym) && (lastSym.type!='EOF'));
 
+    /*
     if (false) {
       console.log("postFixStack:");
       that.showStack(that.postFixStack);
       console.log("symStack:");
       that.showStack(that.symStack);
     }
+    */
   };
 
   that.solve = function(data) {
@@ -610,7 +612,10 @@ var yLexObj = function(aString) {
               break;
           }
 
-          if (false) console.log("{0} = {1} {2} {3}".format(ret, op1, token.token_string, op2));
+          /*
+          if (false) 
+            console.log("{0} = {1} {2} {3}".format(ret, op1, token.token_string, op2));
+          */
 
           if (ret!==null)
             stack.push(ret);
@@ -618,7 +623,9 @@ var yLexObj = function(aString) {
       }
     }
     ret=stack.pop();
-    if (false) console.log(JSON.stringify(ret));
+    /*
+      if (false) console.log(JSON.stringify(ret));
+    */
     return ret;
   };
 
