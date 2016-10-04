@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.50-56 built on 2016-10-04 16:59 (-3 DST)
+  * YeAPF 0.8.50-57 built on 2016-10-04 17:01 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-10-04 16:59:19 (-3 DST)
+  * 2016-10-04 17:01:18 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.50-56 built on 2016-10-04 16:59 (-3 DST)");
+ console.log("YeAPF 0.8.50-57 built on 2016-10-04 17:01 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -5301,7 +5301,7 @@
          fieldType  = aElements[i].type.toLowerCase();
          fieldId    = aElements[i].id;
          maxLength  = aElements[i].getAttribute("maxlength") || 100;
-         lClasses    = aElements[i].classList;
+         lClasses    = aElements[i].className.split(" ");
          
          for (var n=0; n<lClasses.length; n++)
            lClasses[n]=lClasses[n].toUpperCase();
