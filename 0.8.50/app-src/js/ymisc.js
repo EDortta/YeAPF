@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.50-47 built on 2016-10-03 11:50 (-3 DST)
+ * YeAPF 0.8.50-54 built on 2016-10-04 16:54 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-10-03 11:49:42 (-3 DST)
+ * 2016-10-04 16:34:25 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -460,6 +460,60 @@ if (!String.prototype.isCPF) {
       if(c[10] != (((n %= 11) < 2) ? 0 : 11 - n)) return false;
       return true;
   };
+
+
+  function _mod_(a,b){return Math.round(a-(Math.floor(a/b)*b));}
+  //+ Johny W.Alves
+  //@ http://www.johnywalves.com.br/artigos/js-gerador-cnpj-cpf/
+  String.prototype.gerarCNPJ = function() {
+    var n1 = Math.round(Math.random()*9);
+    var n2 = Math.round(Math.random()*9);
+    var n3 = Math.round(Math.random()*9);
+    var n4 = Math.round(Math.random()*9);
+    var n5 = Math.round(Math.random()*9);
+    var n6 = Math.round(Math.random()*9);
+    var n7 = Math.round(Math.random()*9);
+    var n8 = Math.round(Math.random()*9);
+    var n9 = 0;
+    var n10 = 0;
+    var n11 = 0;
+    var n12 = 1;
+     
+    var aux = n1 * 5 + n2 * 4 + n3 * 3 + n4 * 2 + n5 * 9 + n6 * 8 + n7 * 7 + n8 * 6 + n9 * 5 + n10 * 4 + n11 * 3 + n12 * 2;
+    aux = _mod_(aux, 11);
+    var nv1 = aux < 2 ? 0 : 11 - aux;    
+ 
+    aux = n1 * 6 + n2 * 5 + n3 * 4 + n4 * 3 + n5 * 2 + n6 * 9 + n7 * 8 + n8 * 7 + n9 * 6 + n10 * 5 + n11 * 4 + n12 * 3 + nv1 * 2;
+    aux = _mod_(aux, 11);
+    var nv2 = aux < 2 ? 0 : 11 - aux;    
+     
+    return ""+n1+n2+"."+n3+n4+n5+"."+n6+n7+n8+"/"+n9+n10+n11+n12+"-"+nv1+nv2;       
+  };
+
+  //+ Johny W.Alves
+  //@ http://www.johnywalves.com.br/artigos/js-gerador-cnpj-cpf/
+  String.prototype.gerarCPF = function() {
+    var n1 = Math.round(Math.random()*9);
+    var n2 = Math.round(Math.random()*9);
+    var n3 = Math.round(Math.random()*9);
+    var n4 = Math.round(Math.random()*9);
+    var n5 = Math.round(Math.random()*9);
+    var n6 = Math.round(Math.random()*9);
+    var n7 = Math.round(Math.random()*9);
+    var n8 = Math.round(Math.random()*9);
+    var n9 = Math.round(Math.random()*9);
+     
+    var aux = n1 * 10 + n2 * 9 + n3 * 8 + n4 * 7 + n5 * 6 + n6 * 5 + n7 * 4 + n8 * 3 + n9 * 2;
+    aux = _mod_(aux, 11);
+    var nv1 = aux < 2 ? 0 : 11 - aux;    
+             
+    aux = n1 * 11 + n2 * 10 + n3 * 9 + n4 * 8 + n5 * 7 + n6 * 6 + n7 * 5 + n8 * 4 + n9 * 3 + nv1 * 2;
+    aux = _mod_(aux, 11);
+    var nv2 = aux < 2 ? 0 : 11 - aux;
+     
+    return ""+n1+n2+n3+"."+n4+n5+n6+"."+n7+n8+n9+"-"+nv1+nv2;
+  };
+
 }
 
 if (!String.prototype.isEmail) {

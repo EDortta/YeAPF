@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.50-53 built on 2016-10-04 16:26 (-3 DST)
+ * YeAPF 0.8.50-54 built on 2016-10-04 16:54 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-10-04 16:25:33 (-3 DST)
+ * 2016-10-04 16:54:14 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -835,6 +835,10 @@ ycomm.dom._scratch = {
 
 ycomm.dom.testFormWithJunk = function(aFormId) {
 
+  var aElements = this.selectElements(aFormId), 
+      i, fieldType, fieldId, fieldValue, maxLength, classes;
+
+
   var genString = function(base, minLen, maxLen) {
     var ret='', n;
     maxLen=Math.floor((Math.random() * maxLen) + minLen);
@@ -849,13 +853,24 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
     return Math.floor((Math.random() * max) + min);
   }
 
-  var aElements = this.selectElements(aFormId), 
-      i, fieldType, fieldId, fieldValue, maxLength;
+  var classHasName = function (name) {
+    var ret=false;
+    name=name.toUpperCase();
+    foreach(var c=0; c<classes.length; c++)  {
+      ret=ret || (classes[c].indexOf(name)>=0);
+    }
+  return ret;
+  }
 
   for(i=0; i<aElements.length; i++) {
     fieldType  = aElements[i].type.toLowerCase();
     fieldId    = aElements[i].id;
     maxLength  = aElements[i].getAttribute("maxlength") || 100;
+    classes    = aElements[i].classList;
+    
+    for (var n=0; n<classes.length; n++)
+      classes[n]=classes[n].toUpperCase();
+
     fieldValue = '';
     if (fieldId) {
       switch(fieldType) {
@@ -868,8 +883,11 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
         case "email":
           fieldValue=genString(ycomm.dom._scratch.mn,1,2)+"@"+genString(ycomm.dom._scratch.d, 1, 1);
           break;
-        case "color":
         case "date":
+          fieldValue="{0}-{1}-{2}".format(genNumber(1900,2050), genNumber(1,12), genNumber(1,28));
+          break;
+          
+        case "color":
         case "datetime":
         case "datetime-local":
         case "month":
@@ -900,7 +918,13 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
         case "hidden":
         case "text":
         default:
-          fieldValue=genString(ycomm.dom._scratch.t,1,maxLength);
+          if (classHasName('cpf')) {
+            fieldValue=fieldValue.gerarCPF();
+          } else if (classHasName('cnpj')) {
+            fieldValue=fieldValue.gerarCNPJ();
+          } else {
+            fieldValue=genString(ycomm.dom._scratch.t,1,maxLength);
+          }
           fieldValue=fieldValue.substr(0, maxLength);
           break;
       }
