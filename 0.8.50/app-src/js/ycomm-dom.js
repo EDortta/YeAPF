@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.50-31 built on 2016-09-16 18:01 (-3 DST)
+ * YeAPF 0.8.50-51 built on 2016-10-04 16:21 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-09-16 18:01:06 (-3 DST)
+ * 2016-10-04 16:20:49 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -842,6 +842,7 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
       n=Math.floor((Math.random() * base.length));
       ret+=base[n];
     }
+    ret=ret.substr(0, maxLen);
     return ret;
   };
 
@@ -850,11 +851,12 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
   }
 
   var aElements = this.selectElements(aFormId), 
-      i, fieldType, fieldId, fieldValue;
+      i, fieldType, fieldId, fieldValue, maxLength;
 
   for(i=0; i<aElements.length; i++) {
     fieldType  = aElements[i].type.toLowerCase();
     fieldId    = aElements[i].id;
+    maxLength  = aElements[i].getAttribute("maxlength") || 100;
     fieldValue = '';
     if (fieldId) {
       switch(fieldType) {
@@ -863,10 +865,10 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
           break;
         case "hidden":
         case "text":
-          fieldValue=genString(ycomm.dom._scratch.t,1,1);
+          fieldValue=genString(ycomm.dom._scratch.t,1,maxLength);
           break;
         case "textarea":
-          fieldValue=genString(ycomm.dom._scratch.t,1,15);
+          fieldValue=genString(ycomm.dom._scratch.t,1,15 * maxLength);
           break;
         case "email":
           fieldValue=genString(ycomm.dom._scratch.mn,1,2)+"@"+genString(ycomm.dom._scratch.d, 1, 1);
