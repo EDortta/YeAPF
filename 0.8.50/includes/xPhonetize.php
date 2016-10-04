@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xPhonetize.php
-    YeAPF 0.8.50-49 built on 2016-10-04 10:08 (-3 DST)
+    YeAPF 0.8.50-50 built on 2016-10-04 10:10 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-10-04 10:08:36 (-3 DST)
+    2016-10-04 10:09:48 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -302,7 +302,7 @@
       }
       */
       $res=iconv("UTF-8", "ASCII//TRANSLIT", $this->aWord);
-      $this->aWord=$res;
+      $this->aWord=strtolower($res);
     }
 
     function doPhonetize()
