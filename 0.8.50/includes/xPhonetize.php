@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xPhonetize.php
-    YeAPF 0.8.50-10 built on 2016-08-29 09:16 (-3 DST)
+    YeAPF 0.8.50-48 built on 2016-10-04 10:01 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-05-30 09:45:48 (-3 DST)
+    2016-10-04 10:00:29 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -287,9 +287,9 @@
     }
 
     function eliminarAcentuadas()
-    {
-      $a=' áéíóúàèìòùãõâêîôûäëïöü';
-      $b=' aeiouaeiouaoaeiouaeiou';
+    {       
+      $a=' áéíóúàèìòùãõâêîôûäëïöüÁÉÍÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÏÖÜ';
+      $b=' aeiouaeiouaoaeiouaeiouAEIOUAEIOUAOAEIOUAEIOU';
 
       $res='';
       for ($i=0; $i<strlen($this->aWord); $i++) {
