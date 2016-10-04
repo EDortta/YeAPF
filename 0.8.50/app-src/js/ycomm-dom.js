@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.50-51 built on 2016-10-04 16:21 (-3 DST)
+ * YeAPF 0.8.50-52 built on 2016-10-04 16:24 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-10-04 16:20:49 (-3 DST)
+ * 2016-10-04 16:24:32 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -825,7 +825,7 @@ ycomm.dom._scratch = {
        'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.',
        'At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. ',
        'Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'],
-  d:  [ 'yahu.com', 'hotmayl.com', 'jmail.com'],
+  d:  [ 'yahu.com', 'hotmayl.com', 'jmail.com', 'yahu.com.nh', 'hotmayl.com.nh', 'jmail.com.nh'],
   p:  [ 'http://', 'https://', 'ws://', 'wss://', 'ftp://'],
   mn: [ 'James', 'John', 'Robert', 'Michael', 'William', 'David', 'Richard', 'Charles'],
   fn: [ 'Mary', 'Patricia', 'Linda', 'Barbara', 'Elizabeth', 'Jennifer', 'Maria', 'Susan'],
@@ -841,8 +841,7 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
     while (ret.length<maxLen) {
       n=Math.floor((Math.random() * base.length));
       ret+=base[n];
-    }
-    ret=ret.substr(0, maxLen);
+    }    
     return ret;
   };
 
@@ -862,10 +861,6 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
       switch(fieldType) {
         case "password":
           fieldValue=genString(ycomm.dom._scratch.ch,6,15);
-          break;
-        case "hidden":
-        case "text":
-          fieldValue=genString(ycomm.dom._scratch.t,1,maxLength);
           break;
         case "textarea":
           fieldValue=genString(ycomm.dom._scratch.t,1,15 * maxLength);
@@ -892,13 +887,22 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
           break;
         case "url":
           fieldValue=genString(ycomm.dom._scratch.p, 1, 1)+genString(ycomm.dom._scratch.d, 1, 1)+".xyz";
-          break;        
+          break;     
+
         case "radio":
         case "checkbox":
           break;
+
         case "select-one":
         case "select-multi":
          break;
+
+        case "hidden":
+        case "text":
+        default:
+          fieldValue=genString(ycomm.dom._scratch.t,1,maxLength);
+          fieldValue=fieldValue.substr(0, maxLen);
+          break;
       }
 
       y$(fieldId).value=fieldValue;
