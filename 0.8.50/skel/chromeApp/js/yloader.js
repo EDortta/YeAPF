@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.50-57 built on 2016-10-04 17:01 (-3 DST)
+  * YeAPF 0.8.50-58 built on 2016-10-04 17:03 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-10-04 17:01:18 (-3 DST)
+  * 2016-10-04 17:03:28 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.50-57 built on 2016-10-04 17:01 (-3 DST)");
+ console.log("YeAPF 0.8.50-58 built on 2016-10-04 17:03 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -5285,7 +5285,7 @@
        };
      
        var genNumber = function(min, max) {
-         return Math.floor((Math.random() * max) + min);
+         return Math.floor((Math.random() * (max-min) + min);
        }
      
        var classHasName = function (name) {
