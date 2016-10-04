@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.50-55 built on 2016-10-04 16:55 (-3 DST)
+  * YeAPF 0.8.50-56 built on 2016-10-04 16:59 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-10-04 16:55:38 (-3 DST)
+  * 2016-10-04 16:59:19 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.50-55 built on 2016-10-04 16:55 (-3 DST)");
+ console.log("YeAPF 0.8.50-56 built on 2016-10-04 16:59 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -5291,8 +5291,8 @@
        var classHasName = function (name) {
          var ret=false;
          name=name.toUpperCase();
-         for(var c=0; c<classes.length; c++)  {
-           ret=ret || (classes[c].indexOf(name)>=0);
+         for(var c=0; c<lClasses.length; c++)  {
+           ret=ret || (lClasses[c].indexOf(name)>=0);
          }
        return ret;
        }
@@ -5301,10 +5301,10 @@
          fieldType  = aElements[i].type.toLowerCase();
          fieldId    = aElements[i].id;
          maxLength  = aElements[i].getAttribute("maxlength") || 100;
-         classes    = aElements[i].classList;
+         lClasses    = aElements[i].classList;
          
-         for (var n=0; n<classes.length; n++)
-           classes[n]=classes[n].toUpperCase();
+         for (var n=0; n<lClasses.length; n++)
+           lClasses[n]=lClasses[n].toUpperCase();
      
          fieldValue = '';
          if (fieldId) {
