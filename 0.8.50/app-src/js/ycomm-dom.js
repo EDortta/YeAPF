@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.50-54 built on 2016-10-04 16:54 (-3 DST)
+ * YeAPF 0.8.50-55 built on 2016-10-04 16:55 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-10-04 16:54:14 (-3 DST)
+ * 2016-10-04 16:55:17 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -856,7 +856,7 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
   var classHasName = function (name) {
     var ret=false;
     name=name.toUpperCase();
-    foreach(var c=0; c<classes.length; c++)  {
+    for(var c=0; c<classes.length; c++)  {
       ret=ret || (classes[c].indexOf(name)>=0);
     }
   return ret;
@@ -884,9 +884,9 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
           fieldValue=genString(ycomm.dom._scratch.mn,1,2)+"@"+genString(ycomm.dom._scratch.d, 1, 1);
           break;
         case "date":
-          fieldValue="{0}-{1}-{2}".format(genNumber(1900,2050), genNumber(1,12), genNumber(1,28));
+          fieldValue="{0}-{1}-{2}".format(genNumber(1850,2050), genNumber(1,12), genNumber(1,28));
           break;
-          
+
         case "color":
         case "datetime":
         case "datetime-local":
