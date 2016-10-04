@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.50-58 built on 2016-10-04 17:03 (-3 DST)
+ * YeAPF 0.8.50-59 built on 2016-10-04 17:10 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-10-04 17:03:12 (-3 DST)
+ * 2016-10-04 17:09:41 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -884,7 +884,9 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
           fieldValue=genString(ycomm.dom._scratch.mn,1,2)+"@"+genString(ycomm.dom._scratch.d, 1, 1);
           break;
         case "date":
-          fieldValue="{0}-{1}-{2}".format(genNumber(1850,2050), genNumber(1,12), genNumber(1,28));
+          fieldValue=genNumber(-2208981600000, 2556064800000);
+          fieldValue=new Date(fieldValue);
+          fieldValue=fieldValue.toISOString().substr(0,10);
           break;
 
         case "color":
