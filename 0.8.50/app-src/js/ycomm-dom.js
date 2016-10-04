@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.50-59 built on 2016-10-04 17:10 (-3 DST)
+ * YeAPF 0.8.50-60 built on 2016-10-04 17:10 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-10-04 17:09:41 (-3 DST)
+ * 2016-10-04 17:10:29 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -850,7 +850,7 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
   };
 
   var genNumber = function(min, max) {
-    return Math.floor((Math.random() * (max-min) + min);
+    return Math.floor((Math.random() * (max-min) + min));
   }
 
   var classHasName = function (name) {
