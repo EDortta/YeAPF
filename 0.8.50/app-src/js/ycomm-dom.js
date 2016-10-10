@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.50-61 built on 2016-10-10 17:12 (-3 DST)
+ * YeAPF 0.8.50-62 built on 2016-10-10 18:51 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-10-04 17:11:40 (-3 DST)
+ * 2016-10-10 18:51:22 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -830,7 +830,8 @@ ycomm.dom._scratch = {
   mn: [ 'James', 'John', 'Robert', 'Michael', 'William', 'David', 'Richard', 'Charles'],
   fn: [ 'Mary', 'Patricia', 'Linda', 'Barbara', 'Elizabeth', 'Jennifer', 'Maria', 'Susan'],
   sn: [ 'Smith', 'Jones', 'Taylor', 'Williams', 'Brown', 'Davies', 'Evans', 'Wilson'],
-  ch: 'qwertyuiopasdfghjklzxcvbnmQAZWSXEDCRFVTGBYHNUJMIKOLP0123456789'
+  ch: 'qwertyuiopasdfghjklzxcvbnmQAZWSXEDCRFVTGBYHNUJMIKOLP0123456789',
+  n:  '0123456789'
 };
 
 ycomm.dom.testFormWithJunk = function(aFormId) {
@@ -924,6 +925,8 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
             fieldValue=fieldValue.gerarCPF();
           } else if (classHasName('cnpj')) {
             fieldValue=fieldValue.gerarCNPJ();
+          } else if (classHasName('ie')) {            
+            fieldValue=genString(ycomm.dom._scratch.n,6,12);
           } else {
             fieldValue=genString(ycomm.dom._scratch.t,1,maxLength);
           }

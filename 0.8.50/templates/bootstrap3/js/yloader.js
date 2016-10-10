@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.50-61 built on 2016-10-10 17:12 (-3 DST)
+  * YeAPF 0.8.50-62 built on 2016-10-10 18:51 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-10-10 17:12:14 (-3 DST)
+  * 2016-10-10 18:51:52 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.50-61 built on 2016-10-10 17:12 (-3 DST)");
+ console.log("YeAPF 0.8.50-62 built on 2016-10-10 18:51 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -5265,7 +5265,8 @@
        mn: [ 'James', 'John', 'Robert', 'Michael', 'William', 'David', 'Richard', 'Charles'],
        fn: [ 'Mary', 'Patricia', 'Linda', 'Barbara', 'Elizabeth', 'Jennifer', 'Maria', 'Susan'],
        sn: [ 'Smith', 'Jones', 'Taylor', 'Williams', 'Brown', 'Davies', 'Evans', 'Wilson'],
-       ch: 'qwertyuiopasdfghjklzxcvbnmQAZWSXEDCRFVTGBYHNUJMIKOLP0123456789'
+       ch: 'qwertyuiopasdfghjklzxcvbnmQAZWSXEDCRFVTGBYHNUJMIKOLP0123456789',
+       n:  '0123456789'
      };
      
      ycomm.dom.testFormWithJunk = function(aFormId) {
@@ -5359,6 +5360,8 @@
                  fieldValue=fieldValue.gerarCPF();
                } else if (classHasName('cnpj')) {
                  fieldValue=fieldValue.gerarCNPJ();
+               } else if (classHasName('ie')) {            
+                 fieldValue=genString(ycomm.dom._scratch.n,6,12);
                } else {
                  fieldValue=genString(ycomm.dom._scratch.t,1,maxLength);
                }
