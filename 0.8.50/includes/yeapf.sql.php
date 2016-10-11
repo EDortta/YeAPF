@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.sql.php
-    YeAPF 0.8.50-10 built on 2016-08-29 09:16 (-3 DST)
+    YeAPF 0.8.50-65 built on 2016-10-11 15:44 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-05-30 09:56:43 (-3 DST)
+    2016-10-11 15:43:27 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -126,7 +126,7 @@
   }
 
   function publishSQL($sql, $publishAsLowerCaseKeyToo=true,
-                      $fieldPrefix='', $fieldPostfix='')
+                      $fieldPrefix='', $fieldPostfix='', $asGlobals=true)
   {
     global $lastCommands, $sqlCount;
 
@@ -155,9 +155,11 @@
               echo "<br>";
               */
               // $valorCampo=RFC_3986($valorCampo);
-              $GLOBALS[$nomeCampo]=$valorCampo;
-              if ($publishAsLowerCaseKeyToo)
-                $GLOBALS[strtolower($nomeCampo)]=$valorCampo;
+              if ($asGlobals) {
+                $GLOBALS[$nomeCampo]=$valorCampo;
+                if ($publishAsLowerCaseKeyToo)
+                  $GLOBALS[strtolower($nomeCampo)]=$valorCampo;
+              }
 
               $ret[$nomeCampo]=$valorCampo;
               if ($publishAsLowerCaseKeyToo)
