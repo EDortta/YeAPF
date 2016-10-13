@@ -1,0 +1,134 @@
+#!/usr/bin/php
+<?php
+  /*
+   * tools
+   * tools/ydbcreateform
+   * YeAPF 0.8.51-39 built on 2016-10-13 10:38 (-3 DST)
+   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
+   * 2016-10-10 17:11:38 (-3 DST)
+   *
+   * Purpose: create .form .html .js and .php CRUD files
+   */
+
+  function displayError($errMessage)
+  {
+    global $args;
+
+    if (is_writable('./')) {
+      $f=fopen("ydbmigrate.lasterror","w");
+      fwrite($f,$errMessage);
+      fclose($f);
+    }
+
+    $args->setArgValue('help',__TRUE__);
+    die("\n$errMessage\n");
+  }
+
+  $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
+  (@include_once "$mydir/yclilib.php") or die("yclilib.php not found\n");
+  (@include_once "$mydir/ydblib.php") or die("ydblib.php not found\n");
+
+  $cwd=getcwd();
+  $args = new ArgumentsProcessor();
+  if (($args->argValue('h;help')==true) || ($args->optionCount()==0)) {
+    echo "YeAPF 0.8.51 $myself \nCopyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+    echo "YeAPF dbtools*\nusage:";
+    echo "\n\t[--db <host:database name>]\tdatabase identification";
+    echo "\n\t[--user <user name>]\t\tdatabase user name";
+    echo "\n\t[--pass <user password>]";
+    echo "\n\t[--type <mysql|firebird|postgresql>]";
+    echo "\n\t[--sql '<select statement|sql text file>']\tsql command to export data.  Cannot be used with 'table' or 'import' options";
+    echo "\n\t[--table <table name>]\t\tname of the table to be dumped/exported/imported";
+    echo "\n\t[--folder <folder name>]\t\tfolder to be used to generate the files";
+    die("\n");
+  }
+
+  getDBArgs($args);
+  
+  $folder=$args->argValue('folder', getcwd());
+
+  $dbConnect=0;
+
+  _LOAD_YEAPF_();
+  if (db_connect($dbType, $dbHost, $dbName, $dbUser, $dbPass)) {
+    $dbFieldListAux=db_fieldList($dbTable);
+    $dbFieldList=array();
+    foreach($dbFieldListAux as $k=>$v) {
+      $aux=array();
+      if ($v[1]=='enum') {
+        $aux['values']=$v[2];
+        $v[1]="CHAR";
+      } else if (strpos($v[1], 'CHAR')!==FALSE) {
+        $aux['width']=$v[2];
+        $v[1]="CHAR";
+      }
+
+      $aux['type']=$v[1];
+
+      if ($v[5]=='PRI')
+          $aux['PRI']=true;
+
+      $dbFieldList[$v[0]]=$aux;
+    }
+    // print_r($dbFieldList);
+
+    $specFieldData="placeholder='dd/mm/aaaa' editmask='dd/mm/yyyy' storagemask='yyyymmdd' valuetype='date'";
+
+    if (is_dir($folder)) {
+      if (is_writable($folder)) {
+        global $__yeapfPath;
+        $__yeapfPath_tools="$__yeapfPath/tools/";
+        if (!is_dir("$folder/js"))
+          mkdir("$folder/js", 0777, true);
+        $frmBody="";
+        $tBody="";
+        $tHead="";
+        $primaryKey="";
+        $primaryType="";
+        $fieldList="";
+        $formFieldList="";
+        foreach($dbFieldList as $fName=>$fDef) {
+          $specField='';
+          if ($fDef['type']=='date')
+              $specField=$specFieldData;
+          $frmBody.="<div class='form-group col-md-6'><label for='frm_$dbTable"."_$fName'>$fName</label><input type='text' class='form-control' id='frm_$dbTable"."_$fName' $specField /></div>";
+          $tBody.="<td>%($fName)</td>";
+          $tHead.="<th>$fName</th>";
+          if (isset($fDef['PRI'])) {
+            if ($primaryKey>'')
+              displayError("ERROR: You cannot have two or more primary primaryKey");
+            $primaryKey.="$fName";
+            $primaryType=$fDef['type'];
+          }
+          if ($fieldList>'') {
+            $fieldList.=", ";
+            $formFieldList.=",\n";
+          }
+          $fieldList.=$fName;
+          $formFieldList.="$fName: ".$fDef['type'];
+        }
+
+        $tHead="<tr>$tHead<th colspan=2></th></tr>";
+        $tBody="<tr>$tBody<td><a class='btn btn-default' type='button' href='javascript:#(dbTable).editTableItem(%(rowid))'><span class='fa fa-edit'></span></a></td><td><a class='btn btn-default' type='button' href='javascript:#(dbTable).deleteTableItem(%(rowid))'><span class='fa fa-remove' style='color:#900'></span></a></td></tr>";
+
+        $html=analisarString(join("",file("$__yeapfPath_tools/ydbcreateform_files/crud.html")));
+        file_put_contents("$folder/f_$dbTable.html", $html);
+
+        $js=analisarString(join("",file("$__yeapfPath_tools/ydbcreateform_files/script.js")));
+        file_put_contents("$folder/js/$dbTable.js", $js);
+
+        $php=analisarString(join("",file("$__yeapfPath_tools/ydbcreateform_files/script.php")));
+        file_put_contents("$folder/$dbTable.php", $php);
+
+        $form=analisarString(join("",file("$__yeapfPath_tools/ydbcreateform_files/table.form")));
+        file_put_contents("$folder/$dbTable.form", $form);
+
+      } else
+        displayError("Impossible to write to '$folder' directory");
+    } else
+      displayError("Was not possible to found '$folder' directory");
+
+  } else
+    die("Was not possible to connect to $dbHost:$dbUser@$dbName ($dbType)");
+
+?>

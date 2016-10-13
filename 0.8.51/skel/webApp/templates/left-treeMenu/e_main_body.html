@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+
+<!--
+    skel/webApp/templates/left-treeMenu/e_main_body.html
+    YeAPF 0.8.51-39 built on 2016-10-13 10:38 (-3 DST)
+    Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
+    2013-11-18 21:08:52 (-3 DST)
+-->
+<style>
+  body {
+    margin: 0px;
+    padding: 0px;
+  }
+</style>
+
+<body>
+    <div>
+      <div style='float:left; width:240px'>
+        <iframe src='menu.php?u=#(u)' name='menuFrame'  id='menuFrame' scrolling=no marginwidth=0 frameborder=0 height=100% width=100% onload='javascript:resizeAppFrames(this);'></iframe>
+      </div>
+      <div>
+        <iframe src='body.php?u=#(u)&s=#(cfgInitialVerb)' name='mainFrame' id='mainFrame' scrolling=auto marginwidth=0 frameborder=0 height=0 width=0 onload='javascript:resizeAppFrames(this);'></iframe>
+      </div>
+    </div>
+
+</body>
+
+
+<script>
+  function resizeAppFrames(obj) {
+    var s1 = screen.height;
+    var s2 = obj.contentWindow.document.body.scrollHeight + 40;
+    var bestSize=Math.max(s1, s2);
+    obj.style.height = bestSize + 'px';
+  }
+
+  function treco(obj) {
+    alert('ok');
+  }
+</script>

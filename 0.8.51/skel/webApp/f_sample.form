@@ -1,0 +1,16 @@
+table=table_name;
+
+fields {
+  id: char,
+  value: decimal,
+  code: integer,
+  description: char
+};
+
+key {
+  id: uniquemd5
+};
+
+options {
+  jailed
+};
