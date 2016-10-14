@@ -1,9 +1,9 @@
 <?php
   /*
     tools/spread-js.php
-    YeAPF 0.8.51-39 built on 2016-10-13 10:38 (-3 DST)
+    YeAPF 0.8.51-52 built on 2016-10-14 16:23 (-3 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-06-29 07:44:47 (-3 DST)
+    2016-10-13 12:00:51 (-3 DST)
 
     This script will distribute monolite version of yloader.js
     among different application skeletons
@@ -20,7 +20,7 @@
     if (file_exists($srcFileName)) {
       $auxFile = _file($srcFileName);
       if ($addHeader) {
-        $auxFile = "/* YeAPF 0.8.51-39 built on 2016-10-13 10:38 (-3 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
+        $auxFile = "/* YeAPF 0.8.51-52 built on 2016-10-14 16:23 (-3 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
       }
       $tgtFileName=basename($srcFileName);
       if (file_put_contents("$tgtFolder/$tgtFileName", $auxFile))
@@ -86,7 +86,7 @@
   if (file_exists($minJS)) {
     echo "Minified version source: $minJS\n";
     $yeapf_minJS = join("", file($minJS));
-    $yeapf_minJS = "/* YeAPF 0.8.51-39 built on 2016-10-13 10:38 (-3 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
+    $yeapf_minJS = "/* YeAPF 0.8.51-52 built on 2016-10-14 16:23 (-3 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
   }
 
   verifyDirExists("skel/chromeApp/js");
@@ -95,6 +95,7 @@
   verifyDirExists("templates/bootstrap3/js");
   verifyDirExists("skel/webSocket");
   copy("skel/webApp/configure.php", "skel/webSocket/configure.php");
+
 
   putVersion("skel/chromeApp/js/yloader.js", $yeapfJS);
   putVersion("skel/chromeApp/js/yloader.min.js", $yeapf_minJS);
@@ -118,6 +119,7 @@
       putVersion("skel/webApp/js/yloader.js", $yeapfJS);
       copyFile("app-src/js/ycomm-worker.js",          "skel/webApp/js");
       copyFile("app-src/js/ycomm-worker.min.js",      "skel/webApp/js", false);
+      copyFile("app-src/js/ystorage.min.js",          "skel/webApp/js", false);
 
       echo "OK\n";
     } else {

@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.51-39 built on 2016-10-13 10:38 (-3 DST)
+  * YeAPF 0.8.51-52 built on 2016-10-14 16:23 (-3 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-10-13 10:38:55 (-3 DST)
+  * 2016-10-14 16:23:33 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.51-39 built on 2016-10-13 10:38 (-3 DST)");
+ console.log("YeAPF 0.8.51-52 built on 2016-10-14 16:23 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -1961,6 +1961,31 @@
        return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
          s4() + '-' + s4() + s4() + s4();
      }
+     
+     var generateSmallSessionUniqueId = (function() {
+       var nextIndex = [0,0,0];
+       var chars = '8i7u6y5t4r3e2w1q9o0p'.split('');
+       var num = chars.length;
+     
+       return function() {
+         var a = nextIndex[0];
+         var b = nextIndex[1];
+         var c = nextIndex[2];
+         var id = chars[a] + chars[b] + chars[c];
+     
+         a = ++a % num;
+     
+         if (!a) {
+           b = ++b % num; 
+     
+           if (!b) {
+             c = ++c % num; 
+           }
+         }
+         nextIndex = [a, b, c]; 
+         return id;
+       }
+     }());
      
      var md5=function (str) {
        //  discuss at: http://phpjs.org/functions/md5/

@@ -73,7 +73,7 @@
   /* load e_configure */
   $i_configure="<!DOCTYPE html><html><head><meta charset='utf-8'><title>Configure</title><meta content='width=device-width, initial-scale=1' name='viewport'><script src='js/jquery.min.js' type='text/javascript'></script><script src='js/bootstrap.min.js' type='text/javascript'></script><link href='css/font-awesome.min.css' rel='stylesheet' type='text/css'><link href='css/simplex/bootstrap.min.css' rel='stylesheet' type='text/css'><link href='css/bootstrap-theme.min.css' rel='stylesheet' type='text/css'><script src='js/yloader.min.js'></script></head><body><div class='container-fluid'><div class='row'><div class='col-md-12'><ul class='nav nav-tabs'><li><a href='#' id='menuAppConfig'>App &amp; conn</a></li><li><a href='#' id='menuSecurityConfig'>Security</a></li><li><a href='#' id='menuLogs'>Logs</a></li><li><a href='#' id='menuAbout'>About</a></li><li class='dropdown pull-right'><a class='dropdown-toggle' data-toggle='dropdown' href='#'>Control<strong class='caret'></strong></a><ul class='dropdown-menu'><li><a href='#'>Pause</a></li><li><a href='#'>Release</a></li><li></li><li class='divider'></li><li><a href='#'>Save</a></li><li><a href='#'>Discard changes</a></li></ul></li></ul></div></div></div><div class='section'><div class='container tnContainer'><div class='tnTab' id='vwAbout'><center><img class='img-responsive' src='img/yeapf-logo.png'><br>(C) 2016 Esteban D.Dortta <pre style='text-align:left;border:0;font-size:120%'>.
 		License Information                      
-		YeAPF 0.8.51-39 built on 2016-10-13 10:38 (-3 DST)
+		YeAPF 0.8.51-52 built on 2016-10-14 16:23 (-3 DST)
 		
 		YeAPF means 'Yet Another PHP Framework'
 		It was written and maintained by Esteban D.Dortta in order to help the 

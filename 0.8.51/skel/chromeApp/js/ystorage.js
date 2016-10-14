@@ -1,8 +1,8 @@
 /*********************************************
  * skel/chromeApp/js/ystorage.js
- * YeAPF 0.8.51-39 built on 2016-10-13 10:38 (-3 DST)
+ * YeAPF 0.8.51-52 built on 2016-10-14 16:23 (-3 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-10-13 10:38:55 (-3 DST)
+ * 2016-10-14 16:23:33 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -103,7 +103,7 @@ if (!window.ySingleDb) {
     that.setItem = function(id, jData) {
       id = String(id);
 
-      jData._id = generateUUID() || jData._id;
+      jData._id = jData._id || generateUUID();
       jData._ts_update = (new Date()).getTime() / 1000;
 
       localStorage.setItem(that._dbTag_ + "_item_" + id, JSON.stringify(jData));
