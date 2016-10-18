@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.51-39 built on 2016-10-13 10:38 (-3 DST)
+    YeAPF 0.8.51-53 built on 2016-10-18 12:11 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-09-17 17:58:39 (-3 DST)
+    2016-10-18 12:11:06 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -818,7 +818,7 @@
 
   function produceRestOutput($jsonData)
   {
-    global $callback, $callbackId, $scriptSequence, $userMsg;
+    global $callback, $callbackId, $scriptSequence, $userMsg, $_xq_context_;
 
     if ((!isset($callbackId)) || ($callbackId==''))
       $callbackId = 'null';
@@ -827,9 +827,10 @@
     if ((!isset($callback)) || ($callback==''))
       $callback='ycomm.dummy';
 
-    $context=array(  'callbackId'=>$callbackId,
-                     'scriptSequence'=>$scriptSequence  );
-    $context=json_encode($context);
+    $_xq_context_['callback']=$callbackId;
+    $_xq_context_['scriptSequence']=$scriptSequence;
+
+    $context=json_encode($_xq_context_);
 
     $script="
       if (typeof $callback == 'function') {
