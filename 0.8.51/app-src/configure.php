@@ -83,7 +83,7 @@
   $cfgScriptName=basename(__FILE__);
 
   /* load e_configure */
-  $i_configure="#include('i_configure/e_configure.html')";
+  $i_configure=base64_decode("#includeB64('i_configure/e_configure.html')");
   /* adjust configuration */
   $i_configure=str_replace("%(cfgScriptName)", "$cfgScriptName", $i_configure);
 

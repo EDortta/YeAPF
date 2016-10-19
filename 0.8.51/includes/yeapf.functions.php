@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.51-39 built on 2016-10-13 10:38 (-3 DST)
+    YeAPF 0.8.51-71 built on 2016-10-19 11:18 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-09-17 15:49:40 (-3 DST)
+    2016-10-18 17:24:42 (-2 DST)
    */
 
   /*
@@ -1206,157 +1206,161 @@
   {
     global $searchPath, $yeapfConfig, $appName, $s;
 
-    $formFile=str_replace('\\','/',$formFile);
-    if ((substr($formFile,0,5)!='data:') && ($formFile>'')) {
+    if (file_exists($formFile)) {
+      $ret=$formFile;
+    } else {
+      $formFile=str_replace('\\','/',$formFile);
+      if ((substr($formFile,0,5)!='data:') && ($formFile>'')) {
 
-      $priorityExtensions=array('.form','.min.html','.html','.htm',
-                                '.min.js','.js','.dataset','.txt',
-                                '.php','.inc','');
-      _recordWastedTime("Looking '$formFile'");
+        $priorityExtensions=array('.form','.min.html','.html','.htm',
+                                  '.min.js','.js','.dataset','.txt',
+                                  '.php','.inc','');
+        _recordWastedTime("Looking '$formFile'");
 
-      if ((strpos($formFile,':')===false) &&
-          (substr($formFile,0,1)!='/')) {
+        if ((strpos($formFile,':')===false) &&
+            (substr($formFile,0,1)!='/')) {
 
-        $attemp='';
-        $fileID=intval($protocolIdentifier).':'.$formFile;
-        _dumpY(1,5,"FileID: ".$fileID);
-        if (isset($yeapfConfig['files'])) {
-          if (isset($yeapfConfig['files'][$fileID])) {
-              $attemp=$yeapfConfig['files'][intval($protocolIdentifier).':'.$formFile];
-              if (($attemp!='NOT FOUND') && (substr($attemp,0,4)!='http')) {
-                if (!file_exists($attemp)) {
-                  $aux=pathinfo($attemp);
-                  $aux=$aux['dirname'].'/'.$aux['filename'];
-                  for ($i=0; $i<5; $i++) {
-                    _dumpY(1,5,"$aux as ".$priorityExtensions[$i]);
-                    if (file_exists($aux.$priorityExtensions[$i])) {
-                      $attemp=$aux.$priorityExtensions[$i];
-                      break;
+          $attemp='';
+          $fileID=intval($protocolIdentifier).':'.$formFile;
+          _dumpY(1,5,"FileID: ".$fileID);
+          if (isset($yeapfConfig['files'])) {
+            if (isset($yeapfConfig['files'][$fileID])) {
+                $attemp=$yeapfConfig['files'][intval($protocolIdentifier).':'.$formFile];
+                if (($attemp!='NOT FOUND') && (substr($attemp,0,4)!='http')) {
+                  if (!file_exists($attemp)) {
+                    $aux=pathinfo($attemp);
+                    $aux=$aux['dirname'].'/'.$aux['filename'];
+                    for ($i=0; $i<5; $i++) {
+                      _dumpY(1,5,"$aux as ".$priorityExtensions[$i]);
+                      if (file_exists($aux.$priorityExtensions[$i])) {
+                        $attemp=$aux.$priorityExtensions[$i];
+                        break;
+                      }
                     }
+                    $attemp='';
                   }
-                  $attemp='';
                 }
-              }
+            }
           }
-        }
 
-        if ($attemp=='') {
-          _dumpY(1,3,"Looking for $formFile ($protocolIdentifier)");
+          if ($attemp=='') {
+            _dumpY(1,3,"Looking for $formFile ($protocolIdentifier)");
 
-          if (strpos($formFile,'.')===FALSE)
-            $extensions=$priorityExtensions;
-          else
-            $extensions=array('');
+            if (strpos($formFile,'.')===FALSE)
+              $extensions=$priorityExtensions;
+            else
+              $extensions=array('');
 
-          if (!isset($searchPath))
-            $searchPath=array('./');
+            if (!isset($searchPath))
+              $searchPath=array('./');
 
-          $auxSearchPath=explode(',',"$appName,$appName/$s,$s,js/".join(',',$searchPath));
+            $auxSearchPath=explode(',',"$appName,$appName/$s,$s,js/".join(',',$searchPath));
 
-          $auxSearchPath = array_unique($auxSearchPath);
+            $auxSearchPath = array_unique($auxSearchPath);
 
-          foreach($auxSearchPath as $dir) {
-            foreach($extensions as $ext) {
-              $auxFolderName=array("$dir/$formFile$ext", "$formFile$ext");
-              foreach($auxFolderName as $attemp) {
-                $attemp=str_replace("\\","/",$attemp);
-                $attemp=str_replace("//","/",$attemp);
-                $fex=file_exists($attemp);
-                _dumpY(1,5,"       $attemp [".substr($dir,0,1)."] [$fex]");
-                if ($fex) {
+            foreach($auxSearchPath as $dir) {
+              foreach($extensions as $ext) {
+                $auxFolderName=array("$dir/$formFile$ext", "$formFile$ext");
+                foreach($auxFolderName as $attemp) {
+                  $attemp=str_replace("\\","/",$attemp);
+                  $attemp=str_replace("//","/",$attemp);
+                  $fex=file_exists($attemp);
+                  _dumpY(1,5,"       $attemp [".substr($dir,0,1)."] [$fex]");
+                  if ($fex) {
+                    break;
+                  } else
+                    $attemp='';
+                }
+                if ($attemp>'')
                   break;
-                } else
-                  $attemp='';
               }
               if ($attemp>'')
                 break;
             }
-            if ($attemp>'')
-              break;
-          }
 
 
-          if ($attemp>'') {
-            if ($protocolIdentifier==1) {
-              $attemp=str_replace("\\","/",$attemp);
-              $root=str_replace('\\','/',serverSafeVarValue("DOCUMENT_ROOT"));
-              $i=0;
-              _dumpY(1,5,"simplify 1 $attemp over $root");
-              while (substr($attemp,$i,1)==substr($root,$i,1))
-                $i++;
-              if (($i>1) || ((substr($attemp,1,1)==':') && ($i>3))) {
-                $attemp=substr($attemp,$i);
-              } else {
-                if (file_exists($attemp)) {
-                  _dumpY(1,5,"'$attemp' exists");
-                  $attemp=str_replace("\\","/",$attemp);
-                  $root=str_replace("\\","/",$root);
+            if ($attemp>'') {
+              if ($protocolIdentifier==1) {
+                $attemp=str_replace("\\","/",$attemp);
+                $root=str_replace('\\','/',serverSafeVarValue("DOCUMENT_ROOT"));
+                $i=0;
+                _dumpY(1,5,"simplify 1 $attemp over $root");
+                while (substr($attemp,$i,1)==substr($root,$i,1))
+                  $i++;
+                if (($i>1) || ((substr($attemp,1,1)==':') && ($i>3))) {
+                  $attemp=substr($attemp,$i);
+                } else {
+                  if (file_exists($attemp)) {
+                    _dumpY(1,5,"'$attemp' exists");
+                    $attemp=str_replace("\\","/",$attemp);
+                    $root=str_replace("\\","/",$root);
 
-                  if (substr($attemp,0,1)=='.') {
-                    $attemp=$yeapfConfig['myself'].'/'.$attemp;
-                  } else if (substr($attemp,0,1)!='/') {
-                    $attemp=dirname(serverSafeVarValue("SCRIPT_NAME")).'/'.$attemp;
-                  } else {
-                    $homeURL=$yeapfConfig['homeFolder'];
-                    $i=0;
-                    _dumpY(1,5,"simplify 2 $attemp over $homeURL");
-                    while (substr($attemp,$i,1)==substr($homeURL,$i,1))
-                      $i++;
-                    $attemp=$yeapfConfig['homeURL'].substr($attemp,$i);
-                  }
+                    if (substr($attemp,0,1)=='.') {
+                      $attemp=$yeapfConfig['myself'].'/'.$attemp;
+                    } else if (substr($attemp,0,1)!='/') {
+                      $attemp=dirname(serverSafeVarValue("SCRIPT_NAME")).'/'.$attemp;
+                    } else {
+                      $homeURL=$yeapfConfig['homeFolder'];
+                      $i=0;
+                      _dumpY(1,5,"simplify 2 $attemp over $homeURL");
+                      while (substr($attemp,$i,1)==substr($homeURL,$i,1))
+                        $i++;
+                      $attemp=$yeapfConfig['homeURL'].substr($attemp,$i);
+                    }
 
-                } else
-                  $attemp='';
+                  } else
+                    $attemp='';
+                }
+
+                if ($attemp>'') {
+                  $attemp=serverSafeVarValue("HTTP_HOST").'/'.$attemp;
+
+                  _dumpY(1,5,"        = $attemp");
+
+                  $attemp = str_replace('//','/',$attemp);
+                  if ($GLOBALS['isHTTPS'])
+                    $attemp = 'https://'.$attemp;
+                  else
+                    $attemp = 'http://'.$attemp;
+                  $attemp=str_replace("///","//",$attemp);
+                }
+
+              } else if ($protocolIdentifier==2) {
+                $root=serverSafeVarValue("DOCUMENT_ROOT");
+                if (substr($root,strlen($root)-1,1)=='/')
+                  $root=substr($root,0,strlen($root)-1);
+                _dumpY(1,5,$attemp);
+                _dumpY(1,5,$root);
+                $attemp=substr($attemp, strlen($root));
               }
-
-              if ($attemp>'') {
-                $attemp=serverSafeVarValue("HTTP_HOST").'/'.$attemp;
-
-                _dumpY(1,5,"        = $attemp");
-
-                $attemp = str_replace('//','/',$attemp);
-                if ($GLOBALS['isHTTPS'])
-                  $attemp = 'https://'.$attemp;
-                else
-                  $attemp = 'http://'.$attemp;
-                $attemp=str_replace("///","//",$attemp);
-              }
-
-            } else if ($protocolIdentifier==2) {
-              $root=serverSafeVarValue("DOCUMENT_ROOT");
-              if (substr($root,strlen($root)-1,1)=='/')
-                $root=substr($root,0,strlen($root)-1);
-              _dumpY(1,5,$attemp);
-              _dumpY(1,5,$root);
-              $attemp=substr($attemp, strlen($root));
             }
-          }
 
-          if ((($protocolIdentifier==1) && ($attemp>'')) || (file_exists($attemp))) {
-            _dumpY(1,2,"$formFile = '$attemp'");
-            if ($attemp>'')
-              if (substr($attemp,0,strlen($appName))!=$appName) {
-                _dumpY(1,5,"Saving '$formFile' as '$attemp' on $protocolIdentifier protocol");
-                saveBestName($formFile, $protocolIdentifier, $attemp);
-              }
-          } else {
-            _dumpY(1,2,"'$formFile' not found!");
-            if (isset($yeapfConfig['files']))
-              if (isset($yeapfConfig['files'][$fileID])) {
-                _dumpY(1,5,"Deleting '$formFile' as '$attemp' on $protocolIdentifier protocol");
-                unset($yeapfConfig['files'][$fileID]);
-                _saveConfigFile();
-              }
-          }
+            if ((($protocolIdentifier==1) && ($attemp>'')) || (file_exists($attemp))) {
+              _dumpY(1,2,"$formFile = '$attemp'");
+              if ($attemp>'')
+                if (substr($attemp,0,strlen($appName))!=$appName) {
+                  _dumpY(1,5,"Saving '$formFile' as '$attemp' on $protocolIdentifier protocol");
+                  saveBestName($formFile, $protocolIdentifier, $attemp);
+                }
+            } else {
+              _dumpY(1,2,"'$formFile' not found!");
+              if (isset($yeapfConfig['files']))
+                if (isset($yeapfConfig['files'][$fileID])) {
+                  _dumpY(1,5,"Deleting '$formFile' as '$attemp' on $protocolIdentifier protocol");
+                  unset($yeapfConfig['files'][$fileID]);
+                  _saveConfigFile();
+                }
+            }
 
-        } else if ($attemp=='NOT FOUND')
-          $attemp='';
-        $ret=$attemp;
+          } else if ($attemp=='NOT FOUND')
+            $attemp='';
+          $ret=$attemp;
+        } else
+          $ret=$formFile;
+        _recordWastedTime("'$formFile' search result is '$ret'");
       } else
         $ret=$formFile;
-      _recordWastedTime("'$formFile' search result is '$ret'");
-    } else
-      $ret=$formFile;
+    }
     return $ret;
   }
 

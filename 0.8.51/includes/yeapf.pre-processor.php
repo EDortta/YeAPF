@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.pre-processor.php
-    YeAPF 0.8.51-39 built on 2016-10-13 10:38 (-3 DST)
+    YeAPF 0.8.51-71 built on 2016-10-19 11:18 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-08-12 08:43:20 (-3 DST)
+    2016-10-18 19:26:30 (-2 DST)
    */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -19,6 +19,7 @@
            $rowColors, $curRowColor, $curForNdx,
            $userFunctions, $userContext,
            $cont,$forCounter,
+           $searchPath,
 
            $_SQL_cleanCache, $_SQL_cleanAllCaches, $_SQL_doCacheOnTable, $_SQL_cacheTTL,$_SQL_cacheLimit,
            $sysTimeStamp,
@@ -30,6 +31,9 @@
            $appCharset, $dbCharset,
            $formNameSeed,
            $intoFormFile;
+
+    $searchPathLen=count($searchPath);
+
     $i=0;
 
     $s=' '.$s;  // desfarçar o errinho de calculo do parser
@@ -723,9 +727,10 @@
           }
           $s=substr($s,0,$i).$valor.substr($s,$n+1,strlen($s));
 
-        } else if (tokenValido($s, '#include(',$i)) {
+        } else if ( (tokenValido($s, '#include(',$i)) || (tokenValido($s, '#includeB64(',$i))) {
+          $asB64 = (tokenValido($s, '#includeB64(',$i));
           $substituicoes++;
-          $n=$i+9;
+          $n=$i+($asB64?12:9);
           $nomeArquivo = unquote(pegaValor($s, $n, $tokenType));
           $nomeArquivo = analisarString($nomeArquivo,$pegarDadosDaTabela, $nomeTabela, $campoChave, $valorChave, $valores);
           if ((intval($intoFormFile)==0) || (($formNameSeed>'') && (substr($nomeArquivo,0,strlen($formNameSeed))==$formNameSeed)))  {
@@ -734,22 +739,31 @@
               $nomeArquivoOrg=$nomeArquivo;
               $nomeArquivo=bestName($nomeArquivoOrg,0);
               if (canIncludeFile($nomeArquivo)) {
+                if (file_exists($nomeArquivo))
+                  array_push($searchPath, dirname($nomeArquivo));
+
                 $fcontents=_arquivo($nomeArquivo,$pegarDadosDaTabela, $nomeTabela, $campoChave, $valorChave, $valores);
-                $cidi = canIncludeDebugInfo($nomeArquivo);
-                if ($cidi == 1) {
-                  $fcontents=str_replace("\n", "\n\t\t",$fcontents);
-                  $fcontents="\n\n<!-- START $nomeArquivoOrg -->\n\n\t\t$fcontents\n\n<!-- END $nomeArquivo -->\n\n";
-                } else if (($cidi==2) || ($cidi==3)) {
-                  $fcontents=str_replace("\n", "\n\t\t",$fcontents);
-                  $fcontents="\n\n/* START $nomeArquivoOrg */\n\n\t\t$fcontents\n\n/* END $nomeArquivo */\n\n";
+                if ($asB64) { 
+                  $fcontents = base64_encode($fcontents);
+                } else {
+                  $cidi = canIncludeDebugInfo($nomeArquivo);
+                  if ($cidi == 1) {
+                    $fcontents=str_replace("\n", "\n\t\t",$fcontents);
+                    $fcontents="\n\n<!-- START $nomeArquivoOrg -->\n\n\t\t$fcontents\n\n<!-- END $nomeArquivo -->\n\n";
+                  } else if (($cidi==2) || ($cidi==3)) {
+                    $fcontents=str_replace("\n", "\n\t\t",$fcontents);
+                    $fcontents="\n\n/* START $nomeArquivoOrg */\n\n\t\t$fcontents\n\n/* END $nomeArquivo */\n\n";
+                  }
                 }
               } else {
                 _dumpY(1,1,"App is trying to reload .js file $nomeArquivo");
               }
             }
           } else
-            $fcontents="%include($nomeArquivo)";
+            $fcontents="%include($nomeArquivo)";          
+
           $s=substr($s,0,$i).trim($fcontents).substr($s,$n+1,strlen($s));
+
 
         } else if (tokenValido($s, '#banners(',$i)) {
           $substituicoes++;
@@ -2579,6 +2593,10 @@
         }
       }
     } while ($substituicoes>0);
+
+    while (count($searchPath) > $searchPathLen)
+      array_pop($searchPath);
+
     $s=str_replace('%include(','#include(',$s);
     return substr($s,1,strlen($s));
   }

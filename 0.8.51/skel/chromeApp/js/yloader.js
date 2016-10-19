@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.51-53 built on 2016-10-18 12:11 (-2 DST)
+  * YeAPF 0.8.51-71 built on 2016-10-19 11:18 (-2 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-10-18 12:11:31 (-2 DST)
+  * 2016-10-19 11:18:28 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.51-53 built on 2016-10-18 12:11 (-2 DST)");
+ console.log("YeAPF 0.8.51-71 built on 2016-10-19 11:18 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -573,6 +573,24 @@
              this.readOnly = false;
            return this;
          };
+     
+       if (!HTMLElement.prototype.selected) {
+         HTMLElement.prototype.selected = function () {
+           var ret=this;
+           if (typeof this.list == 'object') {
+             var v1=trim(this.value), op=this.list.options;
+             for(var i in op) {
+               if (op.hasOwnProperty(i)) {
+                 if (trim(op[i].innerHTML)==v1) {
+                   ret=op[i];
+                   break;
+                 }
+               }
+             }
+           }
+           return ret;
+         }
+       }
      
      
      }
@@ -4263,9 +4281,13 @@
      
                      ycomm.waitIconControl(false);
                      if (retData.error) {
-                       for(var k in retData.error) {
-                         if (retData.error.hasOwnProperty(k))
-                           console.error(retData.error[k]);
+                       if (typeof retData.error == "string")
+                         console.error(retData.error);
+                       else {
+                         for(var k in retData.error) {
+                           if (retData.error.hasOwnProperty(k))
+                             console.error(retData.error[k]);
+                         }
                        }
                      }
      
@@ -4510,6 +4532,7 @@
                     postfix            - string to be added after each target (element) form fields
       *
       *             beforeElement      - string with LI element id indicating new elements will be added before it
+      *             sep                - sring separator (o be used in DATALIST and SELECT)
       *
       *             -- events -- (READY)
       *             onNewItem(aElementID, aNewElement, aRowData)
@@ -4862,9 +4885,13 @@
          } else if ((aElement.nodeName=='SELECT') || (aElement.nodeName=='DATALIST')) {
      
            /* Clean options */
-           if (aFlags.deleteRows){
-             while (aElement.options.length>0)
-               aElement.options.remove(0);
+           if (aFlags.deleteRows) {
+             while (aElement.options.length>0) {
+               aElement.removeChild(aElement.options[0]);
+               /*
+                 aElement.options.remove(0);
+                */
+             }
            }
            cNdx = 0;
            /* data */
@@ -4893,12 +4920,13 @@
                      auxHTML = auxHTML + xDataItem[aLineSpec.columns[c]] + ' ';
                    }
                  } else {
+                   var sep = aLineSpec.sep || '';
                    if (typeof xDataItem == 'string') {
                      _dumpy(2,1,"ERRO: yeapf-dom.js - string cell not implemented");
                    } else {
                      for(colName in aLineSpec.columns) {
                        if (colName != idFieldName)
-                         auxHTML = auxHTML + xDataItem[colName];
+                         auxHTML = auxHTML + xDataItem[colName]+sep;
                      }
                    }
                  }

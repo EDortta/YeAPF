@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.51-39 built on 2016-10-13 10:38 (-3 DST)
+ * YeAPF 0.8.51-71 built on 2016-10-19 11:18 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-10-11 11:08:39 (-3 DST)
+ * 2016-10-18 17:17:35 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -50,6 +50,7 @@ ycomm.dom.getInplaceData = function(aElement) {
                postfix            - string to be added after each target (element) form fields
  *
  *             beforeElement      - string with LI element id indicating new elements will be added before it
+ *             sep                - sring separator (o be used in DATALIST and SELECT)
  *
  *             -- events -- (READY)
  *             onNewItem(aElementID, aNewElement, aRowData)
@@ -402,9 +403,13 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
     } else if ((aElement.nodeName=='SELECT') || (aElement.nodeName=='DATALIST')) {
 
       /* Clean options */
-      if (aFlags.deleteRows){
-        while (aElement.options.length>0)
-          aElement.options.remove(0);
+      if (aFlags.deleteRows) {
+        while (aElement.options.length>0) {
+          aElement.removeChild(aElement.options[0]);
+          /*
+            aElement.options.remove(0);
+           */
+        }
       }
       cNdx = 0;
       /* data */
@@ -433,12 +438,13 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                 auxHTML = auxHTML + xDataItem[aLineSpec.columns[c]] + ' ';
               }
             } else {
+              var sep = aLineSpec.sep || '';
               if (typeof xDataItem == 'string') {
                 _dumpy(2,1,"ERRO: yeapf-dom.js - string cell not implemented");
               } else {
                 for(colName in aLineSpec.columns) {
                   if (colName != idFieldName)
-                    auxHTML = auxHTML + xDataItem[colName];
+                    auxHTML = auxHTML + xDataItem[colName]+sep;
                 }
               }
             }

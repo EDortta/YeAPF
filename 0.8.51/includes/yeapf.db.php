@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.51-39 built on 2016-10-13 10:38 (-3 DST)
+    YeAPF 0.8.51-71 built on 2016-10-19 11:18 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-08-25 13:46:18 (-3 DST)
+    2016-10-19 11:10:19 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -767,7 +767,7 @@
 
     $asUTF8=outIsJSON();
 
-    while ($dd=db_fetch_array($qq)) {
+    while ($dd=db_fetch_array($qq, false)) {
       $recNdx++;
       _dumpY(4,5,"Record# $recNdx");
       if ($usingRecNdx)
