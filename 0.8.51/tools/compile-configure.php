@@ -221,8 +221,11 @@ $config_php = minify_html(_file("configure.php"));
 file_put_contents("../skel/webApp/config2.php", $config_php);
 
 chdir("i_configure");
+/*
 _copyFolder("css",   "../../skel/webApp/css");
 _copyFolder("fonts", "../../skel/webApp/fonts");
 _copyFolder("js",    "../../skel/webApp/js");
+*/
+
 _copyFolder("img",   "../../skel/webApp/img");
 ?>
