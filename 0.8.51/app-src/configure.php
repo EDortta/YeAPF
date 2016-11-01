@@ -28,7 +28,8 @@
     return $ret;
   }
 
-  function checkFolders($folders, $fileName) {
+  function checkFolders($folders, $fileName) 
+  {
     $ret=false;
 
     foreach($folders as $f) {
@@ -39,7 +40,8 @@
     return $ret;
   };
 
-  function qconfig($a) {
+  function qconfig($a) 
+  {
     global $userContext, $sysDate, $u,
            $fieldValue, $fieldName,
            $userMsg, $xq_start;
