@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.51-71 built on 2016-10-19 11:18 (-2 DST)
+    YeAPF 0.8.51-75 built on 2016-11-02 15:52 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-10-19 11:10:19 (-2 DST)
+    2016-11-01 14:46:13 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -787,7 +787,9 @@
           if ($asUTF8) {
             $auxCharset=detect_encoding($v);
             $v=iconv($auxCharset, 'UTF-8', $v);
-            $v=preg_replace('/[[:^print:]]/', '', $v);
+            /* 2016-11-01 AG 
+             * $v=preg_replace('/[[:^print:]]/', '', $v);
+             */
           }
           $ret[$id][$k]=$v;
         }
