@@ -1,8 +1,8 @@
 /*********************************************
  * skel/chromeApp/js/ystorage.js
- * YeAPF 0.8.51-77 built on 2016-11-03 11:17 (-2 DST)
+ * YeAPF 0.8.51-78 built on 2016-11-03 11:21 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-11-03 11:17:22 (-2 DST)
+ * 2016-11-03 11:21:43 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -248,7 +248,18 @@
         for (var i = 0; i < data.length; i++) {
           that.setItem(data[i][that.cfg.keyName], data[i]);
         }
-      };      
+      };     
+
+      that.extractData = function(oncomplete, condition) {
+        var data = [];
+        var onItem = function(item) {
+          data[data.length] = item;
+        };
+        var atEnd = function() {
+          oncomplete(data);
+        };
+        that.each(onItem, atEnd, condition);
+      };       
 
       that.fillList = function(data, idFieldName, clean) {
         idFieldName = idFieldName || 'id';
