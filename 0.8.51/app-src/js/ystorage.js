@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ystorage.js
- * YeAPF 0.8.51-79 built on 2016-11-03 11:22 (-2 DST)
+ * YeAPF 0.8.51-80 built on 2016-11-03 19:28 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-11-03 11:22:32 (-2 DST)
+ * 2016-11-03 19:28:07 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -79,7 +79,7 @@
 
   if (!window.ySingleDb) {
     console.log("Creating ySingleDb ... ");
-    window.ySingleDb = function(dbTag) {
+    window.ySingleDb = function(dbTag, aKeyName) {
       var that = {};
       that._list = null;
 
@@ -246,7 +246,7 @@
 
       that.insertData = function(data) {
         for (var i = 0; i < data.length; i++) {
-          that.setItem(data[i][that.keyName], data[i]);
+          that.setItem(data[i][that._keyName_], data[i]);
         }
       };     
 
@@ -299,8 +299,10 @@
         }
       };
 
-      that.init = function(dbTag) {
+      that.init = function(dbTag, aKeyName) {
         that._dbTag_ = dbTag;
+        that._keyName_ = aKeyName || '_id';
+
         console.log("ystorage: creating " + dbTag);
 
         that._list = localStorage.getItem(that._dbTag_ + "_list");
@@ -311,7 +313,7 @@
         return that;
       };
 
-      return that.init(dbTag);
+      return that.init(dbTag, aKeyName);
     };
     console.log("ystorage ready!");
   }
@@ -367,8 +369,8 @@
       var that = {};
 
       that.cfg = {
-        db: ySingleDb(aDBName),
-        garbage: ySingleDb(aDBName + "_garbage"),
+        db: ySingleDb(aDBName, aKeyName),
+        garbage: ySingleDb(aDBName + "_garbage", aKeyName),
         dbName: aDBName,
         keyName: aKeyName,
         dataModified: 0,
