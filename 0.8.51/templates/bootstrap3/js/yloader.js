@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.51-78 built on 2016-11-03 11:21 (-2 DST)
+  * YeAPF 0.8.51-79 built on 2016-11-03 11:22 (-2 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-11-03 11:21:43 (-2 DST)
+  * 2016-11-03 11:22:51 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.51-78 built on 2016-11-03 11:21 (-2 DST)");
+ console.log("YeAPF 0.8.51-79 built on 2016-11-03 11:22 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
