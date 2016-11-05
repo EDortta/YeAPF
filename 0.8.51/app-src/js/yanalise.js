@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yanalise.js
- * YeAPF 0.8.51-84 built on 2016-11-05 11:39 (-2 DST)
+ * YeAPF 0.8.51-85 built on 2016-11-05 12:03 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-11-05 11:39:07 (-2 DST)
+ * 2016-11-05 12:02:56 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yLexObj introduced in 2016-08-22 0.8.50-0
 **********************************************/
@@ -15,7 +15,8 @@ function yAnalise(aLine, aStack)
 
     aLine = unmaskHTML(aLine);
 
-    var yPattern = /%[+(\w)]|[]\(/gi;
+    /* var yPattern = /%[+(\w)]|[]\(/gi; */
+    var yPattern = /\%(|\w+)\(/gi;
     var yFunctions = ',int,integer,intz,intn,decimal,ibdate,tsdate,tstime,date,time,lat2deg,lon2deg,words,image,nl2br,quoted,singleQuoted,condLabel';
     var p,p1,p2,c1,c2,p3;
     var aValue='';
