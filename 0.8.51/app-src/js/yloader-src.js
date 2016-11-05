@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yloader-src.js
- * YeAPF 0.8.51-39 built on 2016-10-13 10:38 (-3 DST)
+ * YeAPF 0.8.51-82 built on 2016-11-05 09:06 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-06-23 12:06:15 (-3 DST)
+ * 2016-11-05 09:05:39 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * Purpose:  Build a monolitic YeAPF script so
  *           it can be loaded at once
@@ -29,7 +29,7 @@ if (typeof console === 'undefined')
   }
 )();
 
-console.log("YeAPF 0.8.51-39 built on 2016-10-13 10:38 (-3 DST)");
+console.log("YeAPF 0.8.51-82 built on 2016-11-05 09:06 (-2 DST)");
 
 #include('yopcontext.js')
 #include('ydebug.js')
@@ -103,8 +103,7 @@ var yloaderBase = function () {
   */
 
   if (!that.isWorker) {
-    that.priorOnload=window.onload;
-    window.onload = function() {
+    window.addEventListener("load", function() {
       var elem = (document.compatMode === "CSS1Compat") ?
           document.documentElement :
           document.body;
@@ -113,10 +112,7 @@ var yloaderBase = function () {
       if (appScreen)
         appScreen.style.width = elem.clientWidth + 'px';
 
-      if (that.priorOnLoad != undefined) {
-        that.priorOnLoad();
-      }
-    }
+    });
   }
 
   return that;
