@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xForms.php
-    YeAPF 0.8.51-86 built on 2016-11-07 15:39 (-2 DST)
+    YeAPF 0.8.51-87 built on 2016-11-07 15:58 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-11-07 15:33:43 (-2 DST)
+    2016-11-07 15:58:05 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
   /*
@@ -1328,7 +1328,7 @@
       return array($auxKey, $whereSQL);
     }
 
-    function doSaveFormContent($fieldFixMask=1, $fieldPrefix='', $fieldPostfix='', $forgiveUnknowedFields=false, $acceptMetaDataFields=false, $quoteFieldValues=true)
+    function doSaveFormContent($fieldFixMask=1, $fieldPrefix='', $fieldPostfix='', $forgiveUnknowedFields=false, $acceptMetaDataFields=false, $quoteFieldValues=true, $decodeURL=true)
     {
       $erros = $this->prepareFieldsToBeSaved($campos, $unknowedFields,
                                              $forgiveUnknowedFields,
@@ -1367,7 +1367,7 @@
 
           }
         }
-        $sql=save_form_sql($campos,$this->xfTableName, $auxKey, true, '*', $fieldFixMask, $fieldPrefix, $fieldPostfix, $quoteFieldValues);
+        $sql=save_form_sql($campos,$this->xfTableName, $auxKey, true, '*', $fieldFixMask, $fieldPrefix, $fieldPostfix, $quoteFieldValues, $decodeURL);
       } else
         _dumpY(64,0,"ERRO: Campos indefinidos na tabela '$this->xfTableName' ($unknowedFields)");
 
@@ -1537,7 +1537,7 @@
                          $CreateUniqueID=true, $verb='*',
                          $fieldFixMask=1, $fieldPrefix='',
                          $fieldPostfix='', $quoteFieldValues=true,
-                         $cleanHtmlCode=true)
+                         $decodeURL=true)
   {
     /* Get the unique seed indicated in config file */
     $auxSeed = getArrayValueIfExists($GLOBALS, 'unique_id_seed', 'rnd'.rand(10000,99999));
@@ -1575,7 +1575,7 @@
         }
 
         $fields[$fieldName] = escapeString($v);
-        if ($cleanHtmlCode)
+        if ($decodeURL)
           $fields[$fieldName] = urldecode($fields[$fieldName]);
       }
 

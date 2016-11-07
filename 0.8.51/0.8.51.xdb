@@ -146,8 +146,8 @@
 </fieldFixMask><fieldPrefix><default>%27%27</default>
 </fieldPrefix><fieldPostfix><default>%27%27</default>
 </fieldPostfix><quoteFieldValues><default>true</default>
-</quoteFieldValues><cleanHtmlCode><default>true</default>
-</cleanHtmlCode></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
+</quoteFieldValues><decodeURL><default>true</default>
+</decodeURL></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>1581</start>
 <end>1854</end>
 </code></xForm.save_form_sql><xForm.cleanFormVars><name>xForm.cleanFormVars</name>
@@ -313,7 +313,8 @@
 </fieldPostfix><forgiveUnknowedFields><default>false</default>
 </forgiveUnknowedFields><acceptMetaDataFields><default>false</default>
 </acceptMetaDataFields><quoteFieldValues><default>true</default>
-</quoteFieldValues></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
+</quoteFieldValues><decodeURL><default>true</default>
+</decodeURL></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>1370</start>
 <end>1415</end>
 </code></xForm.doSaveFormContent><xForm.doDeleteFormContent><name>xForm::doDeleteFormContent</name>
