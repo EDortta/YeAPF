@@ -1,9 +1,9 @@
 <?php
 /*
     includes/cXFormInterface.php
-    YeAPF 0.8.51-39 built on 2016-10-13 10:38 (-3 DST)
+    YeAPF 0.8.51-86 built on 2016-11-07 15:39 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-08-12 16:05:43 (-3 DST)
+    2016-11-07 15:37:06 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -150,7 +150,7 @@
     $formProcessor->prepareFieldsToBeSaved($fieldList, $unknowedFields, $forgiveUnknowedFields, $acceptMetaDataFields);
   }
 
-  function saveFormContent($supportSqueleton, $executeImmediately=true, $forgiveUnknowedFields=false, $acceptMetaDataFields=false , $fieldFixMask=1, $fieldPrefix='', $fieldPostfix='')
+  function saveFormContent($supportSqueleton, $executeImmediately=true, $forgiveUnknowedFields=false, $acceptMetaDataFields=false , $fieldFixMask=1, $fieldPrefix='', $fieldPostfix='', $decodeURL=true)
   {
     global $jailID, $u, $auditID;
 
@@ -183,7 +183,7 @@
       $jailOK=true;
 
     if ($jailOK) {
-      $sql=$formProcessor->doSaveFormContent($fieldFixMask, $fieldPrefix, $fieldPostfix,$forgiveUnknowedFields, $acceptMetaDataFields);
+      $sql=$formProcessor->doSaveFormContent($fieldFixMask, $fieldPrefix, $fieldPostfix,$forgiveUnknowedFields, $acceptMetaDataFields, true, $decodeURL);
       if ($sql>'')  {
         // if the table is subjet of audition, then create an auditID with the state prior to update/insert
         $auditID = at_createEntry($formProcessor->tableName(), $formProcessor->keyName(), $formProcessor->keyValue());

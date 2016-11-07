@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xForms.php
-    YeAPF 0.8.51-39 built on 2016-10-13 10:38 (-3 DST)
+    YeAPF 0.8.51-86 built on 2016-11-07 15:39 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-09-23 14:13:32 (-3 DST)
+    2016-11-07 15:33:43 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
   /*
@@ -1574,26 +1574,11 @@
           $fieldsSourceMap[$fieldName]='fields';
         }
 
-        $fields[$fieldName] = urldecode(escapeString($v));
+        $fields[$fieldName] = escapeString($v);
+        if ($cleanHtmlCode)
+          $fields[$fieldName] = urldecode($fields[$fieldName]);
       }
 
-    }
-
-    if ($cleanHtmlCode) {
-      /* OBSOLETO 20140122
-      foreach($fields as $f=>$v) {
-        if (is_numeric($f))
-          $v = $GLOBALS[$fields[$f]];
-        // escapeString esta escapando os 'enter' tambem
-        // $v=escapeString(htmlspecialchars($GLOBALS[$f],ENT_QUOTES,'ISO-8859-1'));
-
-       // $v=htmlspecialchars($v,ENT_QUOTES,'ISO-8859-1');
-
-        // 2012/10/03 15:51:31   $v=str_replace("'","\\'",$v);
-        //$GLOBALS[$f]=htmlentities($v);
-        $fields[$f]=$v;
-      }
-      */
     }
 
     $auxIDFields=explode(',', $idField);
