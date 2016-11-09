@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ystorage.js
- * YeAPF 0.8.51-81 built on 2016-11-03 19:46 (-2 DST)
+ * YeAPF 0.8.51-88 built on 2016-11-09 12:24 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-11-03 19:46:13 (-2 DST)
+ * 2016-11-09 12:23:05 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -112,6 +112,15 @@
             delete jData[jData._linked[i]];
           }
           delete jData._linked;
+        }
+
+        for(var k in jData) {
+          if (jData.hasOwnProperty(k)) {
+            if (k.substr(0,1)!='_') {
+              if (isArray(jData[k]))
+                jData[k]=JSON.stringify(jData[k]);
+            }
+          }
         }
 
         localStorage.setItem(that._dbTag_ + "_item_" + id, JSON.stringify(jData));
@@ -423,7 +432,7 @@
       that.paint = that.each;
 
       that.count = function(condition) {
-        return that.db.count(condition);
+        return that.cfg.db.count(condition);
       };
 
       that.extractData = function(oncomplete, condition) {

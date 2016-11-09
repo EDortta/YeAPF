@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.51-87 built on 2016-11-07 15:58 (-2 DST)
+  * YeAPF 0.8.51-88 built on 2016-11-09 12:24 (-2 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-11-07 15:58:33 (-2 DST)
+  * 2016-11-09 12:24:20 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.51-87 built on 2016-11-07 15:58 (-2 DST)");
+ console.log("YeAPF 0.8.51-88 built on 2016-11-09 12:24 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -5640,6 +5640,7 @@
        return { width : e[ a+'Width' ] , height : e[ a+'Height' ] };
      };
      
+     /* getX() */
      ycomm.dom.getLeft = function( oElement ) {
          var iReturnValue = 0;
          while( oElement!==null ) {
@@ -5649,6 +5650,7 @@
          return iReturnValue;
      };
      
+     /* getY() */
      ycomm.dom.getTop = function( oElement ) {
          var iReturnValue = 0;
          while( oElement !== null ) {
