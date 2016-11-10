@@ -4570,8 +4570,8 @@
            first_time = typeof ycomm.dom._elem_templates[aElementID] == "undefined";
      
        idFieldName = aLineSpec.idFieldName || 'id';
-       if (typeof unlearn=="boolean")
-         first_time = !unlearn;
+       if (typeof aFlags.unlearn=="boolean")
+         first_time = aFlags.unlearn;
      
        var getDataFromXData = function(xDataItem) {
          /* this function extract the pouchdb data from xDataItem if exists. otherwise, return xDataItem */
