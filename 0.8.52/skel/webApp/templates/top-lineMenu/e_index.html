@@ -1,0 +1,47 @@
+<!--
+    skel/webApp/templates/top-lineMenu/e_index.html
+    YeAPF 0.8.52-1 built on 2016-11-10 13:41 (-2 DST)
+    Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
+    2014-03-19 16:24:19 (-2 DST)
+-->
+
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>#(appTitle)</title>
+
+    <link rel="stylesheet" type="text/css" href="menu.css">
+    <link rel="stylesheet" type="text/css" href="menu-white.css">
+  </head>
+
+  <body>
+    <div id="menu">
+    </div>
+    <div id='mainBody'>
+      <iframe src='body.php?u=#(u)&s=yeapf&a=buildMainBody' name='_mainBody_' scrolling=auto marginwidth=0 frameborder=0 height=100% width=100% onload='javascript:resizeIframe(this);'></iframe>
+    </div>
+
+    <div id="mainStatusBar">
+      <iframe src="body.php?u=#(u)&s=yeapf&a=getAppFooter" name='_mainFooter_' scrolling=auto marginwidth=0 frameborder=0></iframe>
+    </div>
+
+    <div id=dataSet style='display:none'><iframe src='body.php?u=#(u)&s=yeapf&a=getAppDataset&devSession=#(devSession)' name='dataset' scrolling=auto marginwidth=0 frameborder=0 height=0 width=0></iframe></div>
+  </body>
+
+  <script src='menu.php?u=#(u)&asJavascript=1'></script>
+  <script>
+
+      if (typeof resizeIframe == 'undefined') {
+        function resizeIframe(obj) {
+          var s1 = screen.height;
+          var s2 = obj.contentWindow.document.body.scrollHeight + 40;
+          var bestSize=Math.max(s1, s2);
+          obj.style.height = bestSize + 'px';
+        }
+      }
+
+  </script>
+
+  <script src='menu.js'></script>
+</html>

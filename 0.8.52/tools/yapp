@@ -1,0 +1,197 @@
+#!/usr/bin/php
+<?php
+/*
+    tools/yapp
+    YeAPF 0.8.52-1 built on 2016-11-10 13:41 (-2 DST)
+    Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
+    2016-10-12 21:45:20 (-2 DST)
+*/
+
+  $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
+  $cmRequired=false;
+  (@include_once "$mydir/yclilib.php") or die("yclilib.php not found\n");
+
+  echo basename("tools/yapp")."\nYeAPF 0.8.52\nCopyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+
+  $args = new ArgumentsProcessor();
+  $appFolder=$args->getSrc(0);
+  $toHelp=$args->argValue('help',__FALSE__)==__TRUE__;
+  $toForce=$args->argValue('force',__FALSE__)==__TRUE__;
+  $toUpdate=$args->argValue('update',__FALSE__)==__TRUE__;
+  $appType=$args->argValue('appType','');
+  $template=$args->argValue('template','');
+  $toCreate=$args->argValue('create','');
+  $YFolder=$args->argValue('source',$__yeapfPath);
+
+  if (($appFolder=='') && (is_dir(".config"))) 
+    $appFolder="./";
+
+  $yeapfAppIniFilename="$appFolder/.config/yeapf-tools.ini";
+
+  /*  backguard compatibility 
+      transform yTemplate.txt in yeapf-tools.ini
+    */
+  if (file_exists("$appFolder/.config/yTemplate.txt")) {
+    if (($appType=='') || ($appType=='webApp')) {
+      /* if yTemplate.txt exists, it´s a webApp */
+      $appType='webApp';
+      $templateUsed=preg_replace('/[\x00-\x1F\x80-\xFF]/', '', join('',file("$appFolder/.config/yTemplate.txt")));
+      
+      /* upgrade file structure */
+      $yeapfAppIni="[app]\nappType=webApp\ntemplate=$templateUsed\n";
+      if (file_put_contents("$yeapfAppIniFilename",$yeapfAppIni))
+        unlink("$appFolder/.config/yTemplate.txt");
+      else
+        die("Was not possible to create '$yeapfAppIniFilename' file");
+
+      /* the new template need to be equals to the old one in order to update */
+      if (($template>'') && ($templateUsed!=$template))
+        die("Your folder is configured to use '$templateUsed' template.\n\n");
+      else {
+        $template=$templateUsed;
+      }
+    } else {
+      die("This folder is a webApp");
+    }
+  }
+
+  /* load current configuration */
+  if (($appType=='') && ($template=='')) {
+    if (file_exists($yeapfAppIniFilename)) {
+      $yeapfAppIni=parse_ini_file($yeapfAppIniFilename);
+      $appType=$yeapfAppIni['appType'];
+      $template=$yeapfAppIni['template'];
+    }
+  }
+
+  $toHelp = $toHelp || (!(($toUpdate) || ($toCreate)));
+
+  if (($appType=='') || ($toHelp) || ($appFolder=='')) {
+    echo "simple usage:\n\t".basename("tools/yapp")." [app-folder] [options]\n\n";
+    echo "options:\n";
+    echo "\t--create\n";
+    echo "\t--force\n";
+    echo "\t--update\n";
+    echo "\t--source <YeAPF source folder>\n\t\tDefaults to '$__yeapfPath'\n";
+    echo "\t--appType <app-type-name>\n";
+    if (is_dir("$YFolder/skel")) {
+      $d=dir("$YFolder/skel");
+      while ($entry=$d->read()) {
+        if (substr($entry,0,1)!='.')
+          echo "\t\t$entry\n";
+      }
+    } else {
+      echo "\t\tYour source of distribution in '$YFolder' does not contain any skeleton\n";
+    }
+    echo "\t--template <template-name>\t(applies to webApp)\n";
+    if (is_dir("$YFolder/skel/webApp/templates")) {
+      $d=dir("$YFolder/skel/webApp/templates");
+      while ($entry=$d->read()) {
+        if (substr($entry,0,1)!='.')
+          echo "\t\t$entry\n";
+      }
+    } else {
+      echo "\t\tYour source of distribution in '$YFolder/skel/webApp/templates' does not contain any template\n";
+    }
+
+    echo "\n* app-folder defaults to current folder if .config exists\n";
+
+    if ($appFolder=='') {
+      echo "\nYou need to declare an 'app-folder' name.\nIf it not exists, we will create it\n";
+    
+      if ($template=='')
+        echo "\nYou need to chose a template\n";
+    } else {
+      echo "\nCurrent config:\n\tapp-folder:\t$appFolder\n\tappType:\t$appType\n\ttemplate:\t$template\n";
+    }
+    die("\n\n");
+  }
+
+  /* grant app folders */
+  if (!is_dir($appFolder))
+    mkdir($appFolder,0777);
+  chmod($appFolder, 0777);
+
+  if (!is_dir("$appFolder/.config"))
+    if (!mkdir("$appFolder/.config", 0777, true))
+      die("\nWas not possible to create '$appFolder/.config'\n");
+
+  /* clean current environment */
+  $environmentFiles=array("yeapf.php", "configure.md5", "WebSocketEmptyImplementation.php");
+  foreach ($environmentFiles as $key => $fileName) {
+    if (file_exists("$appFolder/$fileName"))
+      unlink("$appFolder/$fileName");
+  }
+
+  /* granting personalized yeapf.db.ini */
+  if (!file_exists("$appFolder/yeapf.db.ini")) {
+    if (file_exists("$YFolder/skel/webApp/yeapf.db.ini")) {
+      $aux=join("",file("$YFolder/skel/webApp/yeapf.db.ini"));
+      $aux=str_replace('%(appFolder)',$appFolder,$aux);
+
+      $newAppRegistry=md5(uniqid('YeAPF-app',true));
+      $aux=str_replace('%(newAppRegistry)',$newAppRegistry,$aux);
+
+      $f=fopen("$appFolder/yeapf.db.ini","w");
+      fwrite($f, $aux);
+      fclose($f);
+      echo "\n+------------------------------------";
+      echo "\n| Adjust database connection in \n| '$appFolder/yeapf.db.ini' first\n| then navigate to 'configure.php'";
+      echo "\n+------------------------------------\n";
+    } else
+      echo "$YFolder/skel/webApp/yeapf.db.ini not found in skel/webApp folder!\n";
+  } else
+    echo "yeapf.db.ini not touched\n";
+
+  $exts=array('css','xml','php', 'html');
+  $folders=array("css", "js", "fonts", "img");
+
+  if ($toCreate)
+    echo "Installing:\n";
+  else {
+    if ($toForce)
+      echo "Forcing update:\n";
+    else
+      echo "Updating:\n";
+  }
+
+  /* Update/Install files */
+  foreach($exts as $e) {
+    updateFiles("$YFolder/skel/$appType", "*.$e", "$appFolder", ($toCreate || $toForce));
+  }
+
+  /* Update/Install support folders */
+  foreach($folders as $folderName) {
+    updateFiles("$YFolder/skel/$appType/$folderName", "*", "$appFolder/$folderName", ($toCreate || $toForce));
+  }
+
+  if (!file_exists("$appFolder/search.path"))
+    $mySearchPath[]="$YFolder";
+  else {
+    $mySearchPath=file("$appFolder/search.path");
+    foreach($mySearchPath as $i=>$path)
+      if (strpos($path, "YeAPF"))
+        $mySearchPath[$i]=$YFolder;
+  }
+  $f=fopen("$appFolder/search.path","w");
+  foreach($mySearchPath as $i=>$path)
+    fputs($f, $path);
+  fclose($f);
+
+  /* update/install template */
+  if ($template>'') {
+    updateFiles("$YFolder/skel/webApp/templates/$template", "*", "$appFolder/", ($toCreate || $toForce));
+  }
+
+  /* save application tools environment */
+  $yeapfAppIni="[app]\nappType=$appType\ntemplate=$template\n";
+  if (!file_put_contents("$yeapfAppIniFilename",$yeapfAppIni))
+    echo "\nWARNING!\n\tWas not possible to write '$yeapfAppIniFilename'\n";
+
+
+  if ($toCreate)
+    echo "YeAPF app ($appType) called '$appFolder' created.\nModify 'yeapf.db.ini' and then run 'configure.php' from your browser\n";
+  else if ($toUpdate)
+    echo "YeAPF app ($appType) updated at $appFolder\nRemember to call 'configure.php'\n";
+
+?>

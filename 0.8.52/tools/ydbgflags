@@ -1,0 +1,161 @@
+#!/usr/bin/php
+<?php
+  /*
+   * tools
+   * tools/ydbgflags
+   * YeAPF 0.8.52-1 built on 2016-11-10 13:41 (-2 DST)
+   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
+   * 2013-09-20 15:25:03 (-2 DST)
+   */
+
+  $myself=$argv[0];
+  $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
+  $cmRequired=false;
+  (@include_once "$mydir/yclilib.php") or die("yclilib.php not found\n");
+
+  $_DBG_FLAGS = array(   1 => "Basement",
+                         2 => "Lock manager",
+                         4 => "DB/SQL",
+                         8 => "User Context and messages",
+                        16 => "Application Manager",
+                        32 => "Dataset",
+                        64 => "xForms",
+                       128 => "Parsers",
+                       256 => "Developer");
+
+  echo "YeAPF 0.8.52";
+  echo "\n$myself \n(C)2012 dortta@yahoo.com\nYeAPF dbgtools\n";
+  if (($argc<2) || ($argv[1]=='--help') || ($argv[1]=='-h')) {
+    echo "usage:\n";
+    echo "ydbgflags --list\t\tlist all debug flags and level for current folder\n";
+    echo "ydbgflags --clean\t\tclean all debug flags and set level to 0\n";
+    echo "ydbgflags --on <number>\t\tturn on the specified flag\n";
+    echo "ydbgflags --off <number>\tturn on the specified flag\n";
+    echo "ydbgflags --level <number>\tset global debug log level\n";
+    echo "ydbgflags --set <name> <0|1>\tset debug flag\n";
+    echo "                <name> can be: pause, production, develop, dbgphp or dbgJS\n";
+    echo "ydbgflags --debugip <ip>\tip to be used at develop time (requires develop flag too)\n";
+    die();
+  }
+
+  $cmd=$argv[1];
+  $dbgChanged=false;
+  $dbgFlags='';
+  $dbgLevel='';
+  if (is_dir('flags')) {
+    if (file_exists('flags/debug.flags'))
+      $dbgFlags=join('',file('flags/debug.flags'));
+    if (file_exists('flags/debug.level'))
+      $dbgLevel=join('',file('flags/debug.level'));
+  }
+
+  if ($cmd=='--clean') {
+    $dbgChanged=true;
+    $dbgFlags=0;
+    $dbgLevel=0;
+    $cmd='--list';
+  }
+
+  $validFlags=array('pause', 'production', 'develop', 'dbgphp', 'dbgJS');
+  if ($cmd=='--set') {
+    $dbgChanged=true;
+    $dbgFlag=$argv[2];
+    if (in_array($dbgFlag,$validFlags)) {
+      if (!is_dir("flags"))
+        mkdir("flags");
+      $dbgFileName="flags/flag.$dbgFlag";
+      $dbgValue=isset($argv[3])?intval($argv[3]):-1;
+      if ($dbgValue==1) {
+        touch($dbgFileName);
+      } else if ($dbgValue==0) {
+        if (file_exists($dbgFileName)) {
+          unlink($dbgFileName);
+        }
+      } else
+        die("The flag value need to be 0 or 1\n");
+    } else
+      die("'$dbgFlag' is not a valid flag\n");
+  }
+
+  if ($cmd=='--level') {
+    $dbgChanged=true;
+    $dbgLevel=intval($argv[2]);
+    $cmd='--list';
+  }
+
+  if ($cmd=='--on') {
+    $flags=explode(',',$argv[2]);
+    foreach($flags as $flag) {
+      $flag=intval($flag);
+      if (isset($_DBG_FLAGS[$flag])) {
+        $dbgFlags=$dbgFlags | $flag;
+        $dbgChanged=true;
+      }
+    }
+    $cmd='--list';
+  }
+
+  if ($cmd=='--off') {
+    $flags=explode(',',$argv[2]);
+    foreach($flags as $flag) {
+      $flag=intval($flag);
+      if (isset($_DBG_FLAGS[$flag])) {
+        $dbgFlags=$dbgFlags & ~$flag;
+        $dbgChanged=true;
+      }
+    }
+    $cmd='--list';
+  }
+
+  _LOAD_YEAPF_('yeapf.dbText.php');
+  $setupIni=createDBText($sgugIni);
+  if ($cmd=='--debugip') {
+    if (($setupIni->locate("active",1))==$dbTEXT_NO_ERROR) {
+      $setupIni->addField('aDebugIP');
+      $setupIni->setValue('aDebugIP', $argv[2]);
+      if ($setupIni->commit())
+        echo "Changing debug IP to [ ".$argv[2]." ]\n";
+      else
+        echo "=====================================\nDebug IP cannot be changed to [ ".$argv[2]." ]\n=====================================\n";
+    } else
+      echo "No default DB connection on sgug.ini\n";
+    $cmd='--list';
+  }
+
+  if (($setupIni->locate("active",1))==$dbTEXT_NO_ERROR)
+    $aDebugIP=$setupIni->getValue('aDebugIP');
+
+  if ($dbgChanged) {
+    if (!file_exists('flags'))
+      mkdir('flags');
+    $f=fopen('flags/debug.flags','w');
+    fwrite($f,$dbgFlags);
+    fclose($f);
+
+    $f=fopen('flags/debug.level','w');
+    fwrite($f,$dbgLevel);
+    fclose($f);
+  }
+
+  if ($cmd=='--list') {
+    echo "===[ flags ]==========\n";
+    foreach($_DBG_FLAGS as $k=>$v) {
+      if ($dbgFlags & $k)
+        $state='on';
+      else
+        $state='off';
+      echo str_pad($k,4,' ',STR_PAD_RIGHT).' '.str_pad($v,31,'.')."\t$state\n";
+    }
+
+    echo "===[ level ]==========\n";
+    echo "Current debug level: ".intval($dbgLevel)."\n";
+
+    echo "===[ debug ]==========\n";
+    foreach($validFlags as $f) {
+      echo str_pad($f,31,'.');
+      echo file_exists("flags/flag.$f")?"on\n":"off\n";
+    }
+    if (isset($aDebugIP))
+      echo "Current debug IP: [ $aDebugIP ]\n";
+  }
+?>
