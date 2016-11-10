@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.52-1 built on 2016-11-10 13:41 (-2 DST)
+ * YeAPF 0.8.52-3 built on 2016-11-10 18:29 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-11-10 10:51:21 (-2 DST)
+ * 2016-11-10 18:28:16 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -86,8 +86,8 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
       first_time = typeof ycomm.dom._elem_templates[aElementID] == "undefined";
 
   idFieldName = aLineSpec.idFieldName || 'id';
-  if (typeof unlearn=="boolean")
-    first_time = !unlearn;
+  if (typeof aFlags.unlearn=="boolean")
+    first_time = aFlags.unlearn;
 
   var getDataFromXData = function(xDataItem) {
     /* this function extract the pouchdb data from xDataItem if exists. otherwise, return xDataItem */
