@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.51-88 built on 2016-11-09 12:24 (-2 DST)
+  * YeAPF 0.8.51-90 built on 2016-11-10 10:51 (-2 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-11-09 12:24:20 (-2 DST)
+  * 2016-11-10 10:51:40 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.51-88 built on 2016-11-09 12:24 (-2 DST)");
+ console.log("YeAPF 0.8.51-90 built on 2016-11-10 10:51 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -4548,6 +4548,7 @@
       *          deleteRows  (true by default)
       *          paintRows   (true by default) 
       *          insertAtTop (applies to TR. false by default)
+      *          unlearn      (false by default)
       */
      ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
        if ((aLineSpec === undefined) || (aLineSpec===null))
@@ -4569,6 +4570,8 @@
            first_time = typeof ycomm.dom._elem_templates[aElementID] == "undefined";
      
        idFieldName = aLineSpec.idFieldName || 'id';
+       if (typeof unlearn=="boolean")
+         first_time = !unlearn;
      
        var getDataFromXData = function(xDataItem) {
          /* this function extract the pouchdb data from xDataItem if exists. otherwise, return xDataItem */

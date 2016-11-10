@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.51-88 built on 2016-11-09 12:24 (-2 DST)
+ * YeAPF 0.8.51-90 built on 2016-11-10 10:51 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-11-08 10:12:44 (-2 DST)
+ * 2016-11-10 10:51:21 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -64,6 +64,7 @@ ycomm.dom.getInplaceData = function(aElement) {
  *          deleteRows  (true by default)
  *          paintRows   (true by default) 
  *          insertAtTop (applies to TR. false by default)
+ *          unlearn      (false by default)
  */
 ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
   if ((aLineSpec === undefined) || (aLineSpec===null))
@@ -85,6 +86,8 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
       first_time = typeof ycomm.dom._elem_templates[aElementID] == "undefined";
 
   idFieldName = aLineSpec.idFieldName || 'id';
+  if (typeof unlearn=="boolean")
+    first_time = !unlearn;
 
   var getDataFromXData = function(xDataItem) {
     /* this function extract the pouchdb data from xDataItem if exists. otherwise, return xDataItem */
