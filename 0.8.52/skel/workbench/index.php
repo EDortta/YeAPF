@@ -32,7 +32,7 @@
     
     foreach(glob('www/i_*') as $fileName) {
       $auxFileName=substr($fileName,4);
-      $dBody=basename(substr($auxFileName,2));
+      $dBody=basename(substr($auxFileName,2), ".html");
       $menu.="<div class='col-lg-6'>
                 <div class='panel panel-default'>
                   <div class='panel-heading'>

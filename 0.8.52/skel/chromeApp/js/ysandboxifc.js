@@ -1,8 +1,8 @@
 /*********************************************
  * skel/chromeApp/js/ysandboxifc.js
- * YeAPF 0.8.52-23 built on 2016-11-11 17:47 (-2 DST)
+ * YeAPF 0.8.52-24 built on 2016-11-11 17:49 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-11-11 17:47:50 (-2 DST)
+ * 2016-11-11 17:49:20 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * By security reasons, sometimes you cannot acces
  * your restful interface from your webapp, so you need a bridge.
