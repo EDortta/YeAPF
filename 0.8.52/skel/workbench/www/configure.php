@@ -1,9 +1,9 @@
 <?php
 /*
-    skel/webSocket/configure.php
+    skel/workbench/www/configure.php
     YeAPF 0.8.52-8 built on 2016-11-11 09:50 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-11-11 09:50:41 (-2 DST)
+    2016-11-11 09:50:42 (-2 DST)
 */
 
 
@@ -267,10 +267,10 @@
     echo "<style>body{padding:8px; font-size:12px; font-family: arial; } .info{margin:2px; padding-bottom:8px; width: 800px} .warn{border-top:dotted 1px #900; border-bottom:dotted 1px #900; color:#A86D00;  font-weight:800; margin:2px; padding:8px; background-color:#FFEAC0} .cpyrght{font-size:14px; border-bottom:solid 2px #BFBFBF; padding-bottom:4px} .code { font-family:Consolas,monospace;  background-color: #E5E5E5;  margin: 8px;  padding: 4px;  border: dotted 1px #7F7F7F} .err {background-color:#FFC0CB;  border-style:solid;  border-width:2px;  border-color:#FF0000; margin:32px; padding:32px; border-radius:4px; width: 800px; font-weigth: 800; color: #900} .errItem {border-bottom: dotted 1px #FF0000;  margin-bottom:4px; }</style>";
   }
 
-  echo echoStep("<div class=cpyrght><strong><big><I>skel/webSocket/configure.php</I></big></strong><br>
+  echo echoStep("<div class=cpyrght><strong><big><I>skel/workbench/www/configure.php</I></big></strong><br>
     YeAPF 0.8.52-8 built on 2016-11-11 09:50 (-2 DST)<br>
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    2016-11-11 09:50:41 (-2 DST)</div>");
+    2016-11-11 09:50:42 (-2 DST)</div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     die(echoStep("<div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
