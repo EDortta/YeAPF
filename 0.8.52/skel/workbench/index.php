@@ -32,11 +32,12 @@
     
     foreach(glob('www/i_*') as $fileName) {
       $auxFileName=substr($fileName,4);
+      $dBody=basename(substr($auxFileName,2));
       $menu.="<div class='col-lg-6'>
                 <div class='panel panel-default'>
                   <div class='panel-heading'>
                     <button class='btn btn-default'><i class='fa fa-puzzle-piece'></i></button>
-                    <a class='btn btn-danger' href='?dBody=$auxFileName'><i class='fa fa-close'></i></a>
+                    <a class='btn btn-danger' href='?dBody=$dBody'><i class='fa fa-close'></i></a>
                   </div>
                   <div class='panel-body'>
                     <a href='$fileName'>$auxFileName</a>
