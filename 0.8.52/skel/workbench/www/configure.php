@@ -1,9 +1,9 @@
 <?php
 /*
     skel/workbench/www/configure.php
-    YeAPF 0.8.52-9 built on 2016-11-11 13:42 (-2 DST)
+    YeAPF 0.8.52-11 built on 2016-11-11 15:24 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-11-11 13:42:16 (-2 DST)
+    2016-11-11 15:24:45 (-2 DST)
 */
 
 
@@ -229,7 +229,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.52-9 built on 2016-11-11 13:42 (-2 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.52-11 built on 2016-11-11 15:24 (-2 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -268,9 +268,9 @@
   }
 
   echo echoStep("<div class=cpyrght><strong><big><I>skel/workbench/www/configure.php</I></big></strong><br>
-    YeAPF 0.8.52-9 built on 2016-11-11 13:42 (-2 DST)<br>
+    YeAPF 0.8.52-11 built on 2016-11-11 15:24 (-2 DST)<br>
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    2016-11-11 13:42:16 (-2 DST)</div>");
+    2016-11-11 15:24:45 (-2 DST)</div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     die(echoStep("<div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
@@ -347,7 +347,11 @@
   }
 
   // date_default_timezone_set("America/Sao_Paulo");
-  $auxDefaultTimeZone = @date_default_timezone_get();
+  if (file_exists("flags/timezone"))
+    $auxDefaultTimeZone=file_get_contents("flags/timezone");
+  else
+    $auxDefaultTimeZone = @date_default_timezone_get();
+
   echo echoStep("TimeZone: $auxDefaultTimeZone");
   if ($auxDefaultTimeZone!='UTC') {
 
@@ -565,6 +569,7 @@
               $yeapfDB_ini=whereis($yeapfDB, 'yeapf.db.ini');
 
             $yeapfDB_configured = false;
+            /* flags/flag.nodb */
             if ($yeapfDB_ini>'') {
               echo echoStep("Loading <em>$__PL__/yeapf.dbText.php</em>");
               (@include_once $__PL__."/yeapf.dbText.php") || die(echoStep("Error loading $__PL__/yeapf.dbText.php"));
@@ -853,7 +858,13 @@
                 return $ret;
               }
 
-              date_default_timezone_set("America/Sao_Paulo");
+              if (file_exists("flags/timezone"))
+                $auxDefaultTimeZone=file_get_contents("flags/timezone");
+              else
+                $auxDefaultTimeZone = @date_default_timezone_get();
+              
+              date_default_timezone_set($auxDefaultTimeZone);
+
 
               if (file_exists("flags/flag.dbgloader")) error_log(basename(__FILE__)." ".date("i:s").": preparing flags\n",3,"logs/yeapf.loader.log");
 

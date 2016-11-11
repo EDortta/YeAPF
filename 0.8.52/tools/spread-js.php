@@ -1,9 +1,9 @@
 <?php
   /*
     tools/spread-js.php
-    YeAPF 0.8.52-8 built on 2016-11-11 09:50 (-2 DST)
+    YeAPF 0.8.52-11 built on 2016-11-11 15:24 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-11-10 19:42:57 (-2 DST)
+    2016-11-11 13:53:16 (-2 DST)
 
     This script will distribute monolite version of yloader.js
     among different application skeletons
@@ -20,7 +20,7 @@
     if (file_exists($srcFileName)) {
       $auxFile = _file($srcFileName);
       if ($addHeader) {
-        $auxFile = "/* YeAPF 0.8.52-8 built on 2016-11-11 09:50 (-2 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
+        $auxFile = "/* YeAPF 0.8.52-11 built on 2016-11-11 15:24 (-2 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
       }
       $tgtFileName=basename($srcFileName);
       if (file_put_contents("$tgtFolder/$tgtFileName", $auxFile))
@@ -86,7 +86,7 @@
   if (file_exists($minJS)) {
     echo "Minified version source: $minJS\n";
     $yeapf_minJS = join("", file($minJS));
-    $yeapf_minJS = "/* YeAPF 0.8.52-8 built on 2016-11-11 09:50 (-2 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
+    $yeapf_minJS = "/* YeAPF 0.8.52-11 built on 2016-11-11 15:24 (-2 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
   }
 
   verifyDirExists("skel/chromeApp/js");
@@ -101,6 +101,11 @@
   copy("skel/webApp/configure.php", "skel/webSocket/configure.php");
   copy("skel/webApp/configure.php", "skel/workbench/configure.php");
   copy("skel/webApp/configure.php", "skel/workbench/www/configure.php");
+
+  /* yeapf.db.ini */
+  copy("skel/webApp/yeapf.db.ini", "skel/webSocket/yeapf.db.ini");
+  copy("skel/webApp/yeapf.db.ini", "skel/workbench/yeapf.db.ini");
+  copy("skel/webApp/yeapf.db.ini", "skel/workbench/www/yeapf.db.ini");
 
   /* yloader.js and yloader.min.js */
   $yloaderTarget = array(
