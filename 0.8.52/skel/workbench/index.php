@@ -36,7 +36,7 @@
                 <div class='panel panel-default'>
                   <div class='panel-heading'>
                     <button class='btn btn-default'><i class='fa fa-puzzle-piece'></i></button>
-                    <button class='btn btn-default'><i class='fa fa-close'></i></button>
+                    <a class='btn btn-danger' href='?dBody=$auxFileName'><i class='fa fa-close'></i></a>
                   </div>
                   <div class='panel-body'>
                     <a href='$fileName'>$auxFileName</a>
