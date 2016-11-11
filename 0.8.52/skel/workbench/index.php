@@ -35,6 +35,7 @@
       $menu.="<div class='panel panel-default'>
                 <div class='panel-heading'>
                   <button class='btn btn-default'><i class='fa fa-puzzle-piece'></i></button>
+                  <button class='btn btn-default'><i class='fa fa-close'></i></button>
                 </div>
                 <div class='panel-body'>
                   <a href='$fileName'>$auxFileName</a>
