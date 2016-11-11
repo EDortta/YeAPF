@@ -32,7 +32,9 @@
     
     foreach(glob('www/i_*') as $fileName) {
       $auxFileName=substr($fileName,4);
-      $menu.="<li class='page-btn'><a href='$fileName'>$auxFileName</a><button class='btn btn-default'><i class='fa fa-puzzle-piece'></i></button></li>";
+      $menu.="<div class='list-group-item'>
+          <a href='$fileName'>$auxFileName</a><button class='btn btn-default'><i class='fa fa-puzzle-piece'></i></button>
+        </div>";
     }
     
     processFile("tp_index");
