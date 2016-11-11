@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="css/bootstrap-theme.css" rel="stylesheet" type="text/css">
+
+  </head>
+  
+  <style>
+    .page-btn {
+      width: 15vw;
+      overflow: hidden;
+    }
+  </style>
+
+  <body>
+  <div class="navbar navbar-default navbar-static-top main-menu">
+    <div class="container">
+      <form class="navbar-form navbar-left" role="search" method="get">
+        <div class="form-group">
+          i_<input type="text" class="form-control" placeholder="New page" name="newPageName" id="newPageName">
+        </div>
+        <button type="submit" class="btn btn-default"><i class='fa fa-plus'></i></button>
+        <button type="button" class="btn btn-warning" onclick="javascript:document.location=document.location.href.split('?')[0]"><i class='fa fa-refresh'></i></button>
+      </form>
+    </div>
+  </div>
+  <div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <h3>Pages</h3>
+              <ul class="nav nav-pills" role="tablist">#(menu)</ul>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    document.getElementById('newPageName').focus();
+  </script>
+</html>
