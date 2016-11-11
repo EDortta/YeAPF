@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.52-11 built on 2016-11-11 15:24 (-2 DST)
+ * YeAPF 0.8.52-12 built on 2016-11-11 16:14 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-11-10 19:36:51 (-2 DST)
+ * 2016-11-11 16:13:23 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -1162,7 +1162,7 @@ ycomm.dom.viewport = function () {
 /* getX() */
 ycomm.dom.getLeft = function( oElement ) {
     var iReturnValue = 0;
-    while( oElement!==null ) {
+    while( oElement ) {
       iReturnValue += oElement.offsetLeft;
       oElement = oElement.offsetParent;
     }
@@ -1172,7 +1172,7 @@ ycomm.dom.getLeft = function( oElement ) {
 /* getY() */
 ycomm.dom.getTop = function( oElement ) {
     var iReturnValue = 0;
-    while( oElement !== null ) {
+    while( oElement ) {
       iReturnValue += oElement.offsetTop;
       oElement = oElement.offsetParent;
     }
