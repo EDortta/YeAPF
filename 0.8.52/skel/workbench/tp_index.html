@@ -19,6 +19,34 @@
   </style>
 
   <body>
+
+  <div class="modal fade" id="tp_modal_container_confirm_deletion" role="dialog" aria-labelledby="tp_confirm_deletion" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class='fa fa-close'></i>
+          </button>
+          <h4 class="modal-title" id="tp_confirm_deletion">
+            Eliminar a p&aacute;gina
+          </h4>
+        </div>
+        <div class="modal-body">
+          Tem certeza que deseja eliminar esta p&aacute;gina?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            N&atilde;o
+          </button>
+          <button type="button" class="btn btn-danger" id="tp_btnDeletePageConfirmation">
+            Sim, desejo eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
   <div class="navbar navbar-default navbar-static-top main-menu">
     <div class="container">
       <form class="navbar-form navbar-left" role="search" method="get">
@@ -47,6 +75,29 @@
     </div>
   </body>
   <script>
-    document.getElementById('newPageName').focus();
+    var pageToBeDeleted=null;
+
+    var _tp_deletePageOpenDialog = function(e) {
+      if (e.target) {
+        pageToBeDeleted = e.target.getAttribute('data-page');
+        $("#tp_modal_container_confirm_deletion").modal();
+      } else
+        console.error("Que navegador vc esta usando, meu chapa?");
+
+    };
+
+    var _tp_deletePageAction = function() {
+      window.location = "index.php?dBody="+pageToBeDeleted;
+    };
+
+    addOnLoadManager(
+
+      function() {
+        document.getElementById('newPageName').focus();
+
+        addEvent(".btnDeletePage", "click", _tp_deletePageOpenDialog);
+        addEvent("tp_btnDeletePageConfirmation", "click", _tp_deletePageAction);
+      }
+    );
   </script>
 </html>
