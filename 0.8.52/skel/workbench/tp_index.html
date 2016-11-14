@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script type="text/javascript" src="js/jquery.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/yloader"></script>
     <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
     <link href="css/bootstrap-theme.css" rel="stylesheet" type="text/css">
@@ -77,6 +78,13 @@
   <script>
     var pageToBeDeleted=null;
 
+    var _tp_createDist = function(e) {
+      if (e.target) {
+        var pageToBeDist = e.target.getAttribute('data-page');
+        window.location = "index.php?xBody="+pageToBeDist;
+      }      
+    }
+
     var _tp_deletePageOpenDialog = function(e) {
       if (e.target) {
         pageToBeDeleted = e.target.getAttribute('data-page');
@@ -96,6 +104,7 @@
         document.getElementById('newPageName').focus();
 
         addEvent(".btnDeletePage", "click", _tp_deletePageOpenDialog);
+        addEvent(".btnCreateDist", "click", _tp_createDist);
         addEvent("tp_btnDeletePageConfirmation", "click", _tp_deletePageAction);
       }
     );

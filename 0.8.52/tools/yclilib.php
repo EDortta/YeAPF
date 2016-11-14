@@ -1,9 +1,9 @@
 <?php
 /*
     tools/yclilib.php
-    YeAPF 0.8.52-11 built on 2016-11-11 15:24 (-2 DST)
+    YeAPF 0.8.52-52 built on 2016-11-14 09:20 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-10-12 22:03:47 (-2 DST)
+    2016-11-12 09:32:02 (-2 DST)
 */
 
 
@@ -39,8 +39,7 @@
             } else
               echo "-\n";
           } else {
-            if ($toForce)
-              copy("$sourcePath/$bName", "$target/$bName");
+            copy("$sourcePath/$bName", "$target/$bName");
           }
         }
       }
