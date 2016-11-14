@@ -2,9 +2,9 @@
 <?php
 /*
     tools/yapp
-    YeAPF 0.8.52-52 built on 2016-11-14 09:20 (-2 DST)
+    YeAPF 0.8.52-58 built on 2016-11-14 10:13 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-11-14 09:17:47 (-2 DST)
+    2016-11-14 10:00:08 (-2 DST)
 */
 
   $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
@@ -143,7 +143,7 @@
   } else
     echo "yeapf.db.ini not touched\n";
 
-  $exts=array('css','xml','php', 'html');
+  $exts=array('css','xml','php', 'html', 'js');
   $folders=array("css", "js", "fonts", "img", "lib", "www");
 
   if ($toCreate)
