@@ -4,16 +4,20 @@
   (@include_once("lib/simple_html_dom/simple_html_dom.php")) or die("This software requires 'simple_html_dom'");
   (@include_once("lib/mecha-cms/minifier.php")) or die("This software requires 'mecha-cms' minifier");
 
-  
-  if ((isset($dBody)) && ($dBody!='null')) {
+  function deleteFiles($dBody) 
+  {
     unlink("www/i_$dBody.html");
     unlink("www/js/$dBody.js");
     unlink("www/css/$dBody.css");
     unlink("www/$dBody.php");
 
+    unlink("production/$dBody/i_$dBody.html");
     unlink("production/$dBody/i_$dBody.min.html");
+    unlink("production/$dBody/$dBody.php");
     unlink("production/$dBody/$dBody.min.php");
+    unlink("production/$dBody/js/$dBody.js");
     unlink("production/$dBody/js/$dBody.min.js");
+    unlink("production/$dBody/css/$dBody.css");
     unlink("production/$dBody/css/$dBody.min.css");
 
     rmdir("production/$dBody/css");
@@ -21,21 +25,33 @@
     rmdir("production/$dBody");
 
     unlink("download/$dBody.zip");
-
+  }
+  
+  if ((isset($dBody)) && ($dBody!='null')) {
+    deleteFiles($dBody);
+  
   } else if ((isset($xBody)) && ($xBody!='null')) {
+    $xMinified = isset($xMinified)?intval($xMinified)>0:0;
+    deleteFiles($xBody);
+
     $html = file_get_html("www/i_$xBody.html");
     $js   = file_get_html("www/js/$xBody.js");
     $css  = file_get_html("www/css/$xBody.css");
     $php  = file_get_html("www/$xBody.php");
 
     $html_out="";
-    foreach ($html->find('div.section') as $elem)
-      $html_out.=minify_html($elem);
+    foreach ($html->find('div.section') as $elem) {
+      $html_out.=minify_html($elem, $xMinified);
+    }
 
-    $newHTMLname = "production/$xBody/".str_replace(".html",   ".min.html", "i_$xBody.html");
-    $newPHPname  = "production/$xBody/".str_replace(".php",     ".min.php",  "$xBody.php");
-    $newJSname   = "production/$xBody/js/".str_replace(".js",   ".min.js",   "$xBody.js");
-    $newCSSname  = "production/$xBody/css/".str_replace(".css", ".min.css",  "$xBody.css");
+    $extension='';
+    if ($xMinified)
+      $extension='.min'
+
+    $newHTMLname = "production/$xBody/".str_replace(".html",    "$extension.html", "i_$xBody.html");
+    $newPHPname  = "production/$xBody/".str_replace(".php",     "$extension.php",  "$xBody.php");
+    $newJSname   = "production/$xBody/js/".str_replace(".js",   "$extension.js",   "$xBody.js");
+    $newCSSname  = "production/$xBody/css/".str_replace(".css", "$extension.css",  "$xBody.css");
 
     mkdir("production/$xBody", 0777, true);
     mkdir("production/$xBody/js", 0777, true);
@@ -44,9 +60,9 @@
     mkdir("download", 0777, true);
 
     file_put_contents($newHTMLname, $html_out);
-    file_put_contents($newJSname,   minify_js($js));
-    file_put_contents($newCSSname,  minify_js($css));
-    file_put_contents($newPHPname,  minify_js($php));
+    file_put_contents($newJSname,   minify_js($js,  $xMinified));
+    file_put_contents($newCSSname,  minify_js($css, $xMinified));
+    file_put_contents($newPHPname,  minify_js($php, $xMinified));
 
     $zip = new ZipArchive();
     if ($zip->open("download/$xBody.zip", ZipArchive::CREATE)) {
@@ -117,6 +133,7 @@
       $menu.="<div class='col-lg-5'>
                 <div class='panel panel-default'>
                   <div class='panel-heading'>
+                    <button class='btn btn-default btnCreateZipDist' id='btnZipSection$n' data-page='$dBody'><i class='fa fa-file-zip-o' data-page='$dBody'></i></button>
                     <button class='btn btn-default btnCreateDist' id='btnExtractSection$n' data-page='$dBody'><i class='fa fa-puzzle-piece' data-page='$dBody'></i></button>
                     <button class='btn btn-danger btnDeletePage' data-page='$dBody'><i class='fa fa-close' data-page='$dBody'></i></button>
                     $downloadBtn

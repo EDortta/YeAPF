@@ -7708,7 +7708,8 @@
 <folder>skel%2Fworkbench</folder>
 </extrairSeccao.php><minifier.php><functions><minify_html><name>minify_html</name>
 <parameters><input><dummy>ok</dummy>
-</input></parameters><inner><functions><minify_html.__anonymousFunction__1111><name>minify_html.__anonymousFunction__1111</name>
+</input><minified><default>true</default>
+</minified></parameters><inner><functions><minify_html.__anonymousFunction__1111><name>minify_html.__anonymousFunction__1111</name>
 <parameters><matches><dummy>ok</dummy>
 </matches></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>16</start>
@@ -7723,7 +7724,8 @@
 <end>75</end>
 </code></minify_html><minify_css><name>minify_css</name>
 <parameters><input><dummy>ok</dummy>
-</input></parameters><inner><functions><minify_css.__anonymousFunction__1113><name>minify_css.__anonymousFunction__1113</name>
+</input><minified><default>true</default>
+</minified></parameters><inner><functions><minify_css.__anonymousFunction__1113><name>minify_css.__anonymousFunction__1113</name>
 <parameters><matches><dummy>ok</dummy>
 </matches></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>85</start>
@@ -7733,7 +7735,8 @@
 <end>137</end>
 </code></minify_css><minify_js><name>minify_js</name>
 <parameters><input><dummy>ok</dummy>
-</input></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
+</input><minified><default>true</default>
+</minified></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>140</start>
 <end>179</end>
 </code></minify_js></functions><filename>minifier.php</filename>

@@ -81,7 +81,14 @@
     var _tp_createDist = function(e) {
       if (e.target) {
         var pageToBeDist = e.target.getAttribute('data-page');
-        window.location = "index.php?xBody="+pageToBeDist;
+        window.location = "index.php?xMinified=1&xBody="+pageToBeDist;
+      }      
+    }
+
+    var _tp_createZipDist = function(e) {
+      if (e.target) {
+        var pageToBeDist = e.target.getAttribute('data-page');
+        window.location = "index.php?xMinified=0&xBody="+pageToBeDist;
       }      
     }
 
@@ -103,8 +110,10 @@
       function() {
         document.getElementById('newPageName').focus();
 
-        addEvent(".btnDeletePage", "click", _tp_deletePageOpenDialog);
-        addEvent(".btnCreateDist", "click", _tp_createDist);
+        addEvent(".btnDeletePage",    "click", _tp_deletePageOpenDialog);
+        addEvent(".btnCreateDist",    "click", _tp_createDist);
+        addEvent(".btnCreateZipDist", "click", _tp_createZipDist);
+
         addEvent("tp_btnDeletePageConfirmation", "click", _tp_deletePageAction);
       }
     );

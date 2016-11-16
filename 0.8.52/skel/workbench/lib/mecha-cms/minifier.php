@@ -5,9 +5,9 @@
 	 * --------------------------------------------------------------------------
 	 */
 	// HTML Minifier
-	function minify_html($input)
+	function minify_html($input, $minified=true)
 	{
-	    if (trim($input) === "")
+	    if ((trim($input) === "") || (!$minified))
 	        return $input;
 	    // Remove extra white-space(s) between HTML attribute(s)
 	    $input = preg_replace_callback('#<([^\/\s<>!]+)(?:\s+([^<>]*?)\s*|\s*)(\/?)>#s', function($matches)
@@ -56,9 +56,9 @@
 	    ), $input);
 	}
 	// CSS Minifier => http://ideone.com/Q5USEF + improvement(s)
-	function minify_css($input)
+	function minify_css($input, $minified=true)
 	{
-	    if (trim($input) === "")
+	    if ((trim($input) === "") || (!$minified))
 	        return $input;
 	    // Force white-space(s) in `calc()`
 	    if (strpos($input, 'calc(') !== false) {
@@ -106,9 +106,9 @@
 	    ), $input);
 	}
 	// JavaScript Minifier
-	function minify_js($input)
+	function minify_js($input, $minified=true)
 	{
-	    if (trim($input) === "")
+	    if ((trim($input) === "") || (!$minified))
 	        return $input;
 	    return preg_replace(array(
 	        // Remove comment(s)
