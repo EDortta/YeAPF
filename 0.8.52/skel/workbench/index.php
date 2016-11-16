@@ -6,10 +6,6 @@
 
   function deleteFiles($dBody) 
   {
-    unlink("www/i_$dBody.html");
-    unlink("www/js/$dBody.js");
-    unlink("www/css/$dBody.css");
-    unlink("www/$dBody.php");
 
     unlink("production/$dBody/i_$dBody.html");
     unlink("production/$dBody/i_$dBody.min.html");
@@ -28,6 +24,11 @@
   }
   
   if ((isset($dBody)) && ($dBody!='null')) {
+    unlink("www/i_$dBody.html");
+    unlink("www/js/$dBody.js");
+    unlink("www/css/$dBody.css");
+    unlink("www/$dBody.php");
+
     deleteFiles($dBody);
   
   } else if ((isset($xBody)) && ($xBody!='null')) {
