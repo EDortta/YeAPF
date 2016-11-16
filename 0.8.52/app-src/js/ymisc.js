@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.52-59 built on 2016-11-16 14:23 (-2 DST)
+ * YeAPF 0.8.52-60 built on 2016-11-16 14:29 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-11-16 14:21:40 (-2 DST)
+ * 2016-11-16 14:29:09 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -26,7 +26,7 @@
       if (!ret) {
         /* search by classes */
         var c, className, classes = aElementId.split(' '), classesReturn = null;
-        for(c=0; c<clases.length; c++) {
+        for(c=0; c<classes.length; c++) {
           className=trim(classes[c]);
           if (className.substr(0,1)=='.')
             className = className.substr(1);
