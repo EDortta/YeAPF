@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.52-58 built on 2016-11-14 10:13 (-2 DST)
+  * YeAPF 0.8.52-59 built on 2016-11-16 14:23 (-2 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-11-14 10:13:12 (-2 DST)
+  * 2016-11-16 14:23:08 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.52-58 built on 2016-11-14 10:13 (-2 DST)");
+ console.log("YeAPF 0.8.52-59 built on 2016-11-16 14:23 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -273,11 +273,22 @@
            if (!ret)
              ret = document.getElementsByName(aElementId)[0];
            if (!ret) {
-             if (aElementId.substr(0,1)=='.')
-               aElementId = aElementId.substr(1);
-             auxRet = getElementsByClassName(document, '*', aElementId);
-             if (auxRet.length>0)
-               ret=auxRet;
+             /* search by classes */
+             var c, className, classes = aElementId.split(' '), classesReturn = null;
+             for(c=0; c<clases.length; c++) {
+               className=trim(classes[c]);
+               if (className.substr(0,1)=='.')
+                 className = className.substr(1);
+               auxRet = getElementsByClassName(document, '*', className);
+               if (auxRet.length>0) {
+                 if (classesReturn===null) {
+                   classesReturn = auxRet;
+                 } else {
+                   classesReturn = array_intersect(classesReturn, auxRet);
+                 }
+               }
+             }
+             ret=classesReturn;
            } else {
              if (typeof aTagName !== 'undefined') {
                aIndex = 0+aIndex;
@@ -872,6 +883,14 @@
      
      var forceStringValue = function(aObjArr, aIndex) {
        return ((aObjArr[aIndex] || "")+"").unquote();
+     }
+     
+     array_intersect = function(a, b) {
+         var t=b;
+         if (b.length > a.length) { b = a; a = t }; 
+         return a.filter(function (e) {
+             if (b.indexOf(e) !== -1) return true;
+         });
      }
      
      
@@ -3902,8 +3921,8 @@
                  that.pinger.pingerWatchdog = setTimeout(that.pinger.ping, that.pinger.pingInterleave);
              },
              /*
-              * após um tempo de 60 segundos (pingTimeout)
-              * sem resposta, ele cai nesta função e
+              * apÃ³s um tempo de 60 segundos (pingTimeout)
+              * sem resposta, ele cai nesta funÃ§Ã£o e
               * volta a tentar em 1/2 pingInterleave
               */
              notAnswer: function () {
@@ -3913,7 +3932,7 @@
                  that.pinger.onError();
                else
                  _dumpy(4,1,"Not 'onError' event");
-               // sayStatusBar("Servidor não localizado "+that.pinger.pingCount+'...<br>Tentando novamente');
+               // sayStatusBar("Servidor nÃ£o localizado "+that.pinger.pingCount+'...<br>Tentando novamente');
                if (that.pinger.canPing)
                  that.pinger.pingerWatchdog=setTimeout(that.pinger.ping, that.pinger.pingInterleave / 2);
              },
@@ -3994,8 +4013,8 @@
         * Com o advento do WebSocket, precisamos de novas formas para
         * provocar o servidor.
         * Este primeiro passo pretende melhorar o Ajax
-        * Depois, virão funções genericas
-        * Caso esteja usando prototype, ele usará o mesmo, se não se virará
+        * Depois, virÃ£o funÃ§Ãµes genericas
+        * Caso esteja usando prototype, ele usarÃ¡ o mesmo, se nÃ£o se virarÃ¡
         * para criar uma interface
         *
         * verificar ServerSentEvents
@@ -4398,7 +4417,7 @@
      
          script.abort = function () {
              _dumpy(4,1,"Calling {0}(404);".format(callbackFunctionName));
-             /* https://pt.wikipedia.org/wiki/Lista_de_códigos_de_status_HTTP#404_N.C3.A3o_encontrado */
+             /* https://pt.wikipedia.org/wiki/Lista_de_cÃ³digos_de_status_HTTP#404_N.C3.A3o_encontrado */
              setTimeout("{0}(404,{message: 'Server do not respond ({1})'}, {})".format(callbackFunctionName, url), 100);
          };
      
@@ -5690,9 +5709,9 @@
      
        that.grantMsgProc = function(aInterval)
        {
-         /* caso venha sem parámtros, calcular um tempo prudente de no máximo 20 segs
+         /* caso venha sem parÃ¡mtros, calcular um tempo prudente de no mÃ¡ximo 20 segs
           * Isso acontece quando o servidor devolveu uma resposta errada
-          * e queremos que o sistema de mensagens continue em operação. */
+          * e queremos que o sistema de mensagens continue em operaÃ§Ã£o. */
          if ((aInterval===undefined) || (aInterval<=0))
            aInterval = Math.min(20000,messagePeekerInterval * 2);
      
@@ -6513,7 +6532,7 @@
                  dynSetElementDisplay(allElements[i].id, e.id, e.value);
      
                if ((auxID=='*.') || (!e.checked)) {
-                 // limpar conteúdo dos campos dependentes
+                 // limpar conteÃºdo dos campos dependentes
                  // caso esteja ocultando
                  if (allElements[i].type=='checkbox')
                    allElements[i].checked=false;
@@ -7103,8 +7122,8 @@
                y$(nextCellName).click();
            }
          } else {
-           console.log("O Valor não pode ser lançado por não cumprir condições de existência");
-           window.alert("O valor não é consistente.\nRevise valores do campo pai e o próprio valor lançado\nTente novamente");
+           console.log("O Valor nÃ£o pode ser lanÃ§ado por nÃ£o cumprir condiÃ§Ãµes de existÃªncia");
+           window.alert("O valor nÃ£o Ã© consistente.\nRevise valores do campo pai e o prÃ³prio valor lanÃ§ado\nTente novamente");
            y$(aCellName).click();
          }
        }
@@ -7436,7 +7455,7 @@
      
      function __cbOnChange__(e, saving)
      {
-       // procurar elemento que chamou esta função
+       // procurar elemento que chamou esta funÃ§Ã£o
        if (e==undefined)
          var e = window.event || arguments.callee.caller.arguments[0];
        if (e.target)
@@ -7449,7 +7468,7 @@
      
        if (e.dynOnChange != undefined)
          e.dynOnChange();
-       // salvar informação
+       // salvar informaÃ§Ã£o
        if (saving)
          __saveFormInfo(e);
      /*
@@ -7460,7 +7479,7 @@
                ccDependents++;
              }
       */
-       // corrigir visualização dos elementos dependentes do clicado
+       // corrigir visualizaÃ§Ã£o dos elementos dependentes do clicado
        dynCleanChilds(e, document);
      
      }

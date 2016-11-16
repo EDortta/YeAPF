@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.52-11 built on 2016-11-11 15:24 (-2 DST)
+ * YeAPF 0.8.52-59 built on 2016-11-16 14:23 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-10-18 19:03:37 (-2 DST)
+ * 2016-11-16 14:21:40 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -24,11 +24,22 @@
       if (!ret)
         ret = document.getElementsByName(aElementId)[0];
       if (!ret) {
-        if (aElementId.substr(0,1)=='.')
-          aElementId = aElementId.substr(1);
-        auxRet = getElementsByClassName(document, '*', aElementId);
-        if (auxRet.length>0)
-          ret=auxRet;
+        /* search by classes */
+        var c, className, classes = aElementId.split(' '), classesReturn = null;
+        for(c=0; c<clases.length; c++) {
+          className=trim(classes[c]);
+          if (className.substr(0,1)=='.')
+            className = className.substr(1);
+          auxRet = getElementsByClassName(document, '*', className);
+          if (auxRet.length>0) {
+            if (classesReturn===null) {
+              classesReturn = auxRet;
+            } else {
+              classesReturn = array_intersect(classesReturn, auxRet);
+            }
+          }
+        }
+        ret=classesReturn;
       } else {
         if (typeof aTagName !== 'undefined') {
           aIndex = 0+aIndex;
@@ -623,6 +634,14 @@ if (!Array.prototype.indexOf) {
 
 var forceStringValue = function(aObjArr, aIndex) {
   return ((aObjArr[aIndex] || "")+"").unquote();
+}
+
+array_intersect = function(a, b) {
+    var t=b;
+    if (b.length > a.length) { b = a; a = t }; 
+    return a.filter(function (e) {
+        if (b.indexOf(e) !== -1) return true;
+    });
 }
 
 
