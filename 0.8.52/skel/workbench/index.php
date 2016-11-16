@@ -46,7 +46,7 @@
 
     $extension='';
     if ($xMinified)
-      $extension='.min'
+      $extension='.min';
 
     $newHTMLname = "production/$xBody/".str_replace(".html",    "$extension.html", "i_$xBody.html");
     $newPHPname  = "production/$xBody/".str_replace(".php",     "$extension.php",  "$xBody.php");
