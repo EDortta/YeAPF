@@ -118,8 +118,9 @@
 
   function y_uniqid()
   {
+    global $cfgServerPrefix;
     $ret = UUID::v4();
-    return preg_replace("/[^A-Za-z0-9 ]/", '', $ret);
+    return $cfgServerPrefix.preg_replace("/[^A-Za-z0-9 ]/", '', $ret);
   }
 
 

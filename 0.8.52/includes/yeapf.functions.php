@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.52-59 built on 2016-11-16 14:23 (-2 DST)
+    YeAPF 0.8.52-65 built on 2016-11-17 20:41 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-11-16 12:18:49 (-2 DST)
+    2016-11-17 15:42:15 (-2 DST)
    */
 
   /*
@@ -168,6 +168,8 @@
   $cfgSOAPInstalled=function_exists("is_soap_fault");
 
   $cfgDBCureFields=true;
+
+  $cfgServerPrefix=file_exists("flags/cfgServerPrefix")?file_get_contents("flags/cfgServerPrefix"):"";
 
 
   function _whoiam_()
