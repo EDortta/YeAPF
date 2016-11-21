@@ -1,8 +1,8 @@
 /*********************************************
  * skel/MoSyncApp/LocalFiles/js/ystorage.js
- * YeAPF 0.8.52-65 built on 2016-11-17 20:41 (-2 DST)
+ * YeAPF 0.8.52-66 built on 2016-11-21 09:58 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-11-17 20:41:53 (-2 DST)
+ * 2016-11-21 09:58:01 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -291,9 +291,12 @@
         }
       };
 
-      that.removeItem = function(id) {
-        if (typeof that.onremove == "function") {
-          that.onremove(that.getItem(id));
+      that.removeItem = function(id, propagate) {
+        propagate = typeof propagate !== "undefined"?propagate:true;
+        if (propagate) {
+          if (typeof that.onremove == "function") {
+            that.onremove(that.getItem(id));
+          }
         }
         localStorage.removeItem(that._dbTag_ + "_item_" + id);
         var ndx = that._list.indexOf(String(id));
@@ -303,15 +306,26 @@
         }
       };
 
-      that.cleanList = function() {
+      /* removes an item without propagate it deletion */
+      that.eliminateItem = function(id) {
+        that.removeItem(id, false);
+      };
+
+      that.cleanList = function(propagate) {
+        propagate = typeof propagate !== "undefined"?propagate:true;
         var _id = [],
             n=0;
         for (var i in that._list) {
           _id[n++] = that._list[i];
         }
         for (n=0; n<_id.length; n++) {
-          that.removeItem(_id[n]);      
+          that.removeItem(_id[n], propagate);      
         }
+      };
+
+      /* removes all the items in the list without propagating deletion */
+      that.blankList = function() {
+        that.cleanList(false);
       };
 
       that.init = function(dbTag, aKeyName) {
@@ -415,6 +429,18 @@
 
       that.removeItem = function(itemNdx) {
         return that.cfg.db.removeItem(itemNdx);
+      };
+
+      that.eliminateItem = function(itemNdx) {
+        return that.cfg.db.eliminateItem(itemNdx);
+      };
+
+      that.cleanList = function() {
+        return that.cfg.db.cleanList();
+      };
+
+      that.blankList = function() {
+        return that.cfg.db.blankList();
       };
 
       that.linkTo = function(aSiblingDB, aLinkageField) {
