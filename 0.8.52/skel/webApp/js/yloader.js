@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.52-67 built on 2016-11-21 10:30 (-2 DST)
+  * YeAPF 0.8.52-68 built on 2016-11-21 10:34 (-2 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-11-21 10:30:11 (-2 DST)
+  * 2016-11-21 10:34:12 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.52-67 built on 2016-11-21 10:30 (-2 DST)");
+ console.log("YeAPF 0.8.52-68 built on 2016-11-21 10:34 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -274,7 +274,7 @@
              ret = document.getElementsByName(aElementId)[0];
            if (!ret) {
              /* search by classes */
-             var c, className, classes = aElementId.split(' '), classesReturn = null, first=true;
+             var c, className, classes = aElementId.split(' '), classesReturn = undefined, first=true;
              for(c=0; c<classes.length; c++) {
                className=trim(classes[c]);
                if (className.substr(0,1)=='.')
