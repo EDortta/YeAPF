@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.52-61 built on 2016-11-16 14:33 (-2 DST)
+ * YeAPF 0.8.52-67 built on 2016-11-21 10:30 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-11-16 14:32:32 (-2 DST)
+ * 2016-11-21 10:29:37 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -16,7 +16,7 @@
 
 ( function () {
   y$ = function (aElementId, aTagName, aIndex) {
-    var ret=null, auxRet;
+    var ret=undefined, auxRet;
     if (aElementId>'') {
       if (aElementId.substr(0,1)=='#')
         aElementId = aElementId.substr(1);
