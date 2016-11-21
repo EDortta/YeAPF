@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yanalise.js
- * YeAPF 0.8.52-11 built on 2016-11-11 15:24 (-2 DST)
+ * YeAPF 0.8.52-70 built on 2016-11-21 19:43 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-11-05 12:12:36 (-2 DST)
+ * 2016-11-21 19:43:14 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yLexObj introduced in 2016-08-22 0.8.50-0
 **********************************************/
@@ -240,8 +240,8 @@ var yLexObj = function(aString) {
 
   that.opprecedence = {
     'LIKE':  5,
-    'AND':  5,
-    'OR':   5,
+    'AND':  6,
+    'OR':   6,
     '<':  5,
     '>':  5,
     '<=': 5,
@@ -527,7 +527,8 @@ var yLexObj = function(aString) {
       if (token) {
         if ((token.type=='NUMBER') || (token.type=='LITERAL')) {
           aux=token.token_string;
-          aux=String(aux).toUpperCase();
+          if (!isNumber(aux))
+            aux=String(aux).toUpperCase();
           canPush=true;
         }
         if (token.type=='IDENTIFIER') {
@@ -538,7 +539,8 @@ var yLexObj = function(aString) {
             aux=false;
           }
           else {
-            aux=String(aux).toUpperCase();
+            if (typeof aux=="string")
+              aux=String(aux).toUpperCase();
             canPush=true;
           }
         }
@@ -653,11 +655,12 @@ var yLexObj = function(aString) {
     that.symStack = [];
     that.postFixStack = [];
     that.priorToken=that.voidToken;
+    return that;
   };
 
   that.init = function(aString) {
     that.buf = aString || that.buf || "";
-    that.reset();
+    that.parse();
     return that;
   };
 

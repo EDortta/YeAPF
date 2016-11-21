@@ -1,8 +1,8 @@
 /*********************************************
   * skel/workbench/js/yloader.js
-  * YeAPF 0.8.52-68 built on 2016-11-21 10:34 (-2 DST)
+  * YeAPF 0.8.52-70 built on 2016-11-21 19:43 (-2 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-11-21 10:34:12 (-2 DST)
+  * 2016-11-21 19:43:34 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.52-68 built on 2016-11-21 10:34 (-2 DST)");
+ console.log("YeAPF 0.8.52-70 built on 2016-11-21 19:43 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -2560,8 +2560,8 @@
      
        that.opprecedence = {
          'LIKE':  5,
-         'AND':  5,
-         'OR':   5,
+         'AND':  6,
+         'OR':   6,
          '<':  5,
          '>':  5,
          '<=': 5,
@@ -2847,7 +2847,8 @@
            if (token) {
              if ((token.type=='NUMBER') || (token.type=='LITERAL')) {
                aux=token.token_string;
-               aux=String(aux).toUpperCase();
+               if (!isNumber(aux))
+                 aux=String(aux).toUpperCase();
                canPush=true;
              }
              if (token.type=='IDENTIFIER') {
@@ -2858,7 +2859,8 @@
                  aux=false;
                }
                else {
-                 aux=String(aux).toUpperCase();
+                 if (typeof aux=="string")
+                   aux=String(aux).toUpperCase();
                  canPush=true;
                }
              }
@@ -2973,11 +2975,12 @@
          that.symStack = [];
          that.postFixStack = [];
          that.priorToken=that.voidToken;
+         return that;
        };
      
        that.init = function(aString) {
          that.buf = aString || that.buf || "";
-         that.reset();
+         that.parse();
          return that;
        };
      
