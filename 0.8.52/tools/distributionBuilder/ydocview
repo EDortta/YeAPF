@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ydocview
-    YeAPF 0.8.52-11 built on 2016-11-11 15:24 (-2 DST)
+    YeAPF 0.8.52-74 built on 2016-11-22 12:39 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-05-20 16:54:34 (-2 DST)
+    2016-11-22 12:38:58 (-2 DST)
 */
 
   if (!function_exists("objet2array")) {
@@ -175,7 +175,7 @@
         $docMap.="\t<li><a href='$aHref'>$elemName</a></li>\n";
       $docMap.="</ul>";
     }
-    file_put_contents("$baseToExport/$filename.html", $docMap);
+    file_put_contents("$baseToExport/".basename($filename).".html", $docMap);
 
   } else
     die("\nfile '$filename' not found\n");
