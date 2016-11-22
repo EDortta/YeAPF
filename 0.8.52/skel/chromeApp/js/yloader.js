@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.52-70 built on 2016-11-21 19:43 (-2 DST)
+  * YeAPF 0.8.52-71 built on 2016-11-22 09:01 (-2 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-11-21 19:43:34 (-2 DST)
+  * 2016-11-22 09:01:08 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.52-70 built on 2016-11-21 19:43 (-2 DST)");
+ console.log("YeAPF 0.8.52-71 built on 2016-11-22 09:01 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -2559,20 +2559,20 @@
        };
      
        that.opprecedence = {
-         'LIKE':  5,
-         'AND':  6,
-         'OR':   6,
-         '<':  5,
-         '>':  5,
-         '<=': 5,
-         '>=': 5,
-         '==': 5,
-         '(':  4,
-         '^':  3,
-         '/':  2,
-         '*':  2,
-         '+':  1,
-         '-':  1
+         'LIKE': 5,
+         '<':    5,
+         '>':    5,
+         '<=':   5,
+         '>=':   5,
+         '==':   5,
+         '(':    4,
+         '^':    3,
+         '/':    2,
+         '*':    2,
+         'AND':  1,
+         'OR':   1,
+         '+':    1,
+         '-':    1
        };
      
        that._ALPHA = 1;
