@@ -42,7 +42,7 @@
 
     $html_out="";
     foreach ($html->find('div.section') as $elem) {
-      $html_out.=minify_html($elem, $xMinified);
+      $html_out.=minify_html($elem, $xMinified)."\n";
     }
 
     $extension='';
@@ -50,7 +50,7 @@
       $extension='.min';
 
     $newHTMLname = "production/$xBody/".str_replace(".html",    "$extension.html", "i_$xBody.html");
-    $newPHPname  = "production/$xBody/".str_replace(".php",     "$extension.php",  "$xBody.php");
+    $newPHPname  = "production/$xBody/$xBody.php";
     $newJSname   = "production/$xBody/js/".str_replace(".js",   "$extension.js",   "$xBody.js");
     $newCSSname  = "production/$xBody/css/".str_replace(".css", "$extension.css",  "$xBody.css");
 
@@ -63,7 +63,7 @@
     file_put_contents($newHTMLname, $html_out);
     file_put_contents($newJSname,   minify_js($js,  $xMinified));
     file_put_contents($newCSSname,  minify_js($css, $xMinified));
-    file_put_contents($newPHPname,  minify_js($php, $xMinified));
+    file_put_contents($newPHPname,  $php);
 
     $zip = new ZipArchive();
     if ($zip->open("download/$xBody.zip", ZipArchive::CREATE)) {
