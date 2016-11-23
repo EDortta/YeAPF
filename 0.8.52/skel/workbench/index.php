@@ -65,6 +65,16 @@
     file_put_contents($newCSSname,  minify_js($css, $xMinified));
     file_put_contents($newPHPname,  $php);
 
+    $pageBody="<div class='tnAppPage' data-source='$xBody'>$html_out</div>";
+    if (!file_exists("production/e_index_sample.html")) {
+      $GLOBALS['pageSorceCode']=$pageBody;
+    } else {
+
+    }
+
+    $e_index_sample=_file("tp_app_index.html");
+    file_put_contents("production/e_index_sample.html", $e_index_sample);
+
     $zip = new ZipArchive();
     if ($zip->open("download/$xBody.zip", ZipArchive::CREATE)) {
       $zip->addFile($newHTMLname);
