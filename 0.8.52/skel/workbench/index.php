@@ -36,9 +36,9 @@
     deleteFiles($xBody);
 
     $html = file_get_html("www/i_$xBody.html");
-    $js   = file_get_html("www/js/$xBody.js");
-    $css  = file_get_html("www/css/$xBody.css");
-    $php  = file_get_html("www/$xBody.php");
+    $js   = _file("www/js/$xBody.js");
+    $css  = _file("www/css/$xBody.css");
+    $php  = _file("www/$xBody.php");
 
     $html_out="";
     foreach ($html->find('div.section') as $elem) {
@@ -110,6 +110,7 @@
           if ((!file_exists("www/$newPageName.php")) && (file_exists("www/slotEmptyImplementation.php"))) {
             /* creating php file */
             $scriptName=ucfirst($newPageName);
+            $GLOBALS['s']=$newPageName;
             $newScript = _file("www/slotEmptyImplementation.php");
             file_put_contents("www/$newPageName.php", $newScript);
             chmod("www/$newPageName.php", 0777);
