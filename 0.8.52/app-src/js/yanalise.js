@@ -1,16 +1,16 @@
 /*********************************************
  * app-src/js/yanalise.js
- * YeAPF 0.8.52-71 built on 2016-11-22 09:01 (-2 DST)
+ * YeAPF 0.8.52-93 built on 2016-11-24 07:27 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-11-22 09:00:38 (-2 DST)
+ * 2016-11-23 13:37:10 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yLexObj introduced in 2016-08-22 0.8.50-0
 **********************************************/
-"use strict"
 
 // ==== YeAPF - Javascript implementation
 function yAnalise(aLine, aStack)
 {
+  "use strict";
   if (aLine!==undefined) {
 
     aLine = unmaskHTML(aLine);

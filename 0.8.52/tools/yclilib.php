@@ -1,19 +1,15 @@
 <?php
 /*
     tools/yclilib.php
-    YeAPF 0.8.52-52 built on 2016-11-14 09:20 (-2 DST)
+    YeAPF 0.8.52-93 built on 2016-11-24 07:27 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-11-12 09:32:02 (-2 DST)
+    2016-11-24 07:19:36 (-2 DST)
 */
 
 
   function updateFiles($sourcePath, $pattern, $target='.',  $toForce=false)
   {
     $specialFiles = array('yeapf.db.ini', 'search.path', 'e_index.html', 'e_main_menu.html');
-    if (!is_dir($target)) {
-      echo "\nCreating '$target'\n";
-      mkdir($target, 0777, true);
-    }
     echo "\rFrom $sourcePath/$pattern\n";
     $files = glob("$sourcePath/$pattern");
     foreach($files as $fileName) {
@@ -29,6 +25,10 @@
           } else
             echo "\n";
         } else {
+          if (!is_dir($target)) {
+            echo "\nCreating '$target'\n";
+            mkdir($target, 0777, true);
+          }          
           if (file_exists("$target/$bName")) {
             $t1=filemtime("$sourcePath/$bName");
             $t2=filemtime("$target/$bName");
