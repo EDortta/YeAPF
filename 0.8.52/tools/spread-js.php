@@ -1,9 +1,9 @@
 <?php
   /*
     tools/spread-js.php
-    YeAPF 0.8.52-58 built on 2016-11-14 10:13 (-2 DST)
+    YeAPF 0.8.52-94 built on 2016-11-25 10:11 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-11-14 09:40:59 (-2 DST)
+    2016-11-25 10:09:58 (-2 DST)
 
     This script will distribute monolite version of yloader.js
     among different application skeletons
@@ -15,12 +15,25 @@
   /* load yeapf directly */
   require_once "includes/yeapf.functions.php";
 
+  function grantDirectory($dirName)
+  {
+    if (!is_dir($dirName)) {
+      echo "Granting '$dirName' ... ";
+      $ret=grantDir($dirName);
+      echo ($ret?'Ok':'Error');
+      echo "\n";
+      if (!$ret)
+        die("'$dirName' cannot be granted\n");
+    }
+  }
+
   function copyFile($srcFileName, $tgtFolder, $addHeader = false)
   {
     if (file_exists($srcFileName)) {
+      grantDirectory($tgtFolder);
       $auxFile = _file($srcFileName);
       if ($addHeader) {
-        $auxFile = "/* YeAPF 0.8.52-58 built on 2016-11-14 10:13 (-2 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
+        $auxFile = "/* YeAPF 0.8.52-94 built on 2016-11-25 10:11 (-2 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
       }
       $tgtFileName=basename($srcFileName);
       if (file_put_contents("$tgtFolder/$tgtFileName", $auxFile))
@@ -36,6 +49,7 @@
 
   function copyMobileFiles($targetFolder)
   {
+    grantDirectory($targetFolder);
     copyFile("app-src/js/ysandboxifc.js",       $targetFolder);
     copyFile("app-src/js/ystorage.js",          $targetFolder);
     copyFile("app-src/js/yifc.js",              $targetFolder);
@@ -60,16 +74,9 @@
         die("Error: file cannot be deleted\n");
     if ($fileContent>'')
       if (!file_put_contents($targetFilename, trim($fileContent)))
-        die("Error: file cannot be written\n");
+        die("Error: file '$targetFilename' cannot be written\n");
     echo "OK\n";
     return true;
-  }
-
-  function verifyDirExists($dirName)
-  {
-    echo "Granting '$dirName' ... ";
-    echo (grantDir($dirName)?'Ok':'Error');
-    echo "\n";
   }
 
   echo "Working at ".getcwd()."\n";
@@ -86,16 +93,16 @@
   if (file_exists($minJS)) {
     echo "Minified version source: $minJS\n";
     $yeapf_minJS = join("", file($minJS));
-    $yeapf_minJS = "/* YeAPF 0.8.52-58 built on 2016-11-14 10:13 (-2 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
+    $yeapf_minJS = "/* YeAPF 0.8.52-94 built on 2016-11-25 10:11 (-2 DST) Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
   }
 
-  verifyDirExists("skel/chromeApp/js");
-  verifyDirExists("skel/MoSyncApp/LocalFiles/js");
-  verifyDirExists("skel/webApp/js");
-  verifyDirExists("templates/bootstrap3/js");
-  verifyDirExists("skel/webSocket");
-  verifyDirExists("skel/workbench");
-  verifyDirExists("skel/workbench/www");
+  grantDirectory("skel/chromeApp/js");
+  grantDirectory("skel/MoSyncApp/LocalFiles/js");
+  grantDirectory("skel/webApp/js");
+  grantDirectory("templates/bootstrap3/js");
+  grantDirectory("skel/webSocket");
+  grantDirectory("skel/workbench");
+  grantDirectory("skel/workbench/www");
   
   /* CONFIGURE.PHP */
   copy("skel/webApp/configure.php", "skel/webSocket/configure.php");
@@ -121,6 +128,8 @@
     "skel/workbench/js/yloader.min.js",
     "skel/webApp/js/yloader.js",
     "skel/webApp/js/yloader.min.js",
+    "skel/electron/js/yloader.js",
+    "skel/electron/js/yloader.min.js",
     "templates/bootstrap3/js/yloader.js",
     "templates/bootstrap3/js/yloader.min.js",
     "skel/MoSyncApp/LocalFiles/js/yloader.js",
@@ -145,6 +154,7 @@
 
   copyYeapfAppFiles("templates/bootstrap3/js");
 
+  copyMobileFiles("skel/electron/js");
   copyMobileFiles("skel/chromeApp/js");
   copyMobileFiles("skel/MoSyncApp/LocalFiles/js");
 
