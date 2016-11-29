@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webSocket/configure.php
-    YeAPF 0.8.52-94 built on 2016-11-25 10:11 (-2 DST)
+    YeAPF 0.8.52-98 built on 2016-11-29 10:44 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-11-25 10:11:58 (-2 DST)
+    2016-11-29 10:44:17 (-2 DST)
 */
 
 
@@ -229,7 +229,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.52-94 built on 2016-11-25 10:11 (-2 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.52-98 built on 2016-11-29 10:44 (-2 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -268,9 +268,9 @@
   }
 
   echo echoStep("<div class=cpyrght><strong><big><I>skel/webSocket/configure.php</I></big></strong><br>
-    YeAPF 0.8.52-94 built on 2016-11-25 10:11 (-2 DST)<br>
+    YeAPF 0.8.52-98 built on 2016-11-29 10:44 (-2 DST)<br>
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    2016-11-25 10:11:58 (-2 DST)</div>");
+    2016-11-29 10:44:17 (-2 DST)</div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     die(echoStep("<div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
@@ -620,9 +620,17 @@
                   $setupIni->addRecord();
 
                 $curAppName='';
+                if (isset($val['dbConnect'])) {
+                  $tempDBConnect=strtolower(substr($val['dbConnect'],0,1));
+                  if (($tempDBConnect=='n') || (intval($tempDBConnect)==0) || ($tempDBConnect=='f')) 
+                    $tempDBConnect='no';
+                  else
+                    $tempDBConnect='yes';
+                } else 
+                  $tempDBConnect='no';
 
                 foreach($val as $k1 => $v1) {
-                  if($v1>'') {
+                  if ($v1>'') {
                     $setupIni->addField($k1);
 
                     if ($k1 == 'dbConnect')
@@ -646,7 +654,8 @@
                   } else if (($k1=='dbType') || ($k1=='dbServer') || ($k1=='dbName')) {
                     if ($newSgug)
                       unlink($sgugIni);
-                    die(echoStep("<div class=err><b>yeapf.db.ini</b> malformed<br>**** $k1 needs to be defined</div>"));
+                    if ($tempDBConnect!='no')
+                      die(echoStep("<div class=err><b>yeapf.db.ini</b> malformed<br>**** $k1 needs to be defined</div>"));
                   }
                 }
 

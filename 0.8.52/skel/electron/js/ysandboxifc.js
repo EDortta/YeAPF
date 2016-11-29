@@ -1,5 +1,5 @@
 /*********************************************
- * skel/MoSyncApp/LocalFiles/js/ysandboxifc.js
+ * skel/electron/js/ysandboxifc.js
  * YeAPF 0.8.52-98 built on 2016-11-29 10:44 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
  * 2016-11-29 10:44:18 (-2 DST)
@@ -10,7 +10,7 @@
  * continue to use restful interface from a sandboxed iframe.
  * It counterpart is yifc.js
  *********************************************/
-//# sourceURL=skel/MoSyncApp/LocalFiles/js/ysandboxifc.js
+//# sourceURL=skel/electron/js/ysandboxifc.js
 
 _setLogFlagLevel(1,2);
 
