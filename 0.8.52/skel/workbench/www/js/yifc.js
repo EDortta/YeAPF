@@ -1,5 +1,5 @@
 /*********************************************
- * skel/chromeApp/js/yifc.js
+ * skel/workbench/www/js/yifc.js
  * YeAPF 0.8.52-107 built on 2016-12-01 07:30 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
  * 2016-12-01 07:30:10 (-2 DST)
@@ -8,7 +8,7 @@
  * and runs outside the sandbox.
  * IFC - Inter Frame Communication
  *********************************************/
-//# sourceURL=skel/chromeApp/js/yifc.js
+//# sourceURL=skel/workbench/www/js/yifc.js
 
 var IFCObj = function () {
   var that = {};

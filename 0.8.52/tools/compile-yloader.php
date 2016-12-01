@@ -1,7 +1,7 @@
 <?php
   /*
     tools/compile-yloader.php
-    YeAPF 0.8.52-11 built on 2016-11-11 15:24 (-2 DST)
+    YeAPF 0.8.52-107 built on 2016-12-01 07:30 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
     2016-05-20 11:34:20 (-2 DST)
 
@@ -18,7 +18,7 @@
   /* comment lines to be deleted from each .js file */
   $headers = array(
                "* tools/compile-yloader.php",
-               "* YeAPF 0.8.52-11 built on 2016-11-11 15:24 (-2 DST)",
+               "* YeAPF 0.8.52-107 built on 2016-12-01 07:30 (-2 DST)",
                "* Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com",
                "* 2016-05-20 11:34:20 (-2 DST)"
              );

@@ -1,11 +1,11 @@
 /*********************************************
- * skel/electron/js/ycomm-worker.js
+ * skel/workbench/www/js/ycomm-worker.js
  * YeAPF 0.8.52-107 built on 2016-12-01 07:30 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
  * 2016-12-01 07:30:10 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
-//# sourceURL=skel/electron/js/ycomm-worker.js
+//# sourceURL=skel/workbench/www/js/ycomm-worker.js
 
 importScripts('yloader.js');
 

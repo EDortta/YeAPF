@@ -1,5 +1,5 @@
 /*********************************************
- * skel/electron/js/ystorage.js
+ * skel/workbench/www/js/ystorage.js
  * YeAPF 0.8.52-107 built on 2016-12-01 07:30 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
  * 2016-12-01 07:30:10 (-2 DST)
