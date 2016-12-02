@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/configure.php
-    YeAPF 0.8.52-107 built on 2016-12-01 07:30 (-2 DST)
+    YeAPF 0.8.52-125 built on 2016-12-02 11:27 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-12-01 07:29:19 (-2 DST)
+    2016-12-01 08:15:19 (-2 DST)
 */
 
 
@@ -275,7 +275,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.52-107 built on 2016-12-01 07:30 (-2 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.52-125 built on 2016-12-02 11:27 (-2 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -310,14 +310,14 @@
   $yeapfLogLevel = 10;
 
   if (!$isCLI) {
-    echo "<style>body{padding:8px; font-size:12px; font-family: arial; } * {border-radius: 3px;} .info{margin:2px; padding-bottom:8px; width: 800px} .warn{border-top:dotted 1px #900; border-bottom:dotted 1px #900; color:#A86D00;  font-weight:800; margin:2px; padding:8px; background-color:#FFEAC0} .cpyrght{font-size:14px; border-bottom:solid 2px #BFBFBF; padding-bottom:4px} .code { font-family:Consolas,monospace;  background-color: #E5E5E5;  margin: 8px;  padding: 4px;  border: dotted 1px #7F7F7F} .err {background-color:#FFC0CB;  border-style:solid;  border-width:2px;  border-color:#FF0000; margin:32px; padding:32px; border-radius:4px; width: 800px; font-weigth: 800; color: #900} .errItem {border-bottom: dotted 1px #FF0000;  margin-bottom:4px; }</style>";
+    echo "<style>body{padding:8px; font-size:12px; font-family: 'Courier New, Courier, monospace'; } * {border-radius: 3px;} .info{margin:2px; padding-bottom:8px; width: 800px} .warn{border-top:dotted 1px #900; border-bottom:dotted 1px #900; color:#A86D00;  font-weight:800; margin:2px; padding:8px; background-color:#FFEAC0} .cpyrght{font-size:14px; border-bottom:solid 2px #BFBFBF; padding-bottom:4px} .code { font-family:Consolas,monospace;  background-color: #E5E5E5;  margin: 8px;  padding: 4px;  border: dotted 1px #7F7F7F} .err {background-color:#FFC0CB;  border-style:solid;  border-width:2px;  border-color:#FF0000; margin:32px; padding:32px; border-radius:4px; width: 800px; font-weigth: 800; color: #900} .errItem {border-bottom: dotted 1px #FF0000;  margin-bottom:4px; }</style>";
   }
 
 
   echo sayStep("<div class=cpyrght><strong><big><I>skel/webApp/configure.php</I></big></strong><br>
-    YeAPF 0.8.52-107 built on 2016-12-01 07:30 (-2 DST)<br>
+    YeAPF 0.8.52-125 built on 2016-12-02 11:27 (-2 DST)<br>
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    2016-12-01 07:29:19 (-2 DST)</div>");
+    2016-12-01 08:15:19 (-2 DST)</div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     die(sayStep("<div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
@@ -1079,7 +1079,7 @@
               else
                 $developLink='';
 
-              echo sayStep("<div style='background: #90EE90; border-style: solid; border-width: 2px; border-color: #00BD00; padding: 32px'><big><u>YeAPF 0.8.52 well configured!</u></big><div style='padding-left: 16px'>Location: <b>$__PL__</b><br>DB config: <b>$sgugIni</b></div><br>Click <a href='$referer_uri'>here</a> to go back.<br>Click <a href='configure.php?debugSteps=1'>here</a> to debug configure process.<br> Click <a href='index.php'>here</a> to start your app.<br>$developLink<small style='margin: 16px'>If you wish to destroy database connection an recreate it, click <a href='configure.php?destroydb=yes'>here</a><br><i>It will preserve your database data but will remove all other definitions except the one contained in<em>yeapf.db.ini</em></i></small></div>");
+              echo sayStep("<div style='box-shadow: 5px 5px 2px #888888; background: #90EE90; border-style: solid; border-width: 2px; border-color: #00BD00; padding: 32px'><big><u>YeAPF 0.8.52 well configured!</u></big><div style='padding-left: 16px'>Location: <b>$__PL__</b><br>DB config: <b>$sgugIni</b></div><br>Click <a href='$referer_uri'>here</a> to go back.<br>Click <a href='configure.php?debugSteps=1'>here</a> to debug configure process.<br> Click <a href='index.php'>here</a> to start your app.<br>$developLink<small style='margin: 16px'>If you wish to destroy database connection an recreate it, click <a href='configure.php?destroydb=yes'>here</a><br><i>It will preserve your database data but will remove all other definitions except the one contained in<em>yeapf.db.ini</em></i></small></div>");
 
               $aux=join(file('.config/yeapf.config'),'<br>');
               // echo echoStep("<div class=code>$aux</div>");
