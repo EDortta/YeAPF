@@ -4691,7 +4691,12 @@
 </oElement></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>1205</start>
 <end>1212</end>
-</code></ycomm.dom.getTop></functions><filename>ycomm-dom.js</filename>
+</code></ycomm.dom.getTop><ycomm.dom.getPos><name>ycomm.dom.getPos</name>
+<parameters><oElement><dummy>ok</dummy>
+</oElement></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
+<start>1214</start>
+<end>1222</end>
+</code></ycomm.dom.getPos></functions><filename>ycomm-dom.js</filename>
 <folder>app-src%2Fjs</folder>
 </ycomm-dom.js><ycomm-msg.js><functions><ycommMsgBase><name>ycommMsgBase</name>
 <parameters></parameters><inner><functions><ycommMsgBase.that.grantMsgProc><name>ycommMsgBase.that.grantMsgProc</name>
