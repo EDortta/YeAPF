@@ -1,8 +1,8 @@
 /*********************************************
   * skel/electron/js/yloader.js
-  * YeAPF 0.8.52-126 built on 2016-12-05 14:14 (-2 DST)
+  * YeAPF 0.8.52-134 built on 2016-12-08 21:10 (-2 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-12-05 14:14:01 (-2 DST)
+  * 2016-12-08 21:10:55 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.52-126 built on 2016-12-05 14:14 (-2 DST)");
+ console.log("YeAPF 0.8.52-134 built on 2016-12-08 21:10 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -1600,9 +1600,11 @@
      }
      
      function str2double(aStr) {
-       if (aStr === undefined)
+       if (typeof aStr === 'undefined')
          aStr = '0';
      
+       aStr=""+aStr;
+       
        var a="";
        if ((aStr.indexOf(',')>0) && (aStr.indexOf('.')>0))
          a=aStr.replace('.','');
@@ -3257,20 +3259,24 @@
      
        if (isOnMobile()) {
          _dump("Loading mobile tabs");
-         that.tabchangeEvent = document.createEvent('Events');
-         that.tabchangeEvent.initEvent('tabchange');
+         that.tabchangeEvent = document.createEvent('Event');
+         that.tabchangeEvent.initEvent('tabchange', true, true);
      
-         that.tabblurEvent = document.createEvent('Events');
-         that.tabblurEvent.initEvent('tabblur');
+         that.tabblurEvent = document.createEvent('Event');
+         that.tabblurEvent.initEvent('tabblur', true, true);
      
-         that.tabfocusEvent = document.createEvent('Events');
-         that.tabfocusEvent.initEvent('tabfocus');
+         that.tabfocusEvent = document.createEvent('Event');
+         that.tabfocusEvent.initEvent('tabfocus', true, true);
+     
+         that.tabshowEvent = document.createEvent('Event');
+         that.tabshowEvent.initEvent('tabshow', true, true);
        } else {
          if (typeof Event=='function') {
            _dump("Loading desktop tabs");
            that.tabchangeEvent = new Event('tabchange');
            that.tabblurEvent = new Event('tabblur');
            that.tabfocusEvent = new Event('tabfocus');
+           that.tabshowEvent = new Event('tabshow');
          } else 
            _dump("Tabs are not supported");    
        }
@@ -3576,6 +3582,9 @@
                          }
                          i++;
                        }
+                       
+                       window.dispatchEvent(that.tabshowEvent);
+     
                      } else {
                        _dumpy(64,1,"freeze");
                      }
@@ -4244,6 +4253,26 @@
          return ret;
        };
      
+       ycomm.registerCall = function(via, s, a) {
+         if ((ydbg) && ((ydbg.logFlag & 8)>0)) {
+           if (typeof _ycomm_stat == 'undefined') {
+             window._ycomm_stat = [];
+           }
+     
+           if (typeof _ycomm_stat[via] == 'undefined')
+             _ycomm_stat[via] = [];
+     
+           if (typeof _ycomm_stat[via][s] == 'undefined')
+             _ycomm_stat[via][s] = [];
+     
+           if (typeof _ycomm_stat[via][s][a] == 'undefined')
+             _ycomm_stat[via][s][a] = {count:0};
+     
+           _ycomm_stat[via][s][a].count++;
+           _dumpy(8,2,"via: {0} s: {1} a: {2} count: {3}".format(via, s, a, _ycomm_stat[via][s][a].count));
+         }
+       }
+     
        /*
         * https://developer.mozilla.org/en-US/docs/Web/API/FormData
         * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects
@@ -4268,6 +4297,8 @@
            var aURL=this.buildCommonURL(s || '', a || '', limits || {}, localU);
      
            if (typeof xAjax!='undefined') {
+     
+             ycomm.registerCall('invoke', s, a);
      
              var aux=xAjax();
              aux.Request(
@@ -4465,6 +4496,8 @@
          var localU = (typeof u == 'undefined')?'':u;
          if (typeof callbackId == 'undefined')
            callbackId = 0;
+     
+         ycomm.registerCall('crave', s, a);
          /* sequence number for script garbage collect */
          ycomm._scriptSequence++;
          if (!this.getDataLocation())
@@ -5699,7 +5732,10 @@
      ycomm.dom.getPos = function(oElement) {
          for (var lx=0, ly=0;
               oElement != null;
-              lx += oElement.offsetLeft, ly += oElement.offsetTop, oElement = oElement.offsetParent);
+              oElement = oElement.offsetParent) {
+           lx += oElement.offsetLeft;
+           ly += oElement.offsetTop;
+         }
          return { 
            x: lx,
            y: ly

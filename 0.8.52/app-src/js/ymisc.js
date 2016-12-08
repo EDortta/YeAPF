@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.52-125 built on 2016-12-02 11:27 (-2 DST)
+ * YeAPF 0.8.52-134 built on 2016-12-08 21:10 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-12-02 11:26:51 (-2 DST)
+ * 2016-12-07 11:10:11 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -1351,9 +1351,11 @@ function dec2deg(dec, asLatitude) {
 }
 
 function str2double(aStr) {
-  if (aStr === undefined)
+  if (typeof aStr === 'undefined')
     aStr = '0';
 
+  aStr=""+aStr;
+  
   var a="";
   if ((aStr.indexOf(',')>0) && (aStr.indexOf('.')>0))
     a=aStr.replace('.','');

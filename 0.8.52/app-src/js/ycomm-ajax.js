@@ -1,8 +1,8 @@
   /********************************************************************
    * app-src/js/ycomm-ajax.js
-   * YeAPF 0.8.52-107 built on 2016-12-01 07:30 (-2 DST)
+   * YeAPF 0.8.52-134 built on 2016-12-08 21:10 (-2 DST)
    * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2016-10-19 09:16:50 (-2 DST)
+   * 2016-12-06 09:42:26 (-2 DST)
    *
    * Com o advento do WebSocket, precisamos de novas formas para
    * provocar o servidor.
@@ -224,6 +224,26 @@
     return ret;
   };
 
+  ycomm.registerCall = function(via, s, a) {
+    if ((ydbg) && ((ydbg.logFlag & 8)>0)) {
+      if (typeof _ycomm_stat == 'undefined') {
+        window._ycomm_stat = [];
+      }
+
+      if (typeof _ycomm_stat[via] == 'undefined')
+        _ycomm_stat[via] = [];
+
+      if (typeof _ycomm_stat[via][s] == 'undefined')
+        _ycomm_stat[via][s] = [];
+
+      if (typeof _ycomm_stat[via][s][a] == 'undefined')
+        _ycomm_stat[via][s][a] = {count:0};
+
+      _ycomm_stat[via][s][a].count++;
+      _dumpy(8,2,"via: {0} s: {1} a: {2} count: {3}".format(via, s, a, _ycomm_stat[via][s][a].count));
+    }
+  }
+
   /*
    * https://developer.mozilla.org/en-US/docs/Web/API/FormData
    * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects
@@ -248,6 +268,8 @@
       var aURL=this.buildCommonURL(s || '', a || '', limits || {}, localU);
 
       if (typeof xAjax!='undefined') {
+
+        ycomm.registerCall('invoke', s, a);
 
         var aux=xAjax();
         aux.Request(

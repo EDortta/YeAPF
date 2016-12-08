@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ytabnav.js
- * YeAPF 0.8.52-107 built on 2016-12-01 07:30 (-2 DST)
+ * YeAPF 0.8.52-134 built on 2016-12-08 21:10 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-06-23 17:55:11 (-2 DST)
+ * 2016-12-08 21:10:02 (-2 DST)
  * First Version (C) 2012 - esteban daniel dortta - dortta@yahoo.com
  * Purpose: to control multiple tabs in a only-one-page application
  *          this is specially useful when building web mobile applications
@@ -13,20 +13,24 @@ var tabNavBase = function () {
 
   if (isOnMobile()) {
     _dump("Loading mobile tabs");
-    that.tabchangeEvent = document.createEvent('Events');
-    that.tabchangeEvent.initEvent('tabchange');
+    that.tabchangeEvent = document.createEvent('Event');
+    that.tabchangeEvent.initEvent('tabchange', true, true);
 
-    that.tabblurEvent = document.createEvent('Events');
-    that.tabblurEvent.initEvent('tabblur');
+    that.tabblurEvent = document.createEvent('Event');
+    that.tabblurEvent.initEvent('tabblur', true, true);
 
-    that.tabfocusEvent = document.createEvent('Events');
-    that.tabfocusEvent.initEvent('tabfocus');
+    that.tabfocusEvent = document.createEvent('Event');
+    that.tabfocusEvent.initEvent('tabfocus', true, true);
+
+    that.tabshowEvent = document.createEvent('Event');
+    that.tabshowEvent.initEvent('tabshow', true, true);
   } else {
     if (typeof Event=='function') {
       _dump("Loading desktop tabs");
       that.tabchangeEvent = new Event('tabchange');
       that.tabblurEvent = new Event('tabblur');
       that.tabfocusEvent = new Event('tabfocus');
+      that.tabshowEvent = new Event('tabshow');
     } else 
       _dump("Tabs are not supported");    
   }
@@ -332,6 +336,9 @@ var tabNavBase = function () {
                     }
                     i++;
                   }
+                  
+                  window.dispatchEvent(that.tabshowEvent);
+
                 } else {
                   _dumpy(64,1,"freeze");
                 }
