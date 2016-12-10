@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.52-134 built on 2016-12-08 21:10 (-2 DST)
+  * YeAPF 0.8.52-136 built on 2016-12-10 11:19 (-2 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-12-08 21:10:55 (-2 DST)
+  * 2016-12-10 11:19:17 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.52-134 built on 2016-12-08 21:10 (-2 DST)");
+ console.log("YeAPF 0.8.52-136 built on 2016-12-10 11:19 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -3562,6 +3562,7 @@
                      if (!freeze) {
                        that.setCurrentContainer(that.getContainerNdx(theContainer));
                        theContainer.currentTabNdx = aNdx;
+                       that._currentTab=aTab.id;
                        aTab.dispatchEvent(that.tabfocusEvent);
                        /*
                        if (that.ontabfocus != undefined)
@@ -4433,6 +4434,7 @@
      
        ycomm.bring =  function (url) {
          var head = document.head;
+         ycomm.waitIconControl(true);
          var script = document.createElement("script");
          _dumpy(4,1,url);
          // extrair o scriptSequence e o callback para depuracao
@@ -4458,6 +4460,7 @@
            if (ycomm._load>0)
              ycomm._load--;
            this.abort=null;
+           ycomm.waitIconControl(false);
          };
      
          script.abort = function () {
