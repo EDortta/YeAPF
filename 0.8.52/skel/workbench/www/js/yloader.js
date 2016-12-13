@@ -1,8 +1,8 @@
 /*********************************************
   * skel/workbench/www/js/yloader.js
-  * YeAPF 0.8.52-136 built on 2016-12-10 11:19 (-2 DST)
+  * YeAPF 0.8.52-145 built on 2016-12-13 08:40 (-2 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-12-10 11:19:17 (-2 DST)
+  * 2016-12-13 08:40:14 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.52-136 built on 2016-12-10 11:19 (-2 DST)");
+ console.log("YeAPF 0.8.52-145 built on 2016-12-13 08:40 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -4567,11 +4567,21 @@
      ycomm.dom.fillInplaceData = function(aElement, aData) {
        for(var i in aData)
          if (aData.hasOwnProperty(i))
-           aElement.setAttribute('data_'+i, aData[i]);
+           aElement.setAttribute('data-'+i, aData[i]);
      };
      
      ycomm.dom.getInplaceData = function(aElement) {
+       var attr=aElement.attributes, ret={}, a, name;
+       for(var i in attr) {
+         if (attr.hasOwnProperty(i)) {
+           a=attr[i];
+           name=a.nodeName;
      
+           if ((name.substr(0,5))=='data-')
+             ret[name]=a.nodeValue;
+         }
+       }
+       return ret;
      };
      
      /*
@@ -4649,6 +4659,17 @@
          return xDataItem;
        };
      
+       var saveInplaceData = function(opt, xDataItem) {
+         if (typeof aLineSpec.inplaceData != 'undefined') {
+           for(var c=0;c<aLineSpec.inplaceData.length; c++) {
+             if (typeof xDataItem[aLineSpec.inplaceData[c]] !== "undefined") {
+               var colName = aLineSpec.inplaceData[c];
+               opt.setAttribute("data-"+colName, xDataItem[colName] || '');
+             }
+           }
+         }
+       };  
+     
        var setNewRowAttributes = function (aNewRow) {
          var auxIdSequence,
              auxInplaceData,
@@ -4669,13 +4690,7 @@
              aNewRow.id = xDataItem[idFieldName];
          }
      
-         if (typeof aLineSpec.inplaceData != 'undefined') {
-           for(var i=0; i<aLineSpec.inplaceData.length; i++) {
-             colName = aLineSpec.inplaceData[i];
-             auxInplaceData = xDataItem[colName] || '';
-             aNewRow.setAttribute('data_'+colName, auxInplaceData);
-           }
-         }
+         saveInplaceData(aNewRow, xDataItem);
      
          if ((aLineSpec.onClick) || (aLineSpec.onSelect)) {
            aNewRow.addEventListener('click', ((aLineSpec.onClick) || (aLineSpec.onSelect)), false);
@@ -4864,6 +4879,8 @@
              if (xData.hasOwnProperty(j)) {
                xDataItem=getDataFromXData(xData[j]);
                var entry = document.createElement('li');
+               saveInplaceData(entry, xDataItem);
+               
                var innerText = '',
                    asHTML=false;
                if (typeof aLineSpec.rows=='object') {
@@ -4951,11 +4968,12 @@
                    }
                  }
                }
+               saveInplaceData(newRow, xDataItem);
                oListBox.appendChild(newRow);
                cRow++;
              }
            }
-     
+         
          } else if ((aElement.nodeName=='SELECT') || (aElement.nodeName=='DATALIST')) {
      
            /* Clean options */
@@ -4989,12 +5007,14 @@
                    }
                  }
                } else {
+                 var sep = aLineSpec.sep || '';
                  if (isArray(aLineSpec.columns)) {
                    for (c=0; c<aLineSpec.columns.length; c++) {
-                     auxHTML = auxHTML + xDataItem[aLineSpec.columns[c]] + ' ';
+                     if (auxHTML>'')
+                       auxHTML+=sep;
+                     auxHTML = auxHTML + xDataItem[aLineSpec.columns[c]];
                    }
                  } else {
-                   var sep = aLineSpec.sep || '';
                    if (typeof xDataItem == 'string') {
                      _dumpy(2,1,"ERRO: yeapf-dom.js - string cell not implemented");
                    } else {
@@ -5007,17 +5027,17 @@
                }
      
                var opt =  document.createElement('option');
-               if (typeof xDataItem[idFieldName] != 'undefined')
-                 opt.value = xDataItem[idFieldName];
-               opt.innerHTML = auxHTML;
-               opt.id=aElementID+'_'+cNdx;
-               if (aLineSpec.inplaceData) {
-                 for(c=0;c<aLineSpec.inplaceData.length; c++) {
-                   if (typeof xDataItem[aLineSpec.inplaceData[c]] !== "undefined") {
-                     opt.setAttribute("data_"+aLineSpec.inplaceData[c], xDataItem[aLineSpec.inplaceData[c]]);
-                   }
+               if (typeof xDataItem[idFieldName] != 'undefined') {
+                 if (aElement.nodeName=='DATALIST') {
+                   opt.setAttribute('data-'+idFieldName, xDataItem[idFieldName]);
+                 } else {
+                   opt.value = xDataItem[idFieldName];
                  }
                }
+               opt.innerHTML = auxHTML;
+               opt.id=aElementID+'_'+cNdx;
+               saveInplaceData(opt, xDataItem);
+     
                if (typeof aLineSpec.onNewItem == 'function')
                  aLineSpec.onNewItem(aElementID, opt, xDataItem);
                aElement.appendChild(opt);
@@ -5027,6 +5047,7 @@
      
            if (aElement.onclick)
              aElement.onclick();
+         
          } else if (aElement.nodeName=='FORM') {
            var fieldType,
                valueType,
@@ -5045,6 +5066,7 @@
            if (xData)
              if ((typeof xData=='object') || (xData.length === 1)) {
                var yData=getDataFromXData(xData[0] || xData);
+               saveInplaceData(aElement, yData);
      
                fieldPrefix = aLineSpec.elementPrefixName || aLineSpec.prefix || '';
                fieldPostfix = aLineSpec.elementPostixName || aLineSpec.postfix || '';
@@ -5137,6 +5159,7 @@
                }
              } else if (xData.length > 1)
                _dump("There are more than one record returning from the server");
+         
          } else if (aElement.nodeName=='DIV') {
            if (aFlags.deleteRows)
              aElement.innerHTML='';
@@ -5147,6 +5170,8 @@
              for (j in xData) {
                if (xData.hasOwnProperty(j)) {
                  xDataItem=getDataFromXData(xData[j]);
+                 saveInplaceData(aElement, xDataItem);
+     
                  if (aLineSpec.html) {
                    auxHTML=auxHTML+yAnalise(aLineSpec.html, xDataItem);
                  } else {
@@ -5215,7 +5240,7 @@
      
      ycomm.dom.getTableRowInplaceData = function(aRow, fieldName) {
        if (aRow)
-         return aRow.getAttribute('data_'+fieldName);
+         return aRow.getAttribute('data-'+fieldName);
        else
          return null;
      };
@@ -5416,7 +5441,7 @@
      
        var genNumber = function(min, max) {
          return Math.floor((Math.random() * (max-min) + min));
-       }
+       };
      
        var classHasName = function (name) {
          var ret=false;
@@ -5425,7 +5450,7 @@
            ret=ret || (lClasses[c].indexOf(name)>=0);
          }
        return ret;
-       }
+       };
      
        for(i=0; i<aElements.length; i++) {
          fieldType  = aElements[i].type.toLowerCase();
@@ -5486,7 +5511,6 @@
                fielValue="";
                break;
      
-             case "text":
              default:
                if (classHasName('cpf')) {
                  fieldValue=fieldValue.gerarCPF();
@@ -5508,7 +5532,7 @@
      
      /*
       * get all the elements of the form and returns a JSON
-      * https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Forms/Data_form_validation
+      * https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Forms/data-form_validation
       * http://www.the-art-of-web.com/html/html5-form-validation/
       */
      ycomm.dom.getFormElements = function (aFormId, aLineSpec, aOnReady) {
@@ -5734,7 +5758,7 @@
      
      ycomm.dom.getPos = function(oElement) {
          for (var lx=0, ly=0;
-              oElement != null;
+              oElement !== null;
               oElement = oElement.offsetParent) {
            lx += oElement.offsetLeft;
            ly += oElement.offsetTop;

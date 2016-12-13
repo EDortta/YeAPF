@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ystorage.js
- * YeAPF 0.8.52-107 built on 2016-12-01 07:30 (-2 DST)
+ * YeAPF 0.8.52-145 built on 2016-12-13 08:40 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-11-21 09:01:13 (-2 DST)
+ * 2016-12-13 08:38:07 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -139,23 +139,25 @@
         id = String(id);
         var ret = localStorage.getItem(that._dbTag_ + "_item_" + id);
         ret = JSON.parse(ret || "{}");
-        if (isArray(that._siblingDB)) {
-          var linkedData;
-          ret._linked=[];
+        if (!isEmpty(ret)) {
+          if (isArray(that._siblingDB)) {
+            var linkedData;
+            ret._linked=[];
 
-          for(var i = 0; i<that._siblingDB.length; i++) {
-            linkedData = that._siblingDB[i].db.getItem(ret[that._siblingDB[i].linkage]);
-            for(var n in linkedData) {
-              ret._linked=[];
-              if (linkedData.hasOwnProperty(n)) {
-                if (typeof ret[n] == 'undefined') {
-                  ret[n] = linkedData[n];
-                  ret._linked.push(n);
+            for(var i = 0; i<that._siblingDB.length; i++) {
+              linkedData = that._siblingDB[i].db.getItem(ret[that._siblingDB[i].linkage]);
+              for(var n in linkedData) {
+                ret._linked=[];
+                if (linkedData.hasOwnProperty(n)) {
+                  if (typeof ret[n] == 'undefined') {
+                    ret[n] = linkedData[n];
+                    ret._linked.push(n);
+                  }
                 }
               }
             }
-          }
 
+          }
         }
         return ret;
       };

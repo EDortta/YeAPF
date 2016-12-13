@@ -98,13 +98,13 @@
                   $fileContent=minify_js($fileContent);
                 }
               }
-              $auxFiles[] = $newName;
               $dir=dirname($newName);
               if (!is_dir("production/$xBody/$dir")) {
                 mkdir("production/$xBody/$dir", 0777, true);
               }
 
               file_put_contents("production/$xBody/$newName", $fileContent);
+              $auxFiles[] = "production/$xBody/$newName";
             }
           }
         }    
