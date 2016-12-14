@@ -1,11 +1,18 @@
 /*********************************************
  * app-src/js/ystorage.js
- * YeAPF 0.8.52-145 built on 2016-12-13 08:40 (-2 DST)
+ * YeAPF 0.8.52-152 built on 2016-12-14 15:10 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-12-13 08:38:07 (-2 DST)
+ * 2016-12-13 23:07:43 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
+
+ /*
+   __utma
+   __utmc
+   __utmz
+   https://davidwalsh.name/detecting-online
+ */
 (function () {
   "use strict";
   if (!window.ystorage) {
@@ -308,9 +315,29 @@
         }
       };
 
+      /* removes a set of items that satisfies a condition */
+      that.removeItems = function(condition, propagate) {
+        propagate = typeof propagate !== "undefined"?propagate:true;
+
+        that.extractData(
+          function(list) {
+            for(var i in list) {
+              if (list.hasOwnProperty(i)) {
+                that.removeItem(list[i][that._keyName_], propagate);
+              }
+            }
+          },
+          condition
+        );
+      };
+
       /* removes an item without propagate it deletion */
       that.eliminateItem = function(id) {
         that.removeItem(id, false);
+      };
+
+      that.eliminateItems = function(condition) {
+        that.removeItems(condition, false);
       };
 
       that.cleanList = function(propagate) {
@@ -433,9 +460,18 @@
         return that.cfg.db.removeItem(itemNdx);
       };
 
+      that.removeItems = function(condition) {
+        return that.cfg.db.removeItems(condition);
+      };
+
       that.eliminateItem = function(itemNdx) {
         return that.cfg.db.eliminateItem(itemNdx);
       };
+
+      that.eliminateItems = function(condition) {
+        return that.cfg.db.eliminateItems(condition);
+      };
+
 
       that.cleanList = function() {
         return that.cfg.db.cleanList();

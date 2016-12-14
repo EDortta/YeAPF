@@ -24,7 +24,7 @@ var appBase = function(initialData) {
         if (selects.hasOwnProperty(a)) {
           lista[selects[a].id]=selects[a];
         }
-      }      
+      }
 
       /* crio uma nova div */
       novaDiv = template.innerHTML;
@@ -50,30 +50,28 @@ var appBase = function(initialData) {
       target.appendChild(aDiv);
     }
   };
-    
-  that.consultaCep = function (objeto, valor) {
-    //Nova variável "cep" somente com dígitos.
-    var cep = valor.replace(/\D/g, '');
 
-    //Verifica se campo cep possui valor informado.
-    if (!cep == '') {
+  that.rpc = function (a, params) {
+    params=params||{};
+    var p = new Promise(
+      function(resolve, reject) {
+        ycomm.invoke(
+          that.s,
+          a,
+          params,
+          function(status, error, data) {
+            if (status==200)
+              resolve(data);
+            else
+              reject(error);
+          }
+        )
+      }
+    );
 
-      //Expressão regular para validar o CEP.
-      var validacep = /^[0-9]{8}$/;      
+    return p;
+  };
 
-      //Valida o formato do CEP.
-      if(validacep.test(cep)) {
-        //Cria um elemento javascript.
-        var script = document.createElement('script');
-
-        //Sincroniza com o callback.
-        script.src = '//viacep.com.br/ws/'+ cep + '/json/?callback='+objeto+'.preencheCamposEnd';            
-        document.body.appendChild(script);
-      }else{
-        alert("Formato de CEP inválido.");
-      } 
-    };
-  }; 
 
   that.init=function() {
     that._sequence;

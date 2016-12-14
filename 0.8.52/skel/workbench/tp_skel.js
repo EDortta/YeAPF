@@ -1,5 +1,5 @@
 app#(scriptName)Obj = function () {
-  var dummy={ initialized: false };
+  var dummy={ initialized: false, s: '#(scriptName)' };
   var that=typeof appBase=="object"?appBase(dummy):dummy;
 
   that.init = function () {
