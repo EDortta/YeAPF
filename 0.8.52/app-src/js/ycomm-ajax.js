@@ -1,8 +1,8 @@
   /********************************************************************
    * app-src/js/ycomm-ajax.js
-   * YeAPF 0.8.52-134 built on 2016-12-08 21:10 (-2 DST)
+   * YeAPF 0.8.52-158 built on 2016-12-19 13:27 (-2 DST)
    * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2016-12-06 09:42:26 (-2 DST)
+   * 2016-12-14 16:00:46 (-2 DST)
    *
    * Com o advento do WebSocket, precisamos de novas formas para
    * provocar o servidor.
@@ -265,7 +265,7 @@
       var localU = (typeof u == 'undefined')?'':u;
       ycomm.waitIconControl(true);
 
-      var aURL=this.buildCommonURL(s || '', a || '', limits || {}, localU);
+      var aURL=ycomm.buildCommonURL(s || '', a || '', limits || {}, localU);
 
       if (typeof xAjax!='undefined') {
 

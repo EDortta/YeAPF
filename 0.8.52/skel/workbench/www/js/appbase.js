@@ -2,7 +2,7 @@ var appBase = function(initialData) {
   var that = initialData || {};
 
   that.duplicateDiv = function (sourceDivId, containerDivId) {
-    /* guardo o template dos enderecos */
+    /* guardo o template  */
     var template=y$(sourceDivId), target=y$(containerDivId);
     if ((template) && (target)) {
 
@@ -55,17 +55,19 @@ var appBase = function(initialData) {
     params=params||{};
     var p = new Promise(
       function(resolve, reject) {
-        ycomm.invoke(
-          that.s,
-          a,
-          params,
-          function(status, error, data) {
-            if (status==200)
-              resolve(data);
-            else
-              reject(error);
-          }
-        )
+        if (typeof that.rf=='function') {
+          that.rf(
+            that.s,
+            a,
+            params,
+            function(status, error, data) {
+              if (status==200)
+                resolve(data);
+              else
+                reject(error);
+            }
+          );
+        }
       }
     );
 
@@ -75,6 +77,9 @@ var appBase = function(initialData) {
 
   that.init=function() {
     that._sequence;
+    if (typeof that.s != "string") {
+      console.warn("Please, indicate 's' at appBase() initialization");
+    }
     return that;
   };
 

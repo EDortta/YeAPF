@@ -1,14 +1,17 @@
 app#(scriptName)Obj = function () {
-  var dummy={ initialized: false, s: '#(scriptName)' };
-  var that=typeof appBase=="object"?appBase(dummy):dummy;
+  var dummy={ initialized: false, s: '#(scriptName)', rf: ycomm.invoke };
+  var that=typeof appBase=="function"?appBase(dummy):dummy;
 
   that.init = function () {
     if (!that.initialized) {
-      that.initialized=true;
+      that.initialized=1;
+      if (typeof appBase !='function')
+        console.warn("Are you sure you want to leave 'appbase.js' behind?")
       /*************************************
        * Your initialization code goes here
        *************************************/
 
+      that.initialized=2;
     }
     return that;
   }

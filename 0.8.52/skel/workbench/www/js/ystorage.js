@@ -1,8 +1,8 @@
 /*********************************************
  * skel/workbench/www/js/ystorage.js
- * YeAPF 0.8.52-152 built on 2016-12-14 15:10 (-2 DST)
+ * YeAPF 0.8.52-158 built on 2016-12-19 13:27 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-12-14 15:10:06 (-2 DST)
+ * 2016-12-19 13:27:03 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -27,7 +27,7 @@
         configurable: false,
         enumerable: false
       });
-      Object.defineProperty(oStorage, "key", { 
+      Object.defineProperty(oStorage, "key", {
         value: function(nKeyId) {
           return aKeys[nKeyId]; },
         writable: false,
@@ -178,11 +178,11 @@
       };
 
       that.linkTo = function(aSiblingDB, aLinkageField) {
-        if (!(aSiblingDB && aSiblingDB.getItem)) {        
+        if (!(aSiblingDB && aSiblingDB.getItem)) {
           aLinkageField=null;
           aSiblingDB=null;
         } else {
-          if (typeof aLinkageField == 'undefined') 
+          if (typeof aLinkageField == 'undefined')
             aSiblingDB=null;
         }
 
@@ -190,10 +190,10 @@
           var aux = {
             db: aSiblingDB,
             linkage: aLinkageField || null
-          };    
+          };
           that._siblingDB = that._siblingDB || [];
           that._siblingDB.push(aux);
-        }  
+        }
       };
 
       that.filter = function(onitem, oncomplete, condition) {
@@ -212,7 +212,7 @@
           }
         }
         if (typeof oncomplete == "function")
-          oncomplete();      
+          oncomplete();
       };
 
       that.each = function(onitem, oncomplete, condition) {
@@ -266,7 +266,7 @@
         for (var i = 0; i < data.length; i++) {
           that.setItem(data[i][that._keyName_], data[i]);
         }
-      };   
+      };
 
       that.count = function(condition) {
         var cc = 0;
@@ -283,7 +283,7 @@
           oncomplete(data);
         };
         that.each(onItem, atEnd, condition);
-      };       
+      };
 
       that.fillList = function(data, idFieldName, clean) {
         idFieldName = idFieldName || 'id';
@@ -348,7 +348,7 @@
           _id[n++] = that._list[i];
         }
         for (n=0; n<_id.length; n++) {
-          that.removeItem(_id[n], propagate);      
+          that.removeItem(_id[n], propagate);
         }
       };
 

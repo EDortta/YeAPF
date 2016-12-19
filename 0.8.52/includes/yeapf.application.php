@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.52-107 built on 2016-12-01 07:30 (-2 DST)
+    YeAPF 0.8.52-158 built on 2016-12-19 13:27 (-2 DST)
     Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-11-22 18:08:05 (-2 DST)
+    2016-12-14 16:35:23 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -262,7 +262,7 @@
       if (($canUse) && ($aFieldName>'')) {
         if ($aFieldName!='fieldValue')
           $aFieldValue=rawurldecode($aFieldValue);
-        
+
         _dumpY(16,0,"B: $aFieldName");
         $ret[$aFieldName]=$aFieldValue;
         if ($asGlobals)
@@ -290,11 +290,11 @@
       foreach($_REQUEST as $k=>$v)
         xq_extractValue($ret, $k, $v, $asGlobals, $xq_prefix, $xq_postfix, $xq_only_composed_names);
     }
-    
+
     $fieldName  = unparentesis(xq_varValue($ret, 'fieldName'));
     $fieldValue = unparentesis(xq_varValue($ret, 'fieldValue'));
-    
-    while ($fieldName>'') {      
+
+    while ($fieldName>'') {
       $aFieldName=unquote(getNextValue($fieldName,','));
       $aFieldValue=unquote(getNextValue($fieldValue,','));
       xq_extractValue($ret, $aFieldName, $aFieldValue, $asGlobals, $xq_prefix, $xq_postfix, $xq_only_composed_names);
@@ -621,7 +621,7 @@
       $auxSet=$returnSet;
       $auxSet=strtolower(getNextValue($auxSet,' '));
       if (($auxSet=="select") || ($auxSet=="insert") || ($auxSet=="delete") || ($auxSet=="update") || ($auxSet=="replace")) {
-        
+
         $auxSet=db_queryAndFillArray($returnSet);
         $returnSet=array();
 

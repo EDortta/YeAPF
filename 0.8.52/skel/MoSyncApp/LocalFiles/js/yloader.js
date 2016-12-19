@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.52-152 built on 2016-12-14 15:10 (-2 DST)
+  * YeAPF 0.8.52-158 built on 2016-12-19 13:27 (-2 DST)
   * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2016-12-14 15:10:06 (-2 DST)
+  * 2016-12-19 13:27:03 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.52-152 built on 2016-12-14 15:10 (-2 DST)");
+ console.log("YeAPF 0.8.52-158 built on 2016-12-19 13:27 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -2003,7 +2003,7 @@
            .toString(16)
            .substring(1);
        }
-       return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
+       return s4() + s4() + '-4' + s4().substr(0,3) + '-' + s4() + '-' +
          s4() + '-' + s4() + s4() + s4();
      }
      
@@ -4295,7 +4295,7 @@
            var localU = (typeof u == 'undefined')?'':u;
            ycomm.waitIconControl(true);
      
-           var aURL=this.buildCommonURL(s || '', a || '', limits || {}, localU);
+           var aURL=ycomm.buildCommonURL(s || '', a || '', limits || {}, localU);
      
            if (typeof xAjax!='undefined') {
      
@@ -4388,12 +4388,12 @@
      
      
        ycomm.setDataLocation = function(dataLocation, deviceId) {
-         this._dataLocation_=dataLocation;
-         this._deviceId_=deviceId || guid();
+         ycomm._dataLocation_=dataLocation;
+         ycomm._deviceId_=deviceId || guid();
        };
      
        ycomm.getDataLocation = function () {
-         return this._dataLocation_;
+         return ycomm._dataLocation_;
        };
      
        ycomm._scriptSequence = 0;
@@ -4413,7 +4413,7 @@
        )();
      
        ycomm.getLoad = function () {
-         return this._load;
+         return ycomm._load;
        };  
      
        ycomm._removeJSONP = function (scriptSequence, callback) {
@@ -4503,7 +4503,7 @@
          ycomm.registerCall('crave', s, a);
          /* sequence number for script garbage collect */
          ycomm._scriptSequence++;
-         if (!this.getDataLocation())
+         if (!ycomm.getDataLocation())
            console.error("You need to define dataLocation before 'crave' it");
          else {
            var callbackFunctionName;
@@ -4532,8 +4532,8 @@
              /* number of concurrent calls */
              ycomm._load++;
      
-             var aURL=this.buildCommonURL(s || '', a || '', limits || {}, localU);
-             aURL="{0}?{1}&callback={2}&callbackId={3}&scriptSequence={4}&deviceId={5}".format(this._dataLocation_, aURL, callbackFunctionName, callbackId, ycomm._scriptSequence,this._deviceId_);
+             var aURL=ycomm.buildCommonURL(s || '', a || '', limits || {}, localU);
+             aURL="{0}?{1}&callback={2}&callbackId={3}&scriptSequence={4}&deviceId={5}".format(ycomm._dataLocation_, aURL, callbackFunctionName, callbackId, ycomm._scriptSequence,ycomm._deviceId_);
              if (ycomm.getLoad()<=ycomm._maxDirectCall) {
                _dumpy(4,1,aURL);
                ycomm.bring(aURL);
@@ -4549,7 +4549,7 @@
        };
      
        ycomm.getStatus = function () {
-         return "isIdle() = {0} getLoad() = {1}".format(this.isIdle(), this.getLoad());
+         return "isIdle() = {0} getLoad() = {1}".format(ycomm.isIdle(), ycomm.getLoad());
        };
      
  /* END ycomm-rest.js */
