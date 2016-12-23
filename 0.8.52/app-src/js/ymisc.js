@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.52-158 built on 2016-12-19 13:27 (-2 DST)
+ * YeAPF 0.8.52-159 built on 2016-12-23 16:56 (-2 DST)
  * Copyright (C) 2004-2016 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-12-19 11:51:54 (-2 DST)
+ * 2016-12-23 16:56:21 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -1369,7 +1369,7 @@ function str2double(aStr) {
   a=parseFloat(a);
   if (isNaN(a))
     a=0;
-  var ret = parseFloat(a).toFixed(2);
+  var ret = parseFloat(a);
   ret = parseFloat(ret);
   return ret;
 }
