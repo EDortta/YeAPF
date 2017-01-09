@@ -1,0 +1,90 @@
+RASCUNHO cloudManager - RASCUNHO cloudManager - RASCUNHO cloudManager
+RASCUNHO cloudManager - RASCUNHO cloudManager - RASCUNHO cloudManager
+esteban dortta
+junho 4, 2012
+
+cloudManager pretende ajudar na atualização dos nós que compõem uma nuvem.
+
+Existem alguns comandos básicos no cloudManager: cmscp, cmrsync, cmstop, cmplay, cmstatus, cmdo
+
+Toda a configuração reside no arquivo /etc/cloudManager.ini
+
+cloudManager não trabalha com configurações heterogêneas, todos os arquivos devem ter a mesma estrutura de diretórios.
+
+cloudManager só trabalha com apache2.x
+
+EXEMPLO DE cloudManager.ini:
+  [nodes]
+  A=10.0.2.12:80
+  B=10.0.2.13:80
+  C=10.0.2.14:81
+  D=10.0.2.15:81
+  E=10.0.2.16:8080
+
+  [referee]
+  ip=10.0.2.151
+  config=/etc/apache2/includes/proxybalancer
+  clusterID=meuCluster
+  clusterFolder=cs
+
+No exemplo anterior, descrevemos a nuvem com os nós A,B,C,D e E com seus respectivos IPs e um árbitro com seu IP o local e nome do arquivo de configuração do apache o identificador do cluster e o nome da pasta que fará de alias.
+
+A máquina desde a qual o clusterManager será operado, deverá ter acesso livre aos nós e ao árbitro.  Isso se resolve gerando um certificado e instalando a chave pública gerada nos micros envolvidos.
+
+EXEMPLO DE GERAÇÃO DE CHAVE: (caso não tenha chave gerada, se tiver use a que está em /root/.ssh/id_rsa.pub)
+  Na máquina que rodará o cloudManager faça:
+  $ sudo su
+  $ ssh-keygen -t rsa
+  (dê enter em tudo)
+
+Isso gerará uma chave em /root/.ssh/id_rsa*.  A parte pública é a que vc precisa exportar para cada micro do nó e no árbitro.  Para exportar a chave pública faça assim:
+  $ sudo scp /root/.ssh/id_rsa.pub 10.0.2.12:/root/cloudManager.pub
+  (vai pedir a senha do root no destino)
+  depois entre no micro destino para habilitar a chave
+  $ sudo ssh 10.0.2.12
+  verifique se existe a pasta /root/.ssh/
+  caso não exista, crie a pasta com direitos 0644 (ou 0600 se preferir)
+  $ mkdir -m 0644 /root/.ssh/
+  agora acrescente a chave às chaves já instaladas nesse micro
+  $ cat /root/cloudManager.pub >> /root/.ssh/authorized_keys
+  $ exit
+
+Se tudo deu certo, você poderá fazer ssh desde a máquina do cloudManager sem senha
+  $ ssh 10.0.2.12
+  (ele deve entrar sem pedir senha.  caso não de certo, google nele pois os problemas variam desde a geração da senha até a configuração do nó passando pela presença ou não de algum controle para a porta 22 na rede)
+
+Repita a exportação da mesma chave em todos os micros do nó mais o árbitro.  Lembre que se vc já tem a chave pública gerada não precisa gera-la.
+
+Uma vez as chaves exportadas, é possível fazer uso dos comandos cmscp e cmrsync como nos seguintes exemplos:
+  $ cd /var/www/teste/
+  $ cmscp *.html A:/var/www/teste/
+Isso copiará todos os arquivos com extensão html para o nó chamado 'A' na pasta indicada.
+Até aqui não há vantagems a um scp, porém, quando usado com o '*' o cmscp ganha poder
+  $ cd /var/www/teste/
+  $ cmscp *.html *:/var/www/teste/
+Isso fará com que todos os arquivos .html da pasta /var/www/teste/ sejam copiados para a pasta /var/www/teste/ de cada um dos nós.
+Se quiser copiar só para alguns nós específicos, separe os nomes dos nós por vírgulas
+  $ cd /var/www/teste/
+  $ cmscp *.html B,D:/var/www/teste/
+
+O dito para cmscp vale para cmrsync.  Com esses dois comandos já é possível atualizar o conjunto de servidores de uma só vez.
+
+CONTROLANDO A NUVEM
+Os comandos cmstop, cmplay e cmstatus servem para controlar a nuvem.  Podemos controlar a nuvem inteira ou somente um nó.
+Por exemplo, o comando seguinte estacionará o nó chamado 'B'.
+  $ cmstop B
+Isso quer dizer que ele será tirado do balancer do apache e o serviço será reiniciado no árbitro.  O comando oposto é cmplay e pode ser usado com um, vários ou todos os nós
+  $ cmplay C,D
+
+No exemplo colocado logo acima, indicamos ao cloudManager que o arquivo de configuração é /etc/apache2/includes/proxybalancer.  Esta versão do cloudManager é destrutiva.  Isso quer dizer que os comandos cmstop e cmplay criam uma nova versão desse arquivo sem prestar atenção ao que lá tenha.
+
+Abaixo, uma mostra do que ele produz com a configuração indicada logo acima.
+  <Proxy balancer://meuCluster>
+     BalancerMember http://10.0.2.12:80
+     BalancerMember http://10.0.2.13:80
+     BalancerMember http://10.0.2.14:81
+     BalancerMember http://10.0.2.15:81
+     BalancerMember http://10.0.2.16:8080
+  </Proxy>
+  ProxyPass /cs balancer://meuCluster
+

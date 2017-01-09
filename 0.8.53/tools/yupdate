@@ -1,0 +1,114 @@
+#!/usr/bin/php
+<?php
+  /*
+   * tools
+   * tools/yupdate
+   * YeAPF 0.8.53-1 built on 2017-01-09 08:40 (-2 DST)
+   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
+   * 2016-10-14 07:18:12 (-2 DST)
+   */
+
+  clearstatcache();
+  echo "WARNING: This is becoming obsolete.\nPlease use yapp instead\n";
+
+  $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
+  $cmRequired=false;
+  (@include_once "$mydir/yclilib.php") or die("yclilib.php not found\n");
+
+  echo basename("tools/yupdate")."\nYeAPF 0.8.53\nCopyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+
+  $args = new ArgumentsProcessor();
+  $toHelp=$args->argValue('help',__FALSE__)==__TRUE__;
+  $toForce=$args->argValue('force',__FALSE__)==__TRUE__;
+  $appType=$args->argValue('appType','');
+  $template=$args->argValue('template','');
+  $YFolder=$args->argValue('source',$__yeapfPath);
+
+  $yeapfAppIniFilename=".config/yeapf-tools.ini";
+
+  if (file_exists(".config/yTemplate.txt")) {
+    if (($appType=='') || ($appType=='webApp')) {
+      $appType='webApp';
+      $templateUsed=preg_replace('/[\x00-\x1F\x80-\xFF]/', '', join('',file(".config/yTemplate.txt")));
+      if (($template>'') && ($templateUsed!=$template))
+        die("Your folder is configured to use '$templateUsed' template.\n\n");
+      else {
+        $template=$templateUsed;
+      }
+      $yeapfAppIni="[app]\nappType=webApp\ntemplate=$template\n";
+      if (file_put_contents("$yeapfAppIniFilename",$yeapfAppIni))
+        unlink(".config/yTemplate.txt");
+      else
+        die("Was not possible to create '$yeapfAppIniFilename' file");
+    } else {
+      die("This folder is a webApp");
+    }
+  }
+
+  if (($appType=='') && ($template=='')) {
+    if (file_exists($yeapfAppIniFilename)) {
+      $yeapfAppIni=parse_ini_file($yeapfAppIniFilename);
+      $appType=$yeapfAppIni['appType'];
+      $template=$yeapfAppIni['template'];
+    }
+  }
+
+  if (($appType=='') || ($toHelp) ) {
+    echo "simple usage:\n".basename("tools/yupdate")." [--appType <app-type-name>] [--template <template name>]  [--force]\n\n";
+    echo "\t--source <YeAPF source folder>\n\t\tDefaults to '$__yeapfPath'\n";
+    echo "\t--appType <app-type-name>\n";
+    if (is_dir("$YFolder/skel")) {
+      $d=dir("$YFolder/skel");
+      while ($entry=$d->read()) {
+        if (substr($entry,0,1)!='.')
+          echo "\t\t$entry\n";
+      }
+    } else {
+      echo "\t\tYour source of distribution in '$YFolder' does not contain any skeleton\n";
+    }
+    echo "\t--template <template-name>\n";
+    if (is_dir("$YFolder/skel/webApp/templates")) {
+      $d=dir("$YFolder/skel/webApp/templates");
+      while ($entry=$d->read()) {
+        if (substr($entry,0,1)!='.')
+          echo "\t\t$entry\n";
+      }
+    } else {
+      echo "\t\tYour source of distribution in '$YFolder' does not contain any template\n";
+    }
+    echo "\t--force bring all the files to this folder\n\n";
+    die();
+  }
+
+  $source = $YFolder.'/skel/'.$appType;
+
+  if (is_dir($source)) {
+    if (!is_dir(".config"))
+      mkdir(".config", 0777);
+    if (is_dir(".config"))  {
+      echo "Updating from '".$YFolder."'...\n";
+      $sourceJS = "$source/js";
+
+      updateFiles("$source",      '*.php', '.',     $toForce);
+      updateFiles("$source",      '*.html', '.',    $toForce);
+      updateFiles("$source",      '*.xml', '.',     $toForce);
+      updateFiles("$source",      '*.css', '.',     $toForce);
+      updateFiles("$source",      '*.js', '.',      $toForce);
+      updateFiles("$source",      '*.ini', '.',     $toForce);
+      updateFiles("$source/js",   '*',     'js',    $toForce);
+      updateFiles("$source/css",  '*',     'css',   $toForce);
+      updateFiles("$source/fonts",'*',     'fonts', $toForce);
+
+      if ($template>'') {
+        echo "\nUpdate template '$template'\n";
+        updateFiles("$source/templates/$template", '*', '.');
+      }
+
+      $yeapfAppIni="[app]\nappType=$appType\ntemplate=$template\n";
+      if (!file_put_contents("$yeapfAppIniFilename",$yeapfAppIni))
+        echo "\nWARNING!\n\tWas not possible to write '$yeapfAppIniFilename'\n";
+    } else
+      die("Was not possible to find/create '.config' directory");
+  } else
+    echo "$source not found\n";
+?>
