@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-msg.js
- * YeAPF 0.8.53-1 built on 2017-01-09 08:40 (-2 DST)
+ * YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-05-30 09:45:48 (-2 DST)
+ * 2017-01-11 15:49:22 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * These routines were written in order to help interprocess process messages
  * but as an remote process messages implementation.
@@ -15,7 +15,7 @@
 //# sourceURL=app-src/js/ycomm-msg.js
 
 var ycommMsgBase = function() {
-  that = {
+  var that = {
     messagePeekerTimer: null,
     messageStack: [],
     msgProcs: [],

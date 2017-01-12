@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/index.php
-    YeAPF 0.8.53-1 built on 2017-01-09 08:40 (-2 DST)
+    YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-08-23 06:23:49 (-2 DST)
+    2017-01-11 09:50:26 (-2 DST)
 
     skel/webApp / index.php
     This file cannot be modified within skel/webApp
@@ -61,7 +61,7 @@
     die("<div  style='border-color: #CB0000; background: #FFC0CB; width: 520px; margin: 8px; padding: 32px; border-style: solid; border-width: 2px; padding: 16px; border-radius:4px; font-family: arial; font-size: 12px'>
              <b>yeapf.php cannot be found<br>
              <a href='configure.php?devSession=$devSession'>Click here to configure</a></b><br><br>
-             YeAPF 0.8.53-1 built on 2017-01-09 08:40 (-2 DST)<br>
+             YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)<br>
              Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
         </div>");
   }
@@ -70,11 +70,13 @@
   (@include_once "yeapf.php") or die ("Error loading 'yeapf.php'");
   if (file_exists('flags/flag.dbgloader')) error_log(date('i:s').": yeapf.php ready\n",3,'logs/yeapf.loader.log');
 
+  /* @OBSOLETE 20170111
   $developBase=$yeapfConfig['yeapfPath']."/../develop";
   (@include_once "$developBase/yeapf.develop.php") or die ("Error loading '$developBase/yeapf.develop.php'");
   if (file_exists('flags/flag.dbgloader')) error_log(date('i:s').": yeapf.develop.php ready\n",3,'logs/yeapf.loader.log');
   $devMsgQueue=new xDevelopMSG($devSession, file_exists('flags/flag.nosharedmem'));
   $devMsgQueue->sendStagedMessage('busy');
+  */
 
   // logOutput = -1: Arquivo, 0: silencio, 1: tela, 2: xml
   $logOutput=-1;  /* HTML -> Local TextFile */
@@ -169,14 +171,20 @@
     }
 
     initOutput();
+    /* @OBSOLETE 20170111
     $devMsgQueue->sendStagedMessage('aBody',$aBody);
+    */
     processFile("$aBody");
 
     db_close();
   } catch(Exception $e) {
+    /* @OBSOLETE 20170111
     $devMsgQueue->sendStagedMessage('exception',$e->getMessage());
+    */
   }
+  /* @OBSOLETE 20170111
   $devMsgQueue->sendStagedMessage('idle');
+  */
   _dumpY(1,1,"End of process * $s.$a ($u) -> aBody = $aBody");
   _recordWastedTime("Good bye");
 ?>

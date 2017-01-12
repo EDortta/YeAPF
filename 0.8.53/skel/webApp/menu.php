@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/menu.php
-    YeAPF 0.8.53-1 built on 2017-01-09 08:40 (-2 DST)
+    YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2014-12-10 17:27:26 (-2 DST)
+    2017-01-11 09:54:25 (-2 DST)
 
     skel/webApp / menu.php
     This file cannot be modified within skel/webApp
@@ -14,10 +14,12 @@
   header("Expires: Mon, 26 Jul 1997 05:00:00 GMT"); // Date in the past
 
   (@include_once "yeapf.php") or die("yeapf not configured");
+  /* @OBSOLETE 20170111
   $developBase=$yeapfConfig['yeapfPath']."/../develop";
   (@include_once "$developBase/yeapf.develop.php") or die ("Error loading 'yeapf.develop.php'");
   $devMsgQueue=new xDevelopMSG($devSession, file_exists('flags/flag.nosharedmem'));
   $devMsgQueue->sendStagedMessage('busy');
+  */
 
   function yCreateSubmenu($root, $menuJSCaller='')
   {
@@ -144,5 +146,7 @@
   }
 
   db_close();
+  /* @OBSOLETE 20170111
   $devMsgQueue->sendStagedMessage('idle');
+  */
 ?>

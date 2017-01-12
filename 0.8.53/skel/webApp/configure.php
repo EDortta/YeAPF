@@ -1,7 +1,7 @@
 <?php
 /*
     skel/webApp/configure.php
-    YeAPF 0.8.53-1 built on 2017-01-09 08:40 (-2 DST)
+    YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
     2016-12-01 08:15:19 (-2 DST)
 */
@@ -275,7 +275,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.53-1 built on 2017-01-09 08:40 (-2 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -315,7 +315,7 @@
 
 
   echo sayStep("<div class=cpyrght><strong><big><I>skel/webApp/configure.php</I></big></strong><br>
-    YeAPF 0.8.53-1 built on 2017-01-09 08:40 (-2 DST)<br>
+    YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)<br>
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com<br>
     2016-12-01 08:15:19 (-2 DST)</div>");
 

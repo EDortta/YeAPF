@@ -1,63 +1,78 @@
 <?php
 /*
     skel/webApp/sse.php
-    YeAPF 0.8.53-1 built on 2017-01-09 08:40 (-2 DST)
+    YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-09 08:38:53 (-2 DST)
+    2017-01-12 14:10:55 (-2 DST)
 
     skel/webApp / sse.php
     This file cannot be modified within skel/webApp
     folder, but it can be copied and changed outside it.
 */
-  header("Content-Type: text/event-stream\n\n");
+
   (@include_once "yeapf.php") or die("yeapf not configured");
 
-  while (1) {
-    // Every second, sent a "ping" event.
+  // Turn off output buffering
+  ini_set('output_buffering', 'off');
+  ini_set('zlib.output_compression', false);
 
-    if (file_exists("coifa.txt")) {
-      $valor=file_get_contents("coifa.txt");
-    } else
-      $valor=0;
-    $valor++;
+  /*
+  // Implicitly flush the buffer(s)
+  ini_set('implicit_flush', true);
+  ob_implicit_flush(true);
+  */
 
-    echo "event: ping\n";
-    $curDate = date(DATE_ISO8601);
-    $pongData = array(
-      "msg"  => "normal",
-      "time" => $curDate,
-      "valor"=> $valor,
-      "count" => $count
-    );
 
-    file_put_contents("coifa.txt", $valor);
+  header("Content-Type: text/event-stream\n\n", true);
+  header("Cache-Control: no-cache");
+  header("Connection: Keep-Alive");
+//  header("Content-Transfer-Encoding: chunked");
+  header("Transfer-Encoding: chunked");
 
-    echo 'data: '.json_encode($pongData);
-    echo "\n\n";
+  echo "retry: 5000\n\n";
+  for($n=1000; $n>0; $n--) echo "\n\n";
+  while (@ob_end_flush());
 
-    // Send a simple message at random intervals.
 
-    $count--;
+  _dump("SSE - conn");
+  set_time_limit(0);
 
-    if (!$count) {
-      $pongData = array(
-        "msg"  => "abnormal",
-        "time" => $curDate,
-        "count" => $count
-      );
+  /* @params
+     si - md5(sse_session_id)
 
-      ob_end_flush();
-      flush();
+     w and u comes from the client
+     The folder .sse/$w and the file .sse/$w/$u/.user must exists
+     in order to continue.
+     That means that the client firstly connect to the application
+     through index/body/query/rest -> yeapf.sse.php -> SSE:grantUserFolder()
+  */
 
-      echo "event: ping\ndata: ".json_encode($pongData);
-      echo "\n\n";
-
-      $count = rand(1, 10);
-    }
-
-    ob_end_flush();
-    flush();
-    sleep(1);
+  $sse_dispatch = function($eventName, $eventData) {
+    SSE::sendEvent($eventName, $eventData);
   }
+
+  $sse_session_id=SSE::getSessionId($si);
+  if ($sse_session_id>"") {
+    /* exposes $w and $u as global variables */
+    $sessionInfo = SSE::getSessionInfo($sse_session_id);
+    extract($sessionInfo);
+
+    /* run the loop while this session is enabled */
+    while (SSE::enabled($sse_session_id, $w, $u)) {
+      /* process the message queue */
+      SSE::processQueue($sse_dispatch);
+
+      /* keep alive is controled by yeapf.sse.php
+         usually it send a dummy packet each 30th second after no work */
+      SSE::keepAlive();
+
+      /* sleep half of a second */
+      usleep(500000);
+    }
+  }
+
+  SSE::sendEvent("close");
+
+  _dump("SSE - finish");
 
 ?>

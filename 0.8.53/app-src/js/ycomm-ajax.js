@@ -1,8 +1,8 @@
   /********************************************************************
    * app-src/js/ycomm-ajax.js
-   * YeAPF 0.8.53-1 built on 2017-01-09 08:40 (-2 DST)
+   * YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)
    * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2016-12-14 16:00:46 (-2 DST)
+   * 2017-01-12 15:15:59 (-2 DST)
    *
    * Com o advento do WebSocket, precisamos de novas formas para
    * provocar o servidor.
@@ -273,7 +273,7 @@
 
         var aux=xAjax();
         aux.Request(
-          this.scriptName,
+          ycomm.scriptName,
           {
             method: ycomm.defaultMethod,
             asynchronous: yloader.isWorker?false:async,

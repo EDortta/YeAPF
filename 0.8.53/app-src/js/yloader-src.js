@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yloader-src.js
- * YeAPF 0.8.53-1 built on 2017-01-09 08:40 (-2 DST)
+ * YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-11-05 09:05:39 (-2 DST)
+ * 2017-01-11 15:48:09 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * Purpose:  Build a monolitic YeAPF script so
  *           it can be loaded at once
@@ -29,7 +29,7 @@ if (typeof console === 'undefined')
   }
 )();
 
-console.log("YeAPF 0.8.53-1 built on 2017-01-09 08:40 (-2 DST)");
+console.log("YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)");
 
 #include('yopcontext.js')
 #include('ydebug.js')
@@ -141,6 +141,8 @@ _dump("ycomm-rest");
 _dump("ycomm-dom");
 #include('ycomm-msg.js')
 _dump("ycomm-msg");
+#include('ycomm-sse.js')
+_dump("ycomm-sse");
 #include('ycalendar.js')
 _dump("ycalendar");
 #include('ydyntable.js')

@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/body.php
-    YeAPF 0.8.53-1 built on 2017-01-09 08:40 (-2 DST)
+    YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-09 07:52:30 (-2 DST)
+    2017-01-11 09:54:25 (-2 DST)
 
     skel/webApp / body.php
     This file cannot be modified within skel/webApp
@@ -23,8 +23,10 @@
 
   (@include_once("yeapf.php")) or die("yeapf not configured");
 
+  /* @OBSOLETE 20170111
   $developBase=$yeapfConfig['yeapfPath']."/../develop";
   (@include_once "$developBase/yeapf.develop.php") or die ("Error loading 'yeapf.develop.php'");
+  */
 
 
   if (file_exists('flags/flag.pausedAfterClick')) {
@@ -46,11 +48,13 @@
     if ($userContext->isValidUser($appFolderRights)) {
 
       $userContext->loadUserVars('devSession');
+      /* @OBSOLETE 20170111
       if (isset($devSession)) {
         _dumpY(256,0,"my devSession is '$devSession'");
         $devMsgQueue=new xDevelopMSG($devSession, file_exists('flags/flag.nosharedmem'));
         $devMsgQueue->sendStagedMessage('busy');
       }
+      */
 
       if ($s=='')
         $s=isset($cfgInitialVerb)?$cfgInitialVerb:'';
@@ -127,8 +131,10 @@
         processFile($aBody);
         processFile("frame_footer.html");
       }
+      /* @OBSOLETE 20170111
       if (isset($devMsgQueue))
         $devMsgQueue->sendStagedMessage('aBody',$aBody);
+      */
 
       yeapfStage("afterOutput");
 
@@ -161,11 +167,15 @@
     db_close();
   } catch(Exception $e) {
     _dump("EXCEPTION: ".$e->getMessage());
+    /* @OBSOLETE 20170111
     if ($devMsgQueue)
       $devMsgQueue->sendStagedMessage('exception',$e->getMessage());
+    */
   }
+  /* @OBSOLETE 20170111
   if ($devMsgQueue)
     $devMsgQueue->sendStagedMessage('idle');
+  */
   _recordWastedTime("Good bye");
 ?>
 

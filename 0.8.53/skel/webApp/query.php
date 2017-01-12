@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/query.php
-    YeAPF 0.8.53-1 built on 2017-01-09 08:40 (-2 DST)
+    YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-09 07:52:08 (-2 DST)
+    2017-01-11 09:50:45 (-2 DST)
 
     skel/webApp / query.php
     This file cannot be modified within skel/webApp
@@ -24,9 +24,10 @@
     db_startup();
   }
 
-
+  /* @OBSOLETE 20170111
   $developBase=$yeapfConfig['yeapfPath']."/../develop";
   (@include_once "$developBase/yeapf.develop.php") or die ("Error loading 'yeapf.develop.php'");
+  */
 
   _dumpY(1,1,"appFolderRights=$appFolderRights");
 

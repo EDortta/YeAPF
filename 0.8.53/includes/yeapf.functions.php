@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.53-1 built on 2017-01-09 08:40 (-2 DST)
+    YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-09 08:15:01 (-2 DST)
+    2017-01-11 09:54:26 (-2 DST)
    */
 
   /*
@@ -335,7 +335,10 @@
 
   function yeapfStage($functionName = '')
   {
-    global $s, $a, $currentYeapfStage, $devMsgQueue,
+    global $s, $a, $currentYeapfStage, 
+           /* @OBSOLETE 20170111
+           $devMsgQueue,
+           */
            $__EventBuffer, $__EventBufferFilled;
 
     _recordWastedTime("Starting YeAPF stage: $functionName($a, $a)");
@@ -345,8 +348,10 @@
     else
       $fe = false;
 
+    /* @OBSOLETE 20170111
     if ($devMsgQueue)
       $devMsgQueue->sendStagedMessage('changeStage');
+    */
 
     _dumpY(1,1,"YEAPF STAGE: $functionName    BEGIN ".intval($fe));
 
