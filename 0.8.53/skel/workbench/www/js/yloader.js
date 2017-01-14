@@ -1,8 +1,8 @@
 /*********************************************
   * skel/workbench/www/js/yloader.js
-  * YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)
+  * YeAPF 0.8.53-56 built on 2017-01-14 13:26 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-12 15:16:32 (-2 DST)
+  * 2017-01-14 13:26:53 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)");
+ console.log("YeAPF 0.8.53-56 built on 2017-01-14 13:26 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -5781,7 +5781,7 @@
       * meanwhile, with YeAPF you will send messages to connected users.
       * As this was not inteded to send chat messages, is correct to
       * send messages to and only to connected users.
-     **********************************************/
+      **********************************************/
      
      
      var ycommMsgBase = function() {
@@ -5789,58 +5789,55 @@
          messagePeekerTimer: null,
          messageStack: [],
          msgProcs: [],
-         _dbgFlag_noMessageProcessorPresent:false,
-         msgCount:0,
-         serverOfflineFlag:0
+         _dbgFlag_noMessageProcessorPresent: false,
+         msgCount: 0,
+         serverOfflineFlag: 0
        };
      
-       that.grantMsgProc = function(aInterval)
-       {
+       that.grantMsgProc = function(aInterval) {
          /* caso venha sem parÃ¡mtros, calcular um tempo prudente de no mÃ¡ximo 20 segs
           * Isso acontece quando o servidor devolveu uma resposta errada
           * e queremos que o sistema de mensagens continue em operaÃ§Ã£o. */
-         if ((aInterval===undefined) || (aInterval<=0))
-           aInterval = Math.min(20000,messagePeekerInterval * 2);
+         if ((aInterval === undefined) || (aInterval <= 0))
+           aInterval = Math.min(20000, messagePeekerInterval * 2);
      
          if (that.messagePeekerTimer === undefined) {
-           if (that.msgCount===0)
-             _dumpy(4,1,"Configuring receivers interval to "+aInterval+'ms');
+           if (that.msgCount === 0)
+             _dumpy(4, 1, "Configuring receivers interval to " + aInterval + 'ms');
            that.messagePeekerTimer = setTimeout(ycomm.msg.peek, aInterval);
          } else
-           _dumpy(4,1,"Receivers interval already defined");
+           _dumpy(4, 1, "Receivers interval already defined");
        };
      
-       that.feedBack= function ()
-       {
-         if (dRowCount>0) {
+       that.feedBack = function() {
+         if (dRowCount > 0) {
            that.msgCount++;
            for (var j in xData) {
              if (!isNaN(parseInt(j))) {
-               var aux=xData[j];
+               var aux = xData[j];
      
                that.messageStack.push(new Array(aux['sourceUserId'],
-                                           aux['message'],
-                                           aux['wParam'],
-                                           aux['lParam'])
-                                );
+                 aux['message'],
+                 aux['wParam'],
+                 aux['lParam']));
              }
            }
      
-           if (that.messageStack.length>0) {
-             if (that.msgProcs.length==0) {
+           if (that.messageStack.length > 0) {
+             if (that.msgProcs.length == 0) {
                if (!that._dbgFlag_noMessageProcessorPresent)
                  if (jsDumpEnabled)
-                   window.alert("Messages arriving at  '"+_CurrentFileName+"'  but there is not\na registered message processor in order to receive it.\nUse _registerMsgProc() to register it");
-               that._dbgFlag_noMessageProcessorPresent=true;
+                   window.alert("Messages arriving at  '" + _CurrentFileName + "'  but there is not\na registered message processor in order to receive it.\nUse _registerMsgProc() to register it");
+               that._dbgFlag_noMessageProcessorPresent = true;
              } else {
-               while (that.messageStack.length>0) {
-                 var oldLen=that.messageStack.length;
-                 for (var i=0; i<that.msgProcs.length; i++) {
+               while (that.messageStack.length > 0) {
+                 var oldLen = that.messageStack.length;
+                 for (var i = 0; i < that.msgProcs.length; i++) {
                    // _dumpy(4,1,"Calling: "+that.msgProcs[i]);
-                   var auxCallFunction='<script>'+that.msgProcs[i]+'();</'+'script>';
+                   var auxCallFunction = '<script>' + that.msgProcs[i] + '();</' + 'script>';
                    auxCallFunction.evalScripts();
                  }
-                 if (oldLen==that.messageStack.length)
+                 if (oldLen == that.messageStack.length)
                    that.messageStack.shift();
                }
              }
@@ -5850,46 +5847,42 @@
          grantMsgProc(messagePeekerInterval);
        };
      
-       that.peek = function()
-       {
+       that.peek = function() {
          clearTimeout(that.messagePeekerTimer);
-         that.messagePeekerTimer=null;
+         that.messagePeekerTimer = null;
      
-         var ts=new Date();
-         var auxParameters='s=y_msg&u='+u+'&a=peekMessage&formID='+formID+'&ts='+
-                           ts.getTime()+'&callBackFunction=ycomm.msg.feedBack&messagePeekerInterval='+messagePeekerInterval;
-         var aux=new Ajax.Request(
-           'query.php',
-           {
+         var ts = new Date();
+         var auxParameters = 's=y_msg&u=' + u + '&a=peekMessage&formID=' + formID + '&ts=' +
+           ts.getTime() + '&callBackFunction=ycomm.msg.feedBack&messagePeekerInterval=' + messagePeekerInterval;
+         var aux = new Ajax.Request(
+           'query.php', {
              method: 'get',
              asynchronous: true,
              parameters: auxParameters,
-             onComplete: function (transport) {
-               if (transport.status==200)
+             onComplete: function(transport) {
+               if (transport.status == 200)
                  _QUERY_RETURN(transport);
                else {
-                 _dumpy(4,1,"*** XMLHttpRequest call failure");
-                 setTimeout('_notifyServerOffline()',500);
+                 _dumpy(4, 1, "*** XMLHttpRequest call failure");
+                 setTimeout('_notifyServerOffline()', 500);
                }
              }
            }
          );
        };
      
-       that.postMessage = function(aTargetUserID, aMessage, aWParam, aLParam, aBroadcastCondition)
-       {
-         var ts=new Date();
-         if (aBroadcastCondition!=undefined)
-           var aux='&targetUser=*&broadcastCondition="'+aBroadcastCondition+'"';
+       that.postMessage = function(aTargetUserID, aMessage, aWParam, aLParam, aBroadcastCondition) {
+         var ts = new Date();
+         if (aBroadcastCondition != undefined)
+           var aux = '&targetUser=*&broadcastCondition="' + aBroadcastCondition + '"';
          else
-           var aux='&broadcastCondition=&targetUser='+aTargetUserID;
+           var aux = '&broadcastCondition=&targetUser=' + aTargetUserID;
      
-         var auxParameters='s=y_msg&u='+u+'&a=postMessage'+aux+'&formID='+formID+
-                           '&message='+aMessage+'&wParam='+aWParam+'&lParam='+aLParam+
-                           '&ts='+ts.getTime()+'&callBackFunction=ycomm.msg.feedBack';
-         var aux=new Ajax.Request(
-           'query.php',
-           {
+         var auxParameters = 's=y_msg&u=' + u + '&a=postMessage' + aux + '&formID=' + formID +
+           '&message=' + aMessage + '&wParam=' + aWParam + '&lParam=' + aLParam +
+           '&ts=' + ts.getTime() + '&callBackFunction=ycomm.msg.feedBack';
+         var aux = new Ajax.Request(
+           'query.php', {
              method: 'get',
              asynchronous: false,
              parameters: auxParameters,
@@ -5898,74 +5891,69 @@
          );
        };
      
-       that.cleanMsgQueue = function()
-       {
-         that.msgProcs.length=0;
+       that.cleanMsgQueue = function() {
+         that.msgProcs.length = 0;
        };
      
-       that.notifyServerOnline = function()
-       {
-         if (that.serverOfflineFlag>0) {
+       that.notifyServerOnline = function() {
+         if (that.serverOfflineFlag > 0) {
            that.serverOfflineFlag = 0;
-           var mainBody=__getMainBody();
+           var mainBody = __getMainBody();
            var isReady = (typeof mainBody.$ == 'function') && (mainBody.document.body != null);
            if (isReady) {
              var notificationArea = mainBody.y$('notificationArea');
              if (notificationArea)
-               notificationArea.style.display='none';
+               notificationArea.style.display = 'none';
            }
          }
        };
      
-       that.notifyServerOffline = function()
-       {
+       that.notifyServerOffline = function() {
          that.serverOfflineFlag++;
-         var mainBody=__getMainBody();
+         var mainBody = __getMainBody();
          var isReady = (typeof mainBody.$ == 'function') && (mainBody.document.body != null);
          if (isReady) {
            var notificationArea = mainBody.y$('notificationArea');
            if (!notificationArea) {
              notificationArea = mainBody.document.createElement('div');
-             notificationArea.id='notificationArea';
-             setOpacity(notificationArea,90);
+             notificationArea.id = 'notificationArea';
+             setOpacity(notificationArea, 90);
              mainBody.document.body.appendChild(notificationArea);
              if (!existsCSS('notificationArea')) {
-               notificationArea.style.zIndex=1000;
-               notificationArea.style.position='absolute';
-               notificationArea.style.left='0px';
-               notificationArea.style.top='0px';
-               notificationArea.style.border='1px #900 solid';
-               notificationArea.style.backgroundColor='#fefefe';
+               notificationArea.style.zIndex = 1000;
+               notificationArea.style.position = 'absolute';
+               notificationArea.style.left = '0px';
+               notificationArea.style.top = '0px';
+               notificationArea.style.border = '1px #900 solid';
+               notificationArea.style.backgroundColor = '#fefefe';
              } else
-               notificationArea.className='notificationArea';
+               notificationArea.className = 'notificationArea';
            }
      
-           notificationArea.style.width=mainBody.innerWidth+'px';
-           notificationArea.style.height=mainBody.innerHeight+'px';
-           notificationArea.style.display='block';
+           notificationArea.style.width = mainBody.innerWidth + 'px';
+           notificationArea.style.height = mainBody.innerHeight + 'px';
+           notificationArea.style.display = 'block';
      
-           notificationArea.innerHTML="<div style='padding: 32px'><big><b>Server Offline</b></big><hr>Your server has become offline or is mispeling answers when requested.<br>Wait a few minutes and try again later, or wait while YeAPF try again by itself</div>&nbsp;";
+           notificationArea.innerHTML = "<div style='padding: 32px'><big><b>Server Offline</b></big><hr>Your server has become offline or is mispeling answers when requested.<br>Wait a few minutes and try again later, or wait while YeAPF try again by itself</div>&nbsp;";
          }
      
          grantMsgProc();
        };
      
-       that.registerMsgProc = function(aFunctionName)
-       {
-         var canAdd=true;
-         _dumpy(4,1,"Registering message receiver: "+aFunctionName);
-         for (var i=0; i<that.msgProcs.length; i++)
-           if (that.msgProcs[i]==aFunctionName)
-             canAdd=false;
+       that.registerMsgProc = function(aFunctionName) {
+         var canAdd = true;
+         _dumpy(4, 1, "Registering message receiver: " + aFunctionName);
+         for (var i = 0; i < that.msgProcs.length; i++)
+           if (that.msgProcs[i] == aFunctionName)
+             canAdd = false;
      
          if (canAdd)
-           that.msgProcs[that.msgProcs.length]=aFunctionName;
+           that.msgProcs[that.msgProcs.length] = aFunctionName;
      
          grantMsgProc(messagePeekerInterval);
        };
      
-       that.stopMsgProc = function()
-       {
+       that.stopMsgProc = function() {
          clearTimeout(that.messagePeekerTimer);
        }
      
@@ -5975,13 +5963,12 @@
      
      ycomm.msg = ycommMsgBase();
      
-     
  /* END ycomm-msg.js */
  _dump("ycomm-msg");
  /* START ycomm-sse.js */
        /********************************************************************
        ********************************************************************/
-       var ycommSSEBase = function (w, dataLocation) {
+       var ycommSSEBase = function (workgroup, user, dataLocation) {
          var that = {
      
            getLocation: function() {
@@ -5993,77 +5980,173 @@
              return location.substr(0,b+1);
            },
      
-           poll: function () {
-             that.rpc(
-               "sse",
-               "peekMessage",
-               {
-                 "sse_session_id": that.sse_session_id
-               },
-               function(status, error, data) {
-                 if (data) {
-                   for(var i=0; i<data.length; i++) {
-                     that.message({
-                       'event': data[i].event,
-                       'data' : data[i].data
-                     });
+           rpc: function(a, params) {
+             params = params || {};
+             if (typeof that.sse_session_id!="undefined")
+               params.sse_session_id = that.sse_session_id;
+     
+             var p = new Promise(
+               function(resolve, reject) {
+                 that.rpcMethod(
+                   "_sse", a, params,
+                   function(status, error, data) {
+                     if (status==200) {
+                       resolve(data);
+                     } else {
+                       reject(status);
+                     }
                    }
-                 }
-                 setTimeout(that.poll, 750);
+                 );
                }
              );
+             return p;
            },
      
-           startPolling: function () {
-             /* check same-source */
-             var l1=that.getFolder(that.getLocation()),
-                 l2=that.getFolder(that._dataLocation_);
-     
-             if (l1==l2) {
-               that.rpc = ycomm.invoke;
-             } else {
-               that.rpc = ycomm.crave;
+           poll: function () {
+             if (that.pollEnabled) {
+               that.rpc("peekMessage").then( function(data) {
+                   if (data) {
+                     var eventName;
+                     for(var i=0; i<data.length; i++) {
+                       if (!that.dispatchEvent(data[i].event, { data: data[i].data } )) {
+                         that.message({
+                           'data' : data[i].data
+                         });
+                       }
+                     }
+                   }
+                   setTimeout(that.poll, 1000);
+                 });
              }
+           },
+     
+           attachUser: function (callback) {
              that.rpc(
-               "sse",
                "attachUser",
                {
-                 "w": w,
-                 "u": typeof u != "undefined"?u:generateSmallSessionUniqueId()
-               },
-               function(status, error, data) {
-                 if (data && data[0] && data[0].ok) {
-                   that.sse_session_id = data[0].sse_session_id;
-                   that.poll();
+                 "w": workgroup,
+                 "user": that.user
+               }).then(function(data) {
+                   if (data && data[0] && data[0].ok) {
+                     that.sse_session_id = data[0].sse_session_id;
+                     callback();
+                   }
                  }
+               );
+           },
+     
+           addEventListener: function (eventName, func) {
+             if (trim(eventName.toLowerCase()) != "ready") {
+               /* save the event in the internal list */
+               if (typeof that.events == "undefined") {
+                 that.events={};
                }
-             );
+               if ("undefined" == typeof that.events[eventName])
+                 that.events[eventName] = [];
+               that.events[eventName].push([that.state, func]);
+             }
+     
+             /* add the manager */
+             that["on_"+eventName] = func;
+     
+             if (that.state==1) {
+               if (!that.pollEnabled)
+                 that.evtSource.addEventListener(eventName, func);
+               if (trim(eventName.toLowerCase()) == "ready") {
+                 that.dispatchEvent("ready");
+               }
+             }
+             return that;
+           },
+     
+           dispatchEvent: function (eventName, params) {
+             var ret=false;
+     
+             if (typeof that.events !== "undefined") {
+               for(var implementations=0; implementations<(that.events[eventName] || []).length; implementations++) {
+                 var eventDef = that.events[eventName][implementations];
+                 eventDef[1](params);
+                 ret |= true;
+               }
+             }
+     
+     
+             eventName1=eventName;
+             eventName2="on_"+eventName;
+             if (typeof that[eventName1] == "function") {
+               that[eventName1](params);
+               ret |= true;
+             } else if (typeof that[eventName2] == "function") {
+               that[eventName2](params);
+               ret |= true;
+             } else
+               ret |= false;
+     
+             return ret;
+           },
+     
+           startPolling : function() {
+             that.pollEnabled=true;
+             that.state=1;
+             that.dispatchEvent("ready", {"gateway": "Polling"});
+             setTimeout(that.poll, 125);
            },
      
            guardianTimeout: function (e) {
              /* if SSE.PHP don't answer up to guardian timeout, use poll version */
              clearTimeout(that.evtGuardian);
              that.evtSource.close();
-             setTimeout(that.startPolling, 125);
+             that.evtSource = undefined;
+             that.startPolling();
+           },
+     
+           close: function(e) {
+             if (!that.closing) {
+               that.closing=true;
+               console.log("CLOSE");
+               that.state=-1;
+               that.pollEnabled = false;
+               that.dispatchEvent('close');
+               if (that.evtSource)
+                 that.evtSource.close();
+               that.closing=false;
+             }
            },
      
            open: function (e) {
-             console.log(e);
+             console.log("OPEN");
            },
      
            error: function(e) {
-             console.error(e);
+             console.error("ERROR");
            },
      
            message: function (e) {
              /* as connected, clear guardian timeout */
              clearTimeout(that.evtGuardian);
+             console.log("MESSAGE");
+             if (that.state===0) {
+               that.state=1;
+               for(var eventName in that.events) {
+                 if (that.events.hasOwnProperty(eventName)) {
+                   for(var implementations=0; implementations<that.events[eventName].length; implementations++) {
+                     var eventDef = that.events[eventName][implementations];
+                     if (eventDef[0]<1) {
+                       eventDef[0]=1;
+                       that.evtSource.addEventListener(eventName, eventDef[1]);
+                     }
+                   }
+                 }
+               }
+               that.dispatchEvent("ready", {"gateway": "SSE"});
+             }
              if (typeof that.onmessage=="function") {
                that.onmessage(e.data);
              }
            },
      
            init: function() {
+             that.state = -1;
              if (typeof dataLocation=="undefined") {
                /* default data location is current location/sse.pph */
                that._dataLocation_ = (
@@ -6076,19 +6159,41 @@
              } else {
                that._dataLocation_=dataLocation;
              }
+     
              if (that._dataLocation_.substr(0,5)=="file:") {
                console.error("'"+that._dataLocation_+"' is not a correct data location");
              } else {
-               /* first try to use EventSource() */
-               if (typeof window.EventSource == "function") {
-                 that.evtSource = new EventSource(that._dataLocation_);
-                 that.evtGuardian = setTimeout(that.guardianTimeout, 2000);
-                 that.evtSource.addEventListener("open",    that.open,    false);
-                 that.evtSource.addEventListener("error",   that.error,   false);
-                 that.evtSource.addEventListener("message", that.message, false);
+               /* create user id */
+               that.user = typeof user != "undefined"?user:generateUUID();
+     
+               /* check same-source */
+               var l1=that.getFolder(that.getLocation()),
+                   l2=that.getFolder(that._dataLocation_);
+     
+               /* chose better way to communicate with server */
+               if (l1==l2) {
+                 that.rpcMethod = ycomm.invoke;
                } else {
-                 that.startPolling();
+                 that.rpcMethod = ycomm.crave;
                }
+     
+               that.attachUser(
+                 function() {
+                   that.state=0;
+                   /* first try to use EventSource() */
+                   if (typeof window.EventSource == "function") {
+                     that.evtSource = new EventSource(that._dataLocation_+"?si="+md5(that.sse_session_id));
+                     that.evtSource.addEventListener("open",    that.open,    false);
+                     that.evtSource.addEventListener("error",   that.error,   false);
+                     that.evtSource.addEventListener("message", that.message, false);
+                     that.evtSource.addEventListener("close",   that.close,   false);
+     
+                     that.evtGuardian = setTimeout(that.guardianTimeout, 1500);
+                   } else {
+                     that.startPolling();
+                   }
+                 }
+               );
              }
      
              return that;

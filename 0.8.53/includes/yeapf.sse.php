@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)
+    YeAPF 0.8.53-56 built on 2017-01-14 13:26 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-12 14:16:52 (-2 DST)
+    2017-01-14 13:18:50 (-2 DST)
    */
 
   class SSE
@@ -107,29 +107,30 @@
         $u_target=basename(self::$queue_folder);
         $lockName=$u_target."-queue";
 
-        if (lock($lockName,true)) {
-          _dumpY(8,3,"SSE::processQueue()");
-          $files=glob(self::$queue_folder."/*.*");
-          array_multisort(
-            array_map( 'filemtime', $files ),
-            SORT_NUMERIC,
-            SORT_ASC,
-            $files
-          );
+        _dumpY(8,3,"SSE::processQueue()");
+        $files=glob(self::$queue_folder."/*.*");
+        array_multisort(
+          array_map( 'filemtime', $files ),
+          SORT_NUMERIC,
+          SORT_ASC,
+          $files
+        );
 
-          foreach ($files as $key => $value) {
-            $ok=fnmatch("*.msg", basename($value));
+        foreach ($files as $key => $value) {
+          $ok=fnmatch("*.msg", basename($value));
 
-            $f=fopen($value, "r");
-            $eventName = trim(preg_replace('/[[:^print:]]/', '', fgets($f)));
-            $eventData = preg_replace('/[[:^print:]]/', '', fgets($f));
-            fclose($f);
-            if ($eventName>'') {
-              _dumpY(8,4,"SSE::processQueue() - $value - $eventName - $eventData");
-              $callback($eventName, $eventData);
-              unlink($value);
-            }
+          $f=fopen($value, "r");
+          $eventName = trim(preg_replace('/[[:^print:]]/', '', fgets($f)));
+          $eventData = preg_replace('/[[:^print:]]/', '', fgets($f));
+          fclose($f);
+          if ($eventName>'') {
+            _dumpY(8,4,"SSE::processQueue() - $value - $eventName - $eventData");
+            $callback($eventName, $eventData);
+            unlink($value);
           }
+        }
+
+        if (lock($lockName,true)) {
           unlink($queueFlag);
           unlock($lockName);
         }
@@ -218,30 +219,32 @@
     {
       $messageFile='';
       $lockName=$u_target."-queue";
-      if (lock($lockName)) {
-        _dumpY(8,3,"SSE::__enqueueMessage('$u_target', '$message', '$data')");
-        $ndxFile=".sse/$u_target.ndx";
-        if (file_exists($ndxFile)) {
-          $ndx = file($ndxFile);
-          $w_target       = preg_replace('/[[:^print:]]/', '', $ndx[0]);
-          $msg_ndx        = intval(preg_replace('/[[:^print:]]/', '', $ndx[1]))+1;
-          $sse_session_id = preg_replace('/[[:^print:]]/', '', $ndx[2]);
-          $usr_folder = ".sse/$w_target/$u_target";
-          if (is_dir($usr_folder)) {
-            file_put_contents("$ndxFile", "$w_target\n$msg_ndx\n$sse_session_id\n".date("U"));
-            $messageFileI = "$usr_folder/$msg_ndx.new";
-            $messageFileF = "$usr_folder/$msg_ndx.msg";
-            $f=fopen($messageFileI, "wt");
-            fputs($f, "$message\n");
-            fputs($f, "$data\n");
-            fclose($f);
+      _dumpY(8,3,"SSE::__enqueueMessage('$u_target', '$message', '$data')");
+      $ndxFile=".sse/$u_target.ndx";
+      if (file_exists($ndxFile)) {
+        $ndx = file($ndxFile);
+        $w_target       = preg_replace('/[[:^print:]]/', '', $ndx[0]);
+        // $msg_ndx        = intval(preg_replace('/[[:^print:]]/', '', $ndx[1]))+1;
+        $sse_session_id = preg_replace('/[[:^print:]]/', '', $ndx[2]);
+        $usr_folder = ".sse/$w_target/$u_target";
+        if (is_dir($usr_folder)) {
+          mt_srand();
+          $msg_ndx = date("U")."-".mt_rand(1000,9999)."-".mt_rand(1000,9999);
+          // file_put_contents("$ndxFile", "$w_target\n$msg_ndx\n$sse_session_id\n".date("U"));
+          $messageFileI = "$usr_folder/$msg_ndx.new";
+          $messageFileF = "$usr_folder/$msg_ndx.msg";
+          $f=fopen($messageFileI, "wt");
+          fputs($f, "$message\n");
+          fputs($f, "$data\n");
+          fclose($f);
 
-            rename($messageFileI, $messageFileF);
+          rename($messageFileI, $messageFileF);
 
+          if (lock($lockName)) {
             touch("$usr_folder/ready.flag");
+            unlock($lockName);
           }
         }
-        unlock($lockName);
       }
       return $messageFile;
     }
@@ -310,11 +313,11 @@
   }
 
 
-  function qsse($a)
+  function q_sse($a)
   {
     global $userContext, $sysDate, $u,
            $fieldValue, $fieldName,
-           $userMsg, $xq_start;
+           $userMsg, $xq_start, $__sse_ret;
 
     $useColNames = true;
     $countLimit=20;
@@ -326,7 +329,7 @@
     switch($a)
     {
       case 'attachUser':
-        $sse_session_id  = SSE::attachUser($w, $u);
+        $sse_session_id  = SSE::attachUser($w, $user);
         $ret = array(
               'ok'=>$sse_session_id>'',
               'sse_session_id' => $sse_session_id
@@ -334,16 +337,21 @@
         break;
 
       case 'peekMessage':
-        $ret=array();
+        $__sse_ret=array();
         $sessionInfo = SSE::getSessionInfo($sse_session_id);
         extract($sessionInfo);
         if (SSE::enabled($sse_session_id, $w, $u)) {
           $sse_dispatch = function($eventName, $eventData) {
-            $ret[]=array(  'event' => $eventName,
-                           'data'  => $eventData   );
+            global $__sse_ret;
+            $__sse_ret[]=array(  'event' => $eventName,
+                                 'data'  => $eventData   );
           };
           SSE::processQueue($sse_dispatch);
+        } else {
+          $__sse_ret=array(  'event' => 'close',
+                             'data'  => ''   );
         }
+        $ret=$__sse_ret;
         break;
     }
 

@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/sse.php
-    YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)
+    YeAPF 0.8.53-56 built on 2017-01-14 13:26 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-12 14:10:55 (-2 DST)
+    2017-01-12 17:59:33 (-2 DST)
 
     skel/webApp / sse.php
     This file cannot be modified within skel/webApp
@@ -27,14 +27,17 @@
   header("Cache-Control: no-cache");
   header("Connection: Keep-Alive");
 //  header("Content-Transfer-Encoding: chunked");
-  header("Transfer-Encoding: chunked");
+//  header("Transfer-Encoding: chunked");
 
   echo "retry: 5000\n\n";
   for($n=1000; $n>0; $n--) echo "\n\n";
   while (@ob_end_flush());
 
+  /* this message will help SSE client to recognizes as valid SSE connection */
+  SSE::sendEvent("message", "welcome");
 
   _dump("SSE - conn");
+  
   set_time_limit(0);
 
   /* @params
@@ -49,9 +52,9 @@
 
   $sse_dispatch = function($eventName, $eventData) {
     SSE::sendEvent($eventName, $eventData);
-  }
+  };
 
-  $sse_session_id=SSE::getSessionId($si);
+  $sse_session_id=SSE::getSessionId(isset($si)?$si:"");
   if ($sse_session_id>"") {
     /* exposes $w and $u as global variables */
     $sessionInfo = SSE::getSessionInfo($sse_session_id);

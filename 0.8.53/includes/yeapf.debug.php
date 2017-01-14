@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.debug.php
-    YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)
+    YeAPF 0.8.53-56 built on 2017-01-14 13:26 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-09-09 13:04:09 (-2 DST)
+    2017-01-12 16:34:24 (-2 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -549,10 +549,13 @@
           $inReservedFunctions=false;
       }
 
-      if (function_exists("decimalMicrotime"))
+      if (function_exists("decimalMicrotime")) {
         $wastedTime=decimalMicrotime()-$_debugTag;
-      else
-        $wastedTime=0;
+      } else {
+        $wastedTime="?.0";
+      }
+      $wastedTime.="00000";
+      $wastedTime=substr($wastedTime,0,7);
 
       $priorCall="$funFileName at $funLine";
       if ($curCall==$priorCall)
