@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.53-67 built on 2017-01-16 15:18 (-2 DST)
+  * YeAPF 0.8.53-68 built on 2017-01-16 15:26 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-16 15:18:24 (-2 DST)
+  * 2017-01-16 15:26:18 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.53-67 built on 2017-01-16 15:18 (-2 DST)");
+ console.log("YeAPF 0.8.53-68 built on 2017-01-16 15:26 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -4557,35 +4557,39 @@
  /* START ycomm-dom.js */
      /*********************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
-     **********************************************/
+      **********************************************/
      
      
      ycomm.dom = {
-       _elem_templates: []
+         _elem_templates: []
      };
      
      ycomm.dom.fillInplaceData = function(aElement, aData) {
-       for(var i in aData)
-         if (aData.hasOwnProperty(i)) {
-           if (i.substr(0,5)=='data-')
-             i=i.substr(5);
-           aElement.setAttribute('data-'+i, aData[i]);
-         }
+         for (var i in aData)
+             if (aData.hasOwnProperty(i)) {
+                 if (i.substr(0, 5) == 'data-') {
+                     aElement.setAttribute(i, aData[i]);
+                 } else {
+                     aElement.setAttribute('data-' + i, aData[i]);
+                 }
+             }
      };
      
      ycomm.dom.getInplaceData = function(aElement) {
-       var attr=aElement.attributes, ret={}, a, name;
-       for(var i in attr) {
-         if (attr.hasOwnProperty(i)) {
-           a=attr[i];
-           name=a.nodeName;
+         var attr = aElement.attributes,
+             ret = {},
+             a, name;
+         for (var i in attr) {
+             if (attr.hasOwnProperty(i)) {
+                 a = attr[i];
+                 name = a.nodeName;
      
-           if ((name.substr(0,5))=='data-') {
-             ret[name]=a.nodeValue;
-           }
+                 if ((name.substr(0, 5)) == 'data-') {
+                     ret[name] = a.nodeValue;
+                 }
+             }
          }
-       }
-       return ret;
+         return ret;
      };
      
      /*
@@ -4634,563 +4638,565 @@
       *          unlearn      (false by default)
       */
      ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
-       if ((aLineSpec === undefined) || (aLineSpec===null))
-         aLineSpec = {};
+         if ((aLineSpec === undefined) || (aLineSpec === null))
+             aLineSpec = {};
      
-       if (typeof aFlags=="boolean")
-         aFlags={deleteRows: aFlags};
+         if (typeof aFlags == "boolean")
+             aFlags = { deleteRows: aFlags };
      
-       aFlags=aFlags || {};
+         aFlags = aFlags || {};
      
-       if (typeof aFlags.deleteRows=='undefined')
-         aFlags.deleteRows=true;
-       if (typeof aFlags.paintRows=='undefined')
-         aFlags.paintRows=true;
+         if (typeof aFlags.deleteRows == 'undefined')
+             aFlags.deleteRows = true;
+         if (typeof aFlags.paintRows == 'undefined')
+             aFlags.paintRows = true;
      
-       var idFieldName, colName, newRow, canCreateRow,
-           aElement = y$(aElementID),
-           rowIdOffset=0,
-           first_time = typeof ycomm.dom._elem_templates[aElementID] == "undefined";
+         var idFieldName, colName, newRow, canCreateRow,
+             aElement = y$(aElementID),
+             rowIdOffset = 0,
+             first_time = typeof ycomm.dom._elem_templates[aElementID] == "undefined";
      
-       idFieldName = aLineSpec.idFieldName || 'id';
-       if (typeof aFlags.unlearn=="boolean")
-         first_time = aFlags.unlearn;
+         idFieldName = aLineSpec.idFieldName || 'id';
+         if (typeof aFlags.unlearn == "boolean")
+             first_time = aFlags.unlearn;
      
-       var getDataFromXData = function(xDataItem) {
-         /* this function extract the pouchdb data from xDataItem if exists. otherwise, return xDataItem */
-         if ((xDataItem.doc) && (xDataItem.id) && (xDataItem.value))
-           xDataItem=xDataItem.doc;
-         return xDataItem;
-       };
+         var getDataFromXData = function(xDataItem) {
+             /* this function extract the pouchdb data from xDataItem if exists. otherwise, return xDataItem */
+             if ((xDataItem.doc) && (xDataItem.id) && (xDataItem.value))
+                 xDataItem = xDataItem.doc;
+             return xDataItem;
+         };
      
-       var saveInplaceData = function(opt, xDataItem) {
-         if (typeof aLineSpec.inplaceData != 'undefined') {
-           for(var c=0;c<aLineSpec.inplaceData.length; c++) {
-             if (typeof xDataItem[aLineSpec.inplaceData[c]] !== "undefined") {
-               var colName = aLineSpec.inplaceData[c];
-               opt.setAttribute("data-"+colName, xDataItem[colName] || '');
-             }
-           }
-         }
-       };  
-     
-       var setNewRowAttributes = function (aNewRow) {
-         var auxIdSequence,
-             auxInplaceData,
-             xDataItem=getDataFromXData(xData[j]);
-     
-         cNdx = 0;
-         if (aNewRow.nodeName=='TR') {
-           if (aFlags.paintRows)
-             aNewRow.style.backgroundColor=rowColorSpec.suggestRowColor(rowGroup);
-         }
-         if (xDataItem[idFieldName]) {
-           if (y$(xDataItem[idFieldName])) {
-             auxIdSequence = 0;
-             while (y$(xDataItem[idFieldName]+'_'+auxIdSequence))
-               auxIdSequence++;
-             aNewRow.id = xDataItem[idFieldName]+'_'+auxIdSequence;
-           } else
-             aNewRow.id = xDataItem[idFieldName];
-         }
-     
-         saveInplaceData(aNewRow, xDataItem);
-     
-         if ((aLineSpec.onClick) || (aLineSpec.onSelect)) {
-           aNewRow.addEventListener('click', ((aLineSpec.onClick) || (aLineSpec.onSelect)), false);
-         }
-       };
-     
-       var addCell = function(colName) {
-         if (colName != idFieldName) {
-           var newCell  = newRow.insertCell(cNdx),
-               xDataItem=getDataFromXData(xData[j]),
-               aNewCellValue = colName!==null?unmaskHTML(xDataItem[colName]):unmaskHTML(xDataItem);
-           if ((aLineSpec.columns) && (aLineSpec.columns[colName])) {
-             if (aLineSpec.columns[colName].align)
-               newCell.style.textAlign=aLineSpec.columns[colName].align;
-             if (aLineSpec.columns[colName].type) {
-               aNewCellValue = yAnalise('%'+aLineSpec.columns[colName].type+'('+aNewCellValue+')');
-             }
-           }
-     
-           if (!canCreateRow) {
-             newCell.addClass('warning');
-             /* newCell.style.borderLeft = 'solid 1px red'; */
-           }
-     
-           newCell.innerHTML = aNewCellValue.length===0?'&nbsp;':aNewCellValue;
-           newCell.style.verticalAlign='top';
-           newCell.id=aElementID+'_'+cNdx+'_'+oTable.rows.length;
-           newCell.setAttribute('colName', colName);
-           if (typeof aLineSpec.onNewItem == 'function')
-             aLineSpec.onNewItem(aElementID, newCell, xDataItem);
-           cNdx = cNdx + 1;
-         }
-       };
-     
-       var oTable, auxHTML, j, c, cNdx, i, newCell, internalRowId=(new Date()).getTime()-1447265735470, xDataItem;
-     
-       if (aElement) {
-         if (aElement.nodeName=='TABLE') {
-           if (aElement.getElementsByTagName('tbody').length>0)
-             oTable = aElement.getElementsByTagName('tbody')[0];
-           else
-             oTable = aElement;
-           if (oTable.getElementsByTagName('tbody').length>0)
-             oTable = oTable.getElementsByTagName('tbody')[0];
-     
-           /* 1) if this is the first time, pull the template from the table itself
-            * 2) the 'aLineSpec' has higher priority */
-           if (first_time) {
-             if (typeof (aLineSpec.columns || aLineSpec.rows || aLineSpec.html) == "undefined") {
-               ycomm.dom._elem_templates[aElementID]={};
-               if (oTable.rows.length>0) {
-                 ycomm.dom._elem_templates[aElementID].rows = [];
-                 for(i=0; i<oTable.rows.length; i++)
-                   ycomm.dom._elem_templates[aElementID].rows[i]=trim(oTable.rows[i].innerHTML+"").replace(/\ \s+/g,'');
-               }
-             } else {
-               ycomm.dom._elem_templates[aElementID]={};
-               ycomm.dom._elem_templates[aElementID].columns = aLineSpec.columns;
-               ycomm.dom._elem_templates[aElementID].rows    = aLineSpec.rows;
-               ycomm.dom._elem_templates[aElementID].html    = aLineSpec.html;
-             }
-           }
-           mergeObject(ycomm.dom._elem_templates[aElementID], aLineSpec, true);
-     
-           if (aFlags.deleteRows) {
-             while(oTable.rows.length>0)
-               oTable.deleteRow(oTable.rows.length-1);
-           } else {
-             rowIdOffset=oTable.rows.length;
-           }
-     
-           var rowGroup = oTable.rows.length % 2;
-           cNdx = null;
-           for (j in xData) {
-             if (xData.hasOwnProperty(j)) {
-               xDataItem=getDataFromXData(xData[j]);
-               rowGroup++;
-     
-               canCreateRow = true;
-               if (!aFlags.deleteRows) {
-                 if (xDataItem[idFieldName]) {
-                   for(i=0; ((canCreateRow) && (i<oTable.rows.length)); i++) {
-                     if (oTable.rows[i].id == xDataItem[idFieldName]) {
-                       newRow = oTable.rows[i];
-                       while (newRow.cells.length>0)
-                         newRow.deleteCell(0);
-                       canCreateRow = false;
-                       xDataItem.rowid = i;
+         var saveInplaceData = function(opt, xDataItem) {
+             if (typeof aLineSpec.inplaceData != 'undefined') {
+                 for (var c = 0; c < aLineSpec.inplaceData.length; c++) {
+                     if (typeof xDataItem[aLineSpec.inplaceData[c]] !== "undefined") {
+                         var colName = aLineSpec.inplaceData[c];
+                         opt.setAttribute("data-" + colName, xDataItem[colName] || '');
                      }
-                   }
                  }
-               }
+             }
+         };
      
-               if (canCreateRow) {
-                 if (aFlags.insertAtTop)
-                   newRow = oTable.insertRow(0);
-                 else
-                   newRow = oTable.insertRow(oTable.rows.length);
-               }
+         var setNewRowAttributes = function(aNewRow) {
+             var auxIdSequence,
+                 auxInplaceData,
+                 xDataItem = getDataFromXData(xData[j]);
      
-               // xDataItem['rowid'] = parseInt(xDataItem['rowid']) + rowIdOffset + '';
-               internalRowId++;
-               xDataItem.rowid = ((!aFlags.insertAtTop) && (typeof newRow.rowIndex !== "undefined" ))?newRow.rowIndex:internalRowId + '';
-               xDataItem._elementid_ = aElementID;
+             cNdx = 0;
+             if (aNewRow.nodeName == 'TR') {
+                 if (aFlags.paintRows)
+                     aNewRow.style.backgroundColor = rowColorSpec.suggestRowColor(rowGroup);
+             }
+             if (xDataItem[idFieldName]) {
+                 if (y$(xDataItem[idFieldName])) {
+                     auxIdSequence = 0;
+                     while (y$(xDataItem[idFieldName] + '_' + auxIdSequence))
+                         auxIdSequence++;
+                     aNewRow.id = xDataItem[idFieldName] + '_' + auxIdSequence;
+                 } else
+                     aNewRow.id = xDataItem[idFieldName];
+             }
      
-               setNewRowAttributes(newRow);
+             saveInplaceData(aNewRow, xDataItem);
      
-               /* default action when neither columns nor html are defined */
-               if ((typeof aLineSpec.html == 'undefined') &&
-                   (typeof aLineSpec.rows == 'undefined') &&
-                   (typeof aLineSpec.columns == 'undefined')) {
-                 if (typeof xDataItem=='string') {
-                   addCell(null);
-                 } else {
-                   for(colName in xDataItem) {
-                     if ((xDataItem.hasOwnProperty(colName)) &&
-                         (colName!=idFieldName) &&
-                         (colName!='rowid') &&
-                         (colName!='_elementid_')) {
-                       addCell(colName);
+             if ((aLineSpec.onClick) || (aLineSpec.onSelect)) {
+                 aNewRow.addEventListener('click', ((aLineSpec.onClick) || (aLineSpec.onSelect)), false);
+             }
+         };
+     
+         var addCell = function(colName) {
+             if (colName != idFieldName) {
+                 var newCell = newRow.insertCell(cNdx),
+                     xDataItem = getDataFromXData(xData[j]),
+                     aNewCellValue = colName !== null ? unmaskHTML(xDataItem[colName]) : unmaskHTML(xDataItem);
+                 if ((aLineSpec.columns) && (aLineSpec.columns[colName])) {
+                     if (aLineSpec.columns[colName].align)
+                         newCell.style.textAlign = aLineSpec.columns[colName].align;
+                     if (aLineSpec.columns[colName].type) {
+                         aNewCellValue = yAnalise('%' + aLineSpec.columns[colName].type + '(' + aNewCellValue + ')');
                      }
-                   }
                  }
      
-               } else {
-                 /* columns order are defined */
-                 if (typeof aLineSpec.columns != 'undefined') {
+                 if (!canCreateRow) {
+                     newCell.addClass('warning');
+                     /* newCell.style.borderLeft = 'solid 1px red'; */
+                 }
      
-                   if (isArray(aLineSpec.columns)) {
-                     for (c=0; c<aLineSpec.columns.length; c++) {
-                       addCell(aLineSpec.columns[c]);
-                     }
-                   } else {
-                     for(c in aLineSpec.columns) {
-                       if (aLineSpec.columns.hasOwnProperty(c))
-                         addCell(c);
-                     }
-                   }
-     
-                 } else if (typeof aLineSpec.html != 'undefined'){
-                   /* html parser is enabled */
-                   newCell  = newRow.insertCell(0);
-                   newCell.innerHTML = yAnalise(aLineSpec.html,xDataItem);
-                   newCell.style.verticalAlign='top';
-                   newCell.id=aElementID+'_'+cNdx+'_'+oTable.rows.length;
-                   if (typeof aLineSpec.onNewItem == 'function')
+                 newCell.innerHTML = aNewCellValue.length === 0 ? '&nbsp;' : aNewCellValue;
+                 newCell.style.verticalAlign = 'top';
+                 newCell.id = aElementID + '_' + cNdx + '_' + oTable.rows.length;
+                 newCell.setAttribute('colName', colName);
+                 if (typeof aLineSpec.onNewItem == 'function')
                      aLineSpec.onNewItem(aElementID, newCell, xDataItem);
-     
-                 } else if (typeof aLineSpec.rows != 'undefined') {
-                   var firstRow = true;
-                   for(r=0; r < aLineSpec.rows.length; r++) {
-                     if (!firstRow) {
-                       newRow = oTable.insertRow(oTable.rows.length);
-                       setNewRowAttributes(newRow);
-                     }
-                     newRow.innerHTML = yAnalise(aLineSpec.rows[r],xDataItem);
-                     if (!canCreateRow) {
-                       for(c=0; c<newRow.cells.length; c++)
-                         newRow.cells[c].style.borderLeft = 'solid 1px red';
-                     }
-                     if (typeof aLineSpec.onNewItem == 'function')
-                       aLineSpec.onNewItem(aElementID, newRow, xDataItem);
-                     firstRow = false;
-                   }
-                 }
-     
-               }
-     
-               if (typeof aLineSpec.onNewRowReady == 'function') {
-                 aLineSpec.onNewRowReady(aElementID, newRow);
-               }
-     
+                 cNdx = cNdx + 1;
              }
-           }
+         };
      
-         } else if (aElement.nodeName=='UL') {
-           var oUL = aElement;
+         var oTable, auxHTML, j, c, cNdx, i, newCell, internalRowId = (new Date()).getTime() - 1447265735470,
+             xDataItem;
      
-           if (aFlags.deleteRows) {
-             while (oUL.firstChild) {
-               oUL.removeChild(oUL.firstChild);
-             }
-           }
+         if (aElement) {
+             if (aElement.nodeName == 'TABLE') {
+                 if (aElement.getElementsByTagName('tbody').length > 0)
+                     oTable = aElement.getElementsByTagName('tbody')[0];
+                 else
+                     oTable = aElement;
+                 if (oTable.getElementsByTagName('tbody').length > 0)
+                     oTable = oTable.getElementsByTagName('tbody')[0];
      
-           for (j in xData) {
-             if (xData.hasOwnProperty(j)) {
-               xDataItem=getDataFromXData(xData[j]);
-               var entry = document.createElement('li');
-               saveInplaceData(entry, xDataItem);
-               
-               var innerText = '',
-                   asHTML=false;
-               if (typeof aLineSpec.rows=='object') {
-                 for(r=0; r < aLineSpec.rows.length; r++) {
-                   innerText=innerText+yAnalise(aLineSpec.rows[r],xDataItem)+"";
-                 }
-                 asHTML=true;
-               } else if (typeof aLineSpec.html=='string') {
-                 innerText=innerText+yAnalise(aLineSpec.html,xDataItem)+"";
-                 asHTML=true;
-               } else {
-                 for(colName in xDataItem) {
-                   if (innerText==='') {
-                     if ((xDataItem.hasOwnProperty(colName)) &&
-                         (colName!=idFieldName) &&
-                         (colName!='rowid') &&
-                         (colName!='_elementid_')) {
-                           innerText=innerText+xDataItem[colName];
+                 /* 1) if this is the first time, pull the template from the table itself
+                  * 2) the 'aLineSpec' has higher priority */
+                 if (first_time) {
+                     if (typeof(aLineSpec.columns || aLineSpec.rows || aLineSpec.html) == "undefined") {
+                         ycomm.dom._elem_templates[aElementID] = {};
+                         if (oTable.rows.length > 0) {
+                             ycomm.dom._elem_templates[aElementID].rows = [];
+                             for (i = 0; i < oTable.rows.length; i++)
+                                 ycomm.dom._elem_templates[aElementID].rows[i] = trim(oTable.rows[i].innerHTML + "").replace(/\ \s+/g, '');
                          }
-                   }
-                 }
-     
-               }
-     
-               setNewRowAttributes(entry);
-               if (asHTML)
-                 entry.innerHTML=innerText;
-               else
-                 entry.appendChild(document.createTextNode(innerText));
-               if (typeof aLineSpec.beforeElement=='string') {
-                 var item=y$(aLineSpec.beforeElement);
-                 oUL.insertBefore(entry, item);
-               } else
-                 oUL.appendChild(entry);
-     
-               if (typeof aLineSpec.onNewItem == 'function')
-                 aLineSpec.onNewItem(aElementID, entry, xDataItem);
-             }
-           }
-     
-         } else if (aElement.nodeName=='LISTBOX') {
-           var oListBox = aElement;
-           if (aFlags.deleteRows) {
-             while(oListBox.childElementCount>0)
-               oListBox.childNodes[0].remove();
-           }
-           var cRow = 0;
-     
-           for (j in xData) {
-             if (xData.hasOwnProperty(j)) {
-               xDataItem=getDataFromXData(xData[j]);
-               xDataItem._elementid_ = aElementID;
-               newRow   = document.createElement('listitem');
-               cNdx = 0;
-     
-               if (typeof aLineSpec.columns == 'undefined') {
-                 if (typeof xDataItem == 'string') {
-                   _dumpy(2,1,"ERRO: yeapf-dom.js - string cell not implemented");
-                 } else {
-                   for(colName in xDataItem) {
-                     if ((xDataItem.hasOwnProperty(colName)) &&
-                         (colName!=idFieldName) &&
-                         (colName!='rowid') &&
-                         (colName!='_elementid_')) {
-                       newCell  = document.createElement('listcell');
-                       newCell.innerHTML = xDataItem[colName];
-                       newCell.id=aElementID+'_'+cNdx+'_'+cRow;
-                       if (typeof aLineSpec.onNewItem == 'function')
-                         aLineSpec.onNewItem(aElementID, newCell, xDataItem);
-                       cNdx = cNdx + 1;
-                       newRow.appendChild(newCell);
+                     } else {
+                         ycomm.dom._elem_templates[aElementID] = {};
+                         ycomm.dom._elem_templates[aElementID].columns = aLineSpec.columns;
+                         ycomm.dom._elem_templates[aElementID].rows = aLineSpec.rows;
+                         ycomm.dom._elem_templates[aElementID].html = aLineSpec.html;
                      }
-                   }
                  }
-               } else {
-                 for(colName in aLineSpec.columns) {
-                   if (colName != idFieldName) {
-                     newCell  = document.createElement('listcell');
-                     newCell.innerHTML = xDataItem[colName];
-                     newCell.id=aElementID+'_'+cNdx+'_'+cRow;
-                     if (typeof aLineSpec.onNewItem == 'function')
-                       aLineSpec.onNewItem(aElementID, newCell, xDataItem);
-                     cNdx = cNdx + 1;
-                     newRow.appendChild(newCell);
-                   }
-                 }
-               }
-               saveInplaceData(newRow, xDataItem);
-               oListBox.appendChild(newRow);
-               cRow++;
-             }
-           }
-         
-         } else if ((aElement.nodeName=='SELECT') || (aElement.nodeName=='DATALIST')) {
+                 mergeObject(ycomm.dom._elem_templates[aElementID], aLineSpec, true);
      
-           /* Clean options */
-           if (aFlags.deleteRows) {
-             while (aElement.options.length>0) {
-               aElement.removeChild(aElement.options[0]);
-               /*
-                 aElement.options.remove(0);
-                */
-             }
-           }
-           cNdx = 0;
-           /* data */
-           for (j in xData) {
-     
-             if (xData.hasOwnProperty(j)) {
-               xDataItem=getDataFromXData(xData[j]);
-               xDataItem._elementid_ = aElementID;
-               auxHTML = '';
-               if (typeof aLineSpec.columns == 'undefined') {
-                 if (typeof xDataItem == 'string') {
-                   _dumpy(2,1,"ERRO: yeapf-dom.js - string cell not implemented");
+                 if (aFlags.deleteRows) {
+                     while (oTable.rows.length > 0)
+                         oTable.deleteRow(oTable.rows.length - 1);
                  } else {
-                   for(colName in xDataItem) {
-                     if ((xDataItem.hasOwnProperty(colName)) &&
-                         (colName!=idFieldName) &&
-                         (colName!='rowid') &&
-                         (colName!='_elementid_')) {
-                       auxHTML = auxHTML + xDataItem[colName];
-                     }
-                   }
+                     rowIdOffset = oTable.rows.length;
                  }
-               } else {
-                 var sep = aLineSpec.sep || '';
-                 if (isArray(aLineSpec.columns)) {
-                   for (c=0; c<aLineSpec.columns.length; c++) {
-                     if (auxHTML>'')
-                       auxHTML+=sep;
-                     auxHTML = auxHTML + xDataItem[aLineSpec.columns[c]];
-                   }
-                 } else {
-                   if (typeof xDataItem == 'string') {
-                     _dumpy(2,1,"ERRO: yeapf-dom.js - string cell not implemented");
-                   } else {
-                     for(colName in aLineSpec.columns) {
-                       if (colName != idFieldName)
-                         auxHTML = auxHTML + xDataItem[colName]+sep;
-                     }
-                   }
-                 }
-               }
      
-               var opt =  document.createElement('option');
-               if (typeof xDataItem[idFieldName] != 'undefined') {
-                 if (aElement.nodeName=='DATALIST') {
-                   opt.setAttribute('data-'+idFieldName, xDataItem[idFieldName]);
-                 } else {
-                   opt.value = xDataItem[idFieldName];
-                 }
-               }
-               opt.innerHTML = auxHTML;
-               opt.id=aElementID+'_'+cNdx;
-               saveInplaceData(opt, xDataItem);
+                 var rowGroup = oTable.rows.length % 2;
+                 cNdx = null;
+                 for (j in xData) {
+                     if (xData.hasOwnProperty(j)) {
+                         xDataItem = getDataFromXData(xData[j]);
+                         rowGroup++;
      
-               if (typeof aLineSpec.onNewItem == 'function')
-                 aLineSpec.onNewItem(aElementID, opt, xDataItem);
-               aElement.appendChild(opt);
-               cNdx++;
-             }
-           }
-     
-           if (aElement.onclick)
-             aElement.onclick();
-         
-         } else if (aElement.nodeName=='FORM') {
-           var fieldType,
-               valueType,
-               editMask,
-               storageMask,
-               fieldValue,
-               fieldName,
-               fieldPrefix, fieldPostfix,
-               aElements;
-     
-           if (aFlags.deleteRows)
-             aElements = this.cleanForm(aElementID);
-           else
-             aElements = this.selectElements(aElementID);
-     
-           if (xData)
-             if ((typeof xData=='object') || (xData.length === 1)) {
-               var yData=getDataFromXData(xData[0] || xData);
-               saveInplaceData(aElement, yData);
-     
-               fieldPrefix = aLineSpec.elementPrefixName || aLineSpec.prefix || '';
-               fieldPostfix = aLineSpec.elementPostixName || aLineSpec.postfix || '';
-               for (i=0; i < aElements.length; i++) {
-                 /* the less prioritary MASK comes from the html form */
-                 editMask = aElements[i].getAttribute('editMask');
-                 storageMask = aElements[i].getAttribute('storageMask');
-                 valueType = aElements[i].getAttribute('valueType') || 'text';
-     
-                 /* data comming from the server */
-                 fieldName = suggestKeyName(yData, aElements[i].name || aElements[i].id, fieldPrefix, fieldPostfix);
-     
-                 /* column name defined by the programmer on client side */
-                 colName = (aLineSpec.columns && suggestKeyName(aLineSpec.columns, aElements[i].name || aElements[i].id)) || null;
-     
-                 if (typeof yData[fieldName] != 'undefined') {
-                   fieldValue = unmaskHTML(yData[fieldName]);
-                   fieldType = aElements[i].type.toLowerCase();
-     
-                   /* only fill field if there is not column definition
-                    * or if the colName is defined */
-                   if ((!aLineSpec.columns) || (colName>'')) {
-                     /* if thete is a colName, pick type and mask from aLineSpec */
-                     if (colName>'') {
-                       if (!isArray(aLineSpec.columns)) {
-                         valueType = aLineSpec.columns[colName].type;
-                         editMask = (aLineSpec.columns[colName].editMask) || editMask;
-                         storageMask = (aLineSpec.columns[colName].storageMask) || storageMask;
-                       }
-                     }
-     
-                     if (valueType!='text') {
-                       if ((editMask>'') && (storageMask>'')) {
-                         if (valueType.indexOf('date')>=0) {
-                           fieldValue = dateTransform(fieldValue, storageMask, editMask);
+                         canCreateRow = true;
+                         if (!aFlags.deleteRows) {
+                             if (xDataItem[idFieldName]) {
+                                 for (i = 0;
+                                     ((canCreateRow) && (i < oTable.rows.length)); i++) {
+                                     if (oTable.rows[i].id == xDataItem[idFieldName]) {
+                                         newRow = oTable.rows[i];
+                                         while (newRow.cells.length > 0)
+                                             newRow.deleteCell(0);
+                                         canCreateRow = false;
+                                         xDataItem.rowid = i;
+                                     }
+                                 }
+                             }
                          }
-                       } else
-                         fieldValue = yAnalise("%"+valueType+"("+fieldValue+")");
+     
+                         if (canCreateRow) {
+                             if (aFlags.insertAtTop)
+                                 newRow = oTable.insertRow(0);
+                             else
+                                 newRow = oTable.insertRow(oTable.rows.length);
+                         }
+     
+                         // xDataItem['rowid'] = parseInt(xDataItem['rowid']) + rowIdOffset + '';
+                         internalRowId++;
+                         xDataItem.rowid = ((!aFlags.insertAtTop) && (typeof newRow.rowIndex !== "undefined")) ? newRow.rowIndex : internalRowId + '';
+                         xDataItem._elementid_ = aElementID;
+     
+                         setNewRowAttributes(newRow);
+     
+                         /* default action when neither columns nor html are defined */
+                         if ((typeof aLineSpec.html == 'undefined') &&
+                             (typeof aLineSpec.rows == 'undefined') &&
+                             (typeof aLineSpec.columns == 'undefined')) {
+                             if (typeof xDataItem == 'string') {
+                                 addCell(null);
+                             } else {
+                                 for (colName in xDataItem) {
+                                     if ((xDataItem.hasOwnProperty(colName)) &&
+                                         (colName != idFieldName) &&
+                                         (colName != 'rowid') &&
+                                         (colName != '_elementid_')) {
+                                         addCell(colName);
+                                     }
+                                 }
+                             }
+     
+                         } else {
+                             /* columns order are defined */
+                             if (typeof aLineSpec.columns != 'undefined') {
+     
+                                 if (isArray(aLineSpec.columns)) {
+                                     for (c = 0; c < aLineSpec.columns.length; c++) {
+                                         addCell(aLineSpec.columns[c]);
+                                     }
+                                 } else {
+                                     for (c in aLineSpec.columns) {
+                                         if (aLineSpec.columns.hasOwnProperty(c))
+                                             addCell(c);
+                                     }
+                                 }
+     
+                             } else if (typeof aLineSpec.html != 'undefined') {
+                                 /* html parser is enabled */
+                                 newCell = newRow.insertCell(0);
+                                 newCell.innerHTML = yAnalise(aLineSpec.html, xDataItem);
+                                 newCell.style.verticalAlign = 'top';
+                                 newCell.id = aElementID + '_' + cNdx + '_' + oTable.rows.length;
+                                 if (typeof aLineSpec.onNewItem == 'function')
+                                     aLineSpec.onNewItem(aElementID, newCell, xDataItem);
+     
+                             } else if (typeof aLineSpec.rows != 'undefined') {
+                                 var firstRow = true;
+                                 for (r = 0; r < aLineSpec.rows.length; r++) {
+                                     if (!firstRow) {
+                                         newRow = oTable.insertRow(oTable.rows.length);
+                                         setNewRowAttributes(newRow);
+                                     }
+                                     newRow.innerHTML = yAnalise(aLineSpec.rows[r], xDataItem);
+                                     if (!canCreateRow) {
+                                         for (c = 0; c < newRow.cells.length; c++)
+                                             newRow.cells[c].style.borderLeft = 'solid 1px red';
+                                     }
+                                     if (typeof aLineSpec.onNewItem == 'function')
+                                         aLineSpec.onNewItem(aElementID, newRow, xDataItem);
+                                     firstRow = false;
+                                 }
+                             }
+     
+                         }
+     
+                         if (typeof aLineSpec.onNewRowReady == 'function') {
+                             aLineSpec.onNewRowReady(aElementID, newRow);
+                         }
+     
                      }
+                 }
      
-                     switch(fieldType) {
+             } else if (aElement.nodeName == 'UL') {
+                 var oUL = aElement;
      
-                       case "text":
-                       case "password":
-                       case "textarea":
-                       case "email":
-                       case "hidden":
-                       case "color":
-                       case "date":
-                       case "datetime":
-                       case "datetime-local":
-                       case "month":
-                       case "number":
-                       case "range":
-                       case "search":
-                       case "tel":
-                       case "time":
-                       case "url":
-                       case "week":
-                         aElements[i].value = fieldValue;
-                         break;
+                 if (aFlags.deleteRows) {
+                     while (oUL.firstChild) {
+                         oUL.removeChild(oUL.firstChild);
+                     }
+                 }
      
-                       case "radio":
-                       case "checkbox":
+                 for (j in xData) {
+                     if (xData.hasOwnProperty(j)) {
+                         xDataItem = getDataFromXData(xData[j]);
+                         var entry = document.createElement('li');
+                         saveInplaceData(entry, xDataItem);
+     
+                         var innerText = '',
+                             asHTML = false;
+                         if (typeof aLineSpec.rows == 'object') {
+                             for (r = 0; r < aLineSpec.rows.length; r++) {
+                                 innerText = innerText + yAnalise(aLineSpec.rows[r], xDataItem) + "";
+                             }
+                             asHTML = true;
+                         } else if (typeof aLineSpec.html == 'string') {
+                             innerText = innerText + yAnalise(aLineSpec.html, xDataItem) + "";
+                             asHTML = true;
+                         } else {
+                             for (colName in xDataItem) {
+                                 if (innerText === '') {
+                                     if ((xDataItem.hasOwnProperty(colName)) &&
+                                         (colName != idFieldName) &&
+                                         (colName != 'rowid') &&
+                                         (colName != '_elementid_')) {
+                                         innerText = innerText + xDataItem[colName];
+                                     }
+                                 }
+                             }
+     
+                         }
+     
+                         setNewRowAttributes(entry);
+                         if (asHTML)
+                             entry.innerHTML = innerText;
+                         else
+                             entry.appendChild(document.createTextNode(innerText));
+                         if (typeof aLineSpec.beforeElement == 'string') {
+                             var item = y$(aLineSpec.beforeElement);
+                             oUL.insertBefore(entry, item);
+                         } else
+                             oUL.appendChild(entry);
+     
+                         if (typeof aLineSpec.onNewItem == 'function')
+                             aLineSpec.onNewItem(aElementID, entry, xDataItem);
+                     }
+                 }
+     
+             } else if (aElement.nodeName == 'LISTBOX') {
+                 var oListBox = aElement;
+                 if (aFlags.deleteRows) {
+                     while (oListBox.childElementCount > 0)
+                         oListBox.childNodes[0].remove();
+                 }
+                 var cRow = 0;
+     
+                 for (j in xData) {
+                     if (xData.hasOwnProperty(j)) {
+                         xDataItem = getDataFromXData(xData[j]);
+                         xDataItem._elementid_ = aElementID;
+                         newRow = document.createElement('listitem');
+                         cNdx = 0;
+     
+                         if (typeof aLineSpec.columns == 'undefined') {
+                             if (typeof xDataItem == 'string') {
+                                 _dumpy(2, 1, "ERRO: yeapf-dom.js - string cell not implemented");
+                             } else {
+                                 for (colName in xDataItem) {
+                                     if ((xDataItem.hasOwnProperty(colName)) &&
+                                         (colName != idFieldName) &&
+                                         (colName != 'rowid') &&
+                                         (colName != '_elementid_')) {
+                                         newCell = document.createElement('listcell');
+                                         newCell.innerHTML = xDataItem[colName];
+                                         newCell.id = aElementID + '_' + cNdx + '_' + cRow;
+                                         if (typeof aLineSpec.onNewItem == 'function')
+                                             aLineSpec.onNewItem(aElementID, newCell, xDataItem);
+                                         cNdx = cNdx + 1;
+                                         newRow.appendChild(newCell);
+                                     }
+                                 }
+                             }
+                         } else {
+                             for (colName in aLineSpec.columns) {
+                                 if (colName != idFieldName) {
+                                     newCell = document.createElement('listcell');
+                                     newCell.innerHTML = xDataItem[colName];
+                                     newCell.id = aElementID + '_' + cNdx + '_' + cRow;
+                                     if (typeof aLineSpec.onNewItem == 'function')
+                                         aLineSpec.onNewItem(aElementID, newCell, xDataItem);
+                                     cNdx = cNdx + 1;
+                                     newRow.appendChild(newCell);
+                                 }
+                             }
+                         }
+                         saveInplaceData(newRow, xDataItem);
+                         oListBox.appendChild(newRow);
+                         cRow++;
+                     }
+                 }
+     
+             } else if ((aElement.nodeName == 'SELECT') || (aElement.nodeName == 'DATALIST')) {
+     
+                 /* Clean options */
+                 if (aFlags.deleteRows) {
+                     while (aElement.options.length > 0) {
+                         aElement.removeChild(aElement.options[0]);
                          /*
-                         var options=document.getElementsByName(fieldName);
-                         for (var j=0; j<options.length; j++)
-                           if (options[j].value==fieldValue)
-                             options[j].checked=true;
-                         */
-     
-                         if (aElements[i].value==fieldValue)
-                           aElements[i].checked = (aElements[i].value === fieldValue);
-                         break;
-     
-                       case "select-one":
-                       case "select-multi":
-                         for(j=0; j < aElements[i].options.length; j++)
-                           if (aElements[i].options[j].value==fieldValue)
-                             aElements[i].selectedIndex = j;
-                         break;
+                           aElement.options.remove(0);
+                          */
                      }
+                 }
+                 cNdx = 0;
+                 /* data */
+                 for (j in xData) {
      
-                     if (typeof aLineSpec.onNewItem == 'function')
-                       aLineSpec.onNewItem(aElementID, aElements[i], yData);
+                     if (xData.hasOwnProperty(j)) {
+                         xDataItem = getDataFromXData(xData[j]);
+                         xDataItem._elementid_ = aElementID;
+                         auxHTML = '';
+                         if (typeof aLineSpec.columns == 'undefined') {
+                             if (typeof xDataItem == 'string') {
+                                 _dumpy(2, 1, "ERRO: yeapf-dom.js - string cell not implemented");
+                             } else {
+                                 for (colName in xDataItem) {
+                                     if ((xDataItem.hasOwnProperty(colName)) &&
+                                         (colName != idFieldName) &&
+                                         (colName != 'rowid') &&
+                                         (colName != '_elementid_')) {
+                                         auxHTML = auxHTML + xDataItem[colName];
+                                     }
+                                 }
+                             }
+                         } else {
+                             var sep = aLineSpec.sep || '';
+                             if (isArray(aLineSpec.columns)) {
+                                 for (c = 0; c < aLineSpec.columns.length; c++) {
+                                     if (auxHTML > '')
+                                         auxHTML += sep;
+                                     auxHTML = auxHTML + xDataItem[aLineSpec.columns[c]];
+                                 }
+                             } else {
+                                 if (typeof xDataItem == 'string') {
+                                     _dumpy(2, 1, "ERRO: yeapf-dom.js - string cell not implemented");
+                                 } else {
+                                     for (colName in aLineSpec.columns) {
+                                         if (colName != idFieldName)
+                                             auxHTML = auxHTML + xDataItem[colName] + sep;
+                                     }
+                                 }
+                             }
+                         }
      
-                   }
+                         var opt = document.createElement('option');
+                         if (typeof xDataItem[idFieldName] != 'undefined') {
+                             if (aElement.nodeName == 'DATALIST') {
+                                 opt.setAttribute('data-' + idFieldName, xDataItem[idFieldName]);
+                             } else {
+                                 opt.value = xDataItem[idFieldName];
+                             }
+                         }
+                         opt.innerHTML = auxHTML;
+                         opt.id = aElementID + '_' + cNdx;
+                         saveInplaceData(opt, xDataItem);
+     
+                         if (typeof aLineSpec.onNewItem == 'function')
+                             aLineSpec.onNewItem(aElementID, opt, xDataItem);
+                         aElement.appendChild(opt);
+                         cNdx++;
+                     }
                  }
      
-               }
-             } else if (xData.length > 1)
-               _dump("There are more than one record returning from the server");
-         
-         } else if (aElement.nodeName=='DIV') {
-           if (aFlags.deleteRows)
-             aElement.innerHTML='';
-           
-           auxHTML=aElement.innerHTML; 
+                 if (aElement.onclick)
+                     aElement.onclick();
      
-           if (xData) {
-             for (j in xData) {
-               if (xData.hasOwnProperty(j)) {
-                 xDataItem=getDataFromXData(xData[j]);
-                 saveInplaceData(aElement, xDataItem);
+             } else if (aElement.nodeName == 'FORM') {
+                 var fieldType,
+                     valueType,
+                     editMask,
+                     storageMask,
+                     fieldValue,
+                     fieldName,
+                     fieldPrefix, fieldPostfix,
+                     aElements;
      
-                 if (aLineSpec.html) {
-                   auxHTML=auxHTML+yAnalise(aLineSpec.html, xDataItem);
-                 } else {
-                   for(colName in xDataItem) {
-                     if (xDataItem.hasOwnProperty(colName)) {
-                       auxHTML+='<div><div class=tnFieldName><b><small>{0}</small></b></div>{1}'.format(colName, xDataItem[colName]);
+                 if (aFlags.deleteRows)
+                     aElements = this.cleanForm(aElementID);
+                 else
+                     aElements = this.selectElements(aElementID);
+     
+                 if (xData)
+                     if ((typeof xData == 'object') || (xData.length === 1)) {
+                         var yData = getDataFromXData(xData[0] || xData);
+                         saveInplaceData(aElement, yData);
+     
+                         fieldPrefix = aLineSpec.elementPrefixName || aLineSpec.prefix || '';
+                         fieldPostfix = aLineSpec.elementPostixName || aLineSpec.postfix || '';
+                         for (i = 0; i < aElements.length; i++) {
+                             /* the less prioritary MASK comes from the html form */
+                             editMask = aElements[i].getAttribute('editMask');
+                             storageMask = aElements[i].getAttribute('storageMask');
+                             valueType = aElements[i].getAttribute('valueType') || 'text';
+     
+                             /* data comming from the server */
+                             fieldName = suggestKeyName(yData, aElements[i].name || aElements[i].id, fieldPrefix, fieldPostfix);
+     
+                             /* column name defined by the programmer on client side */
+                             colName = (aLineSpec.columns && suggestKeyName(aLineSpec.columns, aElements[i].name || aElements[i].id)) || null;
+     
+                             if (typeof yData[fieldName] != 'undefined') {
+                                 fieldValue = unmaskHTML(yData[fieldName]);
+                                 fieldType = aElements[i].type.toLowerCase();
+     
+                                 /* only fill field if there is not column definition
+                                  * or if the colName is defined */
+                                 if ((!aLineSpec.columns) || (colName > '')) {
+                                     /* if thete is a colName, pick type and mask from aLineSpec */
+                                     if (colName > '') {
+                                         if (!isArray(aLineSpec.columns)) {
+                                             valueType = aLineSpec.columns[colName].type;
+                                             editMask = (aLineSpec.columns[colName].editMask) || editMask;
+                                             storageMask = (aLineSpec.columns[colName].storageMask) || storageMask;
+                                         }
+                                     }
+     
+                                     if (valueType != 'text') {
+                                         if ((editMask > '') && (storageMask > '')) {
+                                             if (valueType.indexOf('date') >= 0) {
+                                                 fieldValue = dateTransform(fieldValue, storageMask, editMask);
+                                             }
+                                         } else
+                                             fieldValue = yAnalise("%" + valueType + "(" + fieldValue + ")");
+                                     }
+     
+                                     switch (fieldType) {
+     
+                                         case "text":
+                                         case "password":
+                                         case "textarea":
+                                         case "email":
+                                         case "hidden":
+                                         case "color":
+                                         case "date":
+                                         case "datetime":
+                                         case "datetime-local":
+                                         case "month":
+                                         case "number":
+                                         case "range":
+                                         case "search":
+                                         case "tel":
+                                         case "time":
+                                         case "url":
+                                         case "week":
+                                             aElements[i].value = fieldValue;
+                                             break;
+     
+                                         case "radio":
+                                         case "checkbox":
+                                             /*
+                                             var options=document.getElementsByName(fieldName);
+                                             for (var j=0; j<options.length; j++)
+                                               if (options[j].value==fieldValue)
+                                                 options[j].checked=true;
+                                             */
+     
+                                             if (aElements[i].value == fieldValue)
+                                                 aElements[i].checked = (aElements[i].value === fieldValue);
+                                             break;
+     
+                                         case "select-one":
+                                         case "select-multi":
+                                             for (j = 0; j < aElements[i].options.length; j++)
+                                                 if (aElements[i].options[j].value == fieldValue)
+                                                     aElements[i].selectedIndex = j;
+                                             break;
+                                     }
+     
+                                     if (typeof aLineSpec.onNewItem == 'function')
+                                         aLineSpec.onNewItem(aElementID, aElements[i], yData);
+     
+                                 }
+                             }
+     
+                         }
+                     } else if (xData.length > 1)
+                     _dump("There are more than one record returning from the server");
+     
+             } else if (aElement.nodeName == 'DIV') {
+                 if (aFlags.deleteRows)
+                     aElement.innerHTML = '';
+     
+                 auxHTML = aElement.innerHTML;
+     
+                 if (xData) {
+                     for (j in xData) {
+                         if (xData.hasOwnProperty(j)) {
+                             xDataItem = getDataFromXData(xData[j]);
+                             saveInplaceData(aElement, xDataItem);
+     
+                             if (aLineSpec.html) {
+                                 auxHTML = auxHTML + yAnalise(aLineSpec.html, xDataItem);
+                             } else {
+                                 for (colName in xDataItem) {
+                                     if (xDataItem.hasOwnProperty(colName)) {
+                                         auxHTML += '<div><div class=tnFieldName><b><small>{0}</small></b></div>{1}'.format(colName, xDataItem[colName]);
+                                     }
+                                 }
+                             }
+                         }
                      }
-                   }
+                     aElement.innerHTML = auxHTML;
                  }
-               }
              }
-             aElement.innerHTML=auxHTML;
-           }
          }
-       }
      };
      
      /*
@@ -5200,338 +5206,341 @@
       * contains the ROW and the aElement is a button into the row
       */
      ycomm.dom.getRowId = function(aElement, aContainerID) {
-       if (aElement) {
-         while ((aElement) && (aElement.parentNode)) {
-           aElement = aElement.parentNode;
+         if (aElement) {
+             while ((aElement) && (aElement.parentNode)) {
+                 aElement = aElement.parentNode;
+             }
          }
-       }
      };
      
      ycomm.dom.getRowByRowNo = function(tableId, aRowNo) {
-       var table = document.getElementById(tableId);
-       if (table) {
-         var row = table.rows[aRowNo];
-         return row;
-       } else
-         return null;
+         var table = document.getElementById(tableId);
+         if (table) {
+             var row = table.rows[aRowNo];
+             return row;
+         } else
+             return null;
      };
      
-     ycomm.dom.getTableRowId = function(tableId, aRowNo)  {
-       var row = ycomm.dom.getRowByRowNo(tableId, aRowNo);
+     ycomm.dom.getTableRowId = function(tableId, aRowNo) {
+         var row = ycomm.dom.getRowByRowNo(tableId, aRowNo);
      
-       return row?row.id:null;
+         return row ? row.id : null;
      };
      
      ycomm.dom.highlightRow = function(tableId, aRowId, highlightClass) {
-       highlightClass = highlightClass || '';
-       var c;
-       aRowId = typeof aRowId=='undefined'?-1:aRowId;
-       var table = document.getElementById(tableId);
-       if (table) {
-         for(var i=0; i<table.rows.length; i++) {
-           if (i==aRowId) {
-             table.rows[i].addClass(highlightClass);
-             for(c=0; c<table.rows[i].cells.length; c++)
-               table.rows[i].cells[c].addClass(highlightClass);
-           } else {
-             table.rows[i].removeClass(highlightClass);
-             for(c=0; c<table.rows[i].cells.length; c++)
-               table.rows[i].cells[c].removeClass(highlightClass);
-           }
+         highlightClass = highlightClass || '';
+         var c;
+         aRowId = typeof aRowId == 'undefined' ? -1 : aRowId;
+         var table = document.getElementById(tableId);
+         if (table) {
+             for (var i = 0; i < table.rows.length; i++) {
+                 if (i == aRowId) {
+                     table.rows[i].addClass(highlightClass);
+                     for (c = 0; c < table.rows[i].cells.length; c++)
+                         table.rows[i].cells[c].addClass(highlightClass);
+                 } else {
+                     table.rows[i].removeClass(highlightClass);
+                     for (c = 0; c < table.rows[i].cells.length; c++)
+                         table.rows[i].cells[c].removeClass(highlightClass);
+                 }
+             }
          }
-       }
      };
      
      ycomm.dom.getTableRowInplaceData = function(aRow, fieldName) {
-       if (aRow)
-         return aRow.getAttribute('data-'+fieldName);
-       else
-         return null;
+         if (aRow)
+             return aRow.getAttribute('data-' + fieldName);
+         else
+             return null;
      };
      
      ycomm.dom.getTableInplaceData = function(tableId, y, fieldName) {
-       var table = document.getElementById(tableId);
-       if (table) {
-         var row = table.rows[y];
-         return ycomm.dom.getTableRowInplaceData(row, fieldName);
-       } else
-         return null;
+         var table = document.getElementById(tableId);
+         if (table) {
+             var row = table.rows[y];
+             return ycomm.dom.getTableRowInplaceData(row, fieldName);
+         } else
+             return null;
      };
      
      ycomm.dom.deleteElement = function(aElementId) {
-       var aElement = y$(aElementId);
-       if (aElement)
-         aElement.parentNode.removeChild(aElement);
+         var aElement = y$(aElementId);
+         if (aElement)
+             aElement.parentNode.removeChild(aElement);
      };
      
-     ycomm.dom.selectElements = function (aElementId, aFieldListFilter) {
-       var aElements = [], knownField, allElements, i, fieldType;
+     ycomm.dom.selectElements = function(aElementId, aFieldListFilter) {
+         var aElements = [],
+             knownField, allElements, i, fieldType;
      
-       var aForm = y$(aElementId);
-       if (aForm) {
-         allElements=aForm.getElementsByTagName('*');
-         for (i=0; i<allElements.length; i++) {
-           if (allElements[i].type) {
-             fieldType = allElements[i].type.toLowerCase();
-             knownFieldType = false;
+         var aForm = y$(aElementId);
+         if (aForm) {
+             allElements = aForm.getElementsByTagName('*');
+             for (i = 0; i < allElements.length; i++) {
+                 if (allElements[i].type) {
+                     fieldType = allElements[i].type.toLowerCase();
+                     knownFieldType = false;
      
-             if (aFieldListFilter) {
-               if (aFieldListFilter.indexOf(allElements[i].name || allElements[i].id)<0)
-                 fieldType='--AVOID--';
+                     if (aFieldListFilter) {
+                         if (aFieldListFilter.indexOf(allElements[i].name || allElements[i].id) < 0)
+                             fieldType = '--AVOID--';
+                     }
+     
+                     switch (fieldType) {
+     
+                         case "text":
+                         case "password":
+                         case "textarea":
+                         case "hidden":
+                         case "email":
+                         case "radio":
+                         case "checkbox":
+                         case "select-one":
+                         case "select-multi":
+                         case "file":
+                             knownFieldType = true;
+                             break;
+     
+                         case "color":
+                         case "date":
+                         case "datetime":
+                         case "datetime-local":
+                         case "month":
+                         case "number":
+                         case "range":
+                         case "search":
+                         case "tel":
+                         case "time":
+                         case "url":
+                         case "week":
+                             knownFieldType = true;
+                             break;
+                     }
+     
+                     if (knownFieldType)
+                         aElements[aElements.length] = allElements[i];
+                 }
              }
-     
-             switch(fieldType) {
-     
-               case "text":
-               case "password":
-               case "textarea":
-               case "hidden":
-               case "email":
-               case "radio":
-               case "checkbox":
-               case "select-one":
-               case "select-multi":
-               case "file":
-                 knownFieldType = true;
-                 break;
-     
-               case "color":
-               case "date":
-               case "datetime":
-               case "datetime-local":
-               case "month":
-               case "number":
-               case "range":
-               case "search":
-               case "tel":
-               case "time":
-               case "url":
-               case "week":
-                 knownFieldType = true;
-                 break;
-             }
-     
-             if (knownFieldType)
-               aElements[aElements.length] = allElements[i];
-           }
          }
-       }
-       return aElements;
+         return aElements;
      };
      
      ycomm.dom.cleanElement = function(aElement) {
-       if (typeof aElement == 'string')
-         aElement = y$(aElement);
-       if (aElement) {
-         var reservedFields = ['__cmd5p__'],
-             fieldModified,
-             fieldType, aux;
+         if (typeof aElement == 'string')
+             aElement = y$(aElement);
+         if (aElement) {
+             var reservedFields = ['__cmd5p__'],
+                 fieldModified,
+                 fieldType, aux;
      
-         fieldType = aElement.type?aElement.type.toLowerCase():aElement.nodeName?aElement.nodeName.toLowerCase():'UNKNOWN';
-         fieldModified = false;
-         if (reservedFields.indexOf(aElement.id)<0) {
-           switch(fieldType) {
+             fieldType = aElement.type ? aElement.type.toLowerCase() : aElement.nodeName ? aElement.nodeName.toLowerCase() : 'UNKNOWN';
+             fieldModified = false;
+             if (reservedFields.indexOf(aElement.id) < 0) {
+                 switch (fieldType) {
      
-             case "text":
-             case "password":
-             case "textarea":
-             case "hidden":
-             case "color":
-             case "date":
-             case "datetime":
-             case "datetime-local":
-             case "month":
-             case "number":
-             case "range":
-             case "search":
-             case "tel":
-             case "time":
-             case "url":
-             case "week":
-               fieldModified = (aElement.value>'');
-               aElement.value = "";
-               break;
+                     case "text":
+                     case "password":
+                     case "textarea":
+                     case "hidden":
+                     case "color":
+                     case "date":
+                     case "datetime":
+                     case "datetime-local":
+                     case "month":
+                     case "number":
+                     case "range":
+                     case "search":
+                     case "tel":
+                     case "time":
+                     case "url":
+                     case "week":
+                         fieldModified = (aElement.value > '');
+                         aElement.value = "";
+                         break;
      
-             case "radio":
-             case "checkbox":
-               fieldModified = (aElement.checked !== false);
-               aElement.checked = false;
-               break;
+                     case "radio":
+                     case "checkbox":
+                         fieldModified = (aElement.checked !== false);
+                         aElement.checked = false;
+                         break;
      
-             case "select-one":
-             case "select-multi":
-               fieldModified = (aElement.selectedIndex>-1);
-               aElement.selectedIndex = -1;
-               break;
-             case "table":
-               if (aElement.getElementsByTagName('tbody').length>0)
-                 aElement = aElement.getElementsByTagName('tbody')[0];
-               while(aElement.rows.length>0)
-                 aElement.deleteRow(aElement.rows.length-1);
-               break;
-             case "ul":
-               while (aElement.firstChild) {
-                 aElement.removeChild(aElement.firstChild);
-               }
+                     case "select-one":
+                     case "select-multi":
+                         fieldModified = (aElement.selectedIndex > -1);
+                         aElement.selectedIndex = -1;
+                         break;
+                     case "table":
+                         if (aElement.getElementsByTagName('tbody').length > 0)
+                             aElement = aElement.getElementsByTagName('tbody')[0];
+                         while (aElement.rows.length > 0)
+                             aElement.deleteRow(aElement.rows.length - 1);
+                         break;
+                     case "ul":
+                         while (aElement.firstChild) {
+                             aElement.removeChild(aElement.firstChild);
+                         }
      
-               break;
-           }
-         }
-       } else
-         _dumpy(2,1,"null element when calling cleanElement()");
+                         break;
+                 }
+             }
+         } else
+             _dumpy(2, 1, "null element when calling cleanElement()");
      };
      
-     ycomm.dom.cleanForm = function (aFormId, aFieldList) {
-       /*
-         <button>
-         <datalist>
-         <fieldset>
-         <form>
-         <input>
-         <keygen>
-         <label>
-         <legend>
-         <meter>
-         <optgroup>
-         <option>
-         <output>
-         <progress>
-         <select>
-         <textarea>
-       */
-       var i, aElements;
+     ycomm.dom.cleanForm = function(aFormId, aFieldList) {
+         /*
+           <button>
+           <datalist>
+           <fieldset>
+           <form>
+           <input>
+           <keygen>
+           <label>
+           <legend>
+           <meter>
+           <optgroup>
+           <option>
+           <output>
+           <progress>
+           <select>
+           <textarea>
+         */
+         var i, aElements;
      
-       aElements = this.selectElements(aFormId, aFieldList);
-       for (i=0; i<aElements.length; i++) {
-         ycomm.dom.cleanElement(aElements[i]);
-       }
-       return aElements;
+         aElements = this.selectElements(aFormId, aFieldList);
+         for (i = 0; i < aElements.length; i++) {
+             ycomm.dom.cleanElement(aElements[i]);
+         }
+         return aElements;
      };
      
      ycomm.dom._scratch = {
-       t:  ['Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
-            'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.',
-            'Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.',
-            'Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.',
-            'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.',
-            'At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. ',
-            'Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'],
-       d:  [ 'yahu.com', 'hotmayl.com', 'jmail.com', 'yahu.com.nh', 'hotmayl.com.nh', 'jmail.com.nh'],
-       p:  [ 'http://', 'https://', 'ws://', 'wss://', 'ftp://'],
-       mn: [ 'James', 'John', 'Robert', 'Michael', 'William', 'David', 'Richard', 'Charles'],
-       fn: [ 'Mary', 'Patricia', 'Linda', 'Barbara', 'Elizabeth', 'Jennifer', 'Maria', 'Susan'],
-       sn: [ 'Smith', 'Jones', 'Taylor', 'Williams', 'Brown', 'Davies', 'Evans', 'Wilson'],
-       ch: 'qwertyuiopasdfghjklzxcvbnmQAZWSXEDCRFVTGBYHNUJMIKOLP0123456789',
-       n:  '0123456789'
+         t: ['Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
+             'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.',
+             'Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.',
+             'Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.',
+             'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.',
+             'At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. ',
+             'Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
+         ],
+         d: ['yahu.com', 'hotmayl.com', 'jmail.com', 'yahu.com.nh', 'hotmayl.com.nh', 'jmail.com.nh'],
+         p: ['http://', 'https://', 'ws://', 'wss://', 'ftp://'],
+         mn: ['James', 'John', 'Robert', 'Michael', 'William', 'David', 'Richard', 'Charles'],
+         fn: ['Mary', 'Patricia', 'Linda', 'Barbara', 'Elizabeth', 'Jennifer', 'Maria', 'Susan'],
+         sn: ['Smith', 'Jones', 'Taylor', 'Williams', 'Brown', 'Davies', 'Evans', 'Wilson'],
+         ch: 'qwertyuiopasdfghjklzxcvbnmQAZWSXEDCRFVTGBYHNUJMIKOLP0123456789',
+         n: '0123456789'
      };
      
      ycomm.dom.testFormWithJunk = function(aFormId) {
      
-       var aElements = this.selectElements(aFormId), 
-           i, fieldType, fieldId, fieldValue, maxLength, classes;
+         var aElements = this.selectElements(aFormId),
+             i, fieldType, fieldId, fieldValue, maxLength, classes;
      
      
-       var genString = function(base, minLen, maxLen) {
-         var ret='', n, j;
-         maxLen=Math.floor((Math.random() * maxLen) + minLen);
-         j=0;
-         while (j<maxLen) {
-           n=Math.floor((Math.random() * base.length));
-           ret+=base[n];
-           j++;
-         }    
-         return ret;
-       };
+         var genString = function(base, minLen, maxLen) {
+             var ret = '',
+                 n, j;
+             maxLen = Math.floor((Math.random() * maxLen) + minLen);
+             j = 0;
+             while (j < maxLen) {
+                 n = Math.floor((Math.random() * base.length));
+                 ret += base[n];
+                 j++;
+             }
+             return ret;
+         };
      
-       var genNumber = function(min, max) {
-         return Math.floor((Math.random() * (max-min) + min));
-       };
+         var genNumber = function(min, max) {
+             return Math.floor((Math.random() * (max - min) + min));
+         };
      
-       var classHasName = function (name) {
-         var ret=false;
-         name=name.toUpperCase();
-         for(var c=0; c<lClasses.length; c++)  {
-           ret=ret || (lClasses[c].indexOf(name)>=0);
+         var classHasName = function(name) {
+             var ret = false;
+             name = name.toUpperCase();
+             for (var c = 0; c < lClasses.length; c++) {
+                 ret = ret || (lClasses[c].indexOf(name) >= 0);
+             }
+             return ret;
+         };
+     
+         for (i = 0; i < aElements.length; i++) {
+             fieldType = aElements[i].type.toLowerCase();
+             fieldId = aElements[i].id;
+             maxLength = aElements[i].getAttribute("maxlength") || 100;
+             lClasses = aElements[i].className.split(" ");
+     
+             for (var n = 0; n < lClasses.length; n++)
+                 lClasses[n] = lClasses[n].toUpperCase();
+     
+             fieldValue = '';
+             if (fieldId) {
+                 switch (fieldType) {
+                     case "password":
+                         fieldValue = genString(ycomm.dom._scratch.ch, 6, 15);
+                         break;
+                     case "textarea":
+                         fieldValue = genString(ycomm.dom._scratch.t, 1, 15 * maxLength);
+                         break;
+                     case "email":
+                         fieldValue = genString(ycomm.dom._scratch.mn, 2, 3) + "@" + genString(ycomm.dom._scratch.d, 1, 1);
+                         break;
+                     case "date":
+                         fieldValue = genNumber(-2208981600000, 2556064800000);
+                         fieldValue = new Date(fieldValue);
+                         fieldValue = fieldValue.toISOString().substr(0, 10);
+                         break;
+     
+                     case "color":
+                     case "datetime":
+                     case "datetime-local":
+                     case "month":
+                         fieldValue = genNumber(1, 12);
+                         break;
+                     case "number":
+                     case "range":
+                         fieldValue = genNumber(1, 100);
+                         break;
+                     case "search":
+                     case "tel":
+                     case "time":
+                     case "week":
+                         fieldValue = genNumber(1, 52);
+                         break;
+                     case "url":
+                         fieldValue = genString(ycomm.dom._scratch.p, 1, 1) + genString(ycomm.dom._scratch.d, 1, 1) + ".xyz";
+                         break;
+     
+                     case "radio":
+                     case "checkbox":
+                         break;
+     
+                     case "select-one":
+                     case "select-multi":
+                         break;
+     
+                     case "hidden":
+                         fielValue = "";
+                         break;
+     
+                     default:
+                         if (classHasName('cpf')) {
+                             fieldValue = fieldValue.gerarCPF();
+                         } else if (classHasName('cnpj')) {
+                             fieldValue = fieldValue.gerarCNPJ();
+                         } else if (classHasName('ie')) {
+                             fieldValue = genString(ycomm.dom._scratch.n, 6, 12);
+                         } else {
+                             fieldValue = genString(ycomm.dom._scratch.t, 1, maxLength);
+                         }
+                         fieldValue = fieldValue.substr(0, maxLength);
+                         break;
+                 }
+     
+                 y$(fieldId).value = fieldValue;
+             }
          }
-       return ret;
-       };
-     
-       for(i=0; i<aElements.length; i++) {
-         fieldType  = aElements[i].type.toLowerCase();
-         fieldId    = aElements[i].id;
-         maxLength  = aElements[i].getAttribute("maxlength") || 100;
-         lClasses    = aElements[i].className.split(" ");
-         
-         for (var n=0; n<lClasses.length; n++)
-           lClasses[n]=lClasses[n].toUpperCase();
-     
-         fieldValue = '';
-         if (fieldId) {
-           switch(fieldType) {
-             case "password":
-               fieldValue=genString(ycomm.dom._scratch.ch,6,15);
-               break;
-             case "textarea":
-               fieldValue=genString(ycomm.dom._scratch.t,1,15 * maxLength);
-               break;
-             case "email":
-               fieldValue=genString(ycomm.dom._scratch.mn,2,3)+"@"+genString(ycomm.dom._scratch.d, 1, 1);
-               break;
-             case "date":
-               fieldValue=genNumber(-2208981600000, 2556064800000);
-               fieldValue=new Date(fieldValue);
-               fieldValue=fieldValue.toISOString().substr(0,10);
-               break;
-     
-             case "color":
-             case "datetime":
-             case "datetime-local":
-             case "month":
-               fieldValue=genNumber(1,12);
-               break;
-             case "number":
-             case "range":
-               fieldValue=genNumber(1,100);
-               break;
-             case "search":
-             case "tel":
-             case "time":
-             case "week":
-               fieldValue=genNumber(1,52);
-               break;
-             case "url":
-               fieldValue=genString(ycomm.dom._scratch.p, 1, 1)+genString(ycomm.dom._scratch.d, 1, 1)+".xyz";
-               break;     
-     
-             case "radio":
-             case "checkbox":
-               break;
-     
-             case "select-one":
-             case "select-multi":
-               break;
-     
-             case "hidden":
-               fielValue="";
-               break;
-     
-             default:
-               if (classHasName('cpf')) {
-                 fieldValue=fieldValue.gerarCPF();
-               } else if (classHasName('cnpj')) {
-                 fieldValue=fieldValue.gerarCNPJ();
-               } else if (classHasName('ie')) {            
-                 fieldValue=genString(ycomm.dom._scratch.n,6,12);
-               } else {
-                 fieldValue=genString(ycomm.dom._scratch.t,1,maxLength);
-               }
-               fieldValue=fieldValue.substr(0, maxLength);
-               break;
-           }
-     
-           y$(fieldId).value=fieldValue;
-         }
-       }
      };
      
      /*
@@ -5539,237 +5548,236 @@
       * https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Forms/data-form_validation
       * http://www.the-art-of-web.com/html/html5-form-validation/
       */
-     ycomm.dom.getFormElements = function (aFormId, aLineSpec, aOnReady) {
-       aLineSpec=aLineSpec || {};
-       var fieldPrefix = aLineSpec.elementPrefixName || aLineSpec.prefix || '';
-       var fieldPostfix = aLineSpec.elementPostixName || aLineSpec.postfix || '';
+     ycomm.dom.getFormElements = function(aFormId, aLineSpec, aOnReady) {
+         aLineSpec = aLineSpec || {};
+         var fieldPrefix = aLineSpec.elementPrefixName || aLineSpec.prefix || '';
+         var fieldPostfix = aLineSpec.elementPostixName || aLineSpec.postfix || '';
      
-       var ret = {},
-           aElements = this.selectElements(aFormId),
-           fieldName, fieldType, fieldValue,
-           editMask,
-           storageMask,
-           valueType,
-           busyCount=0,
-           canChangeRetValue;
+         var ret = {},
+             aElements = this.selectElements(aFormId),
+             fieldName, fieldType, fieldValue,
+             editMask,
+             storageMask,
+             valueType,
+             busyCount = 0,
+             canChangeRetValue;
      
-       for (var i=0; i<aElements.length; i++) {
-         if (aElements[i].getAttribute) {
-           editMask = aElements[i].getAttribute('editMask') || '';
-           storageMask = aElements[i].getAttribute('storageMask') || '';
-           valueType = aElements[i].getAttribute('valueType') || 'text';
-         } else {
-           editMask='';
-           storageMask='';
-           valueType='text';
-         }
-         canChangeRetValue = true;
-     
-         fieldType = aElements[i].type.toLowerCase();
-         fieldName = aElements[i].name || aElements[i].id;
-     
-         if ((fieldName.substr(fieldName.length, -(fieldPostfix.length)) == fieldPostfix) &&
-             (fieldName.substr(0,fieldPrefix.length)==fieldPrefix)) {
-     
-           fieldName=fieldName.substr(fieldPrefix.length);
-           fieldName=fieldName.substr(0,fieldName.length - (fieldPostfix.length));
-     
-           if (fieldName>'') {
-             fieldValue = '';
-     
-             if ( (fieldType=='radio') ||
-                  (fieldType=='checkbox')  )  {
-               canChangeRetValue = false;
-               if (typeof ret[fieldName] == 'undefined')
-                 ret[fieldName]='';
+         for (var i = 0; i < aElements.length; i++) {
+             if (aElements[i].getAttribute) {
+                 editMask = aElements[i].getAttribute('editMask') || '';
+                 storageMask = aElements[i].getAttribute('storageMask') || '';
+                 valueType = aElements[i].getAttribute('valueType') || 'text';
+             } else {
+                 editMask = '';
+                 storageMask = '';
+                 valueType = 'text';
              }
+             canChangeRetValue = true;
      
-             switch(fieldType) {
+             fieldType = aElements[i].type.toLowerCase();
+             fieldName = aElements[i].name || aElements[i].id;
      
-               case "text":
-               case "password":
-               case "textarea":
-               case "email":
-               case "hidden":
-               case "color":
-               case "date":
-               case "datetime":
-               case "datetime-local":
-               case "month":
-               case "number":
-               case "range":
-               case "search":
-               case "tel":
-               case "time":
-               case "url":
-               case "week":
-                 fieldValue = aElements[i].value+"";
-                 if ((editMask>'') && (storageMask>'')) {
-                   if (valueType.indexOf('date')>=0) {
-                     fieldValue = dateTransform(fieldValue, editMask, storageMask);
-                     fieldValue = fieldValue?fieldValue+"":"";
-                   }
-                 }
-                 break;
+             if ((fieldName.substr(fieldName.length, -(fieldPostfix.length)) == fieldPostfix) &&
+                 (fieldName.substr(0, fieldPrefix.length) == fieldPrefix)) {
      
-               case "radio":
-               case "checkbox":
-                 fieldValue = aElements[i].checked?aElements[i].value:'';
-                 canChangeRetValue=(fieldValue!=='');
-                 break;
+                 fieldName = fieldName.substr(fieldPrefix.length);
+                 fieldName = fieldName.substr(0, fieldName.length - (fieldPostfix.length));
      
-               case "select-one":
-               case "select-multi":
-                 fieldValue = aElements[i].selectedIndex;
-                 if (aElements[i].options[fieldValue])
-                   fieldValue = aElements[i].options[fieldValue].value;
-                 break;
+                 if (fieldName > '') {
+                     fieldValue = '';
      
-               case "file":
-                 if (typeof aOnReady=='function') {
-                   /*
-                   http://stackoverflow.com/questions/12090996/waiting-for-a-file-to-load-onload-javascript
-                   http://stackoverflow.com/questions/6978156/get-base64-encode-file-data-from-input-form
-                   http://igstan.ro/posts/2009-01-11-ajax-file-upload-with-pure-javascript.html
-                   https://developer.tizen.org/dev-guide/web/2.3.0/org.tizen.mobile.web.appprogramming/html/tutorials/w3c_tutorial/comm_tutorial/upload_ajax.htm
-                   */
-                   var reader=new FileReader();
-                   busyCount++;
-                   reader._fieldName=fieldName;
-                   reader.addEventListener("load", function() {
-                     ret[this._fieldName]=this.result;
-                     busyCount--;
-                     if (busyCount<=0) {
-                       aOnReady(ret);
+                     if ((fieldType == 'radio') ||
+                         (fieldType == 'checkbox')) {
+                         canChangeRetValue = false;
+                         if (typeof ret[fieldName] == 'undefined')
+                             ret[fieldName] = '';
                      }
-                   });
-                   reader.readAsDataURL(aElements[i].files[0]); 
-                   canChangeRetValue=false;           
-                 } else
-                   fieldValue="aOnReady() not present in js call to getFormElements()";
-                 break;
-             }
-             if (typeof fieldValue=='string') {
-               if (isNumber(fieldValue))
-                 fieldValue=fieldValue.toFloat();
-               else { 
-                 if (fieldValue.indexOf(',')>=0)
-                   fieldValue = encodeURIComponent(fieldValue);
-               }
-             }
      
-             if (canChangeRetValue)
-               ret[fieldName] = fieldValue;
-           }
+                     switch (fieldType) {
+     
+                         case "text":
+                         case "password":
+                         case "textarea":
+                         case "email":
+                         case "hidden":
+                         case "color":
+                         case "date":
+                         case "datetime":
+                         case "datetime-local":
+                         case "month":
+                         case "number":
+                         case "range":
+                         case "search":
+                         case "tel":
+                         case "time":
+                         case "url":
+                         case "week":
+                             fieldValue = aElements[i].value + "";
+                             if ((editMask > '') && (storageMask > '')) {
+                                 if (valueType.indexOf('date') >= 0) {
+                                     fieldValue = dateTransform(fieldValue, editMask, storageMask);
+                                     fieldValue = fieldValue ? fieldValue + "" : "";
+                                 }
+                             }
+                             break;
+     
+                         case "radio":
+                         case "checkbox":
+                             fieldValue = aElements[i].checked ? aElements[i].value : '';
+                             canChangeRetValue = (fieldValue !== '');
+                             break;
+     
+                         case "select-one":
+                         case "select-multi":
+                             fieldValue = aElements[i].selectedIndex;
+                             if (aElements[i].options[fieldValue])
+                                 fieldValue = aElements[i].options[fieldValue].value;
+                             break;
+     
+                         case "file":
+                             if (typeof aOnReady == 'function') {
+                                 /*
+                                 http://stackoverflow.com/questions/12090996/waiting-for-a-file-to-load-onload-javascript
+                                 http://stackoverflow.com/questions/6978156/get-base64-encode-file-data-from-input-form
+                                 http://igstan.ro/posts/2009-01-11-ajax-file-upload-with-pure-javascript.html
+                                 https://developer.tizen.org/dev-guide/web/2.3.0/org.tizen.mobile.web.appprogramming/html/tutorials/w3c_tutorial/comm_tutorial/upload_ajax.htm
+                                 */
+                                 var reader = new FileReader();
+                                 busyCount++;
+                                 reader._fieldName = fieldName;
+                                 reader.addEventListener("load", function() {
+                                     ret[this._fieldName] = this.result;
+                                     busyCount--;
+                                     if (busyCount <= 0) {
+                                         aOnReady(ret);
+                                     }
+                                 });
+                                 reader.readAsDataURL(aElements[i].files[0]);
+                                 canChangeRetValue = false;
+                             } else
+                                 fieldValue = "aOnReady() not present in js call to getFormElements()";
+                             break;
+                     }
+                     if (typeof fieldValue == 'string') {
+                         if (isNumber(fieldValue))
+                             fieldValue = fieldValue.toFloat();
+                         else {
+                             if (fieldValue.indexOf(',') >= 0)
+                                 fieldValue = encodeURIComponent(fieldValue);
+                         }
+                     }
+     
+                     if (canChangeRetValue)
+                         ret[fieldName] = fieldValue;
+                 }
+             }
          }
-       }
      
-       return ret;
+         return ret;
      };
      
      /* add an element to an existent form */
-     ycomm.dom.addFormElement = function (aForm, aTagName, aElementAttributes) {
-       var aNewElement = document.createElement(aTagName);
-       for(var i in aElementAttributes)
-         if (aElementAttributes.hasOwnProperty(i))
-           aNewElement.setAttribute(i,aElementAttributes[i]);
-       aForm.appendChild(aNewElement);
-       return aNewElement;
+     ycomm.dom.addFormElement = function(aForm, aTagName, aElementAttributes) {
+         var aNewElement = document.createElement(aTagName);
+         for (var i in aElementAttributes)
+             if (aElementAttributes.hasOwnProperty(i))
+                 aNewElement.setAttribute(i, aElementAttributes[i]);
+         aForm.appendChild(aNewElement);
+         return aNewElement;
      };
      
-     ycomm.dom.URL2post = function (aURL, aTarget, aWindow) {
-       if (aURL !== undefined) {
-         setTimeout(function () {
-           /* if no target was defined, use _self */
-           if (aTarget === undefined)
-             aTarget = '_self';
+     ycomm.dom.URL2post = function(aURL, aTarget, aWindow) {
+         if (aURL !== undefined) {
+             setTimeout(function() {
+                 /* if no target was defined, use _self */
+                 if (aTarget === undefined)
+                     aTarget = '_self';
      
-           /* if no window was defined, use current */
-           if (aWindow === undefined)
-             aWindow = window;
+                 /* if no window was defined, use current */
+                 if (aWindow === undefined)
+                     aWindow = window;
      
-           /* default action is 'body.php' */
-           var aAction = 'body.php';
-           /* get the method */
-           aURL = aURL.split('?');
-           if (aURL.length==2) {
-             aAction = aURL[0];
-             aURL = aURL[1];
-           } else
-             aURL = aURL[0];
-           /* get the parameters */
-           aURL = aURL.split('&');
+                 /* default action is 'body.php' */
+                 var aAction = 'body.php';
+                 /* get the method */
+                 aURL = aURL.split('?');
+                 if (aURL.length == 2) {
+                     aAction = aURL[0];
+                     aURL = aURL[1];
+                 } else
+                     aURL = aURL[0];
+                 /* get the parameters */
+                 aURL = aURL.split('&');
      
-           /* create the temporary form */
-           aWindow.auxForm = aWindow.document.createElement("form");
-           aWindow.document.body.appendChild(aWindow.auxForm);
-           aWindow.auxForm.setAttribute('method','post');
-           aWindow.auxForm.setAttribute('action',aAction);
-           aWindow.auxForm.setAttribute('target',aTarget);
-           for(var i=0; i<aURL.length; i++) {
-             var value = aURL[i].split('=');
-             if (value.length==1)
-               value[1]='';
-             ycomm.dom.addFormElement(aWindow.auxForm, 'input', {
-                                        'type': 'hidden',
-                                        'id': value[0],
-                                        'name': value[0],
-                                        'value': value[1] });
-           }
-           aWindow.auxForm.submit();
-         }, 1000);
-       }
+                 /* create the temporary form */
+                 aWindow.auxForm = aWindow.document.createElement("form");
+                 aWindow.document.body.appendChild(aWindow.auxForm);
+                 aWindow.auxForm.setAttribute('method', 'post');
+                 aWindow.auxForm.setAttribute('action', aAction);
+                 aWindow.auxForm.setAttribute('target', aTarget);
+                 for (var i = 0; i < aURL.length; i++) {
+                     var value = aURL[i].split('=');
+                     if (value.length == 1)
+                         value[1] = '';
+                     ycomm.dom.addFormElement(aWindow.auxForm, 'input', {
+                         'type': 'hidden',
+                         'id': value[0],
+                         'name': value[0],
+                         'value': value[1]
+                     });
+                 }
+                 aWindow.auxForm.submit();
+             }, 1000);
+         }
      };
      
-     ycomm.dom.deleteFieldClass = function (aElementList, aClassName) {
-         for(var i in aElementList)
-           if (aElementList.hasOwnProperty(i)) {
-             y$(i).deleteClass(aClassName);
-           }
+     ycomm.dom.deleteFieldClass = function(aElementList, aClassName) {
+         for (var i in aElementList)
+             if (aElementList.hasOwnProperty(i)) {
+                 y$(i).deleteClass(aClassName);
+             }
      };
      
-     ycomm.dom.viewport = function () {
-       var e = window,
-           a = 'inner';
-       while (e.parent != e)
-         e = e.parent;
-       if ( !( 'innerWidth' in window ) ) {
-         a = 'client';
-         e = document.documentElement || document.body;
-       }
-       return { width : e[ a+'Width' ] , height : e[ a+'Height' ] };
+     ycomm.dom.viewport = function() {
+         var e = window,
+             a = 'inner';
+         while (e.parent != e)
+             e = e.parent;
+         if (!('innerWidth' in window)) {
+             a = 'client';
+             e = document.documentElement || document.body;
+         }
+         return { width: e[a + 'Width'], height: e[a + 'Height'] };
      };
      
      /* getX() */
-     ycomm.dom.getLeft = function( oElement ) {
+     ycomm.dom.getLeft = function(oElement) {
          var iReturnValue = 0;
-         while( oElement ) {
-           iReturnValue += oElement.offsetLeft;
-           oElement = oElement.offsetParent;
+         while (oElement) {
+             iReturnValue += oElement.offsetLeft;
+             oElement = oElement.offsetParent;
          }
          return iReturnValue;
      };
      
      /* getY() */
-     ycomm.dom.getTop = function( oElement ) {
+     ycomm.dom.getTop = function(oElement) {
          var iReturnValue = 0;
-         while( oElement ) {
-           iReturnValue += oElement.offsetTop;
-           oElement = oElement.offsetParent;
+         while (oElement) {
+             iReturnValue += oElement.offsetTop;
+             oElement = oElement.offsetParent;
          }
          return iReturnValue;
      };
      
      ycomm.dom.getPos = function(oElement) {
-         for (var lx=0, ly=0;
-              oElement !== null;
-              oElement = oElement.offsetParent) {
-           lx += oElement.offsetLeft;
-           ly += oElement.offsetTop;
+         for (var lx = 0, ly = 0; oElement !== null; oElement = oElement.offsetParent) {
+             lx += oElement.offsetLeft;
+             ly += oElement.offsetTop;
          }
-         return { 
-           x: lx,
-           y: ly
+         return {
+             x: lx,
+             y: ly
          };
      };
      
