@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.53-65 built on 2017-01-16 14:41 (-2 DST)
+ * YeAPF 0.8.53-66 built on 2017-01-16 14:58 (-2 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-01-16 14:36:41 (-2 DST)
+ * 2017-01-16 14:57:49 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -14,7 +14,7 @@ ycomm.dom = {
 ycomm.dom.fillInplaceData = function(aElement, aData) {
   for(var i in aData)
     if (aData.hasOwnProperty(i)) {
-      if (i.substr(0,5)=='-data')
+      if (i.substr(0,5)=='data-')
         i=i.substr(5);
       aElement.setAttribute('data-'+i, aData[i]);
     }
