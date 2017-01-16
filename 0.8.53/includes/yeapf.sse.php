@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.53-65 built on 2017-01-16 14:41 (-2 DST)
+    YeAPF 0.8.53-67 built on 2017-01-16 15:18 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-16 13:54:55 (-2 DST)
+    2017-01-16 15:17:54 (-2 DST)
    */
 
   class SSE
@@ -101,48 +101,45 @@
 
     public function processQueue($callback)
     {
-      $queueFlag=self::$queue_folder."/ready.flag";
+      $u_target=basename(self::$queue_folder);
+      $lockName=$u_target."-queue";
 
-      if (file_exists($queueFlag)) {
-        $u_target=basename(self::$queue_folder);
-        $lockName=$u_target."-queue";
+      if (lock($lockName,true)) {
+        unlink($queueFlag);
+        unlock($lockName);
+      }
 
-        if (lock($lockName,true)) {
-          unlink($queueFlag);
-          unlock($lockName);
-        }
+      _dumpY(8,3,"SSE::processQueue(".self::$queue_folder.")");
+      $files=glob(self::$queue_folder."/*.*");
+      array_multisort(
+        array_map( 'filemtime', $files ),
+        SORT_NUMERIC,
+        SORT_ASC,
+        $files
+      );
 
-        _dumpY(8,3,"SSE::processQueue(".self::$queue_folder.")");
-        $files=glob(self::$queue_folder."/*.*");
-        array_multisort(
-          array_map( 'filemtime', $files ),
-          SORT_NUMERIC,
-          SORT_ASC,
-          $files
-        );
+      $cc=0;
 
-        $cc=0;
+      if (count($files)>0) {
+        foreach ($files as $key => $value) {
+          if ($cc<5) {
+            $cc++;
+            $ok=fnmatch("*.msg", basename($value));
 
-        if (count($files)>0) {
-          foreach ($files as $key => $value) {
-            if ($cc<5) {
-              $cc++;
-              $ok=fnmatch("*.msg", basename($value));
-
-              $f=fopen($value, "r");
-              $eventName = trim(preg_replace('/[[:^print:]]/', '', fgets($f)));
-              $eventData = preg_replace('/[[:^print:]]/', '', fgets($f));
-              fclose($f);
-              if ($eventName>'') {
-                _dumpY(8,4,"SSE::processQueue(".self::$queue_folder.") - $value - $eventName - $eventData");
-                $callback($eventName, $eventData);
-                unlink($value);
-              }
+            $f=fopen($value, "r");
+            $eventName = trim(preg_replace('/[[:^print:]]/', '', fgets($f)));
+            $eventData = preg_replace('/[[:^print:]]/', '', fgets($f));
+            fclose($f);
+            if ($eventName>'') {
+              _dumpY(8,4,"SSE::processQueue(".self::$queue_folder.") - $value - $eventName - $eventData");
+              $callback($eventName, $eventData);
+              unlink($value);
             }
           }
         }
-
       }
+
+    
     }
 
     public function dettachUser($w, $u)
@@ -248,10 +245,6 @@
 
           rename($messageFileI, $messageFileF);
 
-          if (lock($lockName)) {
-            touch("$usr_folder/ready.flag");
-            unlock($lockName);
-          }
         }
       }
       return $messageFile;
