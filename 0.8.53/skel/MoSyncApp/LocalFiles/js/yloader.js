@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.53-61 built on 2017-01-16 10:43 (-2 DST)
+  * YeAPF 0.8.53-65 built on 2017-01-16 14:41 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-16 10:43:13 (-2 DST)
+  * 2017-01-16 14:41:33 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.53-61 built on 2017-01-16 10:43 (-2 DST)");
+ console.log("YeAPF 0.8.53-65 built on 2017-01-16 14:41 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -4566,8 +4566,11 @@
      
      ycomm.dom.fillInplaceData = function(aElement, aData) {
        for(var i in aData)
-         if (aData.hasOwnProperty(i))
+         if (aData.hasOwnProperty(i)) {
+           if (i.substr(0,5)=='-data')
+             i=i.substr(5);
            aElement.setAttribute('data-'+i, aData[i]);
+         }
      };
      
      ycomm.dom.getInplaceData = function(aElement) {
@@ -4577,8 +4580,9 @@
            a=attr[i];
            name=a.nodeName;
      
-           if ((name.substr(0,5))=='data-')
+           if ((name.substr(0,5))=='data-') {
              ret[name]=a.nodeValue;
+           }
          }
        }
        return ret;
@@ -6028,6 +6032,7 @@
                  "user": that.user
                }).then(function(data) {
                    if (data && data[0] && data[0].ok) {
+                     that.w=workgroup;
                      that.sse_session_id = data[0].sse_session_id;
                      callback();
                    }

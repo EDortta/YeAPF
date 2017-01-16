@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/sse.php
-    YeAPF 0.8.53-56 built on 2017-01-14 13:26 (-2 DST)
+    YeAPF 0.8.53-65 built on 2017-01-16 14:41 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-12 17:59:33 (-2 DST)
+    2017-01-16 14:27:49 (-2 DST)
 
     skel/webApp / sse.php
     This file cannot be modified within skel/webApp
@@ -62,6 +62,7 @@
 
     /* run the loop while this session is enabled */
     while (SSE::enabled($sse_session_id, $w, $u)) {
+      _dump("$sse_session_id QUEUE");
       /* process the message queue */
       SSE::processQueue($sse_dispatch);
 

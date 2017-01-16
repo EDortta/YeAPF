@@ -1,8 +1,8 @@
   /********************************************************************
   * app-src/js/ycomm-sse.js
-  * YeAPF 0.8.53-61 built on 2017-01-16 10:43 (-2 DST)
+  * YeAPF 0.8.53-65 built on 2017-01-16 14:41 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-16 10:41:59 (-2 DST)
+  * 2017-01-16 14:17:03 (-2 DST)
   ********************************************************************/
   var ycommSSEBase = function (workgroup, user, dataLocation) {
     var that = {
@@ -64,6 +64,7 @@
             "user": that.user
           }).then(function(data) {
               if (data && data[0] && data[0].ok) {
+                that.w=workgroup;
                 that.sse_session_id = data[0].sse_session_id;
                 callback();
               }
