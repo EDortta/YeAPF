@@ -1,8 +1,8 @@
 /*********************************************
   * skel/electron/js/yloader.js
-  * YeAPF 0.8.53-56 built on 2017-01-14 13:26 (-2 DST)
+  * YeAPF 0.8.53-61 built on 2017-01-16 10:43 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-14 13:26:53 (-2 DST)
+  * 2017-01-16 10:43:13 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.53-56 built on 2017-01-14 13:26 (-2 DST)");
+ console.log("YeAPF 0.8.53-61 built on 2017-01-16 10:43 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -6036,18 +6036,13 @@
            },
      
            addEventListener: function (eventName, func) {
-             if (trim(eventName.toLowerCase()) != "ready") {
-               /* save the event in the internal list */
-               if (typeof that.events == "undefined") {
-                 that.events={};
-               }
-               if ("undefined" == typeof that.events[eventName])
-                 that.events[eventName] = [];
-               that.events[eventName].push([that.state, func]);
+             /* save the event in the internal list */
+             if (typeof that.events == "undefined") {
+               that.events={};
              }
-     
-             /* add the manager */
-             that["on_"+eventName] = func;
+             if ("undefined" == typeof that.events[eventName])
+               that.events[eventName] = [];
+             that.events[eventName].push([that.state, func]);
      
              if (that.state==1) {
                if (!that.pollEnabled)

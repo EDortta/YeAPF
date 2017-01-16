@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.53-56 built on 2017-01-14 13:26 (-2 DST)
+    YeAPF 0.8.53-61 built on 2017-01-16 10:43 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-14 13:18:50 (-2 DST)
+    2017-01-14 20:32:01 (-2 DST)
    */
 
   class SSE
@@ -107,6 +107,11 @@
         $u_target=basename(self::$queue_folder);
         $lockName=$u_target."-queue";
 
+        if (lock($lockName,true)) {
+          unlink($queueFlag);
+          unlock($lockName);
+        }
+
         _dumpY(8,3,"SSE::processQueue()");
         $files=glob(self::$queue_folder."/*.*");
         array_multisort(
@@ -116,24 +121,22 @@
           $files
         );
 
-        foreach ($files as $key => $value) {
-          $ok=fnmatch("*.msg", basename($value));
+        if (count($files)>0) {
+          foreach ($files as $key => $value) {
+            $ok=fnmatch("*.msg", basename($value));
 
-          $f=fopen($value, "r");
-          $eventName = trim(preg_replace('/[[:^print:]]/', '', fgets($f)));
-          $eventData = preg_replace('/[[:^print:]]/', '', fgets($f));
-          fclose($f);
-          if ($eventName>'') {
-            _dumpY(8,4,"SSE::processQueue() - $value - $eventName - $eventData");
-            $callback($eventName, $eventData);
-            unlink($value);
+            $f=fopen($value, "r");
+            $eventName = trim(preg_replace('/[[:^print:]]/', '', fgets($f)));
+            $eventData = preg_replace('/[[:^print:]]/', '', fgets($f));
+            fclose($f);
+            if ($eventName>'') {
+              _dumpY(8,4,"SSE::processQueue() - $value - $eventName - $eventData");
+              $callback($eventName, $eventData);
+              unlink($value);
+            }
           }
         }
 
-        if (lock($lockName,true)) {
-          unlink($queueFlag);
-          unlock($lockName);
-        }
       }
     }
 
