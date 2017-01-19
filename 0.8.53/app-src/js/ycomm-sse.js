@@ -1,8 +1,8 @@
   /********************************************************************
   * app-src/js/ycomm-sse.js
-  * YeAPF 0.8.53-65 built on 2017-01-16 14:41 (-2 DST)
+  * YeAPF 0.8.53-80 built on 2017-01-19 08:52 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-16 14:17:03 (-2 DST)
+  * 2017-01-16 15:43:56 (-2 DST)
   ********************************************************************/
   var ycommSSEBase = function (workgroup, user, dataLocation) {
     var that = {
@@ -42,6 +42,7 @@
         if (that.pollEnabled) {
           that.rpc("peekMessage").then( function(data) {
               if (data) {
+                console.log("data: "+JSON.stringify(data));
                 var eventName;
                 for(var i=0; i<data.length; i++) {
                   if (!that.dispatchEvent(data[i].event, { data: data[i].data } )) {

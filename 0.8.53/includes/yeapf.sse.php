@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.53-69 built on 2017-01-16 15:33 (-2 DST)
+    YeAPF 0.8.53-80 built on 2017-01-19 08:52 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-16 15:33:00 (-2 DST)
+    2017-01-16 17:33:38 (-2 DST)
    */
 
   class SSE
@@ -127,13 +127,12 @@
             $ok=fnmatch("*.msg", basename($value));
 
             if ($ok) {
-              _dump("SSE::processQueue() - get file $value");
+              _dump("SSE::popQueue(".basename(self::$queue_folder).") - get file '".basename($value)."'");
               $f=fopen($value, "r");
               $eventName = trim(preg_replace('/[[:^print:]]/', '', fgets($f)));
               $eventData = preg_replace('/[[:^print:]]/', '', fgets($f));
               fclose($f);
               if ($eventName>'') {
-                _dumpY(8,4,"SSE::processQueue(".self::$queue_folder.") - $value - $eventName - $eventData");
                 $callback($eventName, $eventData);
                 unlink($value);
               }
@@ -241,7 +240,7 @@
           // file_put_contents("$ndxFile", "$w_target\n$msg_ndx\n$sse_session_id\n".date("U"));
           $messageFileI = "$usr_folder/$msg_ndx.new";
           $messageFileF = "$usr_folder/$msg_ndx.msg";
-          _dump("SSE::processQueue() - set file $messageFileI");
+          _dump("SSE::pushQueue($u_target) - set file '".basename($messageFileI)."'");
 
           $f=fopen($messageFileI, "wt");
           fputs($f, "$message\n");
@@ -349,6 +348,7 @@
         if (SSE::enabled($sse_session_id, $w, $u)) {
           $sse_dispatch = function($eventName, $eventData) {
             global $__sse_ret;
+            _dump(preg_replace('/[[:^print:]]/', '', "event: $eventName, data: $eventData"));
             $__sse_ret[]=array(  'event' => $eventName,
                                  'data'  => $eventData   );
           };
@@ -357,6 +357,7 @@
           $__sse_ret=array(  'event' => 'close',
                              'data'  => ''   );
         }
+        _dump("ret: ".json_encode($__sse_ret));
         $ret=$__sse_ret;
         break;
     }

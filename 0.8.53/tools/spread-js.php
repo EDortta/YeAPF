@@ -1,9 +1,9 @@
 <?php
   /*
     tools/spread-js.php
-    YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)
+    YeAPF 0.8.53-80 built on 2017-01-19 08:52 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-11-29 10:57:18 (-2 DST)
+    2017-01-19 08:47:35 (-2 DST)
 
     This script will distribute monolite version of yloader.js
     among different application skeletons
@@ -33,7 +33,7 @@
       grantDirectory($tgtFolder);
       $auxFile = _file($srcFileName);
       if ($addHeader) {
-        $auxFile = "/* YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST) Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
+        $auxFile = "/* YeAPF 0.8.53-80 built on 2017-01-19 08:52 (-2 DST) Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
       }
       $tgtFileName=basename($srcFileName);
       if (file_put_contents("$tgtFolder/$tgtFileName", $auxFile))
@@ -93,7 +93,7 @@
   if (file_exists($minJS)) {
     echo "Minified version source: $minJS\n";
     $yeapf_minJS = join("", file($minJS));
-    $yeapf_minJS = "/* YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST) Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
+    $yeapf_minJS = "/* YeAPF 0.8.53-80 built on 2017-01-19 08:52 (-2 DST) Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
   }
 
   grantDirectory("skel/chromeApp/js");
@@ -105,10 +105,13 @@
   grantDirectory("skel/workbench");
   grantDirectory("skel/workbench/www");
   
-  /* CONFIGURE.PHP */
-  copy("skel/webApp/configure.php", "skel/webSocket/configure.php");
-  copy("skel/webApp/configure.php", "skel/workbench/configure.php");
-  copy("skel/webApp/configure.php", "skel/workbench/www/configure.php");
+  /* CONFIGURE.PHP and SSE.PHP */
+  $phpSpreadList=array('configure.php', 'sse.php');
+  foreach($script in $phpSpreadList) {
+    copy("skel/webApp/$script", "skel/webSocket/$script");
+    copy("skel/webApp/$script", "skel/workbench/$script");
+    copy("skel/webApp/$script", "skel/workbench/www/$script");
+  }
 
   /* slotEmptyImplementation.php */
   copy("skel/webApp/slotEmptyImplementation.php", "skel/workbench/www/slotEmptyImplementation.php");

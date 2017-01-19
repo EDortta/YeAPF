@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.53-69 built on 2017-01-16 15:33 (-2 DST)
+  * YeAPF 0.8.53-80 built on 2017-01-19 08:52 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-16 15:33:25 (-2 DST)
+  * 2017-01-16 17:35:06 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.53-69 built on 2017-01-16 15:33 (-2 DST)");
+ console.log("YeAPF 0.8.53-80 built on 2017-01-19 08:52 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -6018,6 +6018,7 @@
              if (that.pollEnabled) {
                that.rpc("peekMessage").then( function(data) {
                    if (data) {
+                     console.log("data: "+JSON.stringify(data));
                      var eventName;
                      for(var i=0; i<data.length; i++) {
                        if (!that.dispatchEvent(data[i].event, { data: data[i].data } )) {
