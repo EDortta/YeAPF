@@ -1,13 +1,13 @@
 <?php
 /*
     includes/yeapf.tasks.php
-    YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)
+    YeAPF 0.8.53-83 built on 2017-01-20 14:39 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-06-18 16:32:53 (-2 DST)
+    2017-01-20 12:52:06 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
-  class YTaskManager 
+  class YTaskManager
   {
     private $initialized  = false;
     private $task_id      = -1;
@@ -20,13 +20,13 @@
     }
 
     /* Get the current task id or -1 */
-    public function getTaskId() 
+    public function getTaskId()
     {
       return $this->initialized?$this->task_id:-1;
     }
 
     /* Create a new task entry in the task manager */
-    public function createNewTask($s, $a, $j_params='', $iteraction_ttl=240, $priority=2) 
+    public function createNewTask($s, $a, $j_params='', $iteraction_ttl=240, $priority=2)
     {
       $retTaskId=-1;
       $priority=min(max(1,intval($priority)), 4);
@@ -41,12 +41,12 @@
             if (lock("newTaskId")) {
               $newId=intval(db_sql("select max(id) from is_tasks"));
               $newId++;
-              
+
               /* all tasks starts with stage=0 (disabled) */
-              $sql="insert into is_tasks(id, stage, s, a, j_params, 
-                                         xq_start, xq_target, 
-                                         mru, priority, 
-                                         creation_ts, iteraction_ttl) 
+              $sql="insert into is_tasks(id, stage, s, a, j_params,
+                                         xq_start, xq_target,
+                                         mru, priority,
+                                         creation_ts, iteraction_ttl)
                     values ($newId, 0, '$s', '$a', '$j_params', 0, -1, 0, $priority, $ts, $iteraction_ttl)";
               db_sql($sql);
               unlock("newTaskId");
@@ -63,7 +63,7 @@
     }
 
     /* Get next idle task from task manager */
-    public function getNextIdleTask() 
+    public function getNextIdleTask()
     {
       $sql="select id from is_tasks where stage=2 order by mru desc";
       $retTaskId=intval(db_sql($sql));
@@ -90,7 +90,7 @@
             $ret=unlink($runFlag);
           else
             $ret=true;
-        }          
+        }
       }
       return $ret;
     }
@@ -130,12 +130,12 @@
         if (($currentStage>=$minStage) && ($currentStage<=$maxStage)) {
           if ($this->setTaskCanRun($canRun)) {
             $now=date('U');
-            db_sql("update is_tasks set stage=$newStage, iteraction_ts=$now where id=$taskId");          
+            db_sql("update is_tasks set stage=$newStage, iteraction_ts=$now where id=$taskId");
             $ret=true;
           }
         }
-      } 
-      return $ret;           
+      }
+      return $ret;
     }
 
     /* set task's stage at 0 */
@@ -171,13 +171,13 @@
         if ($currentStage<4) {
           $this->setTaskCanRun(false);
           $ts=date('U');
-          db_sql("update is_tasks set stage=$stage, finalization_ts=$ts where id=$taskId and stage<4");          
+          db_sql("update is_tasks set stage=$stage, finalization_ts=$ts where id=$taskId and stage<4");
           $ret=true;
         }
-      } 
-      return $ret;           
+      }
+      return $ret;
     }
-    
+
     /* set task's stage at 4 */
     public function abortTask()
     {
@@ -190,7 +190,7 @@
       return $this->_endTask(5);
     }
 
-    public function getTaskContext($complete=false) 
+    public function getTaskContext($complete=false)
     {
       $retContext=array('s'=>'dummy', 'a'=>'void');
       if ($this->initialized) {
@@ -198,7 +198,7 @@
         if ($complete)
           $retContext=db_sql("select s, a, j_params, xq_start, xq_target from is_tasks where id=$taskId", false);
         else
-          $retContext=db_sql("select j_params, xq_start, xq_target from is_tasks where id=$taskId", false);        
+          $retContext=db_sql("select j_params, xq_start, xq_target from is_tasks where id=$taskId", false);
         $j_params=json_decode($retContext['j_params']);
         unset($retContext['j_params']);
         if (isset($j_params)) {
@@ -210,7 +210,7 @@
           }
         }
         foreach($retContext as $k=>$v){
-          if (is_numeric($k)) 
+          if (is_numeric($k))
             unset($retContext[$k]);
         }
       }
@@ -225,6 +225,6 @@
       }
     }
 
-  } 
+  }
 
 ?>

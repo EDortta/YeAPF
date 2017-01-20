@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/sse.php
-    YeAPF 0.8.53-65 built on 2017-01-16 14:41 (-2 DST)
+    YeAPF 0.8.53-83 built on 2017-01-20 14:39 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-16 14:27:49 (-2 DST)
+    2017-01-20 13:13:02 (-2 DST)
 
     skel/webApp / sse.php
     This file cannot be modified within skel/webApp
@@ -16,18 +16,9 @@
   ini_set('output_buffering', 'off');
   ini_set('zlib.output_compression', false);
 
-  /*
-  // Implicitly flush the buffer(s)
-  ini_set('implicit_flush', true);
-  ob_implicit_flush(true);
-  */
-
-
   header("Content-Type: text/event-stream\n\n", true);
   header("Cache-Control: no-cache");
   header("Connection: Keep-Alive");
-//  header("Content-Transfer-Encoding: chunked");
-//  header("Transfer-Encoding: chunked");
 
   echo "retry: 5000\n\n";
   for($n=1000; $n>0; $n--) echo "\n\n";
@@ -37,7 +28,7 @@
   SSE::sendEvent("message", "welcome");
 
   _dump("SSE - conn");
-  
+
   set_time_limit(0);
 
   /* @params

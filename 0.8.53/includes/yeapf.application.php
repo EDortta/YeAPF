@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.53-30 built on 2017-01-12 15:16 (-2 DST)
+    YeAPF 0.8.53-83 built on 2017-01-20 14:39 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-12-14 16:35:23 (-2 DST)
+    2017-01-20 14:26:42 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -281,8 +281,18 @@
     return $ret;
   }
 
+  global $_REQUEST2;
+  $_REQUEST2 = array();
+
+  function xq_injectValueIntoQuery($k, $v) 
+  {
+    global $_REQUEST2;
+    $_REQUEST2[$k] = $v;
+  }
+
   function xq_extractValuesFromQuery($asGlobals=false, $xq_prefix='', $xq_postfix='', $xq_only_composed_names=false)
   {
+    global $_REQUEST2;
     $ret=array();
 
 
@@ -290,6 +300,9 @@
       foreach($_REQUEST as $k=>$v)
         xq_extractValue($ret, $k, $v, $asGlobals, $xq_prefix, $xq_postfix, $xq_only_composed_names);
     }
+
+    foreach($_REQUEST2 as $k=>$v)
+      xq_extractValue($ret, $k, $v, $asGlobals, $xq_prefix, $xq_postfix, $xq_only_composed_names);
 
     $fieldName  = unparentesis(xq_varValue($ret, 'fieldName'));
     $fieldValue = unparentesis(xq_varValue($ret, 'fieldValue'));

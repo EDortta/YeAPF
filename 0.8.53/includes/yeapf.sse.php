@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.53-80 built on 2017-01-19 08:52 (-2 DST)
+    YeAPF 0.8.53-83 built on 2017-01-20 14:39 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-16 17:33:38 (-2 DST)
+    2017-01-20 14:37:55 (-2 DST)
    */
 
   class SSE
@@ -133,15 +133,27 @@
               $eventData = preg_replace('/[[:^print:]]/', '', fgets($f));
               fclose($f);
               if ($eventName>'') {
-                $callback($eventName, $eventData);
-                unlink($value);
+                if ($eventName!='postpone_w') {
+                  $callback($eventName, $eventData);
+                } else {
+                  $eventData = json_decode($eventData, true);
+                  foreach($eventData as $k=>$v) {
+                    if (($k=='s') || ($k=='a')) {
+                      $$k=$v;
+                    } else if ($k!='u') {
+                      xq_injectValueIntoQuery($k, $v);
+                    }
+                  }
+                  implementation($s, $a, 'w');
+                }
               }
+              unlink($value);
             }
           }
         }
       }
 
-    
+
     }
 
     public function dettachUser($w, $u)
@@ -252,6 +264,27 @@
         }
       }
       return $messageFile;
+    }
+
+    /*  push a event to be processed later by the caller itself 
+        The (s,a) pair will be used to imitate an application normal call (xmlHttpRequest, RESTful, URL ...)
+        These calls will be atended by a 'w' prefixed function as when a webSocket or a RESTful is used.
+        The 'w' function will use SSE::postMessage() or SSE::sendMesage() in order to send it result to 
+        the original client (or not).
+     */
+    public function postpone_w($s, $a, $data)
+    {
+      global $u;
+      if (isset($u)) {
+        if (is_string($data))
+          $data=json_decode($data, true);
+        if (is_array($data)) {
+          $data["s"]=$s;
+          $data["a"]=$a;
+          $data=json_encode($data);
+          self::__enqueueMessage($u, 'postpone_w', $data);
+        }
+      }
     }
 
     /* send a message and wait to it be processed by the target
