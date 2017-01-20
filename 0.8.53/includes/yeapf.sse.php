@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.53-83 built on 2017-01-20 14:39 (-2 DST)
+    YeAPF 0.8.53-84 built on 2017-01-20 15:07 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-20 14:37:55 (-2 DST)
+    2017-01-20 15:06:32 (-2 DST)
    */
 
   class SSE
@@ -284,6 +284,8 @@
           $data=json_encode($data);
           self::__enqueueMessage($u, 'postpone_w', $data);
         }
+      } else {
+        _dump("You cannot postpone a message without 'u' parameter");
       }
     }
 
