@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ystorage.js
- * YeAPF 0.8.53-81 built on 2017-01-19 13:28 (-2 DST)
+ * YeAPF 0.8.53-89 built on 2017-01-20 17:45 (-2 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-01-19 13:27:18 (-2 DST)
+ * 2017-01-20 17:44:35 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -16,7 +16,7 @@
 (function () {
   "use strict";
   if (!window.ystorage) {
-    Object.defineProperty(window, "ystorage", new (function() {
+    window.ystorage = (function() {
 
       var aKeys = [],
         oStorage = {};
@@ -81,7 +81,7 @@
       };
       this.configurable = false;
       this.enumerable = true;
-    })());
+    })();
   }
 
   if (!window.ySingleDb) {
