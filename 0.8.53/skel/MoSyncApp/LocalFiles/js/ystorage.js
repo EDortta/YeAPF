@@ -1,8 +1,8 @@
 /*********************************************
  * skel/MoSyncApp/LocalFiles/js/ystorage.js
- * YeAPF 0.8.53-80 built on 2017-01-19 08:52 (-2 DST)
+ * YeAPF 0.8.53-92 built on 2017-01-23 18:31 (-2 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-01-16 17:35:06 (-2 DST)
+ * 2017-01-23 18:31:05 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -16,7 +16,7 @@
 (function () {
   "use strict";
   if (!window.ystorage) {
-    Object.defineProperty(window, "ystorage", new (function() {
+    window.ystorage = (function() {
 
       var aKeys = [],
         oStorage = {};
@@ -81,7 +81,7 @@
       };
       this.configurable = false;
       this.enumerable = true;
-    })());
+    })();
   }
 
   if (!window.ySingleDb) {
@@ -263,8 +263,11 @@
       };
 
       that.insertData = function(data) {
-        for (var i = 0; i < data.length; i++) {
-          that.setItem(data[i][that._keyName_], data[i]);
+        for(var i in data) {
+          if (data.hasOwnProperty(i)) {
+            that.setItem(data[i][that._keyName_], data[i]);
+          }
+
         }
       };
 
