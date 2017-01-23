@@ -1,8 +1,8 @@
   /********************************************************************
    * app-src/js/ycomm-ajax.js
-   * YeAPF 0.8.53-95 built on 2017-01-23 18:40 (-2 DST)
+   * YeAPF 0.8.53-96 built on 2017-01-23 18:45 (-2 DST)
    * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2017-01-23 18:40:22 (-2 DST)
+   * 2017-01-23 18:44:52 (-2 DST)
    *
    * Com o advento do WebSocket, precisamos de novas formas para
    * provocar o servidor.
@@ -244,6 +244,17 @@
     }
   }
 
+  ycomm.dataLength = function (data) {
+    var cc=0;
+    if (data) {
+      for (var i in data) { 
+        if (data.hasOwnProperty(i)) 
+          cc++; 
+      };
+    }
+    return cc;
+  };
+
   /*
    * https://developer.mozilla.org/en-US/docs/Web/API/FormData
    * https://developer.mozilla.org/en-US/docs/Web/Guide/Using_FormData_Objects
@@ -317,16 +328,6 @@
                 }
 
                 ycomm.waitIconControl(false);
-                if (retData.data) {
-                  var cc=0;
-                  for (var i in retData.data) { 
-                    if (retData.hasOwnProperty(i)) 
-                      cc++; 
-                  };
-                  retData.data.count=cc;
-                } else {
-                  retData.data={count:0};
-                }
 
                 if (retData.error) {
                   if (typeof retData.error == "string")
