@@ -1,8 +1,8 @@
 /*********************************************
  * skel/MoSyncApp/LocalFiles/js/ystorage.js
- * YeAPF 0.8.53-92 built on 2017-01-23 18:31 (-2 DST)
+ * YeAPF 0.8.53-93 built on 2017-01-23 18:35 (-2 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-01-23 18:31:05 (-2 DST)
+ * 2017-01-23 18:35:00 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
