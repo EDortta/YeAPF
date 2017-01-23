@@ -1,8 +1,8 @@
 /*********************************************
  * skel/electron/js/yifc.js
- * YeAPF 0.8.53-94 built on 2017-01-23 18:37 (-2 DST)
+ * YeAPF 0.8.53-95 built on 2017-01-23 18:40 (-2 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-01-23 18:37:50 (-2 DST)
+ * 2017-01-23 18:40:44 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * This object allows to communicate with ysandboxifc.js
  * and runs outside the sandbox.
