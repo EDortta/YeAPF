@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.53-68 built on 2017-01-16 15:26 (-2 DST)
+ * YeAPF 0.8.53-97 built on 2017-01-24 08:07 (-2 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-01-16 15:25:57 (-2 DST)
+ * 2017-01-24 08:06:54 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -71,11 +71,11 @@ ycomm.dom.getInplaceData = function(aElement) {
  *             sep                - sring separator (o be used in DATALIST and SELECT)
  *
  *             -- events -- (READY)
+ *             onBeforeNewItem(aElementID, dataLine)
  *             onNewItem(aElementID, aNewElement, aRowData)
  *             onNewRowReady(aElementID, aRow)
  *             onSelect(aElementID, id) ou onClick(aElementID, id)
  *             -- events -- (PLANNED)
- *             onBeforeItemAdd(aElementID, id, dataLine)
  *             onItemAdd(aElementID, id)
  *             onReady(aElementID)
  * aFlags - JSON
@@ -157,6 +157,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
             var newCell = newRow.insertCell(cNdx),
                 xDataItem = getDataFromXData(xData[j]),
                 aNewCellValue = colName !== null ? unmaskHTML(xDataItem[colName]) : unmaskHTML(xDataItem);
+
             if ((aLineSpec.columns) && (aLineSpec.columns[colName])) {
                 if (aLineSpec.columns[colName].align)
                     newCell.style.textAlign = aLineSpec.columns[colName].align;
@@ -255,6 +256,10 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
 
                     setNewRowAttributes(newRow);
 
+                    if (typeof aLineSpec.onBeforeNewItem == 'function') {
+                      onBeforeNewItem(aElementID, xDataItem);
+                    }
+
                     /* default action when neither columns nor html are defined */
                     if ((typeof aLineSpec.html == 'undefined') &&
                         (typeof aLineSpec.rows == 'undefined') &&
@@ -335,6 +340,10 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
             for (j in xData) {
                 if (xData.hasOwnProperty(j)) {
                     xDataItem = getDataFromXData(xData[j]);
+                    if (typeof aLineSpec.onBeforeNewItem == 'function') {
+                      onBeforeNewItem(aElementID, xDataItem);
+                    }
+
                     var entry = document.createElement('li');
                     saveInplaceData(entry, xDataItem);
 
@@ -390,6 +399,10 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                 if (xData.hasOwnProperty(j)) {
                     xDataItem = getDataFromXData(xData[j]);
                     xDataItem._elementid_ = aElementID;
+                    if (typeof aLineSpec.onBeforeNewItem == 'function') {
+                      onBeforeNewItem(aElementID, xDataItem);
+                    }
+
                     newRow = document.createElement('listitem');
                     cNdx = 0;
 
@@ -449,6 +462,10 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                 if (xData.hasOwnProperty(j)) {
                     xDataItem = getDataFromXData(xData[j]);
                     xDataItem._elementid_ = aElementID;
+                    if (typeof aLineSpec.onBeforeNewItem == 'function') {
+                      onBeforeNewItem(aElementID, xDataItem);
+                    }
+
                     auxHTML = '';
                     if (typeof aLineSpec.columns == 'undefined') {
                         if (typeof xDataItem == 'string') {
@@ -524,6 +541,9 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                 if ((typeof xData == 'object') || (xData.length === 1)) {
                     var yData = getDataFromXData(xData[0] || xData);
                     saveInplaceData(aElement, yData);
+                    if (typeof aLineSpec.onBeforeNewItem == 'function') {
+                      onBeforeNewItem(aElementID, yData);
+                    }
 
                     fieldPrefix = aLineSpec.elementPrefixName || aLineSpec.prefix || '';
                     fieldPostfix = aLineSpec.elementPostixName || aLineSpec.postfix || '';
@@ -628,6 +648,9 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                     if (xData.hasOwnProperty(j)) {
                         xDataItem = getDataFromXData(xData[j]);
                         saveInplaceData(aElement, xDataItem);
+                        if (typeof aLineSpec.onBeforeNewItem == 'function') {
+                          onBeforeNewItem(aElementID, xDataItem);
+                        }
 
                         if (aLineSpec.html) {
                             auxHTML = auxHTML + yAnalise(aLineSpec.html, xDataItem);
