@@ -1,8 +1,8 @@
 /*********************************************
   * skel/workbench/www/js/yloader.js
-  * YeAPF 0.8.53-97 built on 2017-01-24 08:07 (-2 DST)
+  * YeAPF 0.8.53-98 built on 2017-01-24 08:10 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-24 08:06:59 (-2 DST)
+  * 2017-01-24 08:10:57 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.53-97 built on 2017-01-24 08:07 (-2 DST)");
+ console.log("YeAPF 0.8.53-98 built on 2017-01-24 08:10 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -4636,11 +4636,11 @@
       *             sep                - sring separator (o be used in DATALIST and SELECT)
       *
       *             -- events -- (READY)
+      *             onBeforeNewItem(aElementID, dataLine)
       *             onNewItem(aElementID, aNewElement, aRowData)
       *             onNewRowReady(aElementID, aRow)
       *             onSelect(aElementID, id) ou onClick(aElementID, id)
       *             -- events -- (PLANNED)
-      *             onBeforeNewItem(aElementID, dataLine)
       *             onItemAdd(aElementID, id)
       *             onReady(aElementID)
       * aFlags - JSON
@@ -4822,7 +4822,7 @@
                          setNewRowAttributes(newRow);
      
                          if (typeof aLineSpec.onBeforeNewItem == 'function') {
-                           onBeforeNewItem(aElementID, xDataItem);
+                           aLineSpec.onBeforeNewItem(aElementID, xDataItem);
                          }
      
                          /* default action when neither columns nor html are defined */
@@ -4906,7 +4906,7 @@
                      if (xData.hasOwnProperty(j)) {
                          xDataItem = getDataFromXData(xData[j]);
                          if (typeof aLineSpec.onBeforeNewItem == 'function') {
-                           onBeforeNewItem(aElementID, xDataItem);
+                           aLineSpec.onBeforeNewItem(aElementID, xDataItem);
                          }
      
                          var entry = document.createElement('li');
@@ -4965,7 +4965,7 @@
                          xDataItem = getDataFromXData(xData[j]);
                          xDataItem._elementid_ = aElementID;
                          if (typeof aLineSpec.onBeforeNewItem == 'function') {
-                           onBeforeNewItem(aElementID, xDataItem);
+                           aLineSpec.onBeforeNewItem(aElementID, xDataItem);
                          }
      
                          newRow = document.createElement('listitem');
@@ -5028,7 +5028,7 @@
                          xDataItem = getDataFromXData(xData[j]);
                          xDataItem._elementid_ = aElementID;
                          if (typeof aLineSpec.onBeforeNewItem == 'function') {
-                           onBeforeNewItem(aElementID, xDataItem);
+                           aLineSpec.onBeforeNewItem(aElementID, xDataItem);
                          }
      
                          auxHTML = '';
@@ -5107,7 +5107,7 @@
                          var yData = getDataFromXData(xData[0] || xData);
                          saveInplaceData(aElement, yData);
                          if (typeof aLineSpec.onBeforeNewItem == 'function') {
-                           onBeforeNewItem(aElementID, yData);
+                           aLineSpec.onBeforeNewItem(aElementID, yData);
                          }
      
                          fieldPrefix = aLineSpec.elementPrefixName || aLineSpec.prefix || '';
@@ -5214,7 +5214,7 @@
                              xDataItem = getDataFromXData(xData[j]);
                              saveInplaceData(aElement, xDataItem);
                              if (typeof aLineSpec.onBeforeNewItem == 'function') {
-                               onBeforeNewItem(aElementID, xDataItem);
+                               aLineSpec.onBeforeNewItem(aElementID, xDataItem);
                              }
      
                              if (aLineSpec.html) {

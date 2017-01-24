@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.53-97 built on 2017-01-24 08:07 (-2 DST)
+ * YeAPF 0.8.53-98 built on 2017-01-24 08:10 (-2 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-01-24 08:06:54 (-2 DST)
+ * 2017-01-24 08:10:23 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -257,7 +257,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                     setNewRowAttributes(newRow);
 
                     if (typeof aLineSpec.onBeforeNewItem == 'function') {
-                      onBeforeNewItem(aElementID, xDataItem);
+                      aLineSpec.onBeforeNewItem(aElementID, xDataItem);
                     }
 
                     /* default action when neither columns nor html are defined */
@@ -341,7 +341,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                 if (xData.hasOwnProperty(j)) {
                     xDataItem = getDataFromXData(xData[j]);
                     if (typeof aLineSpec.onBeforeNewItem == 'function') {
-                      onBeforeNewItem(aElementID, xDataItem);
+                      aLineSpec.onBeforeNewItem(aElementID, xDataItem);
                     }
 
                     var entry = document.createElement('li');
@@ -400,7 +400,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                     xDataItem = getDataFromXData(xData[j]);
                     xDataItem._elementid_ = aElementID;
                     if (typeof aLineSpec.onBeforeNewItem == 'function') {
-                      onBeforeNewItem(aElementID, xDataItem);
+                      aLineSpec.onBeforeNewItem(aElementID, xDataItem);
                     }
 
                     newRow = document.createElement('listitem');
@@ -463,7 +463,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                     xDataItem = getDataFromXData(xData[j]);
                     xDataItem._elementid_ = aElementID;
                     if (typeof aLineSpec.onBeforeNewItem == 'function') {
-                      onBeforeNewItem(aElementID, xDataItem);
+                      aLineSpec.onBeforeNewItem(aElementID, xDataItem);
                     }
 
                     auxHTML = '';
@@ -542,7 +542,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                     var yData = getDataFromXData(xData[0] || xData);
                     saveInplaceData(aElement, yData);
                     if (typeof aLineSpec.onBeforeNewItem == 'function') {
-                      onBeforeNewItem(aElementID, yData);
+                      aLineSpec.onBeforeNewItem(aElementID, yData);
                     }
 
                     fieldPrefix = aLineSpec.elementPrefixName || aLineSpec.prefix || '';
@@ -649,7 +649,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                         xDataItem = getDataFromXData(xData[j]);
                         saveInplaceData(aElement, xDataItem);
                         if (typeof aLineSpec.onBeforeNewItem == 'function') {
-                          onBeforeNewItem(aElementID, xDataItem);
+                          aLineSpec.onBeforeNewItem(aElementID, xDataItem);
                         }
 
                         if (aLineSpec.html) {
