@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webSocket/sse.php
-    YeAPF 0.8.53-99 built on 2017-01-25 08:21 (-2 DST)
+    YeAPF 0.8.53-100 built on 2017-01-25 09:22 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-25 08:21:38 (-2 DST)
+    2017-01-25 09:22:38 (-2 DST)
 
     skel/webApp / sse.php
     This file cannot be modified within skel/webApp
@@ -51,8 +51,11 @@
     $sessionInfo = SSE::getSessionInfo($sse_session_id);
     extract($sessionInfo);
 
+    $iTime=date("U");
+    $cTime=date("U");
+
     /* run the loop while this session is enabled */
-    while (SSE::enabled($sse_session_id, $w, $u)) {
+    while (SSE::enabled($sse_session_id, $w, $u) && ($cTime-$iTime<240*60)) {
       _dump("$sse_session_id QUEUE");
       /* process the message queue */
       SSE::processQueue($sse_dispatch);
@@ -63,6 +66,8 @@
 
       /* sleep half of a second */
       usleep(500000);
+
+      $cTime=date("U");
     }
   }
 
