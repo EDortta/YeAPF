@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.53-111 built on 2017-01-25 15:45 (-2 DST)
+  * YeAPF 0.8.53-112 built on 2017-01-25 17:31 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-25 15:45:52 (-2 DST)
+  * 2017-01-25 17:31:24 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.53-111 built on 2017-01-25 15:45 (-2 DST)");
+ console.log("YeAPF 0.8.53-112 built on 2017-01-25 17:31 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -6075,6 +6075,9 @@
              var _userAlive = function(data) {
                console.log("User is alive");
                setTimeout(that.userAlive, that.peekInterval);
+             };
+             var _userOffline = function(e) {
+               console.error(e);
              };
              var p = that.rpc("userAlive");
              p.then(_userAlive).catch(_userOffline);
