@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.53-102 built on 2017-01-25 11:51 (-2 DST)
+    YeAPF 0.8.53-111 built on 2017-01-25 15:45 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-25 11:45:32 (-2 DST)
+    2017-01-25 12:42:46 (-2 DST)
    */
 
   class SSE
@@ -44,6 +44,7 @@
                   /* maximum idle time is eight times the messagePeekerInterval */
                   $maxT = self::getMaxPeekInterval() * 8;
                   $ret = ($difT<=$maxT);
+                  _dump("SSE difT: $difT maxT: $maxT");
                 }
                 if ($ret)
                   self::$queue_folder=".sse/$w/$u";
@@ -404,6 +405,8 @@
         break;
 
       case 'userAlive':
+      case 'peekMessage':
+        $__sse_ret=array();
         $sessionInfo = SSE::getSessionInfo($sse_session_id);
         extract($sessionInfo);
         if (SSE::enabled($sse_session_id, $w, $u)) {
@@ -411,21 +414,17 @@
           if (file_exists($sessionFile)) {
             touch($sessionFile);
           }
-        }
-        break;
 
-      case 'peekMessage':
-        $__sse_ret=array();
-        $sessionInfo = SSE::getSessionInfo($sse_session_id);
-        extract($sessionInfo);
-        if (SSE::enabled($sse_session_id, $w, $u, false)) {
-          $sse_dispatch = function($eventName, $eventData) {
-            global $__sse_ret;
-            _dump(preg_replace('/[[:^print:]]/', '', "event: $eventName, data: $eventData"));
-            $__sse_ret[]=array(  'event' => $eventName,
-                                 'data'  => $eventData   );
-          };
-          SSE::processQueue($sse_dispatch);
+          if ($a=='peekMessage') {
+            $sse_dispatch = function($eventName, $eventData) {
+              global $__sse_ret;
+              _dump(preg_replace('/[[:^print:]]/', '', "event: $eventName, data: $eventData"));
+              $__sse_ret[]=array(  'event' => $eventName,
+                                   'data'  => $eventData   );
+            };
+            SSE::processQueue($sse_dispatch);
+          }
+
         } else {
           $__sse_ret=array(  'event' => 'close',
                              'data'  => ''   );

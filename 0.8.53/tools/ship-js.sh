@@ -1,4 +1,7 @@
 #!/bin/bash
+echo "YeAPF 0.8.53 shipping js parts";
+echo "Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com";
+
 tmp=`mktemp`
 echo "Generating 7 years license..."
 license=`php tools/ylicenseExpiration.php +2555 | grep x58e1`
@@ -12,7 +15,7 @@ new="$new.min.js"
 
 echo "Minifying... ($temp)"
 echo "    yloader.js"
-java -jar tools/compressors/compiler.jar --js $temp --js_output_file $new
+java -jar tools/compressors/compiler.jar --language_in=ECMASCRIPT5 --js $temp --js_output_file $new
 
 for a in 'ysandboxifc' 'ystorage' 'yifc' 'yapp' 'ycomm-worker'
 do
@@ -20,7 +23,7 @@ do
 
   b="app-src/js/min/$a"
   a="app-src/js/$a"
-  java -jar tools/compressors/compiler.jar --js "$a.js" --js_output_file "$b.min.js"
+  java -jar tools/compressors/compiler.jar --language_in=ECMASCRIPT5 --js "$a.js" --js_output_file "$b.min.js"
 
 done
 

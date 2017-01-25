@@ -7,6 +7,9 @@ cant=1
 dist=`uname -o`
 php=`which php`
 tmp=`echo $TEMP`
+if [[ "$tmp" == "" ]]; then
+	tmp="/tmp"
+fi
 
 if [[ "$dist" == "Cygwin" ]]; then
   if [ ! -f /usr/bin/php ]; then

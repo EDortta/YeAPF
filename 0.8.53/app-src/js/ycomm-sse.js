@@ -1,8 +1,8 @@
   /********************************************************************
   * app-src/js/ycomm-sse.js
-  * YeAPF 0.8.53-102 built on 2017-01-25 11:51 (-2 DST)
+  * YeAPF 0.8.53-111 built on 2017-01-25 15:45 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-25 11:49:13 (-2 DST)
+  * 2017-01-25 15:37:12 (-2 DST)
   ********************************************************************/
   var ycommSSEBase = function (workgroup, user, dataLocation, pollTimeout) {
     var that = {
@@ -62,11 +62,11 @@
 
       userAlive: function () {
         var _userAlive = function(data) {
+          console.log("User is alive");
           setTimeout(that.userAlive, that.peekInterval);
-        },  _userNotAlive = function(e) {
-
         };
-        that.rpc("userAlive").then(_userAlive).catch(_userNotAlive);
+        var p = that.rpc("userAlive");
+        p.then(_userAlive).catch(_userOffline);
       },
 
       attachUser: function (callback) {
@@ -136,7 +136,7 @@
         that.state=1;
         that.dispatchEvent("ready", {"gateway": "Polling"});
         setTimeout(that.poll, 125);
-        setTimeout(that.userAlive, that.peekInterval)
+        console.log("polling for messages. peekInterval: "+that.peekInterval);
       },
 
       guardianTimeout: function (e) {
@@ -186,6 +186,7 @@
             }
           }
           that.dispatchEvent("ready", {"gateway": "SSE"});
+          console.log("peekInterval: "+that.peekInterval);
           setTimeout(that.userAlive, that.peekInterval);
         }
         if (typeof that.onmessage=="function") {

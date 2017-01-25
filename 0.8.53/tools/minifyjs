@@ -34,6 +34,6 @@ if [ ! -d "$1" ]; then
   minjsFilePath=$jsDir/$minjsFile
 
 
-  java -jar $CLOSURE_COMPILER --js=$jsFilePath --js_output_file=$minjsFilePath
+  java -jar $CLOSURE_COMPILER --language_in=ECMASCRIPT5 --js=$jsFilePath --js_output_file=$minjsFilePath
   echo "$jsFilePath minified. Now located at $minjsFilePath"
 fi
