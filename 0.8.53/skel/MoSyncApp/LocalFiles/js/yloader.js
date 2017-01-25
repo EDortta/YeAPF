@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.53-100 built on 2017-01-25 09:22 (-2 DST)
+  * YeAPF 0.8.53-101 built on 2017-01-25 11:09 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-25 09:22:38 (-2 DST)
+  * 2017-01-25 11:09:27 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.53-100 built on 2017-01-25 09:22 (-2 DST)");
+ console.log("YeAPF 0.8.53-101 built on 2017-01-25 11:09 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -6071,6 +6071,15 @@
              }
            },
      
+           userAlive: function () {
+             var _userAlive = function(data) {
+               setTimeout(that.userAlive, that.peekInterval);
+             },  _userNotAlive = function(e) {
+     
+             };
+             that.rpc("userAlive").then(_userAlive).catch(_userNotAlive);
+           },
+     
            attachUser: function (callback) {
              that.rpc(
                "attachUser",
@@ -6079,8 +6088,9 @@
                  "user": that.user
                }).then(function(data) {
                    if (data && data[0] && data[0].ok) {
-                     that.w=workgroup;
+                     that.w              = workgroup;
                      that.sse_session_id = data[0].sse_session_id;
+                     that.peekInterval   = data[0].peekInterval;
                      callback();
                    }
                  }
@@ -6137,6 +6147,7 @@
              that.state=1;
              that.dispatchEvent("ready", {"gateway": "Polling"});
              setTimeout(that.poll, 125);
+             setTimeout(that.userAlive, that.peekInterval)
            },
      
            guardianTimeout: function (e) {
@@ -6186,6 +6197,7 @@
                  }
                }
                that.dispatchEvent("ready", {"gateway": "SSE"});
+               setTimeout(that.userAlive, that.peekInterval);
              }
              if (typeof that.onmessage=="function") {
                that.onmessage(e.data);

@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.53-100 built on 2017-01-25 09:22 (-2 DST)
+    YeAPF 0.8.53-101 built on 2017-01-25 11:09 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-20 15:06:32 (-2 DST)
+    2017-01-25 11:08:52 (-2 DST)
    */
 
   class SSE
@@ -13,13 +13,16 @@
     static $__LastPacketTS=0;
     static $queue_folder="";
     static $__needToFlush=true;
+    static $mpi=-1;
 
     /* indicates that the SSE can be used */
-  	public function enabled($sse_session_id, $w, $u)
+  	public function enabled($sse_session_id, $w, $u, $evaluateTimestamp = true)
     {
+      global $messagePeekerInterval;
+
       _dumpY(8,3,"SSE::enabled($sse_session_id)?");
       $ret=false;
-      if (connection_status()==0) {
+      if (connection_status()==CONNECTION_NORMAL) {
         $sessionFile=".sse/sessions/$sse_session_id.session";
         if (file_exists($sessionFile)) {
           $w = preg_replace('/[[:^print:]]/', '', $w);
@@ -33,7 +36,17 @@
             if (is_dir(".sse/$w")) {
               $ret=is_dir(".sse/$w/$u");
               if ($ret) {
-                self::$queue_folder=".sse/$w/$u";
+                if ($evaluateTimestamp) {
+                  clearstatcache();
+                  $fT = filemtime($sessionFile);
+                  $cT = date('U');
+                  $difT = $cT - $fT;
+                  /* maximum idle time is eight times the messagePeekerInterval */
+                  $maxT = self::getMaxPeekInterval() * 8;
+                  $ret = ($difT<=$maxT);
+                }
+                if ($ret)
+                  self::$queue_folder=".sse/$w/$u";
               } else {
                 _dumpY(8,3,"SSE::disabled - user directory not found");
               }
@@ -52,6 +65,16 @@
       _dumpY(8,3,"SSE::enabled = ".intval($ret));
   		return $ret;
   	}
+
+    private function getMaxPeekInterval() 
+    {
+      /*  allow times between 750 and 12000 ms 
+          BUT... as the file time stamp in UNIX are measured in seconds, 
+          we translate it to seconds */
+      if (self::$mpi<=0)
+        self::$mpi = (min(12000, max(750, isset($messagePeekerInterval)?intval($messagePeekerInterval):0)))/1000;
+      return self::$mpi;
+    }
 
     /* flush the output to the client */
     private function __flush()
@@ -371,16 +394,28 @@
       case 'attachUser':
         $sse_session_id  = SSE::attachUser($w, $user);
         $ret = array(
-              'ok'=>$sse_session_id>'',
-              'sse_session_id' => $sse_session_id
+              'ok'             => $sse_session_id>'',
+              'sse_session_id' => $sse_session_id,
+              'peekInterval'   => SSE::getMaxPeekInterval() * 7
             );
+        break;
+
+      case 'userAlive':
+        $sessionInfo = SSE::getSessionInfo($sse_session_id);
+        extract($sessionInfo);
+        if (SSE::enabled($sse_session_id, $w, $u)) {
+          $sessionFile=".sse/sessions/$sse_session_id.session";
+          if (file_exists($sessionFile)) {
+            touch($sessionFile);
+          }
+        }
         break;
 
       case 'peekMessage':
         $__sse_ret=array();
         $sessionInfo = SSE::getSessionInfo($sse_session_id);
         extract($sessionInfo);
-        if (SSE::enabled($sse_session_id, $w, $u)) {
+        if (SSE::enabled($sse_session_id, $w, $u, false)) {
           $sse_dispatch = function($eventName, $eventData) {
             global $__sse_ret;
             _dump(preg_replace('/[[:^print:]]/', '', "event: $eventName, data: $eventData"));
