@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.53-113 built on 2017-01-25 17:40 (-2 DST)
+  * YeAPF 0.8.53-114 built on 2017-01-25 17:53 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-25 17:40:41 (-2 DST)
+  * 2017-01-25 17:53:55 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.53-113 built on 2017-01-25 17:40 (-2 DST)");
+ console.log("YeAPF 0.8.53-114 built on 2017-01-25 17:53 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -4291,9 +4291,9 @@
         * https://developer.mozilla.org/en-US/docs/Web/API/FileReader#readAsArrayBuffer%28%29
         */
      
-       ycomm.invoke = function(s, a, limits, callbackFunction, async) {
-           if (typeof async=='undefined')
-             async = true;
+       ycomm.invoke = function(s, a, limits, callbackFunction, displayWaitIcon) {
+           if (typeof displayWaitIcon=='undefined')
+             displayWaitIcon = true;
            /* if the first parameter is an object, then
             * all the others parameters are expected to be into that object */
            if (typeof s =='object') {
@@ -4304,7 +4304,8 @@
              callbackFunction = auxObj.callbackFunction;
            }
            var localU = (typeof u == 'undefined')?'':u;
-           ycomm.waitIconControl(true);
+           if (displayWaitIcon)
+             ycomm.waitIconControl(true);
      
            var aURL=ycomm.buildCommonURL(s || '', a || '', limits || {}, localU);
      
@@ -4317,11 +4318,12 @@
                ycomm.scriptName,
                {
                  method: ycomm.defaultMethod,
-                 asynchronous: yloader.isWorker?false:async,
+                 asynchronous: !yloader.isWorker,
                  parameters: aURL,
                  onTimeout: function() {
                    console.log('XMLHttpRequest timeout');
-                   ycomm.waitIconControl(false);
+                   if (displayWaitIcon)
+                     ycomm.waitIconControl(false);
                    callbackFunction(404, {}, [{}], null, null, null);
                  },
                  onComplete: function(r) {
@@ -4444,9 +4446,10 @@
          _dumpy(4,1,ycomm.getStatus());
        };
      
-       ycomm.bring =  function (url) {
+       ycomm.bring =  function (url, displayWaitIcon) {
          var head = document.head;
-         ycomm.waitIconControl(true);
+         if (displayWaitIcon)
+           ycomm.waitIconControl(true);
          var script = document.createElement("script");
          _dumpy(4,1,url);
          // extrair o scriptSequence e o callback para depuracao
@@ -4468,11 +4471,13 @@
          script.UUID = generateUUID();
          script.maxWaitCount=(ycomm.timeout / ycomm.wd_interval)+2;
          script.callbackFunctionName=callbackFunctionName;
+         script.displayWaitIcon = displayWaitIcon;
          script.onload=function() {
            if (ycomm._load>0)
              ycomm._load--;
            this.abort=null;
-           ycomm.waitIconControl(false);
+           if (this.displayWaitIcon)
+             ycomm.waitIconControl(false);
          };
      
          script.abort = function () {
@@ -4507,10 +4512,12 @@
      
        };
      
-       ycomm.crave = function (s, a, limits, callbackFunction, callbackId) {
+       ycomm.crave = function (s, a, limits, callbackFunction, displayWaitIcon, callbackId) {
          var localU = (typeof u == 'undefined')?'':u;
-         if (typeof callbackId == 'undefined')
+         if ((typeof callbackId == 'undefined') || (callbackId === null))
            callbackId = 0;
+         if ((typeof displayWaitIcon == 'undefined') || (displayWaitIcon === null))
+           displayWaitIcon = true;
      
          ycomm.registerCall('crave', s, a);
          /* sequence number for script garbage collect */
@@ -4548,7 +4555,7 @@
              aURL="{0}?{1}&callback={2}&callbackId={3}&scriptSequence={4}&deviceId={5}".format(ycomm._dataLocation_, aURL, callbackFunctionName, callbackId, ycomm._scriptSequence,ycomm._deviceId_);
              if (ycomm.getLoad()<=ycomm._maxDirectCall) {
                _dumpy(4,1,aURL);
-               ycomm.bring(aURL);
+               ycomm.bring(aURL, displayWaitIcon);
              } else
                setTimeout("ycomm.bring('"+aURL+"');", (0.5 + abs(ycomm.getLoad() - ycomm._maxDirectCall)) * ycomm.wd_interval * 2);
            }
@@ -6045,7 +6052,8 @@
                      } else {
                        reject(status);
                      }
-                   }
+                   },
+                   false
                  );
                }
              );

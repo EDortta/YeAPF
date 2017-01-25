@@ -1,8 +1,8 @@
   /********************************************************************
    * app-src/js/ycomm-ajax.js
-   * YeAPF 0.8.53-100 built on 2017-01-25 09:22 (-2 DST)
+   * YeAPF 0.8.53-114 built on 2017-01-25 17:53 (-2 DST)
    * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2017-01-23 18:44:52 (-2 DST)
+   * 2017-01-25 17:42:25 (-2 DST)
    *
    * Com o advento do WebSocket, precisamos de novas formas para
    * provocar o servidor.
@@ -261,9 +261,9 @@
    * https://developer.mozilla.org/en-US/docs/Web/API/FileReader#readAsArrayBuffer%28%29
    */
 
-  ycomm.invoke = function(s, a, limits, callbackFunction, async) {
-      if (typeof async=='undefined')
-        async = true;
+  ycomm.invoke = function(s, a, limits, callbackFunction, displayWaitIcon) {
+      if (typeof displayWaitIcon=='undefined')
+        displayWaitIcon = true;
       /* if the first parameter is an object, then
        * all the others parameters are expected to be into that object */
       if (typeof s =='object') {
@@ -274,7 +274,8 @@
         callbackFunction = auxObj.callbackFunction;
       }
       var localU = (typeof u == 'undefined')?'':u;
-      ycomm.waitIconControl(true);
+      if (displayWaitIcon)
+        ycomm.waitIconControl(true);
 
       var aURL=ycomm.buildCommonURL(s || '', a || '', limits || {}, localU);
 
@@ -287,11 +288,12 @@
           ycomm.scriptName,
           {
             method: ycomm.defaultMethod,
-            asynchronous: yloader.isWorker?false:async,
+            asynchronous: !yloader.isWorker,
             parameters: aURL,
             onTimeout: function() {
               console.log('XMLHttpRequest timeout');
-              ycomm.waitIconControl(false);
+              if (displayWaitIcon)
+                ycomm.waitIconControl(false);
               callbackFunction(404, {}, [{}], null, null, null);
             },
             onComplete: function(r) {
