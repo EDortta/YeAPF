@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.53-101 built on 2017-01-25 11:09 (-2 DST)
+    YeAPF 0.8.53-102 built on 2017-01-25 11:51 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-25 11:08:52 (-2 DST)
+    2017-01-25 11:45:32 (-2 DST)
    */
 
   class SSE
@@ -66,14 +66,15 @@
   		return $ret;
   	}
 
-    private function getMaxPeekInterval() 
-    {
+    public function getMaxPeekInterval() 
+    {      
+      global $messagePeekerInterval;      
       /*  allow times between 750 and 12000 ms 
           BUT... as the file time stamp in UNIX are measured in seconds, 
           we translate it to seconds */
       if (self::$mpi<=0)
         self::$mpi = (min(12000, max(750, isset($messagePeekerInterval)?intval($messagePeekerInterval):0)))/1000;
-      return self::$mpi;
+      return self::$mpi;      
     }
 
     /* flush the output to the client */
@@ -391,13 +392,15 @@
 
     switch($a)
     {
-      case 'attachUser':
-        $sse_session_id  = SSE::attachUser($w, $user);
+      case 'attachUser':      
+        $sse_session_id  = SSE::attachUser($w, $user);        
+        $peekInterval    = SSE::getMaxPeekInterval() * 7;
         $ret = array(
               'ok'             => $sse_session_id>'',
               'sse_session_id' => $sse_session_id,
-              'peekInterval'   => SSE::getMaxPeekInterval() * 7
+              'peekInterval'   => $peekInterval
             );
+
         break;
 
       case 'userAlive':
