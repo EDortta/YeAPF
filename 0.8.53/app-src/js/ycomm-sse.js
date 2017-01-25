@@ -1,8 +1,8 @@
   /********************************************************************
   * app-src/js/ycomm-sse.js
-  * YeAPF 0.8.53-112 built on 2017-01-25 17:31 (-2 DST)
+  * YeAPF 0.8.53-113 built on 2017-01-25 17:40 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-25 17:30:37 (-2 DST)
+  * 2017-01-25 17:40:02 (-2 DST)
   ********************************************************************/
   var ycommSSEBase = function (workgroup, user, dataLocation, pollTimeout) {
     var that = {
@@ -67,6 +67,7 @@
         };
         var _userOffline = function(e) {
           console.error(e);
+          that.close(e);
         };
         var p = that.rpc("userAlive");
         p.then(_userAlive).catch(_userOffline);
