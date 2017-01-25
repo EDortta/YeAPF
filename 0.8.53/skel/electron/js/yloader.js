@@ -1,8 +1,8 @@
 /*********************************************
   * skel/electron/js/yloader.js
-  * YeAPF 0.8.53-98 built on 2017-01-24 08:10 (-2 DST)
+  * YeAPF 0.8.53-99 built on 2017-01-25 08:21 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-24 08:10:57 (-2 DST)
+  * 2017-01-25 08:21:38 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.53-98 built on 2017-01-24 08:10 (-2 DST)");
+ console.log("YeAPF 0.8.53-99 built on 2017-01-25 08:21 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -6015,8 +6015,11 @@
  /* START ycomm-sse.js */
        /********************************************************************
        ********************************************************************/
-       var ycommSSEBase = function (workgroup, user, dataLocation) {
+       var ycommSSEBase = function (workgroup, user, dataLocation, pollTimeout) {
          var that = {
+           
+           /* pollTimeout must be between 1 and 60 seconds */
+           pollTimeout:  Math.min(60000, Math.max(typeof pollTimeout=='number'?pollTimeout:1000, 1000)),
      
            getLocation: function() {
              return (typeof document=='object' && document.location && document.location.href)?document.location.href:'';
@@ -6063,7 +6066,7 @@
                        }
                      }
                    }
-                   setTimeout(that.poll, 1000);
+                   setTimeout(that.poll, that.pollTimeout);
                  });
              }
            },
@@ -6162,7 +6165,7 @@
            },
      
            error: function(e) {
-             console.error("ERROR");
+             console.error("ERROR using SSE");
            },
      
            message: function (e) {
@@ -6191,7 +6194,7 @@
      
            init: function() {
              that.state = -1;
-             if (typeof dataLocation=="undefined") {
+             if ((typeof dataLocation=="undefined") || (dataLocation === null)) {
                /* default data location is current location/sse.pph */
                that._dataLocation_ = (
                  function() {
