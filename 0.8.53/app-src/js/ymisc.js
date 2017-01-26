@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.53-115 built on 2017-01-26 18:57 (-2 DST)
+ * YeAPF 0.8.53-116 built on 2017-01-26 19:06 (-2 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-01-26 18:55:25 (-2 DST)
+ * 2017-01-26 19:06:24 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -140,7 +140,7 @@ function $frameOwner(aName, aType) {
 }
 
 function isSSL() {
-  return (window.location.indexOf("https://")==0);
+  return (window.location.href.indexOf("https://")==0);
 }
 
 function produceWaitMsg(msg) {
