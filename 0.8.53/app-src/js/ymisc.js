@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.53-100 built on 2017-01-25 09:22 (-2 DST)
+ * YeAPF 0.8.53-115 built on 2017-01-26 18:57 (-2 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-12-23 16:56:21 (-2 DST)
+ * 2017-01-26 18:55:25 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -139,7 +139,9 @@ function $frameOwner(aName, aType) {
   return _searchFunctionInFrame_(aName, aType, f);
 }
 
-
+function isSSL() {
+  return (window.location.indexOf("https://")==0);
+}
 
 function produceWaitMsg(msg) {
   var feedbackCSS='<style type="text/css"><!--.yWarnBanner {  font-family: Georgia, "Times New Roman", Times, serif;  font-size: 16px;  font-style: normal; font-variant: normal; font-weight: normal;  text-transform: none; margin: 16px; padding: 8px; background-color: #DFEEF2;  border: 1px dotted #387589; line-height: 24px;}--></style>';
