@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.54-1 built on 2017-01-31 11:51 (-2 DST)
+  * YeAPF 0.8.54-2 built on 2017-01-31 12:13 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-31 11:51:00 (-2 DST)
+  * 2017-01-31 12:13:41 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.54-1 built on 2017-01-31 11:51 (-2 DST)");
+ console.log("YeAPF 0.8.54-2 built on 2017-01-31 12:13 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -4217,14 +4217,15 @@
                xData=new Array(xData);
              }
      
-             retData = [];
      
              if (xData) {
+               retData = [];
                for(var n in xData)
                  if (xData.hasOwnProperty(n)) {
+                   retData[n] = {};
                    for(var j in xData[n])
                      if (xData[n].hasOwnProperty(j))
-                       xData[n][j]=unmaskHTML(xData[n][j]);
+                       retData[n][j]=unmaskHTML(xData[n][j]);
                  }
              }
      
@@ -4236,7 +4237,7 @@
      
      
          var ret = {
-           data: xData,
+           data: retData,
            geometry: xGeometry,
            dataContext: xDataContext,
            error: xError,
