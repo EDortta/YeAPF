@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/yloader"></script>
+    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="css/bootstrap-theme.css" rel="stylesheet" type="text/css">
+    <title>#(wbTitle)</title>
+  </head>
+  
+  <style>
+    .page-btn {
+      width: 15vw;
+      overflow: hidden;
+    }
+  </style>
+
+  <body>
+
+  <div class="modal fade" id="tp_modal_container_confirm_deletion" role="dialog" aria-labelledby="tp_confirm_deletion" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class='fa fa-close'></i>
+          </button>
+          <h4 class="modal-title" id="tp_confirm_deletion">
+            Eliminar a p&aacute;gina
+          </h4>
+        </div>
+        <div class="modal-body">
+          Tem certeza que deseja eliminar esta p&aacute;gina?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            N&atilde;o
+          </button>
+          <button type="button" class="btn btn-danger" id="tp_btnDeletePageConfirmation">
+            Sim, desejo eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="navbar navbar-default navbar-static-top main-menu">
+    <div class="container">
+      <form class="navbar-form navbar-left" role="search" method="get">
+        <div class="form-group">
+          i_<input type="text" class="form-control" placeholder="New page" name="newPageName" id="newPageName">
+        </div>
+        <button type="submit" class="btn btn-default"><i class='fa fa-plus'></i></button>
+        <button type="button" class="btn btn-warning" onclick="javascript:document.location=document.location.href.split('?')[0]"><i class='fa fa-refresh'></i></button>
+        #if(#fileExists('production/e_index_sample.html')>0,{
+        <a type="button" class="btn btn-primary" target="viewer" href="production/e_index_sample.html"><i class='fa fa-folder-open'></i></a>
+        })
+      </form>
+    </div>
+  </div>
+  <div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <h3>Pages</h3>
+          
+          <div class="container">
+            <div class="row">
+              #(menu)
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    var pageToBeDeleted=null;
+    var getDataPage = function(e) {
+      if (e.target)
+        e=e.target;
+      if (e.nodeName=='I')
+        e=e.parentNode;
+      return e.getAttribute('data-page');
+    }
+
+    var _tp_createDist = function(e) {
+      if (e.target) {
+        var pageToBeDist = getDataPage(e)
+;
+        window.location = "index.php?xMinified=0&xBody="+pageToBeDist;
+      }      
+    }
+
+    var _tp_createZipDist = function(e) {
+      if (e.target) {
+        var pageToBeDist = getDataPage(e);
+        window.location = "index.php?xMinified=1&xBody="+pageToBeDist;
+      }      
+    }
+
+    var _tp_deleteZipDist = function(e) {
+      if (e.target) {
+        var distToBeDeleted = getDataPage(e);
+        window.location = "index.php?xMinified=0&xErase=1&xBody="+distToBeDeleted;
+      }      
+    }
+
+    var _tp_deletePageOpenDialog = function(e) {
+      if (e.target) {
+        pageToBeDeleted = getDataPage(e);
+        $("#tp_modal_container_confirm_deletion").modal();
+      } else
+        console.error("Que navegador vc esta usando, meu chapa?");
+
+    };
+
+    var _tp_deletePageAction = function() {
+      window.location = "index.php?dBody="+pageToBeDeleted;
+    };
+
+    addOnLoadManager(
+
+      function() {
+        document.getElementById('newPageName').focus();
+
+        addEvent(".btnDeletePage",    "click", _tp_deletePageOpenDialog);
+        addEvent(".btnCreateDist",    "click", _tp_createDist);
+        addEvent(".btnCreateZipDist", "click", _tp_createZipDist);
+        addEvent(".btnDeleteDist",    "click", _tp_deleteZipDist);
+
+        addEvent("tp_btnDeletePageConfirmation", "click", _tp_deletePageAction);
+      }
+    );
+  </script>
+</html>
