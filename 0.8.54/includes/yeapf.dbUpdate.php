@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.54-3 built on 2017-01-31 14:05 (-2 DST)
+    YeAPF 0.8.54-10 built on 2017-01-31 17:17 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-31 13:58:26 (-2 DST)
+    2017-01-31 17:15:59 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -485,8 +485,8 @@
       if (_db_upd_canReviewVersion(10)) {
         _recordWastedTime("checking v10");
         try {
-          if (!db_tableExists('is_auditingTrack')) {
-            $sql = "CREATE TABLE  is_auditingTrack (
+          if (!db_tableExists('is_auditing_track')) {
+            $sql = "CREATE TABLE  is_auditing_track (
                       id char(32),
                       state char(1),
                       userID char(32),
