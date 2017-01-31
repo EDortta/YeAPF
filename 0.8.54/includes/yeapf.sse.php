@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.54-1 built on 2017-01-31 11:51 (-2 DST)
+    YeAPF 0.8.54-5 built on 2017-01-31 16:27 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-31 11:20:54 (-2 DST)
+    2017-01-31 16:03:40 (-2 DST)
    */
 
   class SSE
@@ -13,7 +13,7 @@
     static $__LastPacketTS=0;
     static $queue_folder="";
     static $__needToFlush=true;
-    static $mpi=-1;
+    static $uai=-1;
 
     /* indicates that the SSE can be used */
   	public function enabled($sse_session_id, $w, $u, $evaluateTimestamp = true)
@@ -42,7 +42,7 @@
                   $cT = date('U');
                   $difT = $cT - $fT; 
                   /* maximum idle time is eight times the messagePeekerInterval */
-                  $maxT = self::getMaxPeekInterval() * 8;
+                  $maxT = self::getMaxUserAliveInterval() * 8;
                   $ret = ($difT<=$maxT);
                   _dumpY(8,0,"SSE difT: $difT maxT: $maxT");
                 }
@@ -67,15 +67,17 @@
   		return $ret;
   	}
 
-    public function getMaxPeekInterval() 
+    public function getMaxUserAliveInterval() 
     {      
       global $messagePeekerInterval;      
       /*  allow times between 750 and 12000 ms 
           BUT... as the file time stamp in UNIX are measured in seconds, 
           we translate it to seconds */
-      if (self::$mpi<=0)
-        self::$mpi = (min(12000, max(750, isset($messagePeekerInterval)?intval($messagePeekerInterval):0)))/1000;
-      return self::$mpi;      
+      if (self::$uai<=0) {
+        self::$uai = (min(12000, max(750, isset($messagePeekerInterval)?intval($messagePeekerInterval):0)))/1000;
+        _dumpY(8,0,"SSE::uai (userAliveInterval) : ".self::$uai);
+      }
+      return self::$uai;      
     }
 
     /* flush the output to the client */
@@ -403,11 +405,11 @@
     {
       case 'attachUser':      
         $sse_session_id  = SSE::attachUser($w, $user);        
-        $peekInterval    = SSE::getMaxPeekInterval() * 7;
+        $userAliveInterval    = SSE::getMaxUserAliveInterval() * 7;
         $ret = array(
               'ok'             => $sse_session_id>'',
               'sse_session_id' => $sse_session_id,
-              'peekInterval'   => $peekInterval
+              'userAliveInterval'   => $userAliveInterval
             );
 
         break;

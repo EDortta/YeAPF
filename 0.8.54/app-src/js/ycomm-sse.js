@@ -1,8 +1,8 @@
   /********************************************************************
   * app-src/js/ycomm-sse.js
-  * YeAPF 0.8.54-4 built on 2017-01-31 14:37 (-2 DST)
+  * YeAPF 0.8.54-5 built on 2017-01-31 16:27 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-31 14:29:23 (-2 DST)
+  * 2017-01-31 16:10:10 (-2 DST)
   ********************************************************************/
   var ycommSSEBase = function (workgroup, user, dataLocation, pollTimeout, preferredGateway) {
     var that = {
@@ -69,7 +69,7 @@
             if (data[0].event!="close") {
               ret=true;
               console.log("User is alive");
-              setTimeout(that.userAlive, that.peekInterval);              
+              setTimeout(that.userAlive, that.userAliveInterval);              
             } 
           }
           if (!ret) {
@@ -94,9 +94,9 @@
             "user": that.user
           }).then(function(data) {
               if (data && data[0] && data[0].ok) {
-                that.w              = workgroup;
-                that.sse_session_id = data[0].sse_session_id;
-                that.peekInterval   = data[0].peekInterval * 1000;
+                that.w                 = workgroup;
+                that.sse_session_id    = data[0].sse_session_id;
+                that.userAliveInterval = data[0].userAliveInterval * 1000;
                 callback();
               }
             }
@@ -133,7 +133,6 @@
           }
         }
 
-
         eventName1=eventName;
         eventName2="on_"+eventName;
         if (typeof that[eventName1] == "function") {
@@ -153,7 +152,7 @@
         that.state=1;
         that.dispatchEvent("ready", {"gateway": "Polling"});
         setTimeout(that.poll, 125);
-        console.log("polling for messages. peekInterval: "+that.peekInterval);
+        console.log("polling for messages. pollTimeout: {0}ms".format(that.pollTimeout));
       },
 
       guardianTimeout: function (e) {
@@ -203,8 +202,8 @@
             }
           }
           that.dispatchEvent("ready", {"gateway": "SSE"});
-          console.log("peekInterval: "+that.peekInterval);
-          setTimeout(that.userAlive, that.peekInterval);
+          console.log("userAliveInterval: "+that.userAliveInterval);
+          setTimeout(that.userAlive, that.userAliveInterval);
         }
         if (typeof that.onmessage=="function") {
           that.onmessage(e.data);
