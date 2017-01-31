@@ -1,9 +1,9 @@
 <?php
 /*
     tools/install-script.php
-    YeAPF 0.8.53-111 built on 2017-01-25 15:45 (-2 DST)
+    YeAPF 0.8.53-123 built on 2017-01-31 11:14 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-25 15:23:47 (-2 DST)
+    2017-01-31 11:13:51 (-2 DST)
 */
 
   function installFile($entry)
@@ -40,7 +40,7 @@
   $targetPath=dirname($php);
 
   echo "TEMP at $targetTemp\n";
-  echo "Windows? = ".($onWinOS:'TRUE':'FALSE')."\n";
+  echo "Windows? = ".($onWinOS?'TRUE':'FALSE')."\n";
 
   $chmodScript='';
   if ($argv[1]=='Cygwin') {
