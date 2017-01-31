@@ -1,9 +1,9 @@
 <?php
 /*
     skel/workbench/www/sse.php
-    YeAPF 0.8.53-117 built on 2017-01-31 09:57 (-2 DST)
+    YeAPF 0.8.53-118 built on 2017-01-31 10:08 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-31 09:57:47 (-2 DST)
+    2017-01-31 10:08:41 (-2 DST)
 
     skel/webApp / sse.php
     This file cannot be modified within skel/webApp
@@ -27,7 +27,7 @@
   /* this message will help SSE client to recognizes as valid SSE connection */
   SSE::sendEvent("message", "welcome");
 
-  _dump("SSE - conn");
+  _dumpY(8,0,"SSE - conn");
 
   set_time_limit(0);
 
@@ -53,7 +53,7 @@
 
     /* run the loop while this session is enabled */
     while (SSE::enabled($sse_session_id, $w, $u)) {
-      _dump("$sse_session_id QUEUE");
+      _dumpY(8,0,"$sse_session_id QUEUE");
       /* process the message queue */
       SSE::processQueue($sse_dispatch);
 
@@ -70,6 +70,6 @@
 
   SSE::sendEvent("close");
 
-  _dump("SSE - finish");
+  _dumpY(8,0,"SSE - finish");
 
 ?>

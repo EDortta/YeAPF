@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.53-117 built on 2017-01-31 09:57 (-2 DST)
+    YeAPF 0.8.53-118 built on 2017-01-31 10:08 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-31 09:57:04 (-2 DST)
+    2017-01-31 10:07:32 (-2 DST)
    */
 
   class SSE
@@ -40,7 +40,7 @@
                   clearstatcache();
                   $fT = filemtime($sessionFile);
                   $cT = date('U');
-                  $difT = $cT - $fT;
+                  $difT = $cT - $fT; 
                   /* maximum idle time is eight times the messagePeekerInterval */
                   $maxT = self::getMaxPeekInterval() * 8;
                   $ret = ($difT<=$maxT);
