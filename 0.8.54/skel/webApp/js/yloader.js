@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.54-7 built on 2017-01-31 16:50 (-2 DST)
+  * YeAPF 0.8.54-8 built on 2017-01-31 17:06 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-31 16:50:08 (-2 DST)
+  * 2017-01-31 17:06:07 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.54-7 built on 2017-01-31 16:50 (-2 DST)");
+ console.log("YeAPF 0.8.54-8 built on 2017-01-31 17:06 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -6087,22 +6087,21 @@
      
            userAlive: function () {
              var _userAlive = function(data) {
-               var ret=false;
+               var toClose=false;
                if (data && data[0]) {
-                 if (data[0].event!="close") {
-                   ret=true;
+                 toClose = (data[0].event || '').toUpperCase() == 'close';
+                 if (!toClose) {
                    console.log("User is alive");
                    setTimeout(that.userAlive, that.userAliveInterval);              
                  } 
                }
-               if (!ret) {
-                 console.log("User logged out");
-                 that.close({});
+               if (toClose) {
+                 _userOffline();
                }
              };
              
              var _userOffline = function(e) {
-               console.error(e);
+               console.log("User logged out");
                that.close(e);
              };
              var p = that.rpc("userAlive");

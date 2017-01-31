@@ -1,8 +1,8 @@
 /*********************************************
  * skel/chromeApp/js/ystorage.js
- * YeAPF 0.8.54-7 built on 2017-01-31 16:50 (-2 DST)
+ * YeAPF 0.8.54-8 built on 2017-01-31 17:06 (-2 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-01-31 16:50:08 (-2 DST)
+ * 2017-01-31 17:06:07 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
