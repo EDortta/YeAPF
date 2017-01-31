@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.54-6 built on 2017-01-31 16:40 (-2 DST)
+    YeAPF 0.8.54-7 built on 2017-01-31 16:50 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-31 16:33:31 (-2 DST)
+    2017-01-31 16:49:16 (-2 DST)
    */
 
   class SSE
@@ -148,14 +148,14 @@
       $cc=0;
 
       if (count($files)>0) {
-        foreach ($files as $key => $value) {
+        foreach ($files as $key => $messageFileName) {
           if ($cc<5) {
             $cc++;
-            $ok=fnmatch("*.msg", basename($value));
+            $ok=fnmatch("*.msg", basename($messageFileName));
 
             if ($ok) {
-              _dumpY(8,0,"SSE::popQueue(".basename(self::$queue_folder).") - get file '".basename($value)."'");
-              $f=fopen($value, "r");
+              _dumpY(8,0,"SSE::popQueue(".basename(self::$queue_folder).") - get file '".basename($messageFileName)."'");
+              $f=fopen($messageFileName, "r");
               $eventName = trim(preg_replace('/[[:^print:]]/', '', fgets($f)));
               $eventData = preg_replace('/[[:^print:]]/', '', fgets($f));
               fclose($f);
@@ -174,7 +174,7 @@
                   implementation($s, $a, 'w');
                 }
               }
-              unlink($value);
+              @unlink($messageFileName);
             }
           }
         }
