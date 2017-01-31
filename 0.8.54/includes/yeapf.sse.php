@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.54-5 built on 2017-01-31 16:27 (-2 DST)
+    YeAPF 0.8.54-6 built on 2017-01-31 16:40 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-31 16:03:40 (-2 DST)
+    2017-01-31 16:33:31 (-2 DST)
    */
 
   class SSE
@@ -423,7 +423,7 @@
           $sessionFile=".sse/sessions/$sse_session_id.session";
           if (file_exists($sessionFile)) {
             touch($sessionFile);
-          }
+          } 
 
           if ($a=='peekMessage') {
             $sse_dispatch = function($eventName, $eventData) {

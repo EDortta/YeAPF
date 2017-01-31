@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.54-5 built on 2017-01-31 16:27 (-2 DST)
+  * YeAPF 0.8.54-6 built on 2017-01-31 16:40 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-31 16:27:46 (-2 DST)
+  * 2017-01-31 16:40:29 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.54-5 built on 2017-01-31 16:27 (-2 DST)");
+ console.log("YeAPF 0.8.54-6 built on 2017-01-31 16:40 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -6225,8 +6225,9 @@
                  }
                }
                that.dispatchEvent("ready", {"gateway": "SSE"});
-               console.log("userAliveInterval: "+that.userAliveInterval);
-               setTimeout(that.userAlive, that.userAliveInterval);
+               console.log("userAliveInterval: {0}ms".format(that.userAliveInterval));
+               /* the first UAI happens in half of the planned time */
+               setTimeout(that.userAlive, that.userAliveInterval / 2);
              }
              if (typeof that.onmessage=="function") {
                that.onmessage(e.data);

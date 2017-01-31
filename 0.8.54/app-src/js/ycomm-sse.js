@@ -1,8 +1,8 @@
   /********************************************************************
   * app-src/js/ycomm-sse.js
-  * YeAPF 0.8.54-5 built on 2017-01-31 16:27 (-2 DST)
+  * YeAPF 0.8.54-6 built on 2017-01-31 16:40 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-31 16:10:10 (-2 DST)
+  * 2017-01-31 16:39:16 (-2 DST)
   ********************************************************************/
   var ycommSSEBase = function (workgroup, user, dataLocation, pollTimeout, preferredGateway) {
     var that = {
@@ -202,8 +202,9 @@
             }
           }
           that.dispatchEvent("ready", {"gateway": "SSE"});
-          console.log("userAliveInterval: "+that.userAliveInterval);
-          setTimeout(that.userAlive, that.userAliveInterval);
+          console.log("userAliveInterval: {0}ms".format(that.userAliveInterval));
+          /* the first UAI happens in half of the planned time */
+          setTimeout(that.userAlive, that.userAliveInterval / 2);
         }
         if (typeof that.onmessage=="function") {
           that.onmessage(e.data);
