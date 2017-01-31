@@ -1,8 +1,8 @@
   /********************************************************************
   * app-src/js/ycomm-sse.js
-  * YeAPF 0.8.53-114 built on 2017-01-25 17:53 (-2 DST)
+  * YeAPF 0.8.53-117 built on 2017-01-31 09:57 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-25 17:52:25 (-2 DST)
+  * 2017-01-31 09:45:48 (-2 DST)
   ********************************************************************/
   var ycommSSEBase = function (workgroup, user, dataLocation, pollTimeout) {
     var that = {
@@ -218,7 +218,7 @@
           console.error("'"+that._dataLocation_+"' is not a correct data location");
         } else {
           /* create user id */
-          that.user = typeof user != "undefined"?user:generateUUID();
+          that.user = ((user !==null) && (typeof user != "undefined"))?user:generateUUID();
 
           /* check same-source */
           var l1=that.getFolder(that.getLocation()),

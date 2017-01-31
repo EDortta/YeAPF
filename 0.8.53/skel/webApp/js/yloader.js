@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.53-116 built on 2017-01-26 19:06 (-2 DST)
+  * YeAPF 0.8.53-117 built on 2017-01-31 09:57 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-26 19:06:43 (-2 DST)
+  * 2017-01-31 09:57:47 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.53-116 built on 2017-01-26 19:06 (-2 DST)");
+ console.log("YeAPF 0.8.53-117 built on 2017-01-31 09:57 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -6238,7 +6238,7 @@
                console.error("'"+that._dataLocation_+"' is not a correct data location");
              } else {
                /* create user id */
-               that.user = typeof user != "undefined"?user:generateUUID();
+               that.user = ((user !==null) && (typeof user != "undefined"))?user:generateUUID();
      
                /* check same-source */
                var l1=that.getFolder(that.getLocation()),

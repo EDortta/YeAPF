@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.53-111 built on 2017-01-25 15:45 (-2 DST)
+    YeAPF 0.8.53-117 built on 2017-01-31 09:57 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-25 12:42:46 (-2 DST)
+    2017-01-31 09:57:04 (-2 DST)
    */
 
   class SSE
@@ -44,7 +44,7 @@
                   /* maximum idle time is eight times the messagePeekerInterval */
                   $maxT = self::getMaxPeekInterval() * 8;
                   $ret = ($difT<=$maxT);
-                  _dump("SSE difT: $difT maxT: $maxT");
+                  _dumpY(8,0,"SSE difT: $difT maxT: $maxT");
                 }
                 if ($ret)
                   self::$queue_folder=".sse/$w/$u";
@@ -94,7 +94,7 @@
       $arg_list = func_get_args();
       foreach($arg_list as $arg) {
         self::$__needToFlush=true;
-        _dump("SSE::__echo() $arg");
+        _dumpY(8,0,"SSE::__echo() $arg");
         echo $arg;
       }
     }
@@ -152,7 +152,7 @@
             $ok=fnmatch("*.msg", basename($value));
 
             if ($ok) {
-              _dump("SSE::popQueue(".basename(self::$queue_folder).") - get file '".basename($value)."'");
+              _dumpY(8,0,"SSE::popQueue(".basename(self::$queue_folder).") - get file '".basename($value)."'");
               $f=fopen($value, "r");
               $eventName = trim(preg_replace('/[[:^print:]]/', '', fgets($f)));
               $eventData = preg_replace('/[[:^print:]]/', '', fgets($f));
@@ -277,7 +277,7 @@
           // file_put_contents("$ndxFile", "$w_target\n$msg_ndx\n$sse_session_id\n".date("U"));
           $messageFileI = "$usr_folder/$msg_ndx.new";
           $messageFileF = "$usr_folder/$msg_ndx.msg";
-          _dump("SSE::pushQueue($u_target) - set file '".basename($messageFileI)."'");
+          _dumpY(8,0,"SSE::pushQueue($u_target) - set file '".basename($messageFileI)."'");
 
           $f=fopen($messageFileI, "wt");
           fputs($f, "$message\n");
@@ -310,7 +310,7 @@
           self::__enqueueMessage($u, 'postpone_w', $data);
         }
       } else {
-        _dump("You cannot postpone a message without 'u' parameter");
+        _dumpY(8,0,"You cannot postpone a message without 'u' parameter");
       }
     }
 
@@ -418,7 +418,7 @@
           if ($a=='peekMessage') {
             $sse_dispatch = function($eventName, $eventData) {
               global $__sse_ret;
-              _dump(preg_replace('/[[:^print:]]/', '', "event: $eventName, data: $eventData"));
+              _dumpY(8,0,preg_replace('/[[:^print:]]/', '', "event: $eventName, data: $eventData"));
               $__sse_ret[]=array(  'event' => $eventName,
                                    'data'  => $eventData   );
             };
@@ -429,7 +429,7 @@
           $__sse_ret=array(  'event' => 'close',
                              'data'  => ''   );
         }
-        _dump("ret: ".json_encode($__sse_ret));
+        _dumpY(8,0,"ret: ".json_encode($__sse_ret));
         $ret=$__sse_ret;
         break;
     }
