@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.53-118 built on 2017-01-31 10:08 (-2 DST)
+    YeAPF 0.8.53-121 built on 2017-01-31 11:10 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-31 10:07:32 (-2 DST)
+    2017-01-31 11:09:20 (-2 DST)
    */
 
   class SSE
@@ -287,6 +287,8 @@
           rename($messageFileI, $messageFileF);
 
         }
+      } else {
+        _dumpY(8,3,"SSE:: index file '$ndxFile' not found");
       }
       return $messageFile;
     }
