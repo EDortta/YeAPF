@@ -1,14 +1,15 @@
   /********************************************************************
   * app-src/js/ycomm-sse.js
-  * YeAPF 0.8.53-117 built on 2017-01-31 09:57 (-2 DST)
+  * YeAPF 0.8.53-119 built on 2017-01-31 10:16 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-31 09:45:48 (-2 DST)
+  * 2017-01-31 10:15:16 (-2 DST)
   ********************************************************************/
-  var ycommSSEBase = function (workgroup, user, dataLocation, pollTimeout) {
+  var ycommSSEBase = function (workgroup, user, dataLocation, pollTimeout, preferredGateway) {
     var that = {
       
       /* pollTimeout must be between 1 and 60 seconds */
-      pollTimeout:  Math.min(60000, Math.max(typeof pollTimeout=='number'?pollTimeout:1000, 1000)),
+      pollTimeout: Math.min(60000, Math.max(typeof pollTimeout=='number'?pollTimeout:1000, 1000)),
+      prefGateway: (preferredGateway || 'SSE').toUpperCase(),
 
       getLocation: function() {
         return (typeof document=='object' && document.location && document.location.href)?document.location.href:'';
@@ -235,7 +236,7 @@
             function() {
               that.state=0;
               /* first try to use EventSource() */
-              if (typeof window.EventSource == "function") {
+              if ((prefGateway=='SSE') && (typeof window.EventSource == "function")) {
                 that.evtSource = new EventSource(that._dataLocation_+"?si="+md5(that.sse_session_id));
                 that.evtSource.addEventListener("open",    that.open,    false);
                 that.evtSource.addEventListener("error",   that.error,   false);
