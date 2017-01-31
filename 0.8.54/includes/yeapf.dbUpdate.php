@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.54-1 built on 2017-01-31 11:51 (-2 DST)
+    YeAPF 0.8.54-3 built on 2017-01-31 14:05 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-06-18 16:36:56 (-2 DST)
+    2017-01-31 13:58:26 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -562,6 +562,22 @@
           db_commit();
         }
         $currentDBVersion=12;
+        _db_grantSetupIni();
+        $setupIni->setValue('currentDBVersion',$currentDBVersion);
+        $setupIni->commit();
+      }
+
+      if(_db_upd_canReviewVersion(13)) {
+        _recordWastedTime("checking v13");
+        if (db_tableExists("is_auditingTrack")) {
+          $sql="RENAME TABLE `is_auditingTrack` TO `is_auditing_track`";
+          if (db_tableExists("is_auditing_track")) {
+            _die("'is_auditing_track' already exists.\nYeAPF db v.13 is trying to rename 'is_auditingTrack' to 'is_auditing_track'.\nYou need to solve this by yourself as it can have serious impact in your application\n");
+          }
+          db_sql($sql);
+          db_commit();
+        }
+        $currentDBVersion=13;
         _db_grantSetupIni();
         $setupIni->setValue('currentDBVersion',$currentDBVersion);
         $setupIni->commit();

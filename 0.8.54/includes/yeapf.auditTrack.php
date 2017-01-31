@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.auditTrack.php
-    YeAPF 0.8.54-1 built on 2017-01-31 11:51 (-2 DST)
+    YeAPF 0.8.54-3 built on 2017-01-31 14:05 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-01-23 22:00:40 (-2 DST)
+    2017-01-31 13:59:01 (-2 DST)
 */
 
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -54,7 +54,7 @@
       $eventDate = date("YmdHis");
       $prevRecord = at_getTableContent($tableName, $idFields, $idValues);
 
-      $sql="insert into is_auditingTrack(id, state, userID, eventDate, tableName, tableID, tableIDField, prevRecord)
+      $sql="insert into is_auditing_track(id, state, userID, eventDate, tableName, tableID, tableIDField, prevRecord)
                    values ('$id', 'O', '$userID', '$eventDate', '$tableName', '$idValues', '$idFields', '$prevRecord')";
       db_sql($sql);
 
@@ -68,13 +68,13 @@
     global $auditingTrackEnabled;
 
     if ($auditingTrackEnabled) {
-      $dd=db_sql("select tableName, tableID, tableIDField from is_auditingTrack where id='$id'");
+      $dd=db_sql("select tableName, tableID, tableIDField from is_auditing_track where id='$id'");
       $tableName=$dd[0];
       $idValues=$dd[1];
       $idFields=$dd[2];
       $newRecord = at_getTableContent($tableName, $idFields, $idValues);
 
-      $sql="update is_auditingTrack set newRecord='$newRecord', state='C', eventDescription='$eventDescription', sqlVerb='$sqlVerb' where id='$id' and state='O'";
+      $sql="update is_auditing_track set newRecord='$newRecord', state='C', eventDescription='$eventDescription', sqlVerb='$sqlVerb' where id='$id' and state='O'";
       db_sql($sql);
     }
   }
