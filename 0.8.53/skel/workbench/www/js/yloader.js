@@ -1,8 +1,8 @@
 /*********************************************
   * skel/workbench/www/js/yloader.js
-  * YeAPF 0.8.53-119 built on 2017-01-31 10:16 (-2 DST)
+  * YeAPF 0.8.53-120 built on 2017-01-31 10:20 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-31 10:16:07 (-2 DST)
+  * 2017-01-31 10:20:38 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.53-119 built on 2017-01-31 10:16 (-2 DST)");
+ console.log("YeAPF 0.8.53-120 built on 2017-01-31 10:20 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -6256,7 +6256,7 @@
                  function() {
                    that.state=0;
                    /* first try to use EventSource() */
-                   if ((prefGateway=='SSE') && (typeof window.EventSource == "function")) {
+                   if ((that.prefGateway=='SSE') && (typeof window.EventSource == "function")) {
                      that.evtSource = new EventSource(that._dataLocation_+"?si="+md5(that.sse_session_id));
                      that.evtSource.addEventListener("open",    that.open,    false);
                      that.evtSource.addEventListener("error",   that.error,   false);
