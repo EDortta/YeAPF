@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.53-122 built on 2017-01-31 11:12 (-2 DST)
+    YeAPF 0.8.53-124 built on 2017-01-31 11:19 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-31 11:12:29 (-2 DST)
+    2017-01-31 11:18:39 (-2 DST)
    */
 
   class SSE
@@ -263,6 +263,10 @@
     {
       $messageFile='';
       $lockName=$u_target."-queue";
+      
+      $message = preg_replace('/[[:^print:]]/', '', $message);
+      $data    = preg_replace('/[[:^print:]]/', '', $data);
+
       _dumpY(8,3,"SSE::__enqueueMessage('$u_target', '$message', '$data')");
       $ndxFile=".sse/$u_target.ndx";
       if (file_exists($ndxFile)) {
