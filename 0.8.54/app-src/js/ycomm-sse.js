@@ -1,8 +1,8 @@
   /********************************************************************
   * app-src/js/ycomm-sse.js
-  * YeAPF 0.8.54-1 built on 2017-01-31 11:51 (-2 DST)
+  * YeAPF 0.8.54-4 built on 2017-01-31 14:37 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-01-31 10:20:19 (-2 DST)
+  * 2017-01-31 14:29:23 (-2 DST)
   ********************************************************************/
   var ycommSSEBase = function (workgroup, user, dataLocation, pollTimeout, preferredGateway) {
     var that = {
@@ -64,9 +64,20 @@
 
       userAlive: function () {
         var _userAlive = function(data) {
-          console.log("User is alive");
-          setTimeout(that.userAlive, that.peekInterval);
+          var ret=false;
+          if (data && data[0]) {
+            if (data[0].event!="close") {
+              ret=true;
+              console.log("User is alive");
+              setTimeout(that.userAlive, that.peekInterval);              
+            } 
+          }
+          if (!ret) {
+            console.log("User logged out");
+            that.close({});
+          }
         };
+        
         var _userOffline = function(e) {
           console.error(e);
           that.close(e);
