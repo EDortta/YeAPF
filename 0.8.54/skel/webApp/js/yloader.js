@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.54-15 built on 2017-02-01 14:17 (-2 DST)
+  * YeAPF 0.8.54-16 built on 2017-02-01 14:27 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-02-01 14:17:06 (-2 DST)
+  * 2017-02-01 14:27:19 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.54-15 built on 2017-02-01 14:17 (-2 DST)");
+ console.log("YeAPF 0.8.54-16 built on 2017-02-01 14:27 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -966,6 +966,7 @@
          date.setHours(0,0,0,0);
          while (date.getDay()!=weekStart) {
            date.setDate(date.getDate()-1);
+           date.setHours(0,0,0,0);
          }
          return date;
        }
