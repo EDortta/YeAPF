@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.54-10 built on 2017-01-31 17:17 (-2 DST)
+    YeAPF 0.8.54-11 built on 2017-02-01 12:08 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-31 16:49:16 (-2 DST)
+    2017-02-01 12:08:11 (-2 DST)
    */
 
   class SSE
@@ -211,25 +211,35 @@
       $ret=null;
       if ($w>'') {
         if ($u>'') {
-          if (!is_dir(".sse/sessions"))
-            mkdir(".sse/sessions", 0777, true);
-          if (is_dir(".sse/sessions")) {
-            if (!is_dir(".sse/$w/$u"))
-              mkdir(".sse/$w/$u", 0777, true);
-            if (is_dir(".sse/$w/$u")) {
-              sleep(2);
-
-              $sse_session_id = UUID::v4();
-              $si             = md5($sse_session_id);
-
-              file_put_contents(".sse/$w/$u/.user", "$u");
-              file_put_contents(".sse/$u.ndx", "$w\n1000\n$sse_session_id\n");
-              file_put_contents(".sse/sessions/$sse_session_id.session", "$w\n$u\n");
-              file_put_contents(".sse/sessions/$si.md5", $sse_session_id);
-              $ret=$sse_session_id;
-
-              _dumpY(8,2,"SSE::user attached: $sse_session_id ($si)");
+          if (!is_dir(".sse/sessions")) {
+            if (!mkdir(".sse/sessions", 0777, true)) {
+              _dump("SSE:: '.sse/sessions cannot be created");
             }
+          }
+          if (is_dir(".sse/sessions")) {
+            if (is_writable(".sse/sessions")) {
+              if (!is_dir(".sse/$w/$u")) {
+                if (!mkdir(".sse/$w/$u", 0777, true))
+                  _dump("SSE:: '.sse/$w/$u' cannot be created");
+              }
+              if (is_dir(".sse/$w/$u")) {
+                sleep(2);
+
+                $sse_session_id = UUID::v4();
+                $si             = md5($sse_session_id);
+
+                file_put_contents(".sse/$w/$u/.user", "$u");
+                file_put_contents(".sse/$u.ndx", "$w\n1000\n$sse_session_id\n");
+                file_put_contents(".sse/sessions/$sse_session_id.session", "$w\n$u\n");
+                file_put_contents(".sse/sessions/$si.md5", $sse_session_id);
+                $ret=$sse_session_id;
+
+                _dumpY(8,2,"SSE::user attached: $sse_session_id ($si)");
+              }
+            } else
+              _dump("SSE:: '.sse/sessions' is not writable");
+          } else {
+            _dumpY(8,0,"SSE:: folder '.sse/sessions' does not exists");
           }
         }
       }
