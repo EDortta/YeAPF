@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.54-14 built on 2017-02-01 13:30 (-2 DST)
+  * YeAPF 0.8.54-15 built on 2017-02-01 14:17 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-02-01 13:30:57 (-2 DST)
+  * 2017-02-01 14:17:06 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.54-14 built on 2017-02-01 13:30 (-2 DST)");
+ console.log("YeAPF 0.8.54-15 built on 2017-02-01 14:17 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -957,7 +957,22 @@
       };
      
      /* date extensions */
-     if (typeof Date.prototype.monthFirstDOW == 'undefined') {
+     if (typeof Date.prototype.getFirstDayOfWeek == 'undefined') {
+       Date.prototype.getFirstDayOfWeek = function(weekStart) {
+         /* weekStart - By default it is sunday (0)
+          */
+         weekStart = (weekStart || 0);
+         var date = (new Date(this.getTime()));
+         date.setHours(0,0,0,0);
+         while (date.getDay()!=weekStart) {
+           date.setDate(date.getDate()-1);
+         }
+         return date;
+       }
+     }
+     
+     if (typeof Date.
+     prototype.monthFirstDOW == 'undefined') {
        Date.prototype.monthFirstDOW = function(aDate) {
          var auxDate = new Date((aDate || this).getTime());
          auxDate.setDate(1);
