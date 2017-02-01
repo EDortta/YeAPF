@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.54-11 built on 2017-02-01 12:08 (-2 DST)
+    YeAPF 0.8.54-13 built on 2017-02-01 12:33 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-02-01 12:08:11 (-2 DST)
+    2017-02-01 12:32:12 (-2 DST)
    */
 
   class SSE
@@ -269,6 +269,20 @@
       }
       return $ret;
     }
+
+    public function reportUserOnline($u_target) 
+    {
+      $u_target = preg_replace('/[[:^print:]]/', '', $u_target);
+      $ndxFile=".sse/$u_target.ndx";
+      if (file_exists($ndxFile)) {
+        $ndx = file($ndxFile);
+        $sse_session_id = preg_replace('/[[:^print:]]/', '', $ndx[2]);
+        $sessionFile=".sse/sessions/$sse_session_id.session";
+        if (file_exists($sessionFile)) {
+          touch($sessionFile);
+        } 
+      }
+    } 
 
     /* messages being sent from a client (rest or query) to another client (sse) */
     function __enqueueMessage($u_target, $message, $data='')
