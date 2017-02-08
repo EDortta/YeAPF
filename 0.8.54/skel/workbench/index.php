@@ -60,7 +60,12 @@
     if (!$xErase) {
       $auxFiles = array();
 
-      $html = file_get_html("www/i_$xBody.html");
+      // $html = file_get_html("www/i_$xBody.html");
+
+      $html = file_get_contents("www/i_$xBody.html");
+      $html = str_replace("\n", '\n', $html);
+      $html = str_get_html($html);
+
       $php  = _file("www/$xBody.php");
 
       mkdir("production/$xBody", 0777, true);
@@ -75,7 +80,7 @@
 
       $html_out="";
       foreach ($html->find('div.section') as $elem) {
-        $html_out.=minify_html($elem, $xMinified)."\n";
+        $html_out.=str_replace('\n', "\n", minify_html($elem, $xMinified))."\n";
 
         foreach($elem->find("script,link") as $script) {
           $srcFile="";
