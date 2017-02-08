@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.54-10 built on 2017-01-31 17:17 (-2 DST)
+    YeAPF 0.8.54-17 built on 2017-02-08 18:30 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-31 17:15:59 (-2 DST)
+    2017-02-07 19:16:04 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -28,6 +28,36 @@
   {
     global $setupIni, $sgugIni;
     if (!isset($setupIni)) $setupIni=createDBText($sgugIni);
+  }
+
+  function _db_upd_createAuditingTrackTable() 
+  {
+    if (!db_tableExists('is_auditing_track')) {
+      $sql='SELECT count(*) FROM rdb$relations WHERE (rdb$relation_name = \'IS_AUDITING_TRACK\') AND (rdb$view_blr IS NOT NULL)';
+      $cc=db_sql($sql);
+      if ($cc==0) {
+        $sql = "CREATE TABLE  is_auditing_track (
+                  id char(32),
+                  state char(1),
+                  userID char(32),
+                  eventDate char(14),
+                  tableName varchar(80) DEFAULT NULL,
+                  tableID char(250) DEFAULT NULL,
+                  tableIDField char(250) DEFAULT NULL,
+                  sqlVerb char(6),
+                  yeapfContext varchar(120),
+                  eventDescription varchar(250) DEFAULT NULL, ";
+        if (db_connectionTypeIs(_MYSQL_))
+          $sql.="prevRecord text,
+                 newRecord text ";
+        else
+          $sql.="prevRecord varchar(32000),
+                 newRecord  varchar(32000)";
+        $sql.=")";
+
+        db_sql($sql);
+      }
+    }
   }
 
   function _db_upd_newVersion($aVersion)
@@ -485,29 +515,7 @@
       if (_db_upd_canReviewVersion(10)) {
         _recordWastedTime("checking v10");
         try {
-          if (!db_tableExists('is_auditing_track')) {
-            $sql = "CREATE TABLE  is_auditing_track (
-                      id char(32),
-                      state char(1),
-                      userID char(32),
-                      eventDate char(14),
-                      tableName varchar(80) DEFAULT NULL,
-                      tableID char(250) DEFAULT NULL,
-                      tableIDField char(250) DEFAULT NULL,
-                      sqlVerb char(6),
-                      yeapfContext varchar(120),
-                      eventDescription varchar(250) DEFAULT NULL, ";
-            if (db_connectionTypeIs(_MYSQL_))
-              $sql.="prevRecord text,
-                     newRecord text ";
-            else
-              $sql.="prevRecord varchar(32000),
-                     newRecord  varchar(32000)";
-            $sql.=")";
-
-            db_sql($sql);
-
-          }
+          _db_upd_createAuditingTrackTable();
           _db_upd_newVersion(10);
         } catch (Exception $e) {
           _db_upd_error($e->getMessage());
@@ -570,17 +578,53 @@
       if(_db_upd_canReviewVersion(13)) {
         _recordWastedTime("checking v13");
         if (db_tableExists("is_auditingTrack")) {
-          $sql="RENAME TABLE `is_auditingTrack` TO `is_auditing_track`";
           if (db_tableExists("is_auditing_track")) {
             _die("'is_auditing_track' already exists.\nYeAPF db v.13 is trying to rename 'is_auditingTrack' to 'is_auditing_track'.\nYou need to solve this by yourself as it can have serious impact in your application\n");
+          } else {
+            if (db_connectionTypeIs(_FIREBIRD_)) {
+              /*
+              _db_upd_createAuditingTrackTable();
+              db_close();
+              sleep(5);
+              db_reconnect();
+              $sql="insert into is_auditing_track select * from is_auditingTrack";
+              db_sql($sql);
+              */
+              $sql='SELECT count(*) FROM rdb$relations WHERE (rdb$relation_name = \'IS_AUDITING_TRACK\') AND (rdb$view_blr IS NOT NULL)';
+              $cc=intval(db_sql($sql));
+              if ($cc==0) {
+                $sql="create view is_auditing_track as select * from is_auditingTrack";
+                db_sql($sql);
+              }
+            } else if (db_connectionTypeIs(_MYSQL_)) {
+              $sql="RENAME TABLE `is_auditingTrack` TO `is_auditing_track`";
+              db_sql($sql);
+            } else if (db_connectionTypeIs(_PGSQL_))  {
+              $sql="alter table is_auditingTrack rename to is_auditing_track";
+              db_sql($sql);
+            }
           }
-          db_sql($sql);
-          db_commit();
         }
         $currentDBVersion=13;
         _db_grantSetupIni();
         $setupIni->setValue('currentDBVersion',$currentDBVersion);
         $setupIni->commit();
+      }
+
+      if (_db_upd_canReviewVersion(14)) {
+        _recordWastedTime("checking v14");
+        if (db_tableExists("wbp_buffer")) {
+          if (!db_fieldExists("wbp_buffer", "o")) {
+            $sql="ALTER TABLE wbp_buffer ADD o Integer";
+            db_sql($sql);
+          }
+          $currentDBVersion=14;
+          _db_grantSetupIni();
+          $setupIni->setValue('currentDBVersion',$currentDBVersion);
+          $setupIni->commit();
+        } else {
+          _die("'wbp_printers' table not found");
+        }
       }
     }
 

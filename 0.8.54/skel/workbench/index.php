@@ -4,7 +4,7 @@
   (@include_once("lib/simple_html_dom/simple_html_dom.php")) or die("This software requires 'simple_html_dom'");
   (@include_once("lib/mecha-cms/minifier.php")) or die("This software requires 'mecha-cms' minifier");
 
-  function deleteFiles($dBody) 
+  function deleteFiles($dBody)
   {
 
     unlink("production/$dBody/i_$dBody.html");
@@ -34,11 +34,11 @@
   }
 
   $wbTitle = basename(getcwd());
-  
+
   if ((isset($dBody)) && ($dBody!='null')) {
     unlink("www/i_$dBody.html");
     unlink("www/$dBody.php");
-    
+
     if (file_exists("$dBody.files")) {
       $fileList = file("$dBody.files");
       foreach($fileList as $f) {
@@ -51,7 +51,7 @@
     }
 
     deleteFiles($dBody);
-  
+
   } else if ((isset($xBody)) && ($xBody!='null')) {
     $xErase = isset($xErase)?intval($xErase)>0:0;
     $xMinified = isset($xMinified)?intval($xMinified)>0:0;
@@ -62,9 +62,9 @@
 
       $html = file_get_html("www/i_$xBody.html");
       $php  = _file("www/$xBody.php");
-      
+
       mkdir("production/$xBody", 0777, true);
-      mkdir("download", 0777, true);      
+      mkdir("download", 0777, true);
 
       $extension='';
       if ($xMinified)
@@ -104,10 +104,13 @@
               }
 
               file_put_contents("production/$xBody/$newName", $fileContent);
-              $auxFiles[] = "production/$xBody/$newName";
+              $_complete_newName = "production/$xBody/$newName";
+              $auxFiles[] = $_complete_newName;
+
+              $html_out = str_replace($srcFile, $_complete_newName, $html_out);
             }
           }
-        }    
+        }
       }
 
       file_put_contents($newHTMLname, $html_out);
@@ -149,7 +152,7 @@
         } else {
           $GLOBALS['pageSourceCode'].="$elem\n";
         }
-      } 
+      }
 
       if (!$xErase) {
         if ($subst==0)
@@ -167,14 +170,14 @@
       $newPageName=trim($newPageName);
       if ($newPageName>'') {
         mkdir("www/js", 0777, true);
-        mkdir("www/css", 0777, true); 
+        mkdir("www/css", 0777, true);
 
         if (!file_exists("www/i_$newPageName.html")) {
           /* creating html file */
           $newPage=_file("tp_skel.html");
           file_put_contents("www/i_$newPageName.html", $newPage);
           chmod("www/i_$newPageName.html", 0777);
-          
+
           if (!file_exists("www/js/$newPageName.js")) {
             /* creating js file */
             $scriptName=ucfirst($newPageName);
@@ -224,7 +227,7 @@
                     <button class='btn btn-danger btnDeletePage' data-page='$dBody'><i class='fa fa-trash' data-page='$dBody'></i></button>
                     &nbsp;
                     <button class='btn btn-default btnCreateZipDist' id='btnZipSection$n' data-page='$dBody'><i class='fa fa-file-zip-o' data-page='$dBody'></i></button>
-                    <button class='btn btn-default btnCreateDist' id='btnExtractSection$n' data-page='$dBody'><i class='fa fa-puzzle-piece' data-page='$dBody'></i></button>                    
+                    <button class='btn btn-default btnCreateDist' id='btnExtractSection$n' data-page='$dBody'><i class='fa fa-puzzle-piece' data-page='$dBody'></i></button>
                     $downloadBtn
                     $eliminateBtn
                   </div>
@@ -234,7 +237,7 @@
                 </div>
               </div>";
     }
-    
+
     processFile("tp_index");
   } else {
     chdir("www");
