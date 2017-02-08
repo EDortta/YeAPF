@@ -142,7 +142,12 @@
       $GLOBALS['pageSourceCode']=$pageBody;
     } else {
       $GLOBALS['pageSourceCode']="";
-      $html = file_get_html("production/e_index_sample.html");
+      //$html = file_get_html("production/e_index_sample.html");
+
+      $html = file_get_contents("production/e_index_sample.html");
+      $html = str_replace("\n", '\n', $html);
+      $html = str_get_html($html);
+
       $subst=0;
       foreach ($html->find('div.tnTab') as $elem) {
         $p1=intval(strpos($elem, $pageId1));
@@ -163,6 +168,7 @@
           $GLOBALS['pageSourceCode'].="$pageBody\n";
       }
     }
+    $html=str_replace('\n', "\n", $html);
 
     $e_index_sample=_file("tp_app_index.html");
     file_put_contents("production/e_index_sample.html", $e_index_sample);
