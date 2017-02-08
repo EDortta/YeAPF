@@ -1,4 +1,10 @@
 <?php
+/*
+    includes/yeapf.uuid.php
+    YeAPF 0.8.54-18 built on 2017-02-08 18:36 (-2 DST)
+    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
+    2017-02-08 18:31:49 (-2 DST)
+*/
 
   /*
    * this function was made public by Andrew Moore at

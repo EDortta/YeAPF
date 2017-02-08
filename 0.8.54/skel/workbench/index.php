@@ -104,10 +104,9 @@
               }
 
               file_put_contents("production/$xBody/$newName", $fileContent);
-              $_complete_newName = "production/$xBody/$newName";
-              $auxFiles[] = $_complete_newName;
+              $auxFiles[] = "production/$xBody/$newName";
 
-              $html_out = str_replace($srcFile, $_complete_newName, $html_out);
+              $html_out = str_replace($srcFile, "$xBody/$newName", $html_out);
             }
           }
         }
