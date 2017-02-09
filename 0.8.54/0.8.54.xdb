@@ -2887,14 +2887,14 @@
 </useWilcards><considerFirstAsNaturalKey><default>false</default>
 </considerFirstAsNaturalKey></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>389</start>
-<end>469</end>
+<end>488</end>
 </code></buildSQLfilter><montarComandoSQL><name>montarComandoSQL</name>
 <parameters><verbo><dummy>ok</dummy>
 </verbo><tabela><dummy>ok</dummy>
 </tabela><campos><dummy>ok</dummy>
 </campos></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
-<start>471</start>
-<end>504</end>
+<start>490</start>
+<end>523</end>
 </code></montarComandoSQL></functions><filename>yeapf.sql.php</filename>
 <folder>includes</folder>
 </yeapf.sql.php><yeapf.sse.php><functions><SSE.q_sse><name>SSE.q_sse</name>

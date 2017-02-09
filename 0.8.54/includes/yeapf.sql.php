@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.sql.php
-    YeAPF 0.8.54-10 built on 2017-01-31 17:17 (-2 DST)
+    YeAPF 0.8.54-27 built on 2017-02-09 10:43 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-10-11 15:43:27 (-2 DST)
+    2017-02-09 10:41:59 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -399,10 +399,26 @@
         $andJunction=false;
       foreach($c as $vc) {
         $sql1='';
-        if (db_connectionTypeIs(_FIREBIRD_))
-          $vc="UPPER($vc)";
+        $fieldDef = explode(":", $vc);
+        /* a field can be defined as a pair table:field */
+        if (count($fieldDef)>1) {
+          $vc=$fieldDef[1];
+          $ft=strtoupper(db_fieldType($fieldDef[0], $fieldDef[1]));
+        } else {
+          $ft="UNKNOWN";
+        }
+
+        $ft_is_char = (strpos($vc,"CHAR")!==false);
+
+        if (db_connectionTypeIs(_FIREBIRD_)) {
+          if ($ft_is_char) {
+            $vc="UPPER($vc)";
+          }
+        }
+
         $firstWord=true;
         foreach($W as $vf) {
+
           if ((is_numeric($vf)) || (strlen($vf)>2)) {
             if ($sql1>'') {
               if (!$andWords)
@@ -410,9 +426,10 @@
               else
                 $sql1.=' and ';
             }
-            if (is_numeric($vf))
+
+            if ((is_numeric($vf)) && ($ft_is_char)) {
               $sql1.="($vc='$vf')";
-            else {
+            } else {
               if ($useWilcards) {
                 if ($firstWord && $considerFirstAsNaturalKey)
                   $sql1.="($vc like '$vf%')";
@@ -426,6 +443,7 @@
               }
             }
           }
+
           $firstWord=false;
         }
 
