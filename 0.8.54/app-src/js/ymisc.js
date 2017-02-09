@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.54-16 built on 2017-02-01 14:27 (-2 DST)
+ * YeAPF 0.8.54-28 built on 2017-02-09 11:53 (-2 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-02-01 14:27:00 (-2 DST)
+ * 2017-02-09 11:51:42 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -1749,6 +1749,19 @@ var utf8_encode = function (argString) {
 
   return utftext;
 };
+
+function utf8_to_ascii(str) {
+ var out = "", i, l = str.length, u;
+ for (i=0; i<l; i++) {
+  if (str.charCodeAt(i) < 0x80) {
+   out += str.charAt(i);
+  } else {
+    u = "" + str.charCodeAt(i).toString(16);
+    out += "\\u" + (u.length === 2 ? "00" + u : u.length === 3 ? "0" + u : u);
+  }
+ }
+ return out;
+} 
 
 /*=====================================================================
  * http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript

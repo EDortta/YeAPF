@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.54-27 built on 2017-02-09 10:43 (-2 DST)
+  * YeAPF 0.8.54-28 built on 2017-02-09 11:53 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-02-09 10:43:40 (-2 DST)
+  * 2017-02-09 11:53:14 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.54-27 built on 2017-02-09 10:43 (-2 DST)");
+ console.log("YeAPF 0.8.54-28 built on 2017-02-09 11:53 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -1998,6 +1998,19 @@
      
        return utftext;
      };
+     
+     function utf8_to_ascii(str) {
+      var out = "", i, l = str.length, u;
+      for (i=0; i<l; i++) {
+       if (str.charCodeAt(i) < 0x80) {
+        out += str.charAt(i);
+       } else {
+         u = "" + str.charCodeAt(i).toString(16);
+         out += "\\u" + (u.length === 2 ? "00" + u : u.length === 3 ? "0" + u : u);
+       }
+      }
+      return out;
+     } 
      
      /*=====================================================================
       * http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript

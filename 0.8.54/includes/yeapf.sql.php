@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.sql.php
-    YeAPF 0.8.54-27 built on 2017-02-09 10:43 (-2 DST)
+    YeAPF 0.8.54-28 built on 2017-02-09 11:53 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-02-09 10:41:59 (-2 DST)
+    2017-02-09 11:06:28 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -372,7 +372,7 @@
   define('_WORDS_AND',  4);
   define('_USE_WILDCARDS', 16);
 
-  function buildSQLfilter($words, $fields, $andJunction=true, $andWords=false, $useWilcards=true, $considerFirstAsNaturalKey=false)
+  function buildSQLfilter($words, $fields, $andJunction=true, $andWords=false, $useWilcards=true, $considerFirstAsNaturalKey=false, $defaultTableName='')
   {
     global $prepositions;
     /*
@@ -405,10 +405,14 @@
           $vc=$fieldDef[1];
           $ft=strtoupper(db_fieldType($fieldDef[0], $fieldDef[1]));
         } else {
-          $ft="UNKNOWN";
+          if ($defaultTableName!='') {
+            $ft=strtoupper(db_fieldType($defaultTableName, $vc));
+          } else {
+            $ft="UNKNOWN";
+          }
         }
 
-        $ft_is_char = (strpos($vc,"CHAR")!==false);
+        $ft_is_char = (strpos($ft,"CHAR")!==false);
 
         if (db_connectionTypeIs(_FIREBIRD_)) {
           if ($ft_is_char) {
@@ -427,7 +431,7 @@
                 $sql1.=' and ';
             }
 
-            if ((is_numeric($vf)) && ($ft_is_char)) {
+            if ((is_numeric($vf)) && (!$ft_is_char)) {
               $sql1.="($vc='$vf')";
             } else {
               if ($useWilcards) {
