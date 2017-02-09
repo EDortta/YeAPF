@@ -15,8 +15,8 @@
       $fileList = file("$dBody.files");
       foreach($fileList as $f) {
         $f=str_replace("\n", "", $f);
-        // echo "<div>$f</div>";
-        unlink("production/$dBody/$f");
+        // echo "<div>file: $f</div>"; 
+        unlink("$f");
       }
       unlink("$dBody.files");
     } else {
@@ -84,6 +84,7 @@
 
         foreach($elem->find("script,link,img") as $script) {
           $srcFile="";
+          $srcType=$script->tag;
           if (isset($script->src)) {
             $srcFile=$script->src;
           } else if(isset($script->href)) {
@@ -94,14 +95,18 @@
           if ($srcFile>"") {
             if (file_exists("www/$srcFile")) {
               $newName=$srcFile;
-              $fileContent=_file("www/$srcFile");
-              if ($xMinified) {
-                if (strpos($srcFile, ".min")==0) {
-                  setlocale(LC_ALL,'en_US.UTF-8');
-                  $ext = pathinfo($srcFile, PATHINFO_EXTENSION);
-                  $newName=str_replace(".$ext", "$extension.$ext", $srcFile);
-                  $fileContent=minify_js($fileContent);
-                }
+              if ($srcType=="img") {
+                $fileContent=file_get_contents("www/$srcFile");
+              } else {
+                $fileContent=_file("www/$srcFile");
+                if ($xMinified) {
+                  if (strpos($srcFile, ".min")==0) {
+                    setlocale(LC_ALL,'en_US.UTF-8');
+                    $ext = pathinfo($srcFile, PATHINFO_EXTENSION);
+                    $newName=str_replace(".$ext", "$extension.$ext", $srcFile);
+                    $fileContent=minify_js($fileContent);
+                  }
+                }                
               }
               $dir=dirname($newName);
               if (!is_dir("production/$xBody/$dir")) {
