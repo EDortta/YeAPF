@@ -2,14 +2,16 @@
 <?php
 /*
     tools/yapp
-    YeAPF 0.8.54-10 built on 2017-01-31 17:17 (-2 DST)
+    YeAPF 0.8.54-25 built on 2017-02-09 08:42 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-11-25 10:55:10 (-2 DST)
+    2017-02-08 19:54:36 (-2 DST)
 */
 
   $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
   $cmRequired=false;
   (@include_once "$mydir/yclilib.php") or die("yclilib.php not found\n");
+  if (file_exists(".config/yeapf.config"))
+    (@include_once ".config/yeapf.config") or die("Error loading '.config/yeapf.config'");
 
   echo basename("tools/yapp")."\nYeAPF 0.8.54\nCopyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
 
@@ -191,7 +193,16 @@
 
   if ($toCreate)
     echo "YeAPF app ($appType) called '$appFolder' created.\nModify 'yeapf.db.ini' and then run 'configure.php' from your browser\n";
-  else if ($toUpdate)
-    echo "YeAPF app ($appType) updated at $appFolder\nRemember to call 'configure.php'\n";
+  else if ($toUpdate) {
+    echo "YeAPF app ($appType) updated at $appFolder\n";
+    if ( (isset($yeapfConfig)) && (isset($yeapfConfig['myself'])) ) {
+      $cfgURL="http://localhost/".$yeapfConfig['myself']."/configure.php";
+      echo "Calling '$cfgURL' ...\n";
+      file_get_contents($cfgURL);
+      echo "Ok";
+    } else {
+      echo "Remember to call 'configure.php' from your navigator\n";
+    }
+  }
 
 ?>

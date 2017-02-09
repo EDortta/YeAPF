@@ -82,7 +82,7 @@
       foreach ($html->find('div.section') as $elem) {
         $html_out.=str_replace('\n', "\n", minify_html($elem, $xMinified))."\n";
 
-        foreach($elem->find("script,link") as $script) {
+        foreach($elem->find("script,link,img") as $script) {
           $srcFile="";
           if (isset($script->src)) {
             $srcFile=$script->src;
@@ -159,6 +159,7 @@
             $subst++;
           }
         } else {
+          $elem=str_replace('\n', "\n", $elem);
           $GLOBALS['pageSourceCode'].="$elem\n";
         }
       }
@@ -168,7 +169,6 @@
           $GLOBALS['pageSourceCode'].="$pageBody\n";
       }
     }
-    $html=str_replace('\n', "\n", $html);
 
     $e_index_sample=_file("tp_app_index.html");
     file_put_contents("production/e_index_sample.html", $e_index_sample);
