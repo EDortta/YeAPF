@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.54-28 built on 2017-02-09 11:53 (-2 DST)
+  * YeAPF 0.8.54-29 built on 2017-02-10 09:32 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-02-09 11:53:14 (-2 DST)
+  * 2017-02-10 09:32:37 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.54-28 built on 2017-02-09 11:53 (-2 DST)");
+ console.log("YeAPF 0.8.54-29 built on 2017-02-10 09:32 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -4916,7 +4916,8 @@
                                      }
                                      newRow.innerHTML = yAnalise(aLineSpec.rows[r], xDataItem);
                                      if (!canCreateRow) {
-                                         for (c = 0; c < newRow.cells.length; c++)
+                                         if (!aFlags.deleteRows)
+                                           for (c = 0; c < newRow.cells.length; c++)
                                              newRow.cells[c].style.borderLeft = 'solid 1px red';
                                      }
                                      if (typeof aLineSpec.onNewItem == 'function')
