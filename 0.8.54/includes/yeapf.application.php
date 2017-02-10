@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.54-10 built on 2017-01-31 17:17 (-2 DST)
+    YeAPF 0.8.54-31 built on 2017-02-10 13:47 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-20 14:26:42 (-2 DST)
+    2017-02-10 13:46:11 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -324,6 +324,7 @@
         xq_printXML($output, $k, $v);
       $output.="</$keyName>";
     } else {
+
       if (strpos($keyName,'/') > 0 ) {
         $keyList=explode('/',$keyName);
         $k0=$keyList[0];
@@ -354,6 +355,13 @@
   function xq_context($aIndex, $aValue, $replaceIfExists=true)
   {
     global $_xq_context_;
+    $auxValue=iconv("UTF-8", "iso-8859-1", $aValue);
+    if (strlen($auxValue)>0) {
+      if (strlen($auxValue<$aValue))
+        $aValue=$auxValue;
+    }
+    // echo "$aValue ".mb_detect_encoding($aValue)." - ".."\n";
+    // mb_encode_numericentity($aValue, array(0x80, 0xff, 0, 0xff), "iso-8859-1")."\n";
 
     if (trim($aIndex)>'') {
       if (strpos($aIndex,'/')>0) {

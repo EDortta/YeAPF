@@ -68,8 +68,8 @@
 
       $php  = _file("www/$xBody.php");
 
-      mkdir("production/$xBody", 0777, true);
-      mkdir("download", 0777, true);
+      @mkdir("production/$xBody", 0777, true);
+      @mkdir("download", 0777, true);
 
       $extension='';
       if ($xMinified)
@@ -110,7 +110,7 @@
               }
               $dir=dirname($newName);
               if (!is_dir("production/$xBody/$dir")) {
-                mkdir("production/$xBody/$dir", 0777, true);
+                @mkdir("production/$xBody/$dir", 0777, true);
               }
 
               file_put_contents("production/$xBody/$newName", $fileContent);
@@ -184,8 +184,8 @@
     if (isset($newPageName)) {
       $newPageName=trim($newPageName);
       if ($newPageName>'') {
-        mkdir("www/js", 0777, true);
-        mkdir("www/css", 0777, true);
+        @mkdir("www/js", 0777, true);
+        @mkdir("www/css", 0777, true);
 
         if (!file_exists("www/i_$newPageName.html")) {
           /* creating html file */

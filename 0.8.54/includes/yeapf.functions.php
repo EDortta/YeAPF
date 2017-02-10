@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.54-10 built on 2017-01-31 17:17 (-2 DST)
+    YeAPF 0.8.54-31 built on 2017-02-10 13:47 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-11 09:54:26 (-2 DST)
+    2017-02-10 13:17:02 (-2 DST)
    */
 
   /*
@@ -3215,7 +3215,7 @@
   function detect_encoding($string)
   {
     global $dbCharset, $appCharset;           
-    return mb_detect_encoding($string, "$dbCharset, $appCharset, ISO-8859-1, ISO-8859-15", true);
+    return mb_detect_encoding($string, "$dbCharset, $appCharset, ISO-8859-1, ISO-8859-15, UTF-8", true);
     /*
     static $list = array('utf-8', 'iso-8859-1', 'windows-1252', 'windows-1251', 'windows-1250');
 
