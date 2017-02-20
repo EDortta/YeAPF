@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ytabnav.js
- * YeAPF 0.8.54-37 built on 2017-02-20 16:45 (-3 DST)
+ * YeAPF 0.8.54-38 built on 2017-02-20 19:32 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-02-20 16:44:21 (-3 DST)
+ * 2017-02-20 19:30:30 (-3 DST)
  * First Version (C) 2012 - esteban daniel dortta - dortta@yahoo.com
  * Purpose: to control multiple tabs in a only-one-page application
  *          this is specially useful when building web mobile applications
@@ -358,9 +358,8 @@ var tabNavBase = function () {
     if (y$('waitIcon')) {
       if (isPropertySupported('opacity')) {
         y$('waitIcon').style.opacity='.99';
-      } else  {
-        y$('waitIcon').style.display='block';
       }
+      y$('waitIcon').style.display='block';
     }
   };
 
