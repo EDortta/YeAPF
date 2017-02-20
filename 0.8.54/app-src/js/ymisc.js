@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.54-28 built on 2017-02-09 11:53 (-2 DST)
+ * YeAPF 0.8.54-36 built on 2017-02-20 09:10 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-02-09 11:51:42 (-2 DST)
+ * 2017-02-20 09:04:36 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -778,22 +778,22 @@ if (typeof Date.prototype.incMonth == 'undefined')
 
 if (typeof Date.prototype.incDay == 'undefined')
   Date.prototype.incDay = function () {
-    this.setTime(this.getTime() + 24 * 60 * 60 * 1000);
+    this.setDate(this.getDate()+1);
   };
 
 if (typeof Date.prototype.decDay == 'undefined')
   Date.prototype.decDay = function () {
-    this.setTime(this.getTime() - 24 * 60 * 60 * 1000);
+    this.setDate(this.getDate()-1);
   };
 
 if (typeof Date.prototype.incWeek == 'undefined')
   Date.prototype.incWeek = function () {
-    this.setTime(this.getTime() + 24 * 60 * 60 * 1000 * 7);
+    this.setDate(this.getDate()+7);
   };
 
 if (typeof Date.prototype.decWeek == 'undefined')
   Date.prototype.decWeek = function () {
-    this.setTime(this.getTime() - 24 * 60 * 60 * 1000 * 7);
+    this.setDate(this.getDate()-7);
   };
 
 if (typeof Date.prototype.daysInMonth == 'undefined')

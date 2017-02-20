@@ -1,8 +1,8 @@
 /*********************************************
   * skel/electron/js/yloader.js
-  * YeAPF 0.8.54-35 built on 2017-02-20 07:52 (-3 DST)
+  * YeAPF 0.8.54-36 built on 2017-02-20 09:10 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-02-20 07:52:28 (-3 DST)
+  * 2017-02-20 09:10:14 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.54-35 built on 2017-02-20 07:52 (-3 DST)");
+ console.log("YeAPF 0.8.54-36 built on 2017-02-20 09:10 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -1027,22 +1027,22 @@
      
      if (typeof Date.prototype.incDay == 'undefined')
        Date.prototype.incDay = function () {
-         this.setTime(this.getTime() + 24 * 60 * 60 * 1000);
+         this.setDate(this.getDate()+1);
        };
      
      if (typeof Date.prototype.decDay == 'undefined')
        Date.prototype.decDay = function () {
-         this.setTime(this.getTime() - 24 * 60 * 60 * 1000);
+         this.setDate(this.getDate()-1);
        };
      
      if (typeof Date.prototype.incWeek == 'undefined')
        Date.prototype.incWeek = function () {
-         this.setTime(this.getTime() + 24 * 60 * 60 * 1000 * 7);
+         this.setDate(this.getDate()+7);
        };
      
      if (typeof Date.prototype.decWeek == 'undefined')
        Date.prototype.decWeek = function () {
-         this.setTime(this.getTime() - 24 * 60 * 60 * 1000 * 7);
+         this.setDate(this.getDate()-7);
        };
      
      if (typeof Date.prototype.daysInMonth == 'undefined')
