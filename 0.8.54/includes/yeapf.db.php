@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.54-10 built on 2017-01-31 17:17 (-2 DST)
+    YeAPF 0.8.54-34 built on 2017-02-20 07:22 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-11-01 14:46:13 (-2 DST)
+    2017-02-17 16:59:36 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -50,6 +50,7 @@
   }
 
 
+  define('_DB_DIRTY_',      512);
   define('_DB_CONNECTED_', 1024);
   define('_DB_ANALYZED_',  2048);
   define('_DB_UPDATABLE',  4096);
@@ -121,6 +122,12 @@
     global $ydb_type, $ydb_type_names;
     // die ("$ydb_type = ".$ydb_type_names[$ydb_type]);
     return $ydb_type_names[$ydb_type];
+  }
+
+  function db_status($mask=65535) 
+  {
+    global $_ydb_ready;
+    return $_ydb_ready & $mask;
   }
 
   function db_die($errorMsg, $className = 'dbErr')
@@ -617,20 +624,22 @@
         $rs = mysqli_query($ydb_conn, $sql);
         $sqlErrNo = mysqli_errno($ydb_conn);
         $sqlError = mysqli_error($ydb_conn);
-        if ($sqlErrNo!=0)
-          showDebugBackTrace("Erro '$sqlError'  ao executar comando [$sql]",$SQLDieOnError);
-        else
+        if ($sqlErrNo!=0) {
+          showDebugBackTrace("Err '$sqlError' trying to run: $sql .",$SQLDieOnError);
+        } else {
           $lastCommands.="$sqlCount) $sql;<BR>";
+        }
 
       } else if (db_connectionTypeIs(_MYSQL_)) {
 
         $rs = mysql_query($sql, $ydb_conn);
         $sqlErrNo = mysql_errno();
         $sqlError = mysql_error();
-        if ($sqlErrNo!=0)
-          showDebugBackTrace("Erro '$sqlError'  ao executar comando [$sql]",$SQLDieOnError);
-        else
+        if ($sqlErrNo!=0) {
+          showDebugBackTrace("Err '$sqlError' trying to run: $sql .",$SQLDieOnError);
+        } else {
           $lastCommands.="$sqlCount) $sql;<BR>";
+        }
 
       } else if (db_connectionTypeIs(_FIREBIRD_)) {
         $cfgIbaseUsePrepare=false;
@@ -683,7 +692,7 @@
           if ($retryCount==0)
             showDebugBackTrace("Erro '$sqlError'  ao executar comando [$sql] ap&oacute;s $maxRetryCount tentativas em $allWastedTime microsegundos",$SQLDieOnError);
           else
-            showDebugBackTrace("Erro '$sqlError'  ao executar comando [$sql]",$SQLDieOnError);
+            showDebugBackTrace("Err '$sqlError' trying to run: $sql .",$SQLDieOnError);
         } else
           $lastCommands.="$sqlCount) $sql;<BR>";
 
@@ -699,7 +708,7 @@
         $sqlError = pg_last_error($ydb_conn);
         _dumpY(4,1,"ret: $rs ErrNo: $sqlErrNo ErrMsg: $sqlError ydb_conn: $ydb_conn");
         if (trim($sqlError)>'')
-          showDebugBackTrace("Erro '$sqlError' ao executar comando [$sql]",$SQLDieOnError);
+          showDebugBackTrace("Err '$sqlError' trying to run: $sql .",$SQLDieOnError);
         else
           $lastCommands.="$sqlCount) $sql;<BR>";
 
@@ -808,51 +817,59 @@
 
     // $lastCommands.="$sql<BR>";
 
-    $_rs=db_query($sql);
+    try {
+      $ret=null;
 
-    if ($_rs) {
-      if ((is_resource($_rs)) || (is_object($_rs))) {
-        if ($asRow)
-          $_values = db_fetch_row($_rs, $fixIBFields);
-        else
-          $_values = db_fetch_array($_rs, $fixIBFields);
+      $_rs=db_query($sql);
 
-        if ( $_values ) {
-
-          if ($asRow) {
-            for ($i=0; $i<count($_values); $i++) {
-              $_v = $_values[$i];
-              if (false)
-                $_v=RFC_3986($_v);
-              _dumpY(4,2,"_values[$i] = $_v");
-              $_values[$i]=trim($_v);
-            }
-          } else {
-
-            foreach($_values as $_k => $_v) {
-              if (false)
-                $_v=RFC_3986($_v);
-              _dumpY(4,2,"$_v");
-              $_values[$_k]=trim($_v);
-            }
-          }
-
-          db_free($_rs);
-          _dumpY(4,2,count($_values));
-          if (count($_values)==1)
-            $ret=$_values[0];
+      if ($_rs) {
+        if ((is_resource($_rs)) || (is_object($_rs))) {
+          if ($asRow)
+            $_values = db_fetch_row($_rs, $fixIBFields);
           else
-            $ret=$_values;
+            $_values = db_fetch_array($_rs, $fixIBFields);
 
-          _dumpY(4,2,var_export($ret,true));
-          return $ret;
-        } else
-          return (substr(strtoupper($sql),0,6)=='UPDATE');
+          if ( $_values ) {
+
+            if ($asRow) {
+              for ($i=0; $i<count($_values); $i++) {
+                $_v = $_values[$i];
+                if (false)
+                  $_v=RFC_3986($_v);
+                _dumpY(4,2,"_values[$i] = $_v");
+                $_values[$i]=trim($_v);
+              }
+            } else {
+
+              foreach($_values as $_k => $_v) {
+                if (false)
+                  $_v=RFC_3986($_v);
+                _dumpY(4,2,"$_v");
+                $_values[$_k]=trim($_v);
+              }
+            }
+
+            db_free($_rs);
+            _dumpY(4,2,count($_values));
+            if (count($_values)==1)
+              $ret=$_values[0];
+            else
+              $ret=$_values;
+
+            _dumpY(4,2,var_export($ret,true));
+            
+          } else
+            $ret = (substr(strtoupper($sql),0,6)=='UPDATE');
+        }
+      } else {
+        _dumpY(4,0,"\t\tEsta retornando zero");
+        $ret = null;
       }
-    } else {
-      _dumpY(4,0,"\t\tEsta retornando zero");
-      return null;
+    } catch (yException $e) {
+
     }
+
+    return $ret;
   }
 
   function db_getList($sql, $sep=',')

@@ -204,7 +204,7 @@
           if (!file_exists("www/css/$newPageName.css")) {
             /* creating css file */
             $scriptName=ucfirst($newPageName);
-            $newScript = _file("tp_skel.css");
+            $newScript = _file("tp_skel.css"); 
             file_put_contents("www/css/$newPageName.css", $newScript);
             chmod("www/css/$newPageName.css", 0777);
           }

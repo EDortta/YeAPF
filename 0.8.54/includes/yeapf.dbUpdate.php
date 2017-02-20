@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.54-17 built on 2017-02-08 18:30 (-2 DST)
+    YeAPF 0.8.54-34 built on 2017-02-20 07:22 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-02-07 19:16:04 (-2 DST)
+    2017-02-20 07:21:36 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -33,8 +33,12 @@
   function _db_upd_createAuditingTrackTable() 
   {
     if (!db_tableExists('is_auditing_track')) {
-      $sql='SELECT count(*) FROM rdb$relations WHERE (rdb$relation_name = \'IS_AUDITING_TRACK\') AND (rdb$view_blr IS NOT NULL)';
-      $cc=db_sql($sql);
+      if (db_connectionTypeIs(_FIREBIRD_)) {
+        $sql='SELECT count(*) FROM rdb$relations WHERE (rdb$relation_name = \'IS_AUDITING_TRACK\') AND (rdb$view_blr IS NOT NULL)';
+        $cc=db_sql($sql);
+      } else {
+        $cc=0;
+      }
       if ($cc==0) {
         $sql = "CREATE TABLE  is_auditing_track (
                   id char(32),
@@ -616,6 +620,22 @@
         if (db_tableExists("wbp_buffer")) {
           if (!db_fieldExists("wbp_buffer", "o")) {
             $sql="ALTER TABLE wbp_buffer ADD o Integer";
+            db_sql($sql);
+          }
+          if (!db_fieldExists("wbp_buffer", "queue")) {
+            $sql="ALTER TABLE wbp_buffer ADD queue char(32)";
+            db_sql($sql);
+          }
+
+          if (!db_tableExists("wbp_queue")) {
+            $sql="CREATE TABLE wbp_queue (
+                    id char(32) NOT NULL,
+                    device char(32) NOT NULL,
+                    printer char(32) NOT NULL,
+                    creationDate integer NOT NULL,
+                    queueSize smallint NOT NULL,
+                    status integer NOT NULL
+                  )";
             db_sql($sql);
           }
           $currentDBVersion=14;

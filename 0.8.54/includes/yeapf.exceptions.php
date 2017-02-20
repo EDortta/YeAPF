@@ -1,27 +1,52 @@
 <?php
 /*
     includes/yeapf.exceptions.php
-    YeAPF 0.8.54-10 built on 2017-01-31 17:17 (-2 DST)
+    YeAPF 0.8.54-34 built on 2017-02-20 07:22 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-05-23 17:02:01 (-2 DST)
+    2017-02-17 15:08:32 (-3 DST)
     more info at http://php.net/manual/en/language.exceptions.php
 */
 
-    abstract class yException extends Exception
+    interface IException
     {
-        public function __construct($aMessage = null, $aCode = 0)
+        /* Protected methods inherited from Exception class */
+        public function getMessage();                 // Exception message
+        public function getCode();                    // User-defined Exception code
+        public function getFile();                    // Source filename
+        public function getLine();                    // Source line
+        public function getTrace();                   // An array of the backtrace()
+        public function getTraceAsString();           // Formated string of trace
+       
+        /* Overrideable methods inherited from Exception class */
+        public function __toString();                 // formated string for display
+        public function __construct($message = null, $code = 0);
+    }
+
+    abstract class CustomException extends Exception implements IException
+    {
+        protected $message = 'Unknown exception';     // Exception message
+        private   $string;                            // Unknown
+        protected $code    = 0;                       // User-defined exception code
+        protected $file;                              // Source filename of exception
+        protected $line;                              // Source line of exception
+        private   $trace;                             // Unknown
+
+        public function __construct($message = null, $code = 0)
         {
-            if (!$aMessage) {
-                $aMessage='Unknown '. get_class($this);
+            global $_ydb_ready;
+            if (!$message) {
+                throw new $this('Unknown '. get_class($this));
             }
-            parent::__construct($aMessage, $aCode);
+            $_ydb_ready|=_DB_DIRTY_;
+            parent::__construct($message, $code);
         }
-        
+       
         public function __toString()
         {
-            return get_class($this) . " '{$this->code}:{$this->message}' in {$this->file}({$this->line})\n"
+            return get_class($this) . " '{$this->message}' in {$this->file}({$this->line})\n"
                                     . "{$this->getTraceAsString()}";
         }
     }
 
+    class YException extends CustomException {}
 ?>

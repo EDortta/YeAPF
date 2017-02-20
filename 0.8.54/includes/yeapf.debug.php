@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.debug.php
-    YeAPF 0.8.54-10 built on 2017-01-31 17:17 (-2 DST)
+    YeAPF 0.8.54-34 built on 2017-02-20 07:22 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-12 16:34:24 (-2 DST)
+    2017-02-17 17:02:24 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -114,7 +114,7 @@
   function _minimalCSS() {
     global $flgMinimalCSS;
     if (!$flgMinimalCSS)
-      if (!(outIsXML() || outIsJSON())) {
+      if (!(outIsXML() || outIsJSON() || outIsText())) {
         echo "<style>.dbErr{padding: 8px; border-radius: 8px; border:solid 1px #E31818; background:#8A0101; color: white} .dbOk {border-radius: 8px; border:solid 1px #39E318; background:#0E8A01; color: white} .dbWarn {border-radius: 8px; border:solid 1px #E3DF18; background:#8A6601; color: white}</style>\n";
       }
     $flgMinimalCss = 1;
@@ -204,7 +204,7 @@
       echo "<div>$argList</div>";
 
     }
-    throw new Exception("APP DIES:\n$auxArgs");
+    throw new YException("APP DIES:\n$auxArgs");
   }
 
   if ((isset($logRequest)) && ($logRequest)) {

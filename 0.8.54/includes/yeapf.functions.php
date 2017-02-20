@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.54-31 built on 2017-02-10 13:47 (-2 DST)
+    YeAPF 0.8.54-34 built on 2017-02-20 07:22 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-02-10 13:17:02 (-2 DST)
+    2017-02-14 17:00:21 (-3 DST)
    */
 
   /*
@@ -1636,7 +1636,8 @@
           _dumpY(1,1,"Implementation '$implementation' loaded");
 
         } catch(Exception $ee) {
-          die("Err loading $implentation");
+          _dump("Err loading '$implentation'");
+          die();
         }
         $functions=array($prefix.trim(str_replace('.','_',$s)), $prefix.str_replace('.','_',$page));
         $functions=array_unique($functions);
@@ -2141,32 +2142,35 @@
 
   function horaFormatada($valorCampo,$segundos=false)
   {
-    if (strpos($valorCampo,':')>0) {
-      $xHora=explode(':',$valorCampo);
-      $valorCampo='';
-      foreach($xHora as $v) {
-        if ($valorCampo>'')
-          $valorCampo.=":";
-        $valorCampo.=str_pad($v,2,'0', STR_PAD_LEFT);
-      }
-    }
-    $valorCampo= preg_replace("/[^0-9]/", "", $valorCampo);
     $res='';
+    if (strlen(preg_replace("/[^0-9]/", "",$valorCampo))>0) {
+      if (strpos($valorCampo,':')>0) {
+        $xHora=explode(':',$valorCampo);
+        $valorCampo='';
+        foreach($xHora as $v) {
+          if ($valorCampo>'')
+            $valorCampo.=":";
+          $valorCampo.=str_pad($v,2,'0', STR_PAD_LEFT);
+        }
+      }
+      $valorCampo= preg_replace("/[^0-9]/", "", $valorCampo);
 
-    if (strlen($valorCampo)>8) {
-      $res=substr($valorCampo,8,2).':'.substr($valorCampo,10,2);
+      if (strlen($valorCampo)>8) {
+        $res=substr($valorCampo,8,2).':'.substr($valorCampo,10,2);
 
 
-    if ($segundos)
-      $res.=':'.substr($valorCampo,12,2);
-    } else if (strlen($valorCampo)>=4) {
-      $res=substr($valorCampo,0,2).':'.substr($valorCampo,2,2);
-    if ($segundos)
-      $res.=':'.substr($valorCampo,4,2);
+      if ($segundos)
+        $res.=':'.substr($valorCampo,12,2);
+      } else if (strlen($valorCampo)>=4) {
+        $res=substr($valorCampo,0,2).':'.substr($valorCampo,2,2);
+      if ($segundos)
+        $res.=':'.substr($valorCampo,4,2);
+      }
+      if (($res==':') || (strlen($res)<=2))
+        $res='00:00';
     }
-    if ($res==':')
-      $res='';
-    return $res;
+    _dump("$valorCampo -> res=$res");
+    return "$res";
   }
 
   function corrigirDataHora($aux)

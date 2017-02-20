@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.54-31 built on 2017-02-10 13:47 (-2 DST)
+    YeAPF 0.8.54-34 built on 2017-02-20 07:22 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-02-10 13:46:11 (-2 DST)
+    2017-02-10 14:09:00 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -355,12 +355,15 @@
   function xq_context($aIndex, $aValue, $replaceIfExists=true)
   {
     global $_xq_context_;
-    $auxValue=iconv("UTF-8", "iso-8859-1", $aValue);
-    if (strlen($auxValue)>0) {
-      if (strlen($auxValue<$aValue))
-        $aValue=$auxValue;
+    if (is_string($aValue)) {
+      $auxValue=iconv("UTF-8", "iso-8859-1", $aValue);
+      if (strlen($auxValue)>0) {
+        if (strlen($auxValue<$aValue))
+          $aValue=$auxValue;
+      }
     }
-    // echo "$aValue ".mb_detect_encoding($aValue)." - ".."\n";
+    // echo "$aValue ".mb_detect_encoding($aValue)." - "."\n";
+
     // mb_encode_numericentity($aValue, array(0x80, 0xff, 0, 0xff), "iso-8859-1")."\n";
 
     if (trim($aIndex)>'') {

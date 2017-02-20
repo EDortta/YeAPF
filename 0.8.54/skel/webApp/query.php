@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/query.php
-    YeAPF 0.8.54-10 built on 2017-01-31 17:17 (-2 DST)
-    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-11 09:50:45 (-2 DST)
+    YeAPF 0.8.54-34 built on 2017-02-20 07:22 (-3 DST)
+    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com 
+    2017-02-10 14:20:20 (-3 DST)
 
     skel/webApp / query.php
     This file cannot be modified within skel/webApp
@@ -11,7 +11,7 @@
 */
 
 
-  header('Content-Type: application/xml; charset=ISO-8859-1', true);
+  header('Content-Type: application/xml; charset=UTF-8', true);
   header("Cache-Control: no-cache, must-revalidate");
   header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
   // logOutput = -1: Arquivo, 0: silencio, 1: tela, 2: xml
@@ -87,11 +87,11 @@
   // dbCharset - database charset
   // appCharset - application charset
   // $xResult=mb_convert_encoding($xResult,"ISO-8859-1",mb_detect_encoding($xResult));
-  $xResult=iconv(detect_encoding($xResult),"ISO-8859-1", $xResult);
+  $xResult=iconv(detect_encoding($xResult),"UTF-8", $xResult);
   if ($logging>2)
     _dumpY(1,1,$xResult);
 
-  echo html_entity_decode("$xResult", ENT_NOQUOTES, $appCharset);
+  echo html_entity_decode("$xResult", ENT_NOQUOTES, "UTF-8");
 
   db_close();
   _recordWastedTime("Good bye query");
