@@ -1,8 +1,8 @@
 /*********************************************
   * skel/workbench/www/js/yloader.js
-  * YeAPF 0.8.54-36 built on 2017-02-20 09:10 (-3 DST)
+  * YeAPF 0.8.54-37 built on 2017-02-20 16:45 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-02-20 09:10:13 (-3 DST)
+  * 2017-02-20 16:45:41 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.54-36 built on 2017-02-20 09:10 (-3 DST)");
+ console.log("YeAPF 0.8.54-37 built on 2017-02-20 16:45 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -646,6 +646,11 @@
            if ((undefined === trgObj[i]) || (overwriteIfExists))
              trgObj[i] = srcObj[i];
          }
+     };
+     
+     function isPropertySupported(property)
+     {
+       return property in document.body.style;
      };
      
      function isEmpty(obj) {
@@ -1269,6 +1274,17 @@
        var aux=new Date();
        aux.setTime(aTimestamp*1000);
        return aux.getDay();
+     }
+     
+     /* http://stackoverflow.com/questions/11887934/how-to-check-if-the-dst-daylight-saving-time-is-in-effect-and-if-it-is-whats */
+     Date.prototype.stdTimezoneOffset = function() {
+         var jan = new Date(this.getFullYear(), 0, 1);
+         var jul = new Date(this.getFullYear(), 6, 1);
+         return Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
+     }
+     
+     Date.prototype.dst = function() {
+         return this.getTimezoneOffset() < this.stdTimezoneOffset();
      }
      
      function TimezoneDetect() {
@@ -3633,13 +3649,20 @@
      
        that.showWaitIcon = function () {
          if (y$('waitIcon')) {
-           y$('waitIcon').style.display='block';
+           if (isPropertySupported('opacity')) {
+             y$('waitIcon').style.opacity='.99';
+           } else  {
+             y$('waitIcon').style.display='block';
+           }
          }
        };
      
        that.hideWaitIcon = function () {
          if (y$('waitIcon')) {
-           y$('waitIcon').style.display='none';
+           if (isPropertySupported('opacity'))
+             y$('waitIcon').style.opacity=0;
+           else
+             y$('waitIcon').style.display='none';
          }
        };
      

@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.54-36 built on 2017-02-20 09:10 (-3 DST)
+ * YeAPF 0.8.54-37 built on 2017-02-20 16:45 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-02-20 09:04:36 (-3 DST)
+ * 2017-02-20 16:42:33 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -397,6 +397,11 @@ var mergeObject = function (srcObj, trgObj, overwriteIfExists) {
       if ((undefined === trgObj[i]) || (overwriteIfExists))
         trgObj[i] = srcObj[i];
     }
+};
+
+function isPropertySupported(property)
+{
+  return property in document.body.style;
 };
 
 function isEmpty(obj) {
@@ -1020,6 +1025,17 @@ function timestamp2dayOfWeek(aTimestamp) {
   var aux=new Date();
   aux.setTime(aTimestamp*1000);
   return aux.getDay();
+}
+
+/* http://stackoverflow.com/questions/11887934/how-to-check-if-the-dst-daylight-saving-time-is-in-effect-and-if-it-is-whats */
+Date.prototype.stdTimezoneOffset = function() {
+    var jan = new Date(this.getFullYear(), 0, 1);
+    var jul = new Date(this.getFullYear(), 6, 1);
+    return Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
+}
+
+Date.prototype.dst = function() {
+    return this.getTimezoneOffset() < this.stdTimezoneOffset();
 }
 
 function TimezoneDetect() {
