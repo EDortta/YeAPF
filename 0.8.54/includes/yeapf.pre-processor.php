@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.pre-processor.php
-    YeAPF 0.8.54-10 built on 2017-01-31 17:17 (-2 DST)
+    YeAPF 0.8.54-39 built on 2017-02-21 17:52 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-10-18 19:26:30 (-2 DST)
+    2017-02-21 17:48:46 (-3 DST)
    */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -962,7 +962,13 @@
             $junction=unquote(analisarString(pegaValor($s, $n, $tokenType),$pegarDadosDaTabela, $nomeTabela, $campoChave, $valorChave, $valores));
           else
             $junction='and';
-          $linhaAux=buildSQLfilter($palavras, $campos,strtoupper($junction)=='AND');
+          if (substr($s,$n,1)!=')')
+            $inter_junction=unquote(analisarString(pegaValor($s, $n, $tokenType),$pegarDadosDaTabela, $nomeTabela, $campoChave, $valorChave, $valores));
+          else
+            $inter_junction='or';
+          $linhaAux=buildSQLfilter($palavras, $campos,strtoupper($junction)=='AND',strtoupper($inter_junction)=='AND');
+          if (trim($linhaAux)=="")
+            $linhaAux=" (1=1) ";
           $s=substr($s,0,$i).$linhaAux.substr($s,$n+2,strlen($s));
 
         } else if (tokenValido($s, '#for(',$i)) {
