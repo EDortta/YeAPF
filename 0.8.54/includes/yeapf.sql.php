@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.sql.php
-    YeAPF 0.8.54-28 built on 2017-02-09 11:53 (-2 DST)
+    YeAPF 0.8.54-40 built on 2017-02-21 18:09 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-02-09 11:06:28 (-2 DST)
+    2017-02-21 18:08:31 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -413,6 +413,7 @@
         }
 
         $ft_is_char = (strpos($ft,"CHAR")!==false);
+        // echo "$vc - $ft - ".intval($ft_is_char)."\n<br>";
 
         if (db_connectionTypeIs(_FIREBIRD_)) {
           if ($ft_is_char) {

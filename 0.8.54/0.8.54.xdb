@@ -2917,14 +2917,14 @@
 </considerFirstAsNaturalKey><defaultTableName><default>%27%27</default>
 </defaultTableName></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>389</start>
-<end>492</end>
+<end>494</end>
 </code></buildSQLfilter><montarComandoSQL><name>montarComandoSQL</name>
 <parameters><verbo><dummy>ok</dummy>
 </verbo><tabela><dummy>ok</dummy>
 </tabela><campos><dummy>ok</dummy>
 </campos></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
-<start>494</start>
-<end>527</end>
+<start>496</start>
+<end>529</end>
 </code></montarComandoSQL></functions><filename>yeapf.sql.php</filename>
 <folder>includes</folder>
 </yeapf.sql.php><yeapf.sse.php><functions><SSE.q_sse><name>SSE.q_sse</name>
