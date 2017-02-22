@@ -1,8 +1,8 @@
 /*********************************************
  * skel/workbench/www/js/ystorage.js
- * YeAPF 0.8.54-42 built on 2017-02-22 16:01 (-3 DST)
+ * YeAPF 0.8.54-43 built on 2017-02-22 20:39 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-02-22 16:01:43 (-3 DST)
+ * 2017-02-22 20:39:42 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -108,11 +108,22 @@
         return strings.join('');
       };
 
-      that.setItem = function(id, jData) {
+      that.setItem = function(id, jData, aFieldsToPreserve) {
         id = String(id);
 
         jData._id = jData._id || generateUUID();
         jData._ts_update = (new Date()).getTime() / 1000;
+
+        if (isArray(aFieldsToPreserve)) {
+          var oldData=that.getItem(id);
+          if (!isEmpty(oldData)) {
+            for(var i=0; i<aFieldsToPreserve.length; i++) {
+              if (typeof oldData[aFieldsToPreserve[i]] !== 'undefined') {
+                jData[aFieldsToPreserve[i]]=oldData[aFieldsToPreserve[i]];
+              }
+            }
+          }
+        }
 
         if (jData._linked) {
           for(var i=0; i<jData._linked.length; i++) {
@@ -138,8 +149,8 @@
       };
 
       /* receives a Uint8Array */
-      that.setBinItem = function(id, bData) {
-        that.setItem(id, that.toBinString(bData));
+      that.setBinItem = function(id, bData, aFieldsToPreserve) {
+        that.setItem(id, that.toBinString(bData), aFieldsToPreserve);
       };
 
       that.getItem = function(id) {
@@ -269,10 +280,10 @@
           oncomplete();
       };
 
-      that.insertData = function(data) {
+      that.insertData = function(data, aFieldsToPreserve) {
         for(var i in data) {
           if (data.hasOwnProperty(i)) {
-            that.setItem(data[i][that._keyName_], data[i]);
+            that.setItem(data[i][that._keyName_], data[i], aFieldsToPreserve);
           }
 
         }
@@ -295,7 +306,7 @@
         that.each(onItem, atEnd, condition);
       };
 
-      that.fillList = function(data, idFieldName, clean) {
+      that.fillList = function(data, idFieldName, clean, aFieldsToPreserve) {
         idFieldName = idFieldName || 'id';
         clean = clean || false;
 
@@ -305,7 +316,7 @@
 
         for (var i = 0; i < data.length; i++) {
           if (data[i][idFieldName]) {
-            that.setItem(data[i][idFieldName], data);
+            that.setItem(data[i][idFieldName], data, aFieldsToPreserve);
           }
         }
       };
@@ -461,9 +472,9 @@
         return that.cfg.db.getItem(itemNdx);
       };
 
-      that.setItem = function(itemNdx, itemJData) {
+      that.setItem = function(itemNdx, itemJData, aFieldsToPreserve) {
         that.cfg.dataModified++;
-        return that.cfg.db.setItem(itemNdx, itemJData);
+        return that.cfg.db.setItem(itemNdx, itemJData, aFieldsToPreserve);
       };
 
       that.removeItem = function(itemNdx) {
@@ -520,8 +531,8 @@
         that.each(onItem, atEnd, condition);
       };
 
-      that.insertData = function(data) {
-        return that.cfg.db.insertData(data);
+      that.insertData = function(data, aFieldsToPreserve) {
+        return that.cfg.db.insertData(data, aFieldsToPreserve);
       };
 
       that.cleanCondition = function() {
