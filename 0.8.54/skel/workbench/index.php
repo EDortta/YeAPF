@@ -128,9 +128,10 @@
         falta:
           indicar a ordem das páginas (ao menos qual é a inicial)
           indicar se https é obrigatorio
-          indicar quais os js obrigatorios em 'todas' as paginas
+          indicar quais os js e css obrigatorios em 'todas' as paginas
           impedir que um mesmo js seja carregado mais de uma vez
           manter o cabeçalho feito pelo usuário. ou seja, a parte entre o <body> e o 'tnContainer'
+          avisar ao aplicativo sobre uma pagina modificada. compilar essa página imediatamente.
       */
 
       file_put_contents($newHTMLname, $html_out);

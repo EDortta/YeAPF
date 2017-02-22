@@ -1,8 +1,8 @@
 /*********************************************
  * skel/electron/js/ystorage.js
- * YeAPF 0.8.54-41 built on 2017-02-22 10:24 (-3 DST)
+ * YeAPF 0.8.54-42 built on 2017-02-22 16:01 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-02-22 10:24:56 (-3 DST)
+ * 2017-02-22 16:01:43 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -196,7 +196,8 @@
         }
       };
 
-      that.filter = function(onitem, oncomplete, condition) {
+      that.filter = function(onitem, oncomplete, condition, haltOnFirst) {
+        haltOnFirst = false || haltOnFirst;
         if (typeof onitem == "function") {
           condition = condition || true;
           var ylex = yLexObj(condition);
@@ -208,6 +209,8 @@
             canCall = ylex.solve(item);
             if (canCall) {
               onitem(item);
+              if (haltOnFirst)
+                i=lista.length+1;
             }
           }
         }
@@ -215,7 +218,8 @@
           oncomplete();
       };
 
-      that.each = function(onitem, oncomplete, condition) {
+      that.each = function(onitem, oncomplete, condition, haltOnFirst) {
+        haltOnFirst = false || haltOnFirst;
         var conditionSatisfied = function(value, needed) {
           needed = String(needed).split(" ");
           var satisfied = true,
@@ -254,8 +258,11 @@
                 }
               }
             }
-            if (canCall)
+            if (canCall) {
               onitem(item);
+              if (haltOnFirst)
+                i = lista.length+1;
+            }
           }
         }
         if (typeof oncomplete == "function")
@@ -488,12 +495,12 @@
         return that.cfg.db.linkTo(aSiblingDB, aLinkageField);
       };
 
-      that.filter = function(onitem, oncomplete, condition) {
-        return that.cfg.db.filter(onitem, oncomplete, condition);
+      that.filter = function(onitem, oncomplete, condition, haltOnFirst) {
+        return that.cfg.db.filter(onitem, oncomplete, condition, haltOnFirst);
       };
 
-      that.each = function(onitem, oncomplete, condition) {
-        return that.cfg.db.each(onitem, oncomplete, condition);
+      that.each = function(onitem, oncomplete, condition, haltOnFirst) {
+        return that.cfg.db.each(onitem, oncomplete, condition, haltOnFirst);
       };
 
       that.paint = that.each;
