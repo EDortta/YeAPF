@@ -116,11 +116,22 @@
               file_put_contents("production/$xBody/$newName", $fileContent);
               $auxFiles[] = "production/$xBody/$newName";
 
-              $html_out = str_replace($srcFile, "$xBody/$newName", $html_out);
+              $html_out = str_replace("src=$srcFile", "src='$xBody/$newName'", $html_out);
+              $html_out = str_replace("src='$srcFile'", "src='$xBody/$newName'", $html_out);
+              $html_out = str_replace("src=\"$srcFile\"", "src=\"$xBody/$newName\"", $html_out);
             }
           }
         }
       }
+
+      /*
+        falta:
+          indicar a ordem das páginas (ao menos qual é a inicial)
+          indicar se https é obrigatorio
+          indicar quais os js obrigatorios em 'todas' as paginas
+          impedir que um mesmo js seja carregado mais de uma vez
+          manter o cabeçalho feito pelo usuário. ou seja, a parte entre o <body> e o 'tnContainer'
+      */
 
       file_put_contents($newHTMLname, $html_out);
       file_put_contents($newPHPname,  $php);
