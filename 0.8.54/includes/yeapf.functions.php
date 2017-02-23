@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.54-34 built on 2017-02-20 07:22 (-3 DST)
+    YeAPF 0.8.54-44 built on 2017-02-23 17:20 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-02-14 17:00:21 (-3 DST)
+    2017-02-23 17:19:18 (-3 DST)
    */
 
   /*
@@ -756,6 +756,14 @@
     if (function_exists('__log'))
       __log("setMySelf($aScriptName);",3);
     $GLOBALS['yeapfConfig']['myself']=$aScriptName;
+  }
+
+  function getMyURL() {
+    $me=(!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off')?'https://':'http://';
+    $me.=$_SERVER["HTTP_HOST"];
+    $me.=dirname($_SERVER["REQUEST_URI"]);
+
+    return $me;
   }
 
   function prepareStrForSql($aStr, $quoted=true)
