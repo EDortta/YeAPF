@@ -89,7 +89,9 @@
 <end>309</end>
 </code></fillOnlineForm></functions><filename>cXFormInterface.php</filename>
 <folder>includes</folder>
-</cXFormInterface.php><mutex.php><classes><Mutex><functions><Mutex.__construct><name>Mutex::__construct</name>
+</cXFormInterface.php><html-entities-utf8.php><filename>html-entities-utf8.php</filename>
+<folder>includes%2Fi18n</folder>
+</html-entities-utf8.php><mutex.php><classes><Mutex><functions><Mutex.__construct><name>Mutex::__construct</name>
 <parameters></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>19</start>
 <end>23</end>
@@ -2332,7 +2334,12 @@
 <end>3523</end>
 </code></processFile></functions><filename>yeapf.functions.php</filename>
 <folder>includes</folder>
-</yeapf.functions.php><yeapf.i18n.php><filename>yeapf.i18n.php</filename>
+</yeapf.functions.php><yeapf.i18n.php><functions><___grantEntFile><name>_dollar__grantEntFile</name>
+<parameters><_entFile><dummy>ok</dummy>
+</_entFile></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
+<start>257</start>
+<end>282</end>
+</code></___grantEntFile></functions><filename>yeapf.i18n.php</filename>
 <folder>includes</folder>
 </yeapf.i18n.php><yeapf.jforms.php><filename>yeapf.jforms.php</filename>
 <folder>includes</folder>
