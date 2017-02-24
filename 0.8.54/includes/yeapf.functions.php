@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.54-44 built on 2017-02-23 17:20 (-3 DST)
+    YeAPF 0.8.54-47 built on 2017-02-24 17:57 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-02-23 17:19:18 (-3 DST)
+    2017-02-24 17:56:04 (-3 DST)
    */
 
   /*
@@ -3244,7 +3244,7 @@
   }
 
   function _file($fileName, $pegarDadosDaTabela=0, $nomeTabela='',
-                 $campoChave='', $valorChave='', $valores='')
+                 $campoChave='', $valorChave='', $valores='', $curarCharset=true)
   {
     global $intoFormFile, $includedFiles, $appName, $includeHistory,
            $lastCommands, $yeapfConfig, $appCharset,
@@ -3297,7 +3297,7 @@
             _dumpY(1,1,"$fileName not found");
           }
 
-          if ($appCharset>'') {
+          if (($appCharset>'') && ($curarCharset)) {
             $sEncoding=detect_encoding($s);
             if ($sEncoding!=$appCharset)
               _dumpY(1,2,"Warning! '$fileName' encoded as '$sEncoding'");
@@ -3352,7 +3352,11 @@
     return $s;
   }
 
-  function processFile($fileName, $pegarDadosDaTabela=0, $nomeTabela='', $campoChave='', $valorChave='')
+  function _file_raw($fileName) {
+    return _file($fileName, 0, '', '', '', '', false);
+  }
+
+  function processFile($fileName, $pegarDadosDaTabela=0, $nomeTabela='', $campoChave='', $valorChave='', $valores='', $curarCharset=true)
   {
     global $_CurrentFileName, $user_IP, $aDebugIP, $yeapfConfig, $sessionCWD;
 
@@ -3376,7 +3380,7 @@
       $oldSessionCWD=isset($sessionCWD)?$sessionCWD:getcwd();
       // $sessionCWD=dirname(substr($auxFileName,strlen($yeapfConfig['root'])));
       $sessionCWD=dirname($auxFileName);
-      $fcontents= _file($auxFileName, $pegarDadosDaTabela=0, $nomeTabela='', $campoChave='', $valorChave='');
+      $fcontents= _file($auxFileName, $pegarDadosDaTabela, $nomeTabela, $campoChave, $valorChave, $valores, $curarCharset);
       $sessionCWD=$oldSessionCWD;
       unset($oldSessionCWD);
 
