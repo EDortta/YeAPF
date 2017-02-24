@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.i18n.php
-    YeAPF 0.8.54-45 built on 2017-02-24 09:29 (-3 DST)
+    YeAPF 0.8.54-46 built on 2017-02-24 09:58 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-02-24 09:27:40 (-3 DST)
+    2017-02-24 09:57:44 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -284,4 +284,15 @@
   (@include_once "$_entFile.php") or (_die("Error loading $_entFile"));
   unset($_entFile);
   unset($_grantEntFile);
+
+  function convertLatin1ToHtml($str) 
+  { 
+    /* source: http://php.net/manual/en/function.get-html-translation-table.php#84623 */
+    $allEntities = get_html_translation_table(HTML_ENTITIES, ENT_NOQUOTES); 
+    $specialEntities = get_html_translation_table(HTML_SPECIALCHARS, ENT_NOQUOTES); 
+    $noTags = array_diff($allEntities, $specialEntities); 
+    $str = strtr($str, $noTags); 
+    return $str; 
+  }   
+
 ?>

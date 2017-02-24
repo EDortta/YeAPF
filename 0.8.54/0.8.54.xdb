@@ -2339,7 +2339,12 @@
 </_entFile></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>257</start>
 <end>282</end>
-</code></___grantEntFile></functions><filename>yeapf.i18n.php</filename>
+</code></___grantEntFile><convertLatin1ToHtml><name>convertLatin1ToHtml</name>
+<parameters><str><dummy>ok</dummy>
+</str></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
+<start>289</start>
+<end>298</end>
+</code></convertLatin1ToHtml></functions><filename>yeapf.i18n.php</filename>
 <folder>includes</folder>
 </yeapf.i18n.php><yeapf.jforms.php><filename>yeapf.jforms.php</filename>
 <folder>includes</folder>
