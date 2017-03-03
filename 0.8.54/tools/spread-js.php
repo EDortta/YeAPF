@@ -1,9 +1,9 @@
 <?php
   /*
     tools/spread-js.php
-    YeAPF 0.8.54-10 built on 2017-01-31 17:17 (-2 DST)
+    YeAPF 0.8.54-48 built on 2017-03-03 06:26 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-01-23 18:30:47 (-2 DST)
+    2017-03-03 06:21:44 (-3 DST)
 
     This script will distribute monolite version of yloader.js
     among different application skeletons
@@ -12,6 +12,9 @@
 
   /* void database connection */
   $dbConnect = 'no';
+  /* avoid loading includes.lst in app folders */
+  $cfgAvoidIncludesLst = 'yes';
+
   /* load yeapf directly */
   require_once "includes/yeapf.functions.php";
 
@@ -33,7 +36,7 @@
       grantDirectory($tgtFolder);
       $auxFile = _file($srcFileName);
       if ($addHeader) {
-        $auxFile = "/* YeAPF 0.8.54-10 built on 2017-01-31 17:17 (-2 DST) Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
+        $auxFile = "/* YeAPF 0.8.54-48 built on 2017-03-03 06:26 (-3 DST) Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
       }
       $tgtFileName=basename($srcFileName);
       if (file_put_contents("$tgtFolder/$tgtFileName", $auxFile))
@@ -93,7 +96,7 @@
   if (file_exists($minJS)) {
     echo "Minified version source: $minJS\n";
     $yeapf_minJS = join("", file($minJS));
-    $yeapf_minJS = "/* YeAPF 0.8.54-10 built on 2017-01-31 17:17 (-2 DST) Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
+    $yeapf_minJS = "/* YeAPF 0.8.54-48 built on 2017-03-03 06:26 (-3 DST) Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
   }
 
   grantDirectory("skel/chromeApp/js");

@@ -1,5 +1,12 @@
 #!/usr/bin/php
 <?php
+  /*
+   * tools
+   * tools/ylicenseExpiration.php
+   * YeAPF 0.8.54-48 built on 2017-03-03 06:26 (-3 DST)
+   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
+   * 2017-03-03 06:25:16 (-3 DST)
+   */
 
   function dataSQL($data, $hora='',$forceInternalFormat=false)
   {

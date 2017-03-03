@@ -1,9 +1,9 @@
 <?php
 /*
     tools/yclilib.php
-    YeAPF 0.8.54-10 built on 2017-01-31 17:17 (-2 DST)
+    YeAPF 0.8.54-48 built on 2017-03-03 06:26 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-11-24 07:19:36 (-2 DST)
+    2017-03-03 06:21:51 (-3 DST)
 */
 
 
@@ -77,7 +77,11 @@
 
   function _LOAD_YEAPF_($libraryList='')
   {
-    global $__yeapfPath;
+    global $__yeapfPath, $cfgAvoidIncludesLst;
+  
+    /* avoid loading includes.lst in app folders */
+    $cfgAvoidIncludesLst = 'yes';
+
     /* to be used when on development stage */
     if (substr($__yeapfPath,0,1)=='%')
       $__yeapfPath = __DIR__."/../";

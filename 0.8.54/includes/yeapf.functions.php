@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.54-47 built on 2017-02-24 17:57 (-3 DST)
+    YeAPF 0.8.54-48 built on 2017-03-03 06:26 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-02-24 17:56:04 (-3 DST)
+    2017-03-03 06:19:02 (-3 DST)
    */
 
   /*
@@ -516,10 +516,17 @@
 
 
   if (file_exists(getcwd()."/includes.lst")) {
-    $auxIncludeFile=file(getcwd()."/includes.lst");
-    foreach($auxIncludeFile as $aIncFile) {
-      if (!((substr($aIncFile,0,1)=='#') || (substr($aIncFile,0,1)==';') || (substr($aIncFile,0,2)=='//')))
-        $yeapfLibrary[count($yeapfLibrary)]=$aIncFile;
+    if (isset($cfgAvoidIncludesLst))
+      $cfgAvoidIncludesLst = (($cfgAvoidIncludesLst===true) || (strtolower($cfgAvoidIncludesLst)!='no'));
+    else
+      $cfgAvoidIncludesLst = false;
+
+    if (!$cfgAvoidIncludesLst) {
+      $auxIncludeFile=file(getcwd()."/includes.lst");
+      foreach($auxIncludeFile as $aIncFile) {
+        if (!((substr($aIncFile,0,1)=='#') || (substr($aIncFile,0,1)==';') || (substr($aIncFile,0,2)=='//')))
+          $yeapfLibrary[count($yeapfLibrary)]=$aIncFile;
+      }
     }
   }
 
@@ -3214,7 +3221,6 @@
   function changeImgRef($aStr)
   {
     $aStr=str_replace('\"',"'",$aStr);
-    // $aStr=preg_replace('/src=("|\')\s*(.*?)\s*\\1.*?/e',"'src='.doChangeRef('\\2')",$aStr);
     $aStr=preg_replace_callback(
               '/src=("|\')\s*(.*?)\s*\\1.*?/',
               create_function('$matches', 'return "src=".doChangeRef($matches[2]);'),
