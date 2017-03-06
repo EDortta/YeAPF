@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.54-34 built on 2017-02-20 07:22 (-3 DST)
+    YeAPF 0.8.54-50 built on 2017-03-06 09:41 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-02-10 14:09:00 (-3 DST)
+    2017-03-06 09:40:33 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -532,7 +532,7 @@
           if ((  ($_ydb_ready & _DB_CONNECTED_)==0) ||
                  (db_connectionTypeIs(_MYSQL_)) ||
               (!in_array($CIK, $CIKeys))) {
-            $CIKeys[]=$CIK;
+            $CIKeys[]=$CIK; 
 
             $knum = is_numeric($k);
             if (is_array($v)) {
@@ -540,6 +540,8 @@
             } else
               $v=maskHTML(trim($v));
             $canAdd=false;
+
+            $v=mb_convert_encoding($v, "iso-8859-1", mb_detect_encoding($v));
 
             // $v=xq_calculatedField($d, $k, $v);
 
