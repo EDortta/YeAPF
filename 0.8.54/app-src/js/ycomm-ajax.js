@@ -1,8 +1,8 @@
   /********************************************************************
    * app-src/js/ycomm-ajax.js
-   * YeAPF 0.8.54-10 built on 2017-01-31 17:17 (-2 DST)
+   * YeAPF 0.8.54-49 built on 2017-03-06 09:02 (-3 DST)
    * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2017-01-31 12:13:15 (-2 DST)
+   * 2017-03-06 09:01:13 (-3 DST)
    *
    * Com o advento do WebSocket, precisamos de novas formas para
    * provocar o servidor.
@@ -64,7 +64,7 @@
 
         if ((options.method || 'POST').toUpperCase()=='POST') {
           that.xmlhttp.open((options.method || 'POST'), script, options.asynchronous);
-          that.xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+          that.xmlhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
           that.xmlhttp.send(options.parameters);
         } else {
           var sep;
