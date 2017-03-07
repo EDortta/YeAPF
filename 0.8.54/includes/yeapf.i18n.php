@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.i18n.php
-    YeAPF 0.8.54-51 built on 2017-03-07 11:36 (-3 DST)
+    YeAPF 0.8.54-52 built on 2017-03-07 11:54 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-07 11:35:35 (-3 DST)
+    2017-03-07 11:53:45 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -252,7 +252,7 @@
       'V.S.AS'=> 'null',
       'V.SAS.'=> 'null');
 
-  $_entFile=__DIR__."/i18n/html-entities-utf8";
+  $_entFile=dirname(__FILE__)."/i18n/html-entities-utf8";
   function _grantEntFile($_entFile) {
     if (!file_exists("$_entFile.php")) {
       if (file_exists("$_entFile.txt")) {
