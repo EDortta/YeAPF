@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.54-34 built on 2017-02-20 07:22 (-3 DST)
+    YeAPF 0.8.54-53 built on 2017-03-07 17:28 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-02-17 16:59:36 (-3 DST)
+    2017-03-07 17:26:17 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -584,14 +584,15 @@
 
       if ($cfgDBCureFields) {
         if ($dbCharset>'') {
-          $auxCharset=detect_encoding($sql);
+          $auxCharset = mb_detect_encoding($sql);
           if ((substr(strtoupper($sql),0,3)!='SET') && (substr(strtoupper($sql),0,4)!='SHOW')) {
             _dumpY(4,5,"converting \"$sql\" from $auxCharset to $dbCharset");
-            // $sql=mb_convert_encoding($sql,$dbCharset,$auxCharset);
-            $sql = iconv($auxCharset, $dbCharset, $sql);
+            
+            $sql=mb_convert_encoding($sql, "$dbCharset", $auxCharset);            
           }
         }
       }
+
       $sql=unquote($sql);
 
       _dumpY(4,0,"[$sql]");
@@ -962,7 +963,7 @@
     }
   }
 
-  function _db_cureFields(&$ret)
+  function _db_cureFieldsFromDB(&$ret)
   {
     global $appCharset;
 
@@ -971,10 +972,9 @@
       if ($value>'') {
         $value=html_entity_decode($value);
         if ($appCharset>'') {
-          $strCharset=detect_encoding($value);
+          $strCharset = mb_detect_encoding($value);
           _dumpY(4,5,"$k from $strCharset to $appCharset ($value)");
-          // $value=mb_convert_encoding($value,$appCharset,$strCharset);
-          $value=iconv($strCharset, $appCharset, $value);
+          $value=mb_convert_encoding($value,$appCharset,$strCharset);
         }
       }
       $ret[$k]=$value;
@@ -999,7 +999,7 @@
       */
 
       if (($ret) && ($cfgDBCureFields))
-        _db_cureFields($ret);
+        _db_cureFieldsFromDB($ret);
 
 
       if ((db_connectionTypeIs(_FIREBIRD_)) && ($ret)) {
@@ -1028,7 +1028,7 @@
       $fetch_func=db_fetch('row');
 
       if ($ret=$fetch_func($res)) {
-        _db_cureFields($ret);
+        _db_cureFieldsFromDB($ret);
 
         if ((db_connectionTypeIs(_FIREBIRD_)) && ($ret))
           if ($fixIBFields)
