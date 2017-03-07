@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.i18n.php
-    YeAPF 0.8.54-46 built on 2017-02-24 09:58 (-3 DST)
+    YeAPF 0.8.54-51 built on 2017-03-07 11:36 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-02-24 09:57:44 (-3 DST)
+    2017-03-07 11:35:35 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -253,7 +253,7 @@
       'V.SAS.'=> 'null');
 
   $_entFile=__DIR__."/i18n/html-entities-utf8";
-  $_grantEntFile = function($_entFile) {
+  function _grantEntFile($_entFile) {
     if (!file_exists("$_entFile.php")) {
       if (file_exists("$_entFile.txt")) {
         $_php1 = ""; $_php2 = ""; $_php3 = "";
@@ -279,11 +279,11 @@
       }
     }
   };
-  $_grantEntFile($_entFile);
+  _grantEntFile($_entFile);
 
   (@include_once "$_entFile.php") or (_die("Error loading $_entFile"));
   unset($_entFile);
-  unset($_grantEntFile);
+  // unset(_grantEntFile);
 
   function convertLatin1ToHtml($str) 
   { 

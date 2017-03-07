@@ -1,10 +1,12 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.54-14 built on 2017-02-01 13:30 (-2 DST)
+    YeAPF 0.8.54-51 built on 2017-03-07 11:36 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-02-01 13:23:45 (-2 DST)
+    2017-03-07 10:32:54 (-3 DST)
    */
+
+  _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
   class SSE
   {
