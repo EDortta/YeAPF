@@ -1,0 +1,655 @@
+#!/usr/bin/php
+<?php
+  /*
+   * tools
+   * tools/ydbmigrate
+   * YeAPF 0.8.56-1 built on 2017-03-13 15:34 (-3 DST)
+   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
+   * 2016-06-02 15:13:44 (-3 DST)
+   *
+   * Purpose: to export/import data to/from a .csv file
+   */
+
+  function displayError($errMessage)
+  {
+    global $args;
+
+    if (is_writable('./')) {
+      $f=fopen("ydbmigrate.lasterror","w");
+      fwrite($f,$errMessage);
+      fclose($f);
+    }
+
+    $args->setArgValue('help',__TRUE__);
+    die("\n$errMessage\n");
+  }
+
+  if (file_exists("ydbmigrate.lasterror")) {
+    $lastExecError=join("\n\t",file("ydbmigrate.lasterror"));
+    echo "Your last error was:\n===================================\n\t$lastExecError\n===================================\n";
+    die("\nCheck your previous error at 'ydbmigrate.lasterror'\nClean it (delete the file) and try again\n");
+  }
+
+  $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
+  (@include_once "$mydir/yclilib.php") or die("yclilib.php not found\n");
+  if (file_exists('ydbmigrate.functions.php'))
+    (@include_once "ydbmigrate.functions.php") or die("ydbmigrate.functions.php cannot be loaded\n");
+  (@include_once "$mydir/ydblib.php") or die("ydblib.php not found\n");
+
+  $cwd=getcwd();
+  $args = new ArgumentsProcessor();
+
+  // analise if the commands are consistent
+  $doImport=$args->argValue('import');
+  $doClean=$args->argValue('clean');
+
+  $imprecision=$args->argValue('imprecision',0);
+  $footerRecognizer=$args->argValue('footerRecognizer','Page');
+  $footerLinesCount=$args->argValue('footerLinesCount',1);
+  $headerRecognizer=$args->argValue('headerRecognizer','----');
+  $headerLinesCount=$args->argValue('headerLinesCount',1);
+
+  $requiredColumns=$args->argValue('requiredColumns','');
+
+  $doExport=$args->argValue('export');
+  $doCreateForm=$args->argValue('create-form');
+  $doCreateBS3Form=$args->argValue('create-bs3-form');
+  $cfgFieldPrefix=$args->argValue('field-prefix','');
+  $doDump=$args->argValue('dump');
+  $doListTables=$args->argValue('list-tables');
+  $doListFields=$args->argValue('list-fields');
+  $doTableStructure=$args->argValue('table-structure');
+  $doTableStructureSQL=$args->argValue('table-structure-sql');
+  $targetCharset=$args->argValue('charset');
+  $keys=explode(',',$args->argValue('keys'));
+  foreach($keys as $k=>$v)
+    $keys[$k]=strtolower($v);
+
+  $firstRow=$args->argValue('firstRow',0);
+  $rowCount=$args->argValue('rowCount',-1);
+  $enumerateRows=$args->argValue('enumerateRows');
+
+  $commitCount=$args->argValue('commit',100);
+
+  if ($doClean && (!$doImport))
+    displayError("ERROR: You can use clean switch only with import");
+
+  if (($doImport) && (($doExport) || ($doDump) || ($doCreateForm) || ($doCreateBS3Form)))
+    displayError("ERROR: You cannot use export/dump/create-form/create-bs3-form and import at the same time");
+
+  if (($doImport || $doExport || $doDump || $doCreateForm || $doCreateBS3Form) && ($doListTables || $doTableStructure || $doTableStructureSQL || $doListFields))
+    displayError("ERROR: You cannot export/import/dump/create-form/create-bs3-form while showing table structures or listing tables");
+
+  if ($doListTables && ($doTableStructure || $doTableStructureSQL || $doCreateForm || $doCreateBS3Form))
+    displayError("ERROR: You cannot show table structure and list tables or create a form at the same time");
+  if ($doCreateForm)
+    if ($doCreateForm==__TRUE__)
+      displayError("ERROR: You need to supply a form name");
+
+  if ($doCreateBS3Form)
+    if ($doCreateBS3Form==__TRUE__)
+      displayError("ERROR: You need to supply a form name");
+
+  $relFileName=$args->argValue('generate-glue');
+  // check db connection details
+  getDBArgs($args);
+
+  if (($dbDef>'') && ($args->argValue('help')==false)) {
+    if (($dbSQL>'') && ($dbTable>'')) {
+      displayError("ERROR: You cannot use sql and table at the same time");
+    } else {
+
+      /*
+        * types returned by typeIndex()
+        * 0 - undefined
+        * 1 - boolean
+        * 2 - integer
+        * 3 - float
+        * 4 - string or big number
+      */
+
+      if (($doImport) && ($dbSQL>''))
+        displayError("ERROR: You cannot import using a sql command");
+      else {
+        /*
+         * load minimal yeapf in order to use db* functions
+         * first, we inhibit the auto db connection
+         */
+        $dbConnect=0;
+
+        _LOAD_YEAPF_();
+
+        if (db_connect($dbType, $dbHost, $dbName, $dbUser, $dbPass)) {
+          set_time_limit(0);
+          if ($doListTables) {
+            /*
+             * emite uma lista das tabelas do banco em questão
+             * uma tabela por linha sem maiores detalhes
+             */
+            $dbList=db_tableList();
+            foreach($dbList as $d)
+              echo $d."\n";
+
+          } else if ($doTableStructure || $doTableStructureSQL || $doCreateForm || $doCreateBS3Form) {
+            /*
+             * emite uma lista de cada campo da tabela dada do banco em questão
+             * tenta usar a unificação de nomes de campos e tamanho do YeAPF
+             */
+            $dbFieldList=db_fieldList($dbTable);
+            $maxWidth=0;
+            foreach ($dbFieldList as $fieldDef) {
+              foreach ($fieldDef as $v) {
+                if (strlen($v) > $maxWidth)
+                  $maxWidth = strlen($v);
+              }
+            }
+            $maxWidth+=2;
+            $linha=0;
+            $fieldDefTitle = Array('Name', 'Type', 'Len', 'Dec', 'NULL', 'Default');
+            $outTXT='';
+            $outSQL='';
+            $outHTML='';
+            $outHTMLBS3='';
+            $outFORM='';
+            $IDfieldExists=false;
+
+            foreach($dbFieldList as $fieldDef) {
+              if ($linha==0) {
+                $k=0;
+                foreach($fieldDefTitle as $v) {
+                  if ($k<2)
+                    $v=substr($v.str_repeat(' ',$maxWidth),0,$maxWidth);
+                  $outTXT.="$v\t";
+                  $k++;
+                }
+                $outTXT.="\n";
+              }
+              $linha++;
+              $k=0;
+              foreach($fieldDef as $v) {
+                if ($k<6) {
+                  if ($k<2)
+                    $v=substr($v.str_repeat(' ',$maxWidth),0,$maxWidth);
+                  $outTXT.="$v\t";
+                }
+                $k++;
+              }
+              $outTXT.="\n";
+
+              if ($outHTML>'') {
+                $outHTML.="\n";
+                $outHTMLBS3.="\n";
+                $outFORM.=",\n";
+              }
+
+              if ($outSQL>'')
+                $outSQL.=",\n";
+              $fieldType=$fieldDef[1]=='DECIMAL'?'DECIMAL(10,'.$fieldDef[3].')':$fieldDef[1];
+              $fieldName=strtoupper($fieldDef[0])=='USER'?'"USER"':$fieldDef[0];
+              if (strtoupper(unquote($fieldName))=='ID')
+                $IDfieldExists=true;
+              $outSQL.="\t".$fieldName.' '.$fieldType;
+              if (($fieldDef[1]=='VARCHAR') || ($fieldDef[1]=='CHAR'))
+                $outSQL.="(".$fieldDef[2].") ";
+              if ($fieldDef[3]=='YES')
+                $outSQL.="NULL ";
+
+
+              if (strpos("*".strtoupper($fieldDef[1]),'CHAR')>0) {
+                $auxFieldType='char';
+                $auxFieldSize=min(60,intval($fieldDef[2]*0.5)+4);
+              } else {
+                $auxFieldType='integer';
+                if ($fieldDef[3]>0)
+                  $auxFieldType='decimal';
+                $auxFieldSize=8;
+              }
+
+              $bs3md=12;
+              if ($auxFieldSize<40)
+                $bs3md=max(2, floor($auxFieldSize*12/40));
+
+              $auxFieldDef="<input type=text name='$cfgFieldPrefix$fieldName' id='$cfgFieldPrefix$fieldName' size=$auxFieldSize value='#($cfgFieldPrefix$fieldName)'>";
+              if ($fieldDef[2]=='TEXT') {
+                $aucFieldDef="<textarea name='$cfgFieldPrefix$fieldName' id='$cfgFieldPrefix$fieldName' cols=80 rows=6>#($fieldName)</textarea>";
+              }
+
+              $outHTML.="    <span class=fieldEntry>\n        <div class=fieldTitle>$cfgFieldPrefix$fieldName</div>\n        <div class=fieldValue>$auxFieldDef</div>\n    </span>";
+
+              $outHTMLBS3.="\t\t\t\t\t\t<div class='col-md-$bs3md'>\n";
+              $outHTMLBS3.="\t\t\t\t\t\t\t<label class='control-label' for='$cfgFieldPrefix$fieldName'>$fieldName<p class='help-block'>Explain $fieldName</p></label>\n";
+              $outHTMLBS3.="\t\t\t\t\t\t\t<input id='$cfgFieldPrefix$fieldName' name='$cfgFieldPrefix$fieldName' placeholder='bla-bla-bla' class='form-control ' type='text'>\n";
+              $outHTMLBS3.="\t\t\t\t\t\t</div>\n";
+
+              $outFORM.="  $cfgFieldPrefix$fieldName: $auxFieldType";
+            }
+
+            if (!$IDfieldExists)
+              $outSQL="\tid char(32),\n$outSQL";
+            $outSQL="CREATE TABLE $dbTable ( \n$outSQL \n);\n";
+
+            $outHTML="<form method='post' name=f$dbTable$cfgFieldPrefix id=f$dbTable$cfgFieldPrefix>\n$outHTML\n</form>\n";
+            $outFORM="table='$dbTable';\nfields {\n$outFORM\n};";
+
+            $outHTMLBS3="\t<div class='row clearfix'>\n\t\t<div class='col-md-12 column'>\n\t\t\t<form class='form' name=f$dbTable class='form-horizontal'>\n\t\t\t\t<fieldset>\n\t\t\t\t\t<legend class='text-primary'>Fields for `$dbTable` table</legend>\n\t\t\t\t\t<div class='form-group'>\n$outHTMLBS3</div>\n\t\t\t\t\t<div class='col-md-12'><button
+             type='button' class='btn btn-default' id='".$dbTable."Save'><span class='glyphicon glyphicon-ok' aria-hidden='true'></span>&nbsp;Save</button>\n\t\t\t\t\t<button type='button' class='btn btn-default' id='".$dbTable."Cancel'><span class='glyphicon glyphicon-remove' aria-hidden='true'></span>&nbsp;Cancel</button></div>\n\t\t\t\t</fieldset>\n\t\t\t</form>\n\t\t</div>\n\t</div>";
+
+            if ($doTableStructureSQL)
+              echo $outSQL;
+            else if ($doCreateForm || $doCreateBS3Form) {
+              if ($doCreateForm)
+                $f=fopen("$doCreateForm.html", "w");
+              else
+                $f=fopen("$doCreateBS3Form.html", "w");
+              if ($f) {
+                if ($doCreateForm)
+                  fwrite($f, $outHTML);
+                else
+                  fwrite($f, $outHTMLBS3);
+                fclose($f);
+                if ($doCreateForm)
+                  $f=fopen("$doCreateForm.form", "w");
+                else
+                  $f=fopen("$doCreateBS3Form.form", "w");
+                if ($f) {
+                  fwrite($f, $outFORM);
+                  fclose($f);
+                }
+              }
+            }
+            else
+              echo $outTXT;
+
+          } else if ($doListFields) {
+            /*
+             * gera uma lista de campos
+             * serve para poder comparar nomes com outros campos em outra tabela/banco
+             */
+            $dbFieldList=db_fieldList($dbTable);
+            $maxWidth=0;
+            foreach($dbFieldList as $fieldDef)
+              foreach($fieldDef as $v) {
+                if (strlen($v)>$maxWidth)
+                  $maxWidth=strlen($v);
+              }
+            $maxWidth+=2;
+
+            foreach($dbFieldList as $fieldDef)
+              echo $fieldDef[0]."\n";
+          } else if ($relFileName!='') {
+            /*
+             * gera os comandos necessários para migrar de uma tabela a
+             * outra qujos nomes de campos são diferentes dos da original.
+             * Isto é especialmente útil quando já importou os dados para uma tabela mas
+             * ela não tem a mesma estrutura desejada.  Para solucionar isso,
+             * gere duas listas de nomes de campos com --list-fields para as duas tabelas
+             * Depois analise e gere o arquivo .rel com a seguinte estrutura:
+             * nome-do-campo-destino <:> nome-do-campo-origem
+             * O nome da tabela destino é o mesmo do arquivo
+             * O nome da tabela origem é o indicado com --table
+             */
+            if (file_exists("$relFileName.rel")) {
+              $relations=file("$relFileName.rel");
+              $dstFieldList='';
+              $srcFieldList='';
+              $srcType=array();
+              $srcQueries=array();
+              $srcStrLimits=array();
+              $srcSplitter=array();
+              $relLineNum=0;
+              foreach($relations as $rel) {
+                $relLineNum++;
+                $rel=str_replace("\n",' ',$rel);
+                $dstField = getNextValue($rel,':');
+                if ($srcFieldList>'') {
+                  $srcFieldList.=', ';
+                  $dstFieldList.=', ';
+                }
+                $dstFieldList.=$dstField;
+                $srcFieldName = getNextValue($rel);
+
+                $srcNdx=count($srcType);
+                if (strpos($srcFieldName,'(')!==FALSE) {
+                  /* o tipo pode ser indicado entre parentesis.  fbdate, char
+                   * pode conter uma query como tipo de analise tb
+                   * exemplos:
+                   *   data_nasc: (dt_nascimento: fbdate)
+                   *   educacao: (formacao: query(1: 'analfabeto', 2: 'primario', 3: 'superior-incompleto'))
+                   *   educacao: (formacao: query("select tipo_formacao, nome_formacao from tb_formacao"))
+                   *   sobrenome: (nome_fulano: split('nomes', 2))
+                   *   ddd: (fone: split('telefone', 1))
+                   */
+
+                  $srcFieldName=unparentesis($srcFieldName);
+                  $p=new xParser($srcFieldName);
+                  $p->get($srcFieldName, $tokenType);
+                  if (!$p->eof()) {
+                    $p->get($token, $tokenType);
+                    if ($token==':') {
+                      $p->get($token, $tokenType);
+                      $token=strtolower($token);
+
+                      $srcType[$srcNdx]=$token;
+                      $srcQueries[$srcNdx]=array();
+
+                      if ($token=='query') {
+                        if ($p->getExpectingType($token, 4)) {
+                          if ($token=='(') {
+                            $querySeq=0;
+                            while ((!$p->eof()) && ($token!=')')) {
+                              $p->get($returnValue, $tokenType);
+                              if (($p->getExpectingType($token, 4)) && ($token==':')) {
+                                $p->get($keyValue, $tokenType);
+                                $srcQueries[$srcNdx][unquote($returnValue)]=$keyValue;
+                                // ',' ou ')'
+                                $p->get($token, $tokenType);
+                              } else if (($querySeq==0) && ($tokenType==5)) {
+                                $sql=unquote($returnValue);
+                                $queryArray=db_queryAndFillArray($sql);
+                                foreach($queryArray as $k=>$v) {
+                                  $ak=array_keys($v);
+                                  $srcQueries[$srcNdx][$v[$ak[0]]]=$v[$ak[1]];
+                                }
+                              } else
+                                displayError("ERROR: Was expeted a ':' after '$returnValue' value on query definition in .rel file at line $relLineNum");
+                              $querySeq++;
+                            }
+                          } else
+                            displayError("ERROR: Was expected a '(' after ':' on query definition in .rel file line $relLineNum");
+                        } else
+                          displayError("ERROR: Was expected a '(' after 'query' in .rel file line $relLineNum");
+                      } else if ($token=='split') {
+                        if ($p->getExpectingType($token, 4)) {
+                          if ($token=='(') {
+                            $p->get($funcName, $tokenType);
+                            $funcName=unquote($funcName);
+                            if (($p->getExpectingType($token, 4)) && ($token==',')) {
+                              $p->get($splitNdx, $tokenType);
+                            } else
+                              $splitNdx=0;
+                            $srcSplitter[$srcNdx]['funcName']=$funcName;
+                            $srcSplitter[$srcNdx]['splitNdx']=$splitNdx;
+                            $srcType[$srcNdx]='char';
+                          } else
+                            displayError("ERROR: Was expected a '(' after ':' on query definition in .rel file line $relLineNum");
+                        }
+                      } else if ($token=='substr') {
+                        if ($p->getExpectingType($token, 4)) {
+                          if ($token=='(') {
+                            $p->get($strLength, $tokenType);
+                            $p->get($token, $tokenType);
+                            if ($token==',') {
+                              $p->get($strStart, $tokenType);
+                            } else
+                              $strStart=0;
+                            $srcStrLimits[$srcNdx]['strLength']=$strLength;
+                            $srcStrLimits[$srcNdx]['strStart']=$strStart;
+                            $srcType[$srcNdx]='char';
+                          } else
+                            displayError("ERROR: Was expected a '(' after ':' on query definition in .rel file line $relLineNum");
+                        }
+                      } else if ($token=='constant') {
+                        $srcFieldName="\"$srcFieldName\" as K$srcNdx";
+                      } else {
+                        $srcType[$srcNdx]=$token;
+                      }
+                    } else
+                      displayError("ERROR: Was expected a ':' after field name in .rel file line $relLineNum");
+                  }
+
+                } else
+                  $srcType[$srcNdx]='';
+
+                if (strpos($srcFieldName,' as ')===FALSE)
+                  if (!db_fieldExists($dbTable, $srcFieldName))
+                    $srcFieldName='null';
+                $srcFieldList.=$srcFieldName;
+              }
+
+              $sql="select $srcFieldList from $dbTable";
+              $sqlLineNumber=0;
+              $qq=db_query($sql);
+              while ($dd=db_fetch_row($qq)) {
+                $sqlLineNumber++;
+
+                $fieldValues='';
+                $fNdx=0;
+                foreach($dd as $value) {
+                  $value=trim($value);
+                  if ($srcType[$fNdx]=='') {
+                    $n=typeIndex($value,true);
+                    if ($n==0)
+                      $value='NULL';
+                  } else
+                    $n=$srcType[$fNdx];
+
+                  switch($n)
+                  {
+                    case '4':
+                    case '1':
+                    case 'char':
+                      if (strtoupper(unquote($value))=="NULL")
+                        $value='NULL';
+                      else {
+                        if (isset($srcStrLimits[$fNdx]))
+                          $value=substr($value, $srcStrLimits[$fNdx]['strStart'], $srcStrLimits[$fNdx]['strLength']);
+                        if (isset($srcSplitter[$fNdx])) {
+                          $funcName=$srcSplitter[$fNdx]['funcName'];
+                          $splitNdx=$srcSplitter[$fNdx]['splitNdx'];
+                          if (function_exists($funcName)) {
+                            $value=$funcName($value,$splitNdx);
+                          } else {
+                            displayError("ERROR: function '$funcName()' not defined");
+                            die();
+                          }
+                        }
+                        $value="'$value'";
+                      }
+                      break;
+                    case 'fbdate':
+                      if (strtoupper(unquote($value))=="NULL")
+                        $value='NULL';
+                      else {
+                        $data=extractDateValues(soNumeros($value),'mmddyyyyHHMMSS');
+                        if (!isset($data['year']) || ($data['year']<'1899')) {
+                          $value='null';
+                        } else {
+                          $value=dateTransform(soNumeros($value),'mmddyyyyHHMMSS','mm-dd-yyyy');
+                          $value="'$value'";
+                        }
+                      }
+                      break;
+                    case 'query':
+                      if (isset($srcQueries[$fNdx][$value]))
+                        $value=$srcQueries[$fNdx][$value];
+                      else
+                        $value='null';
+                      break;
+                    case 'integer':
+                      $value=intval($value);
+                      break;
+                  }
+
+
+                  if ($fieldValues>'')
+                    $fieldValues.=', ';
+                  $fieldValues.=$value;
+
+                  $fNdx++;
+                }
+                $sql="insert into $relFileName ($dstFieldList) values ($fieldValues)";
+                // echo "// $sqlLineNumber:\n";
+                echo "$sql;\n";
+                db_sql($sql);
+              }
+            } else
+              displayError("ERROR: File not exists '$relFileName.rel'");
+          } else if ($doExport) {
+            /*
+             * exporta a tabela ou comando sql para o csv indicado
+             */
+            if (trim($dbSQL).trim($dbTable)=='')
+              displayError("ERROR: You need to indicate a table name or a SQL command");
+            else {
+              if ($doExport==__TRUE__) {
+                displayError("ERROR: You need to supply an output file name");
+              } else {
+                if ($dbTable>'')
+                  $dbSQL="select * from $dbTable";
+
+                $dbSQL=unquote($dbSQL);
+                echo "$dbSQL\n";
+                if (file_exists($dbSQL))
+                  $dbSQL=join(' ', file($dbSQL));
+
+                $header='';
+                $firstLine=true;
+
+                $f=@fopen("$doExport.csv","w");
+                if ($f) {
+                  _dump("$dbSQL");
+                  // firstRow?
+                  // rowCount?
+                  $exportedLines=0;
+                  $q=db_query("$dbSQL");
+                  while ($d=db_fetch_array($q,false,false)) {
+                    $dataLine=db_exportLine($d,$header);
+                    if ($targetCharset)
+                      $dataLine=mb_convert_encoding($dataLine,$targetCharset,mb_detect_encoding($dataLine));
+
+                    if ($firstLine) {
+                      fwrite($f,"$header\n");
+                      $firstLine=false;
+                    }
+                    fwrite($f,"$dataLine\n");
+                    $exportedLines++;
+                  }
+                  echo "$exportedLines lines exported into '$doExport'\n";
+                  echo date('d/m/Y H:i:s');
+                  echo "\n";
+                  fclose($f);
+                } else
+                  die ("ERROR: Impossible to create file '$doExport'");
+
+              }
+            }
+          } else if ($doDump) {
+            if (db_connectionTypeIs(_MYSQL_)) {
+              if (trim($dbSQL).trim($dbTable)=='')
+                displayError("ERROR: You need to indicate a table name or a SQL command");
+              else {
+                if ($dbTable>'')
+                  $dbSQL="select * from $dbTable";
+
+                $dbSQL=unquote($dbSQL);
+                if (file_exists($dbSQL))
+                  $dbSQL=join(' ', file($dbSQL));
+
+                $outFileP=strpos(strtoupper($dbSQL), ' OUTFILE ');
+                if ($outFileP==0) {
+                  $fromP=strpos(strtoupper($dbSQL),' FROM ');
+                  $dbSQL=substr($dbSQL,0,$fromP)." INTO OUTFILE '$doDump.sql' ".substr($dbSQL,$fromP);
+                }
+
+                echo "$dbSQL\n";
+                db_sql($dbSQL);
+              }
+
+            } else
+              die("ERROR: DUMP can be used only with mysql databases");
+          } else if ($doImport) {
+
+            if ($doClean)
+              db_sql("delete from $dbTable");
+
+            if (!file_exists("$doImport.csv")) {
+              if (file_exists("$doImport.txt")) {
+                txt2csv(function($errorLevel, $message) {
+                          if ($errorLevel<2)
+                            echo $message;
+                          else
+                            displayError($message);
+                        },
+                        "$doImport.txt",
+                        "$doImport.csv",
+                        $imprecision,
+                        $headerRecognizer, $headerLinesCount,
+                        $footerRecognizer, $footerLinesCount,
+                        $keys, $requiredColumns);
+              } else
+                echo "$doImport.txt does not exists\n";
+            } else
+              echo "using $doImport.csv\n";
+            /*
+             * importa o .csv na tabela indicada
+             */
+
+            $doImportData = !($args->argValue('dontImportData') == __TRUE__);
+            $doDeleteEmptyFields = !($args->argValue('dontDeleteEmptyFields') == __TRUE__);
+            $doModifyStructure = !($args->argValue('dontModifyStructure') == __TRUE__);
+            $doForceCreateTable = $args->argValue('forceCreateTable');
+
+            csvImport(function ($errorLevel, $message) {
+                        if ($errorLevel<2)
+                          echo $message;
+                        else
+                          displayError($message);
+                      },
+                      $dbTable, $keys, $doImport, $firstRow, $rowCount,
+                      $doImportData, $doForceCreateTable, $doDeleteEmptyFields, $doModifyStructure,
+                      $targetCharset, $commitCount,
+                      $enumerateRows);
+          }
+        }
+      }
+    }
+  }
+
+  // help the user with command line arguments.
+  if (($args->argValue('h;help')==true) || ($args->optionCount()==0)) {
+    $myself=$argv[0];
+    echo "YeAPF 0.8.56 $myself \nCopyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+    echo "YeAPF dbtools*\nusage:";
+    echo "\n\t[--db <host:database name>]\tdatabase identification";
+    echo "\n\t[--user <user name>]\t\tdatabase user name";
+    echo "\n\t[--pass <user password>]";
+    echo "\n\t[--type <mysql|firebird|postgresql>]";
+    echo "\n\t[--sql '<select statement|sql text file>']\tsql command to export data.  Cannot be used with 'table' or 'import' options";
+    echo "\n\t[--table <table name>]\t\tname of the table to be dumped/exported/imported";
+    echo "\n\t[--dump <file name>]\t\texport to 'file name'.sql (requires table name or sql and works on mysql)";
+    echo "\n\t[--create-form <file name>]\t\tcreate 'file name'.html (requires table name)";
+    echo "\n\t[--create-bs3-form <file name>]\t\tcreate bootstrap3 'file name'.html (requires table name)";
+    echo "\n\t[--field-prefix <prefix>]\t\tprefix to add in front of fieldnames";
+    echo "\n\t[--export <file name>]\t\texport to 'file name'.csv (requires table name or sql)";
+    echo "\n\t[--import <file name>]\t\timport from 'file name'.csv or .txt in that order** (requires table name)";
+    echo "\n\t[--imprecision <string>]***\t\tNumber of characters +/- to be considered as being part of a field";
+    echo "\n\t[--headerRecognizer <string>]***\t\tString used to recognize the header";
+    echo "\n\t[--headerLinesCount <number>]***\t\tNumber of lines on header";
+    echo "\n\t[--footerRecognizer <string>]***\t\tString used to recognize the footer";
+    echo "\n\t[--footerLinesCount <number>]***\t\tNumber of lines on footer";
+    echo "\n\t[--clean]\t\t\tclean the table before import data (requires --import)";
+    echo "\n\t[--enumerateRows]\t\tadd a column named 'rowno' with sequential row number";
+    echo "\n\t[--imprecision <number>]\tindicates how imprecise need to be the .txt column discovering (default:0)";
+    echo "\n\t[--keys <key1, key2 ... keyN>]\tused with 'import' verb to update existing data";
+    echo "\n\t[--requiredColumns <col1, col2 ... colN>]\t\tused with 'import' verb to recognize valid data";
+    echo "\n\t[--commit <statement-count>]\tcommit sql transaction each 'statement-count'. default=100";
+    echo "\n\t[--firstRow <number>]\t\tfirst row to be imported/exported";
+    echo "\n\t[--rowCount <number>]\t\tnumber or row to be imported/exported";
+    echo "\n\t[--dontImportData]\t\tJust create the table";
+    echo "\n\t[--dontModifyStructure]\t";
+    echo "\n\t[--dontDeleteEmptyFields]\t";
+    echo "\n\t[--charset <utf8|iso8859-1|...>]\ttarget charset when importing/exporting.";
+    echo "\n\t[--helper <file name>\t\tName of helper .php function file]";
+    echo "\n\t[--list-tables]";
+    echo "\n\t[--forceCreateTable]";
+    echo "\n\t[--table-structure]";
+    echo "\n\t[--table-structure-sql]";
+    echo "\n\t[--list-fields]";
+    echo "\n\t[--generate-glue <target table name>]\tGenerate a list of insert commands (req. <table>.rel)";
+    echo "\n\t\t\t\tThese commands can be used to migrate data from one table to other";
+    echo "\n\t\t\t\tThe <table>.rel you need to create representing the relation between fields names";
+    echo "\n\n* You can put your own functions in 'ydbmigrate.functions.php'";
+    echo "\n** If .csv file does not exists, it tries to create from .txt file\n*** Only can be used with --import options\n";
+    die("");
+  }
+?>

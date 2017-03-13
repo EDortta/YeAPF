@@ -1,0 +1,80 @@
+#!/usr/bin/php -q
+<?php
+/*
+    tools/ywscreate
+    YeAPF 0.8.56-1 built on 2017-03-13 15:34 (-3 DST)
+    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
+    2016-10-12 15:33:14 (-3 DST)
+*/
+    
+  $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
+  (@include_once "$mydir/yclilib.php") or die("yclilib.php not found\n");
+
+  $args = new ArgumentsProcessor();
+  $wsName=$args->getSrc(0);
+  $toHelp=$args->argValue('help',__FALSE__)==__TRUE__;
+  $canUpdate=$args->argValue('update',__FALSE__)==__TRUE__;
+  $wsPort=$args->argValue('port','9000');
+  $wsBindAddress=$args->argValue('host','localhost');
+
+  if (($wsName=='') || ($toHelp)) {
+    echo "simple usage:\n\t".basename("tools/ywscreate")." service-name [options]\n\n";
+    echo "options:\n";
+    echo "\t--help\n";
+    echo "\t--update\tallow to update local library\n";
+    echo "\t--port <integer-number> (defaults to 9000)\n";
+    echo "\t--host <host-name or ip> (defaults to localhost)\n";
+    die();
+  }
+
+  _LOAD_YEAPF_();
+
+  $wsEmpty=dirname($yeapfConfig['yeapfPath']).'/skel/service/WebSocketEmptyImplementation.php';
+
+  if (!file_exists("$wsEmpty")) {
+    die("file '$wsEmpty' was not found\n");
+  }
+
+
+  if (!file_exists("ws$wsName.php")) {
+    echo "Using $wsEmpty\n";
+    $WebSocketImplementation = _file("$wsEmpty");
+    $f=fopen("ws$wsName.php","w");
+    fwrite($f,$WebSocketImplementation);
+    fclose($f);
+
+    echo "ws$wsName.php created\n";
+  } else
+    echo "ws$wsName.php already exists. Untouched.\n";
+
+  foreach(glob(dirname($yeapfConfig['yeapfPath']).'/skel/service/*') as $srvFilename) {
+    $localName=basename($srvFilename);
+    if ($localName!='wsEmptyImplementation.php') {
+      $source_stat = stat($srvFilename);  $source_stat=$source_stat['mtime'];
+      if (file_exists($localName)) {
+        $target_stat = stat($localName);  $target_stat=$target_stat['mtime'];
+      } else
+        $target_stat=0;
+
+      if ($source_stat>$target_stat) {
+        if ($target_stat==0) {
+          $canDo=true;
+          $verb="Installing";
+        } else {
+          $canDo=$canUpdate;
+          $verb="Updating";
+        }
+
+        if (!$canDo)
+          $verb="Untouched";
+
+        echo "$verb $localName\n";
+        if ($canDo) {
+          copy($srvFilename, $localName);
+        }
+      }
+    }
+  }
+
+
+?>

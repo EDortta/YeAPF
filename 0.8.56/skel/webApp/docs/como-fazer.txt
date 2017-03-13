@@ -1,0 +1,22 @@
+Roteiro de criação de aplicativo YeAPF
+1) crie uma pasta vazia (torne www-data ou http segundo seu caso o proprietário da pasta e os arquivos que ali iremos colocar).  Caso esteja usando linux, de direitos 0774 para a pasta.
+2) crie seu banco de dados e um arquivo yeapf.db.ini (tem uma copia vazia no YeAPF/appSkeleton).  preencha os campos necessários para a conexão com o banco.  Preste especial atenção aos campos que começam com 'usr'.  Eles vão definir como trabalha o esquema de segurança.
+3) crie links simbólicos de YeAPF/appSkeleton/configure.php e /YeAPF/appSkeleton/index.php e /YeAPF/appSkeleton/body.php
+4) crie a pasta 'logs' caso queira que o sistema registre a atvidade do YeAPF.  Torne www-data (se for debian,ubuntu,etc) o próprietário da pasta.
+5) crie a pasta includes (www-data ou http como proprietario)
+6) crie includes/security.php e a rotina tryLogon($usuario, $senha) que devolve o GID do usuário se o usuário está conectado, porém não implemente ainda, já que precisará rodar index.php primeiro.
+7) execute configure.php
+8) se tudo deu certo, verá as mensagens de configuração do YeAPF na tela, se deu errado, verifique permissões e config do banco
+9) execute index.php. observe no seu banco de dados que aparecerão algumas tabelas.
+10) crie f_logon.html (tem uma copia pronta em YeAPF/appSkeleton) com os campos chamados q2 para nome de usuário e q1 para senha
+11) implemente includes/security.php - tryLogon().  Assim que o usuário consiga conectar-se, a variável 'u' será criada e conterá o identificador de sessão para o usuário.
+12) crie um arquivo e_index.html com a tela inicial do programa (geralmente contém os frames iniciais)
+13) crie e_main_body.html para responder ao evento universal "buildMainBody"
+14) crie e_footer_body.html para responder ao evento universal "getAppFooter"
+15) crie e_logoff.html para responder ao evento universal "logoff"
+16) crie o e_body.html que vai servir TODOS os frames criados pelo aplicativo
+17) crie sua folha de estilos em cascata (css) usando o nome dado no yeapf.db.ini (appName).  (i.e. se seu app se chama 'teste', crie 'teste.css')
+
+
+Criando pesquisas dinâmicas
+1) vincule dinâmicamente query.php, yMessages.php e e_body.xml a partir de /YeAPF na sua pasta
