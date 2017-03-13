@@ -1,15 +1,19 @@
 <?php
 /*
     includes/yeapf.debug.php
-    YeAPF 0.8.56-1 built on 2017-03-13 15:34 (-3 DST)
+    YeAPF 0.8.56-3 built on 2017-03-13 16:30 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-02-17 17:02:24 (-3 DST)
+    2017-03-13 16:29:12 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
   function yeapfVersion() {
     return "0.8.56";
+  }
+
+  function yeapfBaseDir() {
+    return dirname(__FILE__);
   }
 
   function globalDebug($flag)
