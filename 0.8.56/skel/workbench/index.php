@@ -15,7 +15,7 @@
       $fileList = file("$dBody.files");
       foreach($fileList as $f) {
         $f=str_replace("\n", "", $f);
-        // echo "<div>file: $f</div>"; 
+        // echo "<div>file: $f</div>";
         unlink("$f");
       }
       unlink("$dBody.files");
@@ -106,7 +106,7 @@
                     $newName=str_replace(".$ext", "$extension.$ext", $srcFile);
                     $fileContent=minify_js($fileContent);
                   }
-                }                
+                }
               }
               $dir=dirname($newName);
               if (!is_dir("production/$xBody/$dir")) {
@@ -133,6 +133,7 @@
           manter o cabeçalho feito pelo usuário. ou seja, a parte entre o <body> e o 'tnContainer'
           avisar ao aplicativo sobre uma pagina modificada. compilar essa página imediatamente.
           botao para compilacao em cada pagina
+          permitir marcar uma pagina como indisponivel
       */
 
       file_put_contents($newHTMLname, $html_out);
@@ -217,7 +218,7 @@
           if (!file_exists("www/css/$newPageName.css")) {
             /* creating css file */
             $scriptName=ucfirst($newPageName);
-            $newScript = _file("tp_skel.css"); 
+            $newScript = _file("tp_skel.css");
             file_put_contents("www/css/$newPageName.css", $newScript);
             chmod("www/css/$newPageName.css", 0777);
           }

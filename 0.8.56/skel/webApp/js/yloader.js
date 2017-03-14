@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.56-3 built on 2017-03-13 16:30 (-3 DST)
+  * YeAPF 0.8.56-6 built on 2017-03-14 17:18 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-03-13 16:30:21 (-3 DST)
+  * 2017-03-14 17:18:54 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.56-3 built on 2017-03-13 16:30 (-3 DST)");
+ console.log("YeAPF 0.8.56-6 built on 2017-03-14 17:18 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -1493,7 +1493,7 @@
      function isNumber(n) {
        if (typeof n === 'string') {
          var f=n.toFloat();
-         if (f==n)
+         if (!isNaN(f))
            n=f;      
        }
        return !isNaN(parseFloat(n)) && isFinite(n);
