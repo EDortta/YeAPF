@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.56-6 built on 2017-03-14 17:18 (-3 DST)
+ * YeAPF 0.8.56-15 built on 2017-03-16 09:54 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-03-14 17:04:37 (-3 DST)
+ * 2017-03-16 09:17:42 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -10,6 +10,7 @@
 **********************************************/
 
 
+/*
 /*
  * dom shortcut 'y$()'
  */
@@ -21,8 +22,17 @@
       if (aElementId.substr(0,1)=='#')
         aElementId = aElementId.substr(1);
       ret = document.getElementById(aElementId);
-      if (!ret)
-        ret = document.getElementsByName(aElementId)[0];
+      if (!ret) {
+        ret = document.getElementsByName(aElementId);
+        if (ret.length) {
+          if (ret.length==1)
+            ret=ret[0];
+          if (ret.length===0)
+            ret=undefined;
+        } else {
+          ret=undefined
+        }
+      }
       if (!ret) {
         /* search by classes */
         var c, className, classes = aElementId.split(' '), classesReturn = undefined, first=true;
@@ -140,7 +150,7 @@ function $frameOwner(aName, aType) {
 }
 
 function isSSL() {
-  return (window.location.href.indexOf("https://")==0);
+  return (window.location.href.indexOf("https://")===0);
 }
 
 function produceWaitMsg(msg) {
@@ -184,7 +194,7 @@ if (typeof getElementsByClassName=="undefined") {
         if (oCurrent.hasClass(aClassName))
           arrReturnElements.push(oCurrent);
     }
-    if (arrReturnElements==null)
+    if (arrReturnElements===null)
       arrReturnElements=document.getElementsByClassName(aClassName);
     return arrReturnElements;
   }
@@ -587,14 +597,18 @@ if (!String.prototype.toFloat) {
   String.prototype.toFloat = function () {
     n=this;
     n=n.replace(":", "");
-    var p=n.indexOf('.'),
-        c=n.indexOf(',');
-    if (p<c) {
-      n=n.replace(".", "");
+    if (n.match(/^-?(\d*[,.]){1,2}?\d*$/)) {
+      var p=n.indexOf('.'),
+          c=n.indexOf(',');
+      if (p<c) {
+        n=n.replace(".", "");
+      }
+      n=n.replace(",", ".");    
+      return parseFloat(n);
+    } else {
+      return NaN;
     }
-    n=n.replace(",", ".");    
-    return parseFloat(n);
-  }
+  };
 }
 
 Function.prototype.method = function (name, func) {

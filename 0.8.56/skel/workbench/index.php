@@ -126,6 +126,7 @@
 
       /*
         falta:
+          impedir a geração/eliminação de página de forma concomitante
           indicar a ordem das páginas (ao menos qual é a inicial)
           indicar se https é obrigatorio
           indicar quais os js e css obrigatorios em 'todas' as paginas (ou -o que é o mesmo- no projeto)
@@ -134,6 +135,7 @@
           avisar ao aplicativo sobre uma pagina modificada. compilar essa página imediatamente.
           botao para compilacao em cada pagina
           permitir marcar uma pagina como indisponivel
+          mostrar data/hora criação e ultima modificação
       */
 
       file_put_contents($newHTMLname, $html_out);
