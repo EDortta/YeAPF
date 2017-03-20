@@ -3705,15 +3705,7 @@
 <end>231</end>
 </code></xDevelopMSG></classes><filename>yeapf.develop.php</filename>
 <folder>develop</folder>
-</yeapf.develop.php><ycheckdistsource.php><functions><analiseDistFolder><name>analiseDistFolder</name>
-<parameters><sourceFolder><dummy>ok</dummy>
-</sourceFolder><distFolder><dummy>ok</dummy>
-</distFolder></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
-<start>20</start>
-<end>51</end>
-</code></analiseDistFolder></functions><filename>ycheckdistsource.php</filename>
-<folder>tools%2FdistributionBuilder</folder>
-</ycheckdistsource.php><configure.php><functions><getSgugPath><name>getSgugPath</name>
+</yeapf.develop.php><configure.php><functions><getSgugPath><name>getSgugPath</name>
 <parameters><base><dummy>ok</dummy>
 </base></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>25</start>
