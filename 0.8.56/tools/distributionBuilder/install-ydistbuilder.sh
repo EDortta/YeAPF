@@ -22,7 +22,9 @@ cp ydistbuilder /usr/bin/
 cp yviewdistinfo /usr/bin/
 cp ydocbuilder /usr/bin/
 cp ydocview /usr/bin/
+cp ycheckdistsource /usr/bin/
 chmod +x /usr/bin/ydistbuilder
 chmod +x /usr/bin/yviewdistinfo
 chmod +x /usr/bin/ydocbuilder
 chmod +x /usr/bin/ydocview
+chmod +x /usr/bin/ycheckdistsource
