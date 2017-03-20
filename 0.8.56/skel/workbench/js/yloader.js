@@ -1,8 +1,8 @@
 /*********************************************
   * skel/workbench/js/yloader.js
-  * YeAPF 0.8.56-18 built on 2017-03-20 08:40 (-3 DST)
+  * YeAPF 0.8.56-19 built on 2017-03-20 19:28 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-03-20 08:40:34 (-3 DST)
+  * 2017-03-20 19:28:52 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.56-18 built on 2017-03-20 08:40 (-3 DST)");
+ console.log("YeAPF 0.8.56-19 built on 2017-03-20 19:28 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com

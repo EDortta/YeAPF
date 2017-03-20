@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ydistbuilder
-    YeAPF 0.8.56-15 built on 2017-03-16 09:54 (-3 DST)
+    YeAPF 0.8.56-19 built on 2017-03-20 19:28 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-04-07 09:12:16 (-3 DST)
+    2017-03-20 19:27:14 (-3 DST)
 */
 
   function getVerFromPath($aPath)
@@ -116,11 +116,13 @@
               echo " ERROR: Cannot be created";
           }
         }
+        
+        $fileStat=stat($fileName);
 
         if ((trim($ext)=='') || (in_array($ext, $textualExtensions))) {
           $file=join("",file($fileName));
 
-          $fileStat=stat($fileName);
+
           $symlist[$fileName] = array();
           $symlist[$fileName]['LAST_FILE_MODIFICATION']=@date('Y-m-d H:i:s',$fileStat['mtime'])." ($utcOffset DST)";
           $symlist[$fileName]['FILE_NAME']=$fileName;
