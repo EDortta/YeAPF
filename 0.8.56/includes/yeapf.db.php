@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.56-15 built on 2017-03-16 09:54 (-3 DST)
+    YeAPF 0.8.56-18 built on 2017-03-20 08:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-09 14:50:01 (-3 DST)
+    2017-03-17 08:50:22 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -730,7 +730,7 @@
     }
 
     $auxSQL=explode('<BR>',$lastCommands);
-    $auxSQL=array_slice($auxSQL, -10);
+    $auxSQL=array_slice($auxSQL, -50);
     $lastCommands=join('<BR>',$auxSQL);
     return $rs;
   }

@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misctools.php
-    YeAPF 0.8.56-15 built on 2017-03-16 09:54 (-3 DST)
+    YeAPF 0.8.56-18 built on 2017-03-20 08:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-05-20 11:34:44 (-3 DST)
+    2017-03-16 13:36:14 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -300,6 +300,11 @@
     $qs=substr($qs,1,strlen($qs));
 
     // echo "$qs<br>";
+  }
+
+  function soCaracteresVisiveis($valor) 
+  {
+    return preg_replace( '/[^[:print:]]/', '', $valor);
   }
 
   function soNumeros($valor)

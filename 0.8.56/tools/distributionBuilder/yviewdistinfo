@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/yviewdistinfo
-    YeAPF 0.8.56-15 built on 2017-03-16 09:54 (-3 DST)
+    YeAPF 0.8.56-18 built on 2017-03-20 08:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2015-01-23 14:44:08 (-3 DST)
+    2017-03-20 08:33:30 (-3 DST)
 */
 
   $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
@@ -35,6 +35,7 @@
   if ((!file_exists($versionDef)) && ($argc<=1)) {
     if ((is_dir(".distribution")) && (file_exists("version.inf"))) {
       $curVersion = join(file('version.inf'));
+      $curVersion = substr($curVersion,0,strpos($curVersion, "-"));
       $versionDef = ".distribution/$curVersion/version.def";
     }
   }
