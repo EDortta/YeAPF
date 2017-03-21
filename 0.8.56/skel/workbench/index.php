@@ -116,9 +116,11 @@
               file_put_contents("production/$xBody/$newName", $fileContent);
               $auxFiles[] = "production/$xBody/$newName";
 
-              $html_out = str_replace("src=$srcFile", "src='$xBody/$newName'", $html_out);
-              $html_out = str_replace("src='$srcFile'", "src='$xBody/$newName'", $html_out);
-              $html_out = str_replace("src=\"$srcFile\"", "src=\"$xBody/$newName\"", $html_out);
+              $ts=date("U");
+
+              $html_out = str_replace("src=$srcFile", "src='$xBody/$newName?ts=$ts'", $html_out);
+              $html_out = str_replace("src='$srcFile'", "src='$xBody/$newName?ts=$ts'", $html_out);
+              $html_out = str_replace("src=\"$srcFile\"", "src=\"$xBody/$newName?ts=$ts\"", $html_out);
             }
           }
         }
