@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ydebug.js
- * YeAPF 0.8.56-15 built on 2017-03-16 09:54 (-3 DST)
+ * YeAPF 0.8.56-23 built on 2017-03-21 10:00 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-07-11 09:12:31 (-3 DST)
+ * 2017-03-21 09:57:05 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ydebug.js
@@ -87,7 +87,8 @@ function _setLogFlagLevel(aLogFlag, aLevel) {
 function _dumpy(logFlag, logLevel) {
   if (ydbg.logFlag & logFlag) {
     if (ydbg.logLevel>=logLevel) {
-      var aLine = '', aAnArgument;
+      var aLine = '', aAnArgument, ts, d=new Date();
+      ts=d.getHours()+':'+d.getMinutes()+':'+d.getSeconds()+' ';
       for (var i=2; i<arguments.length; i++) {
         if (aLine>'')
           aLine+=', ';
@@ -96,7 +97,7 @@ function _dumpy(logFlag, logLevel) {
           aAnArgument = aAnArgument.toString();
         aLine += aAnArgument;
       }
-      __dump__(aLine);
+      __dump__(ts+aLine);
     }
   }
 
