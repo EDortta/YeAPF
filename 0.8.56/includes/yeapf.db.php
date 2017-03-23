@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.56-18 built on 2017-03-20 08:40 (-3 DST)
+    YeAPF 0.8.56-25 built on 2017-03-23 08:00 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-17 08:50:22 (-3 DST)
+    2017-03-22 07:14:32 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -598,6 +598,7 @@
       _dumpY(4,0,"[$sql]");
       if ((strtoupper(substr($sql,0,6))=='INSERT') ||
           (strtoupper(substr($sql,0,6))=='UPDATE') ||
+          (strtoupper(substr($sql,0,7))=='CREATE') ||
           (strtoupper(substr($sql,0,7))=='REPLACE') ||
           (strtoupper(substr($sql,0,6))=='DELETE')) {
         $updateSQLStatement=true;
@@ -643,7 +644,7 @@
         }
 
       } else if (db_connectionTypeIs(_FIREBIRD_)) {
-        $cfgIbaseUsePrepare=false;
+        $cfgIbaseUsePrepare=true;
         $cfgIbaseUseTransactions=true;
         $transactionOpened=false;
         if (($updateSQLStatement) and ($cfgIbaseUseTransactions)) {
@@ -665,7 +666,11 @@
         while (($sqlErrNo==-913) && ($retryCount>0)) {
           $retryCount--;
           if ($cfgIbaseUsePrepare) {
-            $sth=ibase_prepare($ydb_conn, $transaction, $sql);
+            if ($transactionOpened) {
+              $sth=ibase_prepare($ydb_conn, $transaction, $sql);
+            } else {
+              $sth=ibase_prepare($ydb_conn, $sql);
+            }
             $lastCommands.="$sqlCount) (TRANSACTION PREPARED)<BR>";
             $rs=ibase_execute($sth);
             $lastCommands.="$sqlCount) (TRANSACTION EXECUTED)<BR>";
@@ -681,7 +686,10 @@
           }
           $waitTime*=2;
         }
-
+        /*
+        if(strpos($sql,"into")>0)
+          die(str_replace("<BR>", "\n", intval($updateSQLStatement).".".intval($cfgIbaseUseTransactions).".".intval($cfgIbaseUsePrepare)."\n$sql\n$lastCommands\n"));
+        */
 
         if (($sqlErrNo!=0) && (strpos('LASTACCESS',strtoupper($sql))===FALSE) && (strpos('IS_SQLCACHE',strtoupper($sql))===FALSE)) {
           _dumpY(4,0,"*** ERRO AO EXECUTAR\n$sql");
@@ -700,7 +708,8 @@
         if ($transactionOpened) {
           ibase_commit($transaction);
           $lastCommands.="$sqlCount) (TRANSACTION COMMITED)<BR>";
-          ibase_free_query($sth);
+          if ($cfgIbaseUsePrepare)
+            ibase_free_query($sth);
         }
 
       } else if (db_connectionTypeIs(_PGSQL_)) {

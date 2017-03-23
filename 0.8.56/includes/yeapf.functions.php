@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.56-15 built on 2017-03-16 09:54 (-3 DST)
+    YeAPF 0.8.56-25 built on 2017-03-23 08:00 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-13 14:50:11 (-3 DST)
+    2017-03-22 07:40:18 (-3 DST)
    */
 
   /*
@@ -85,7 +85,12 @@
       $search = array("\\",  "\x00", "\n",  "\r",  "'",  '"', "\x1a");
       $replace = array("\\\\","\\0","\\n", "\\r", "\'", '\"', "\\Z");
 
-      return str_replace($search, $replace, $value);
+      $ret= str_replace($search, $replace, $value);
+
+      if (db_connectionTypeIs(_FIREBIRD_))
+        $ret=str_replace("\\'", "''", $ret);
+
+      return $ret;
   }
 
   $_debugTag=decimalMicrotime();
