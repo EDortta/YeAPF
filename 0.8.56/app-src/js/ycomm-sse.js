@@ -1,8 +1,8 @@
   /********************************************************************
   * app-src/js/ycomm-sse.js
-  * YeAPF 0.8.56-15 built on 2017-03-16 09:54 (-3 DST)
+  * YeAPF 0.8.56-27 built on 2017-03-23 08:40 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-02-01 12:18:31 (-3 DST)
+  * 2017-03-23 08:39:49 (-3 DST)
   ********************************************************************/
   var ycommSSEBase = function (workgroup, user, dataLocation, pollTimeout, preferredGateway) {
     var that = {
@@ -94,7 +94,7 @@
               if (data && data[0] && data[0].ok) {
                 that.w                 = workgroup;
                 that.sse_session_id    = data[0].sse_session_id;
-                that.userAliveInterval = data[0].userAliveInterval * 1000;
+                that.userAliveInterval = Math.min(60000, data[0].userAliveInterval * 1000);
                 callback();
               }
             }
