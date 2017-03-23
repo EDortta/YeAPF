@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.56-25 built on 2017-03-23 08:00 (-3 DST)
+    YeAPF 0.8.56-28 built on 2017-03-23 12:22 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-22 07:14:32 (-3 DST)
+    2017-03-23 12:21:55 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -644,8 +644,8 @@
         }
 
       } else if (db_connectionTypeIs(_FIREBIRD_)) {
-        $cfgIbaseUsePrepare=true;
-        $cfgIbaseUseTransactions=true;
+        $cfgIbaseUsePrepare=false;
+        $cfgIbaseUseTransactions=false;
         $transactionOpened=false;
         if (($updateSQLStatement) and ($cfgIbaseUseTransactions)) {
           $lastCommands.="$sqlCount) (TRANSACTION OPENED)<BR>";
