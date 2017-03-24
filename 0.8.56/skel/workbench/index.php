@@ -13,8 +13,11 @@
     return $ret;
   }
 
-  function fileNameTag($fileName) {
-    return "<span class='file-tag'>$fileName</span>";
+  function fileNameTag($fileName, $modified=false) {
+    if ($modified)
+      return "<span class='file-tag' style='text-decoration: underline;'>$fileName</span>";
+    else
+      return "<span class='file-tag'>$fileName</span>";
   }
 
   function fileModifiedTag($base, $fileName) {
@@ -305,8 +308,9 @@
         $prodFile=str_replace("\n", "", $prodFile);
         $workbenchFile=str_replace("production/$dBody/", "www/", $prodFile);
         $m_prod = filemtime($prodFile);
-        $fmList.=fileNameTag(basename($workbenchFile));
-        $fmModified |= fileModified($m_prod, $workbenchFile);
+        $m_modified = fileModified($m_prod, $workbenchFile);
+        $fmList.=fileNameTag(basename($workbenchFile), $m_modified);
+        $fmModified |= $m_modified;
 
         $file_info=pathinfo($workbenchFile);
         $ext=strtolower($file_info['extension']);
@@ -338,7 +342,7 @@
                     $eliminateBtn
                   </div>
                   <div class='panel-body'>
-                    <a href='$fileName'>$auxFileName</a><div>$fmList</div>
+                    <a href='$fileName'>$auxFileName</a><div class='col-lg-12'>$fmList</div>
                   </div>
                 </div>
               </div>";
