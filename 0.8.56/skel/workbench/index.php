@@ -210,7 +210,12 @@
       }
     }
 
-    $e_index_sample=_file("tp_app_index.html");
+    if (!file_exists("e_index_sample.html")) {
+      copy("tp_app_index.html", "e_index_sample.html");
+      echo "<div>e_index_sample.html file created on workbench folder</div>";
+    }
+
+    $e_index_sample=_file("e_index_sample.html");
     file_put_contents("production/e_index_sample.html", $e_index_sample);
 
   }
