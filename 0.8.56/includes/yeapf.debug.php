@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.debug.php
-    YeAPF 0.8.56-15 built on 2017-03-16 09:54 (-3 DST)
+    YeAPF 0.8.56-29 built on 2017-03-24 10:21 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-13 16:29:12 (-3 DST)
+    2017-03-23 17:22:41 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -45,7 +45,7 @@
     }
     if (substr($argList,strlen($argList)-2)=="\n\t")
       $argList=substr($argList,0,strlen($argList)-1);
-    $argList=_caller_().$argList;
+    $argList=_caller_().'says: '.$argList;
     if (!isset($canDoLog))
       $canDoLog=true;
     if ($canDoLog) {
@@ -521,7 +521,7 @@
   // testar com http://10.0.2.1/~esteban/webApps/metaForms/body.php??u=14&s=formGenerator&a=grantTable&id=cadastroDeFuncionarios&=&=
   function _caller_()
   {
-    global $yeapfLogBacktrace, $_debugTag;
+    global $yeapfLogBacktrace, $_debugTag, $_lastTag;
 
     $traceCall=isset($yeapfLogBacktrace)?($yeapfLogBacktrace&1):false;
     $res='';
@@ -535,7 +535,7 @@
       $ln='';
 
       $reservedFunctions=" :_caller_:_echo:_dump:_dumpY:";
-      $reservedFilenames=" :yeapf.:query.:query.:xParser.:";
+      $reservedFilenames=" :yeapf.:rest.:query.:query.:xParser.:";
 
       $callerNdx=-1;
       $inReservedFunctions=true;
@@ -546,15 +546,21 @@
           $funLine=getArrayValueIfExists($myBacktrace[$callerNdx],'line','');
           $funFileName=basename(getArrayValueIfExists($myBacktrace[$callerNdx],'file',''));
           $funPos=strpos($reservedFunctions, ":$funName:");
-          $inReservedFunctions=($funPos>0) || !($yeapfLogBacktrace&2);
+          
+          $inReservedFunctions=($funPos>0) || ($yeapfLogBacktrace&2);
           if ($inReservedFunctions)
             $curCall="$funFileName at $funLine";
         } else
           $inReservedFunctions=false;
       }
+      
 
       if (function_exists("decimalMicrotime")) {
-        $wastedTime=decimalMicrotime()-$_debugTag;
+        if (!isset($_lastTag))
+          $_lastTag=$_debugTag;
+        $_currentTag=decimalMicrotime();
+        $wastedTime=$_currentTag-$_lastTag;
+        $_lastTag = $_currentTag;
       } else {
         $wastedTime="?.0";
       }

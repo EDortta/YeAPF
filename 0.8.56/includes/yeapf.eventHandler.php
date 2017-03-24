@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.eventHandler.php
-    YeAPF 0.8.56-15 built on 2017-03-16 09:54 (-3 DST)
+    YeAPF 0.8.56-29 built on 2017-03-24 10:21 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-01-23 22:00:40 (-3 DST)
+    2017-03-24 09:55:58 (-3 DST)
 */
 
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -19,18 +19,34 @@
 
   function doEventHandler($aS='', $aA='')
   {
-    global $lastImplementation, $__eventHandler, $s, $a;
+    global $lastImplementation, $__eventHandler, $s, $a, $flgCanContinueWorking;
 
     $cEvents=0;
     $auxS=($aS > '')? $aS: $s;
     $auxA=($aA > '')? $aA: $a;
     if (isset($__eventHandler)) {
       foreach($__eventHandler as $eh) {
-        _dumpY(1,1,"calling event handler '$eh'");
-        if (function_exists($eh)) {
-          _record($lastImplementation,"eventHandler::$eh($auxS,$auxA)");
-          $eh($auxS,$auxA);
-          $cEvents++;
+        if (($flgCanContinueWorking) || ($auxS=='yeapf')) {
+          if (function_exists($eh)) {
+            _dumpY(1,1,"calling event handler '$eh'");
+            _record($lastImplementation,"eventHandler::$eh($auxS,$auxA)");
+            // $ret=$eh($auxS,$auxA);
+
+            _recordWastedTime("Preparing to call $eh($auxS, $auxA)");
+            $__impt0=decimalMicrotime();
+            //$ret=call_user_func($eh, $auxS, $auxA);
+            $ret=$eh($auxS, $auxA);
+            _dumpY(1,2,"$eh('$auxS', '$auxA') returns $ret");
+            $__impt0=decimalMicrotime()-$__impt0;
+            _recordWastedTime("Time wasted calling $eh($a): $__impt0");
+            if ((intval($ret)&2)==2) {
+              $flgCanContinueWorking=false;
+              _dump("flgCanContinueWorking has been dropped by '$auxS'.'$auxA' event handler ($eh)");
+            }
+
+
+            $cEvents++;
+          }
         }
       }
     }

@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.56-25 built on 2017-03-23 08:00 (-3 DST)
+    YeAPF 0.8.56-29 built on 2017-03-24 10:21 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-22 07:40:18 (-3 DST)
+    2017-03-23 21:31:38 (-3 DST)
    */
 
   /*
@@ -96,6 +96,12 @@
   $_debugTag=decimalMicrotime();
   $_debugSequence=0;
   $_lastTimeMark=microtime(true)*1000;
+  /* binary mask for yeapfLogBacktrace:
+     1 - treace function call
+     2 - show entry point instead of caller php */
+  $yeapfLogBacktrace = 0;
+
+  $flgCanContinueWorking=true;
 
   if (file_exists("logs/wastedTime.log"))
     error_log("\n\n\n",3,"logs/wastedTime.log");
@@ -367,11 +373,14 @@
     _dumpY(1,1,"YEAPF STAGE: $functionName    eventHandler ");
     if (function_exists('doEventHandler')) {
       if ($__EventBufferFilled) {
-        for ($i=0; $i<count($__EventBuffer); $i++)
+        for ($i=0; $i<count($__EventBuffer); $i++) {
+          _dumpY(1,1,"YeAPF STAGE: $functionName     ".$__EventBuffer[$i][0]);
           doEventHandler($__EventBuffer[$i][0],$__EventBuffer[$i][1]);
+        }
         $__EventBufferFilled = false;
         $__EventBuffer = array();
       }
+      _dump("calling 'yeapf'.'$functionName' event handler");
       doEventHandler('yeapf', $functionName);
     } else {
       $__EventBufferFilled = true;
@@ -1617,7 +1626,22 @@
 
   function implementation($s, $a='', $prefix='f', $onlyTest=false)
   {
-    global $lastImplementation, $_ydb_ready;
+    global $lastImplementation, $_ydb_ready, $flgCanContinueWorking;
+
+    /* this functions try to find the most apropriate implementation
+       of the required event.
+       1) determine the `page`
+           If it is yet connected to the database, it will try to use 
+           `implementation` field from is_menu table.
+           If not connected or not defined, it defaults to `s` parameter.
+       2) Once it has the page, it try to load `page`.php
+       3) Search for `prefix``page`() function and call it if exists
+       4) If an event handler can be called, call it
+
+       if the function or the eventhandler return the integer value 2,
+       then global flag flgCanContinueWorking is dropped and nothing except
+       `yeapf` events can be handled
+     */
 
     $implemented=0;
 
@@ -1633,6 +1657,8 @@
           $page=valorSQL("select implementation from is_menu where s='$s'");
     } else
       $page='';
+
+    // _dump("page=$page | s=$s");
 
     if ((!isset($page)) || ($page==''))
       $page=$s;
@@ -1659,43 +1685,48 @@
           _dump("Err loading '$implentation'");
           die();
         }
-        $functions=array($prefix.trim(str_replace('.','_',$s)), $prefix.str_replace('.','_',$page));
-        $functions=array_unique($functions);
-        foreach($functions as $func) {
-          if (!$implemented) {
-            _dumpY(1,1,"function_exists('$func')?");
-            if (function_exists("$func")) {
-              if ($onlyTest)
-                _dumpY(1,1,"Testing $func('$a')");
-              else
-                _dumpY(1,1,"Calling $func('$a')");
-              _record($lastImplementation,"using $func");
-              $implemented++;
-              if (!$onlyTest) {
-                _recordWastedTime("Preparing to call $func($a)");
-                $__impt0=decimalMicrotime();
-                call_user_func($func, $a);
-                $__impt0=decimalMicrotime()-$__impt0;
-                _recordWastedTime("Time wasted calling $func($a): $__impt0");
-              }
-            } else
-              _dumpY(1,1,"function $func doesen't found");
-          }
-        }
       }
     } else {
       if ($page>'')
         _record($lastImplementation,"implementation '$page.php' not found");
       _record($lastImplementation,"trying undeclared implementation");
-      $func=$prefix.trim($s);
-      if (function_exists($func)) {
-        $implemented++;
-        $func($a);
+    }
+
+    $functions=array($prefix.trim(str_replace('.','_',$s)), $prefix.str_replace('.','_',$page));
+    $functions=array_unique($functions);
+    foreach($functions as $func) {
+      if (($flgCanContinueWorking) || ($s=='yeapf')) {
+        if (!$implemented) {
+          _dumpY(1,1,"function_exists('$func')?");
+          if (function_exists("$func")) {
+            if ($onlyTest)
+              _dumpY(1,1,"Testing $func('$a')");
+            else
+              _dumpY(1,1,"Calling $func('$a')");
+            _record($lastImplementation,"using $func");
+            $implemented++;
+            if (!$onlyTest) {
+              _recordWastedTime("Preparing to call $func($a)");
+              $__impt0=decimalMicrotime();
+              $ret=call_user_func($func, $a);
+              _dump("$func($a) returns $ret");
+              $__impt0=decimalMicrotime()-$__impt0;
+              _recordWastedTime("Time wasted calling $func($a): $__impt0");
+              if (intval($ret)&2==2) {
+                $flgCanContinueWorking=false;
+                _dump("flgCanContinueWorking has been dropped by '$s'.'$a' function ($func)");
+              }
+            }
+          } else
+            _dumpY(1,1,"function $func doesen't found");
+        }
       }
     }
 
-    if ($implemented==0)
+
+    if (($flgCanContinueWorking) || ($s=='yeapf')) {
       doEventHandler($s, $a);
+    }
 
     return $implemented;
   }
@@ -2189,7 +2220,6 @@
       if (($res==':') || (strlen($res)<=2))
         $res='00:00';
     }
-    _dump("$valorCampo -> res=$res");
     return "$res";
   }
 

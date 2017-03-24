@@ -4,6 +4,23 @@
   (@include_once("lib/simple_html_dom/simple_html_dom.php")) or die("This software requires 'simple_html_dom'");
   (@include_once("lib/mecha-cms/minifier.php")) or die("This software requires 'mecha-cms' minifier");
 
+  function fileModified($base, $fileName) {
+    $ret=false;
+    if (file_exists("$fileName")) {
+      $mt=filemtime("$fileName");
+      $ret = $mt>$base;
+    }
+    return $ret;
+  }
+
+  function fileModifiedTag($base, $fileName) {
+    $ret="";
+    if (fileModified($base,$fileName)) {
+      $ret="<span>$fileName</span>";
+    }
+    return $ret;
+  }
+
   function deleteFiles($dBody)
   {
 
@@ -254,6 +271,23 @@
         $eliminateBtn="<a class='btn btn-warning btnDeleteDist' data-page='$dBody'><i class='fa fa-minus-square'></i></a>";
       }
 
+
+      $m_html = filemtime("$fileName");
+      $fmList  = "";
+      if (file_exists("$dBody.files")) {
+        $fileList = file("$dBody.files");
+        foreach($fileList as $prodFile) {
+          $prodFile=str_replace("\n", "", $prodFile);
+          $workbenchFile=str_replace("production/$dBody/", "www/", $prodFile);
+          $m_prod = filemtime($prodFile);
+          $fmList .= fileModified($m_prod, $workbenchFile);
+        }
+      } else {
+        $m_php   = fileModified($m_html, "www/$d.php");
+        $fmList .= fileModified($m_html, "www/css/$d.css");
+        $fmList .= fileModified($m_html, "www/js/$d.js");
+      }
+
       $menu.="<div class='col-lg-5'>
                 <div class='panel panel-default'>
                   <div class='panel-heading'>
@@ -265,7 +299,7 @@
                     $eliminateBtn
                   </div>
                   <div class='panel-body'>
-                    <a href='$fileName'>$auxFileName</a>
+                    <a href='$fileName'>$auxFileName</a><div>$fmList</div>
                   </div>
                 </div>
               </div>";
