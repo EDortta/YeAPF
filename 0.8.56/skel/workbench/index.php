@@ -13,13 +13,18 @@
     return $ret;
   }
 
+  function fileNameTag($fileName) {
+    return "<span class='file-tag'>$fileName</span>";
+  }
+
   function fileModifiedTag($base, $fileName) {
     $ret="";
     if (fileModified($base,$fileName)) {
-      $ret="<span class='modified-tag'>$fileName</span>";
+      $ret=fileNameTag($fileName);
     }
     return $ret;
   }
+
 
   function deleteFiles($dBody)
   {
@@ -286,25 +291,41 @@
 
 
 
-      $fmList  = "";
+      $fmList     = "";
+      $fmModified = false;
+      $jsList     = array();
+      $phpList    = array();
+      $cssList    = array();
       if (file_exists("$dBody.files")) {
         $fileList = file("$dBody.files");
-        foreach($fileList as $prodFile) {
-          $prodFile=str_replace("\n", "", $prodFile);
-          $workbenchFile=str_replace("production/$dBody/", "www/", $prodFile);
-          $m_prod = filemtime($prodFile);
-          $fmList.=fileModifiedTag($m_prod, $workbenchFile);
-
-        }
-        $m_html  = filemtime("production/$dBody/i_$dBody.html");
-        $fmList.=fileModifiedTag($m_html, "$fileName");
       } else {
-        $m_html = filemtime("$fileName");
-        $fmList.=fileModifiedTag($m_html, "www/$d.php");
-        $fmList.=fileModifiedTag($m_html, "www/css/$d.css");
-        $fmList.=fileModifiedTag($m_html, "www/js/$d.js");
+        $fileList = array("www/$d.php", "www/css/$d.css", "www/js/$d.js");
       }
+      foreach($fileList as $prodFile) {
+        $prodFile=str_replace("\n", "", $prodFile);
+        $workbenchFile=str_replace("production/$dBody/", "www/", $prodFile);
+        $m_prod = filemtime($prodFile);
+        $fmList.=fileNameTag($workbenchFile);
+        $fmModified |= fileModified($m_prod, $workbenchFile);
 
+        $file_info=pathinfo($workbenchFile);
+        $ext=strtolower($file_info['extension']);
+        if ($ext=='php')
+          $phpList[]=$workbenchFile;
+        else if ($ext=='js')
+          $jsList[]=$workbenchFile;
+        else if ($ext=='css')
+          $cssList[]=$workbenchFile;
+      }
+      $m_html  = filemtime("production/$dBody/i_$dBody.html");
+      $fmList.=fileModifiedTag($m_html, "$fileName");
+
+      $cl1="";
+      $cl2="";
+      if ($fmModified) {
+        $cl1=" highight-blue";
+        $cl2=" spin";
+      }
 
       $menu.="<div class='col-lg-5'>
                 <div class='panel panel-default'>
@@ -312,7 +333,7 @@
                     <button class='btn btn-danger btnDeletePage' data-page='$dBody'><i class='fa fa-trash' data-page='$dBody'></i></button>
                     &nbsp;
                     <button class='btn btn-default btnCreateZipDist' id='btnZipSection$n' data-page='$dBody'><i class='fa fa-file-zip-o' data-page='$dBody'></i></button>
-                    <button class='btn btn-default btnCreateDist' id='btnExtractSection$n' data-page='$dBody'><i class='fa fa-puzzle-piece' data-page='$dBody'></i></button>
+                    <button class='btn btn-default btnCreateDist $cl1' id='btnExtractSection$n' data-page='$dBody'><i class='fa fa-puzzle-piece $cl2' data-page='$dBody'></i></button>
                     $downloadBtn
                     $eliminateBtn
                   </div>
