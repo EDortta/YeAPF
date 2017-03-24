@@ -305,7 +305,7 @@
         $prodFile=str_replace("\n", "", $prodFile);
         $workbenchFile=str_replace("production/$dBody/", "www/", $prodFile);
         $m_prod = filemtime($prodFile);
-        $fmList.=fileNameTag($workbenchFile);
+        $fmList.=fileNameTag(basename($workbenchFile));
         $fmModified |= fileModified($m_prod, $workbenchFile);
 
         $file_info=pathinfo($workbenchFile);
