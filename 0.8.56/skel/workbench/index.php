@@ -14,10 +14,11 @@
   }
 
   function fileNameTag($fileName, $modified=false) {
+    $extra="";
     if ($modified)
-      return "<span class='file-tag' style='text-decoration: underline;'>$fileName</span>";
-    else
-      return "<span class='file-tag'>$fileName</span>";
+      $extra="style='text-decoration: underline;'"
+
+    return "<div class='file-tag' $extra>$fileName</div>";
   }
 
   function fileModifiedTag($base, $fileName) {
@@ -281,6 +282,11 @@
     $menu="";
     $n=0;
 
+    if (file_exists("tp.config"))
+      $tp_config = parse_ini_file("tp.config");
+    else
+      $tp_config=array();
+
     foreach(glob('www/i_*') as $fileName) {
       $n++;
       $downloadBtn='';
@@ -331,13 +337,29 @@
         $cl2=" spin";
       }
 
+      $firstButtonClass="";
+      if (isset($tp_config['first_page'])) {
+        if ($auxFileName==$tp_config['first_page']) {
+          $firstButtonClass="active";
+        }
+      }
+
+      $btnFirstPage  = "<button class='btn btn-danger btnFirstPage $firstButtonClass' data-page='$dBody'><i class='fa fa-home' data-page='$dBody'></i></button>";
+
+      $btnDeletePage = "<button class='btn btn-danger btnDeletePage highight-red' data-page='$dBody'><i class='fa fa-trash' data-page='$dBody'></i></button>";
+
+      $btnZipSection = "<button class='btn btn-default btnCreateZipDist' id='btnZipSection$n' data-page='$dBody'><i class='fa fa-file-zip-o' data-page='$dBody'></i></button>";
+
+      $btnExtractSecion = "<button class='btn btn-default btnCreateDist $cl1' id='btnExtractSection$n' data-page='$dBody'><i class='fa fa-puzzle-piece $cl2' data-page='$dBody'></i></button>";
+
       $menu.="<div class='col-lg-5'>
                 <div class='panel panel-default'>
                   <div class='panel-heading'>
-                    <button class='btn btn-danger btnDeletePage' data-page='$dBody'><i class='fa fa-trash' data-page='$dBody'></i></button>
+                    $btnDeletePage
                     &nbsp;
-                    <button class='btn btn-default btnCreateZipDist' id='btnZipSection$n' data-page='$dBody'><i class='fa fa-file-zip-o' data-page='$dBody'></i></button>
-                    <button class='btn btn-default btnCreateDist $cl1' id='btnExtractSection$n' data-page='$dBody'><i class='fa fa-puzzle-piece $cl2' data-page='$dBody'></i></button>
+                    $btnFirstPage
+                    $btnZipSection
+                    $btnExtractSecion
                     $downloadBtn
                     $eliminateBtn
                   </div>
