@@ -272,7 +272,7 @@
       }
 
 
-      $m_html = filemtime("$fileName");
+
       $fmList  = "";
       if (file_exists("$dBody.files")) {
         $fileList = file("$dBody.files");
@@ -282,8 +282,11 @@
           $m_prod = filemtime($prodFile);
           $fmList .= fileModifiedTag($m_prod, $workbenchFile);
         }
+        $m_html = filemtime("$fileName");
+        $fmList .= fileModifiedTag($m_html, "www/i_$d.html");
       } else {
-        $m_php   = fileModifiedTag($m_html, "www/$d.php");
+        $m_html = filemtime("$fileName");
+        $fmList .= fileModifiedTag($m_html, "www/$d.php");
         $fmList .= fileModifiedTag($m_html, "www/css/$d.css");
         $fmList .= fileModifiedTag($m_html, "www/js/$d.js");
       }
