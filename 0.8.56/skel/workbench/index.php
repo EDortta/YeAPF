@@ -280,16 +280,18 @@
           $prodFile=str_replace("\n", "", $prodFile);
           $workbenchFile=str_replace("production/$dBody/", "www/", $prodFile);
           $m_prod = filemtime($prodFile);
-          $fmList .= fileModifiedTag($m_prod, $workbenchFile);
+          $fmList.=fileModifiedTag($m_prod, $workbenchFile);
+
         }
-        $m_html = filemtime("$fileName");
-        $fmList .= fileModifiedTag($m_html, "www/i_$d.html");
+        $m_html  = filemtime("production/$dBody/i_$dBody.html");
+        $fmList.=fileModifiedTag($m_html, "$fileName");
       } else {
         $m_html = filemtime("$fileName");
-        $fmList .= fileModifiedTag($m_html, "www/$d.php");
-        $fmList .= fileModifiedTag($m_html, "www/css/$d.css");
-        $fmList .= fileModifiedTag($m_html, "www/js/$d.js");
+        $fmList.=fileModifiedTag($m_html, "www/$d.php");
+        $fmList.=fileModifiedTag($m_html, "www/css/$d.css");
+        $fmList.=fileModifiedTag($m_html, "www/js/$d.js");
       }
+
 
       $menu.="<div class='col-lg-5'>
                 <div class='panel panel-default'>
