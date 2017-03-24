@@ -16,7 +16,7 @@
   function fileModifiedTag($base, $fileName) {
     $ret="";
     if (fileModified($base,$fileName)) {
-      $ret="<span>$fileName</span>";
+      $ret="<span class='modified-tag'>$fileName</span>";
     }
     return $ret;
   }
