@@ -11,7 +11,7 @@
     <link href="css/bootstrap-theme.css" rel="stylesheet" type="text/css">
     <title>#(wbTitle)</title>
   </head>
-  
+
   <style>
     .page-btn {
       width: 15vw;
@@ -74,17 +74,17 @@
       <div class="row">
         <div class="col-lg-12">
           <h3>Pages</h3>
-          
+
           <div class="container">
             <div class="row">
               #(menu)
             </div>
           </div>
 
-          <div><small>YeAPF 0.8.56-39 built on 2017-03-24 11:17 (-3 DST)</small></div>
+          <div><small>YeAPF 0.8.56-40 built on 2017-03-24 11:34 (-3 DST)</small></div>
 
         </div>
-      </div>      
+      </div>
     </div>
   </body>
   <script>
@@ -102,21 +102,21 @@
         var pageToBeDist = getDataPage(e)
 ;
         window.location = "index.php?xMinified=0&xBody="+pageToBeDist;
-      }      
+      }
     }
 
     var _tp_createZipDist = function(e) {
       if (e.target) {
         var pageToBeDist = getDataPage(e);
         window.location = "index.php?xMinified=1&xBody="+pageToBeDist;
-      }      
+      }
     }
 
     var _tp_deleteZipDist = function(e) {
       if (e.target) {
         var distToBeDeleted = getDataPage(e);
         window.location = "index.php?xMinified=0&xErase=1&xBody="+distToBeDeleted;
-      }      
+      }
     }
 
     var _tp_deletePageOpenDialog = function(e) {

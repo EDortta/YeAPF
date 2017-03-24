@@ -74,6 +74,14 @@
     $xMinified = isset($xMinified)?intval($xMinified)>0:0;
     deleteFiles($xBody);
 
+    if (file_exists("www/js/app.js")) {
+      $ap_mt_1=filemtime("www/js/app.js");
+      $ap_mt_2=file_exists("production/js/app.js")?filemtime("production/js/app.js"):$ap_mt_1-1;
+      if ($ap_mt_2<$ap_mt_1) {
+        copy("www/js/app.js", "production/js/app.js");
+      }
+    }
+
     if (!$xErase) {
       $auxFiles = array();
 
