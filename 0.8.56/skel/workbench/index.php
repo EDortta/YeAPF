@@ -9,8 +9,9 @@
     $ret=false;
     foreach($tp_config['essentials'] as $key=>$value) {
       $file=substr("$value", 0, strpos($value, ":"));
-      if ($file==$fileName)
+      if ($file==$fileName) {
         $ret=$key;
+      }
     }
     return $ret;
   } 
