@@ -18,13 +18,18 @@
       overflow: hidden;
     }
 
-    .file-tag {
+    .file-tag, .file-tag-essential {
       font-size: 80%;
       color: rgb(88, 88, 88);
       /* text-shadow: 1px 1px 2px #000; */
       padding-right: 16px;
       padding-left: 4px;
       border-left: dotted 1px #A6A6A6;
+    }
+
+    .file-tag-essential {
+      font-weight: 800;
+      color: #2C699E;
     }
 
     .highight-blue {
@@ -34,9 +39,25 @@
     .highight-red {
       border: solid 2px #FF1D00;
     }
+
+    .centered {
+       margin-left: auto;
+       margin-right: auto;
+       display: block;
+       text-align: center;
+    }
   </style>
 
-  <body>
+<body>
+  <div id="waitIcon" style="display: none; position: absolute; width: 100vw; height: 100vh; background-color: #fafafa; z-index: 1001; opacity: 0.8">
+    <div style="padding-top: 20%">
+      <img src="wait.gif" class='centered'>
+      <div class="centered">
+      Wait...
+      </div>
+    </div>
+  </div>
+
 
   <div class="modal fade" id="tp_modal_container_confirm_deletion" role="dialog" aria-labelledby="tp_confirm_deletion" aria-hidden="true">
     <div class="modal-dialog">
@@ -91,13 +112,18 @@
             </div>
           </div>
 
-          <div><small>YeAPF 0.8.56-44 built on 2017-03-24 17:31 (-3 DST)</small></div>
+          <div><small>YeAPF 0.8.56-61 built on 2017-03-27 07:10 (-3 DST)</small></div>
 
         </div>
       </div>
     </div>
   </body>
   <script>
+    var showWaitIcon = function() {
+      var waitIcon = document.getElementById('waitIcon');
+      if (waitIcon)
+        waitIcon.style.display='';
+    }
     var pageToBeDeleted=null;
     var getDataPage = function(e) {
       if (e.target)
@@ -109,8 +135,8 @@
 
     var _tp_createDist = function(e) {
       if (e.target) {
-        var pageToBeDist = getDataPage(e)
-;
+        var pageToBeDist = getDataPage(e);
+        showWaitIcon();
         window.location = "index.php?xMinified=0&xBody="+pageToBeDist;
       }
     }
@@ -118,6 +144,7 @@
     var _tp_createZipDist = function(e) {
       if (e.target) {
         var pageToBeDist = getDataPage(e);
+        showWaitIcon();
         window.location = "index.php?xMinified=1&xBody="+pageToBeDist;
       }
     }
@@ -125,6 +152,7 @@
     var _tp_deleteZipDist = function(e) {
       if (e.target) {
         var distToBeDeleted = getDataPage(e);
+        showWaitIcon();
         window.location = "index.php?xMinified=0&xErase=1&xBody="+distToBeDeleted;
       }
     }
@@ -135,11 +163,23 @@
         $("#tp_modal_container_confirm_deletion").modal();
       } else
         console.error("Que navegador vc esta usando, meu chapa?");
-
     };
 
     var _tp_deletePageAction = function() {
+      showWaitIcon();
       window.location = "index.php?dBody="+pageToBeDeleted;
+    };
+
+    var _tp_toggleEssentialFilename = function(e) {
+      var essentialFilename = getDataPage(e);
+      showWaitIcon();
+      window.location = "index.php?essentialFilename="+essentialFilename;
+    };
+
+    var _tp_setFirstPage = function(e) {
+      var setFirstPage = getDataPage(e);
+      showWaitIcon();
+      window.location = "index.php?setFirstPage="+setFirstPage;
     };
 
     addOnLoadManager(
@@ -147,10 +187,13 @@
       function() {
         document.getElementById('newPageName').focus();
 
-        addEvent(".btnDeletePage",    "click", _tp_deletePageOpenDialog);
-        addEvent(".btnCreateDist",    "click", _tp_createDist);
-        addEvent(".btnCreateZipDist", "click", _tp_createZipDist);
-        addEvent(".btnDeleteDist",    "click", _tp_deleteZipDist);
+        addEvent(".btnDeletePage",               "click", _tp_deletePageOpenDialog);
+        addEvent(".btnCreateDist",               "click", _tp_createDist);
+        addEvent(".btnCreateZipDist",            "click", _tp_createZipDist);
+        addEvent(".btnDeleteDist",               "click", _tp_deleteZipDist);
+
+        addEvent(".btnToggleEssentialFile",      "click", _tp_toggleEssentialFilename);
+        addEvent(".btnFirstPage",                "click", _tp_setFirstPage);
 
         addEvent("tp_btnDeletePageConfirmation", "click", _tp_deletePageAction);
       }

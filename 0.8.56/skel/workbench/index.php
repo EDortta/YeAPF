@@ -14,11 +14,22 @@
   }
 
   function fileNameTag($fileName, $modified=false) {
+    global $tp_config;
+
+    if (isset($tp_config['essentials'])) {
+      $essential=in_array($fileName, $tp_config['essentials']);
+    } else {
+      $essential=false;
+    }
+
+    $boxClass=$essential?"square":"square-o";
+    $fileNameClass=$essential?"file-tag-essential":"file-tag";
+
     $extra="";
     if ($modified)
-      $extra="style='text-decoration: underline;'"
+      $extra="style='text-decoration: underline;'";
 
-    return "<div class='file-tag' $extra>$fileName</div>";
+    return "<div class='file-tag' $extra><i class='fa fa-$boxClass'></i>&nbsp;<a class='btnToggleEssentialFile' data-page='$fileName'>$fileName</a></div>";
   }
 
   function fileModifiedTag($base, $fileName) {
@@ -60,6 +71,15 @@
   }
 
   $wbTitle = basename(getcwd());
+  if (file_exists("tp.config")) {
+    $tp_config = parse_ini_file("tp.config");
+  } else {
+    $tp_config=array();
+  }
+
+  if (!isset($tp_config['essentials'])) {
+    $tp_config['essentials']=[];
+  }
 
   if ((isset($dBody)) && ($dBody!='null')) {
     unlink("www/i_$dBody.html");
@@ -161,11 +181,12 @@
       }
 
       /*
-        falta:
+        pronto:
           impedir a geração/eliminação de página de forma concomitante
           indicar a ordem das páginas (ao menos qual é a inicial)
-          indicar se https é obrigatorio
           indicar quais os js e css obrigatorios em 'todas' as paginas (ou -o que é o mesmo- no projeto)
+        falta:
+          indicar se https é obrigatorio
           impedir que um mesmo js seja carregado mais de uma vez no aplicativo
           manter o cabeçalho feito pelo usuário. ou seja, a parte entre o <body> e o 'tnContainer'
           avisar ao aplicativo sobre uma pagina modificada. compilar essa página imediatamente.
@@ -192,8 +213,6 @@
       file_put_contents("$xBody.files", $fileList);
     }
 
-    $pageId1 ="id='vw_".$xBody."'";
-    $pageId2 ='id="vw_'.$xBody.'"';
     $pageBody=$html_out;
     if (!file_exists("production/e_index_sample.html")) {
       $GLOBALS['pageSourceCode']=$pageBody;
@@ -206,30 +225,93 @@
       $html = str_get_html($html);
 
       $subst=0;
+      $tabNdx=1;
+      $tnTabs=array();
+      $scriptsList=array();
+      $stylesList=array();
+
+      function getScripts(&$html, $elem) {
+        global $scriptsList, $stylesList;
+
+        foreach($elem->find('script') as $script) {
+          $scriptName = basename($script->src).'?';
+          $scriptName = substr($scriptName, 0, strpos($scriptName, '?'));
+
+          $scriptsList[$scriptName]=$script->src;
+          $html=str_replace($script, "", $html);
+        }
+
+        foreach($elem->find('link') as $script) {
+          $styleName = basename($script->href).'?';
+          $styleName = substr($styleName, 0, strpos($styleName, '?'));
+
+          $stylesList[$styleName]=$style->href;
+          $html=str_replace($script, "", $html);
+        }
+      }
+
       foreach ($html->find('div.tnTab') as $elem) {
-        $p1=intval(strpos($elem, $pageId1));
-        $p2=intval(strpos($elem, $pageId2));
-        $p=max($p1,$p2);
-        if ($p>0) {
+        $elemId=$elem->id;
+        getScripts($html, $elem);
+
+        $_ndx=($elemId=="vw_".$tp_config['first_page'])?0:++$tabNdx;
+        if ($elemId=="vw_$xBody") {
           if (!$xErase) {
-            $GLOBALS['pageSourceCode'].="$pageBody\n";
+            $page_html=str_get_html($pageBody);
+            foreach($page_html -> find('div') as $divElem) {
+              getScripts($pageBody, $divElem);
+            }
+            $tnTabs[$_ndx]=$pageBody;
             $subst++;
           }
         } else {
+          /* preserve tnTabs without id */
           $elem=str_replace('\n', "\n", $elem);
-          $GLOBALS['pageSourceCode'].="$elem\n";
+          $tnTabs[$_ndx]=$elem;
         }
       }
 
       if (!$xErase) {
-        if ($subst==0)
-          $GLOBALS['pageSourceCode'].="$pageBody\n";
+        /* add the page */
+        if ($subst==0) {
+          $html=str_get_html($pageBody);
+          foreach($elem = $html->find('div.tnTab')) {
+            getScripts($pageBody, $elem);
+            $elemId = $elem->id;
+            $_ndx=($elemId=="vw_".$tp_config['first_page'])?0:++$tabNdx;
+            $tnTabs[$_ndx]=$pageBody;
+          }
+        }
       }
+
+      asort($tnTabs);
+
+      foreach($tnTabs as $k=>$tab) {
+        $GLOBALS['pageSourceCode'].="\n$tab\n";
+      }
+
     }
 
     if (!file_exists("e_index_sample.html")) {
       copy("tp_app_index.html", "e_index_sample.html");
       echo "<div>e_index_sample.html file created on workbench folder</div>";
+    }
+
+
+    ksort($scriptsList);
+    ksort($stylesList);
+
+    $scriptsList = array_unique($scriptsList);
+    $stylesList  = array_unique($stylesList);
+
+    $scripts='';
+    foreach($scriptsList as $name=>$location) {
+      $scripts.="\t<script charset='utf-8' src='$location'></script>\n";
+    }
+
+    $layouts='';
+    foreach($stylesList as $name=>$location) {
+      $layouts.="\t<link href='css/bootstrap-switch.css' charset='utf-8' rel='$location'>\n";
     }
 
     $e_index_sample=_file("e_index_sample.html");
@@ -279,13 +361,26 @@
       }
     }
 
+    if (isset($essentialFilename)) {
+      $_key=array_search($essentialFilename, $tp_config['essentials']);
+      if ($_key!==FALSE) {
+        unset($tp_config['essentials'][$_key]);
+      } else {
+        $tp_config['essentials'][]=$essentialFilename;
+      }
+      write_ini_file($tp_config, "tp.config");
+    }
+
+    if (isset($setFirstPage)) {
+      if ((isset($tp_config['first_page'])) && ($tp_config['first_page']==$setFirstPage))
+        unset($tp_config['first_page']);
+      else
+        $tp_config['first_page']="$setFirstPage";
+      write_ini_file($tp_config, "tp.config");
+    }
+
     $menu="";
     $n=0;
-
-    if (file_exists("tp.config"))
-      $tp_config = parse_ini_file("tp.config");
-    else
-      $tp_config=array();
 
     foreach(glob('www/i_*') as $fileName) {
       $n++;
@@ -339,12 +434,12 @@
 
       $firstButtonClass="";
       if (isset($tp_config['first_page'])) {
-        if ($auxFileName==$tp_config['first_page']) {
+        if ($dBody==$tp_config['first_page']) {
           $firstButtonClass="active";
         }
       }
 
-      $btnFirstPage  = "<button class='btn btn-danger btnFirstPage $firstButtonClass' data-page='$dBody'><i class='fa fa-home' data-page='$dBody'></i></button>";
+      $btnFirstPage  = "<button class='btn btn-default btnFirstPage $firstButtonClass' data-page='$dBody'><i class='fa fa-home' data-page='$dBody'></i></button>";
 
       $btnDeletePage = "<button class='btn btn-danger btnDeletePage highight-red' data-page='$dBody'><i class='fa fa-trash' data-page='$dBody'></i></button>";
 
@@ -356,12 +451,13 @@
                 <div class='panel panel-default'>
                   <div class='panel-heading'>
                     $btnDeletePage
-                    &nbsp;
-                    $btnFirstPage
-                    $btnZipSection
-                    $btnExtractSecion
-                    $downloadBtn
-                    $eliminateBtn
+                    <div class='btn-group pull-right'>
+                      $btnFirstPage
+                      $btnZipSection
+                      $btnExtractSecion
+                      $downloadBtn
+                      $eliminateBtn
+                    </div>
                   </div>
                   <div class='panel-body'>
                     <a href='$fileName'>$auxFileName</a><div class='col-lg-12'>$fmList</div>
