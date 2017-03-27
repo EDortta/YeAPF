@@ -3,6 +3,21 @@
   (@include_once("yeapf.php")) or die("yeapf not configured<br><a href='configure.php'>Click here to configure</a>");
   (@include_once("lib/simple_html_dom/simple_html_dom.php")) or die("This software requires 'simple_html_dom'");
   (@include_once("lib/mecha-cms/minifier.php")) or die("This software requires 'mecha-cms' minifier");
+ 
+  function getEssentialKey($fileName) {
+    global $tp_config;
+    $ret=false;
+    foreach($tp_config['essentials'] as $key=>$value) {
+      $file=substr("$value", 0, strpos($value, ":"));
+      if ($file==$fileName)
+        $ret=$key;
+    }
+    return $ret;
+  } 
+
+  function declareAsEssential($fileName, $filePath) {
+
+  }
 
   function fileModified($base, $fileName) {
     $ret=false;
@@ -16,11 +31,10 @@
   function fileNameTag($fileName, $modified=false) {
     global $tp_config;
 
-    if (isset($tp_config['essentials'])) {
-      $essential=in_array($fileName, $tp_config['essentials']);
-    } else {
-      $essential=false;
-    }
+    $bName=basename($fileName);
+    $filePath=dirname($fileName);
+
+    $essential=getEssentialKey($fileName)!==FALSE);
 
     $boxClass=$essential?"square":"square-o";
     $fileNameClass=$essential?"file-tag-essential":"file-tag";
@@ -29,7 +43,7 @@
     if ($modified)
       $extra="style='text-decoration: underline;'";
 
-    return "<div class='file-tag' $extra><i class='fa fa-$boxClass'></i>&nbsp;<a class='btnToggleEssentialFile' data-page='$fileName'>$fileName</a></div>";
+    return "<div class='file-tag' $extra><i class='fa fa-$boxClass'></i>&nbsp;<a class='btnToggleEssentialFile' data-page='$bName' data-path='$filePath'>$bName</a></div>";
   }
 
   function fileModifiedTag($base, $fileName) {
@@ -309,9 +323,9 @@
       $scripts.="\t<script charset='utf-8' src='$location'></script>\n";
     }
 
-    $layouts='';
+    $styles='';
     foreach($stylesList as $name=>$location) {
-      $layouts.="\t<link href='css/bootstrap-switch.css' charset='utf-8' rel='$location'>\n";
+      $styles.="\t<link href='$location' charset='utf-8' rel='stylesheet' type='text/css'>\n";
     }
 
     $e_index_sample=_file("e_index_sample.html");
@@ -362,11 +376,11 @@
     }
 
     if (isset($essentialFilename)) {
-      $_key=array_search($essentialFilename, $tp_config['essentials']);
+      $_key=getEssentialKey($essentialFilename);
       if ($_key!==FALSE) {
         unset($tp_config['essentials'][$_key]);
       } else {
-        $tp_config['essentials'][]=$essentialFilename;
+        $tp_config['essentials'][]="$essentialFilename:$essentialFilepath";
       }
       write_ini_file($tp_config, "tp.config");
     }
@@ -410,7 +424,7 @@
         $workbenchFile=str_replace("production/$dBody/", "www/", $prodFile);
         $m_prod = filemtime($prodFile);
         $m_modified = fileModified($m_prod, $workbenchFile);
-        $fmList.=fileNameTag(basename($workbenchFile), $m_modified);
+        $fmList.=fileNameTag($workbenchFile, $m_modified);
         $fmModified |= $m_modified;
 
         $file_info=pathinfo($workbenchFile);

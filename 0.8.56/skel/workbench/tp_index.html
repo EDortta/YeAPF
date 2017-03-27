@@ -112,7 +112,7 @@
             </div>
           </div>
 
-          <div><small>YeAPF 0.8.56-61 built on 2017-03-27 07:10 (-3 DST)</small></div>
+          <div><small>YeAPF 0.8.56-62 built on 2017-03-27 12:22 (-3 DST)</small></div>
 
         </div>
       </div>
@@ -125,7 +125,8 @@
         waitIcon.style.display='';
     }
     var pageToBeDeleted=null;
-    var getDataPage = function(e) {
+    var getItemAttribute = function(e, attribute) {
+      attribute=attribute || 'data-page';
       if (e.target)
         e=e.target;
       if (e.nodeName=='I')
@@ -135,7 +136,7 @@
 
     var _tp_createDist = function(e) {
       if (e.target) {
-        var pageToBeDist = getDataPage(e);
+        var pageToBeDist = getItemAttribute(e);
         showWaitIcon();
         window.location = "index.php?xMinified=0&xBody="+pageToBeDist;
       }
@@ -143,7 +144,7 @@
 
     var _tp_createZipDist = function(e) {
       if (e.target) {
-        var pageToBeDist = getDataPage(e);
+        var pageToBeDist = getItemAttribute(e);
         showWaitIcon();
         window.location = "index.php?xMinified=1&xBody="+pageToBeDist;
       }
@@ -151,7 +152,7 @@
 
     var _tp_deleteZipDist = function(e) {
       if (e.target) {
-        var distToBeDeleted = getDataPage(e);
+        var distToBeDeleted = getItemAttribute(e);
         showWaitIcon();
         window.location = "index.php?xMinified=0&xErase=1&xBody="+distToBeDeleted;
       }
@@ -159,7 +160,7 @@
 
     var _tp_deletePageOpenDialog = function(e) {
       if (e.target) {
-        pageToBeDeleted = getDataPage(e);
+        pageToBeDeleted = getItemAttribute(e);
         $("#tp_modal_container_confirm_deletion").modal();
       } else
         console.error("Que navegador vc esta usando, meu chapa?");
@@ -171,13 +172,14 @@
     };
 
     var _tp_toggleEssentialFilename = function(e) {
-      var essentialFilename = getDataPage(e);
       showWaitIcon();
-      window.location = "index.php?essentialFilename="+essentialFilename;
+      var essentialFilename = getItemAttribute(e),
+          essentialFilepath = getItemAttribute(e, 'data-path');
+      window.location = "index.php?essentialFilename="+essentialFilename+"&essentialFilepath="+essentialFilepath;
     };
 
     var _tp_setFirstPage = function(e) {
-      var setFirstPage = getDataPage(e);
+      var setFirstPage = getItemAttribute(e);
       showWaitIcon();
       window.location = "index.php?setFirstPage="+setFirstPage;
     };
