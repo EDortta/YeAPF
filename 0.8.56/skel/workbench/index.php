@@ -34,7 +34,7 @@
     $bName=basename($fileName);
     $filePath=dirname($fileName);
 
-    $essential=getEssentialKey($fileName)!==FALSE);
+    $essential=(getEssentialKey($fileName)!==FALSE);
 
     $boxClass=$essential?"square":"square-o";
     $fileNameClass=$essential?"file-tag-essential":"file-tag";
