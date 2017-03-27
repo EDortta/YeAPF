@@ -290,7 +290,7 @@
         /* add the page */
         if ($subst==0) {
           $html=str_get_html($pageBody);
-          foreach($elem = $html->find('div.tnTab')) {
+          foreach($html->find('div.tnTab') as $elem) {
             getScripts($pageBody, $elem);
             $elemId = $elem->id;
             $_ndx=($elemId=="vw_".$tp_config['first_page'])?0:++$tabNdx;
