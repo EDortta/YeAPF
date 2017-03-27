@@ -44,7 +44,7 @@
     if ($modified)
       $extra="style='text-decoration: underline;'";
 
-    return "<div class='file-tag' $extra><i class='fa fa-$boxClass'></i>&nbsp;<a class='btnToggleEssentialFile' data-page='$bName' data-path='$filePath'>$bName</a></div>";
+    return "<div class='file-tag' $extra><i class='fa fa-$boxClass'></i>&nbsp;<a class='btnToggleEssentialFile' data-page='$bName' data-path='$fileName'>$bName</a></div>";
   }
 
   function fileModifiedTag($base, $fileName) {
@@ -321,7 +321,8 @@
 
     $scripts='';
     foreach($scriptsList as $name=>$location) {
-      $scripts.="\t<script charset='utf-8' src='$location'></script>\n";
+      $scripts.="<!-- $name -->\n";
+      $scripts.="<script charset='utf-8' src='$location'></script>\n";
     }
 
     $styles='';
