@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.56-29 built on 2017-03-24 10:21 (-3 DST)
+    YeAPF 0.8.56-73 built on 2017-03-28 17:24 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-23 21:31:38 (-3 DST)
+    2017-03-28 11:43:22 (-3 DST)
    */
 
   /*
@@ -3258,7 +3258,7 @@
     $aStr=str_replace('\"',"'",$aStr);
     $aStr=preg_replace_callback(
               '/src=("|\')\s*(.*?)\s*\\1.*?/',
-              create_function('$matches', 'return "src=".doChangeRef($matches[2]);'),
+              create_function('$matches', 'return "src=\'".doChangeRef($matches[2])."\'";'),
               $aStr
           );
 
