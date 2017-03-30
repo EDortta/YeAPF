@@ -6267,7 +6267,7 @@
 </code></String.prototype.isCNPJ><String.prototype.toFloat><name>String.prototype.toFloat</name>
 <parameters></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>881</start>
-<end>892</end>
+<end>893</end>
 </code></String.prototype.toFloat></functions><filename>yloader.js</filename>
 <folder>templates%2Fbootstrap3%2Fjs</folder>
 </yloader.js><ymisc.js><functions><__anonymousFunction__270><name>__anonymousFunction__270</name>
@@ -6489,7 +6489,7 @@
 </code></String.prototype.isCNPJ><String.prototype.toFloat><name>String.prototype.toFloat</name>
 <parameters></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>616</start>
-<end>627</end>
+<end>628</end>
 </code></String.prototype.toFloat></functions><filename>ymisc.js</filename>
 <folder>app-src%2Fjs</folder>
 </ymisc.js><yopcontext.js><functions><getInternetExplorerVersion><name>getInternetExplorerVersion</name>

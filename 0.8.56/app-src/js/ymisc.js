@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.56-17 built on 2017-03-16 10:59 (-3 DST)
+ * YeAPF 0.8.56-77 built on 2017-03-30 15:49 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-03-16 10:57:58 (-3 DST)
+ * 2017-03-30 15:48:38 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -596,7 +596,7 @@ if (!String.prototype.isCNPJ) {
 if (!String.prototype.toFloat) {
   String.prototype.toFloat = function () {
     n=this;
-    n=n.replace(":", "");
+    // n=n.replace(":", "");
     if (n.match(/^-?((\d*[,.]){1,4})?\d*$/)) {
       var p=n.indexOf('.'),
           c=n.indexOf(',');
