@@ -100,11 +100,11 @@
       }
     }
 
-    // ksort($scriptsList);
-    // ksort($stylesList);
-
     $scriptsList = array_unique($scriptsList);
     $stylesList  = array_unique($stylesList);
+
+    if ($toDebug) print_r($scriptsList);
+    if ($toDebug) print_r($stylesList);
 
     $scripts='';
     $ts=md5(time('U'));
@@ -131,22 +131,46 @@
     }
   }
 
-  function getScripts(&$html, $elem) {
+  function getScripts(&$html, $elem, $baseDir='') {
     global $scriptsList, $stylesList;
+
+    if ($baseDir=='') {
+      $baseDir=getcwd();
+    }
+    if ($toDebug) echo "$baseDir------------\n";
 
     foreach($elem->find('script') as $script) {
       $scriptName = basename($script->src).'?';
       $scriptName = substr($scriptName, 0, strpos($scriptName, '?'));
+      $scriptSrc  = $script->src."?";
+      $scriptSrc  = substr($scriptSrc, 0, strpos($scriptSrc, "?"));
+      if ($scriptSrc>'') {
+        if ($toDebug) echo "$scriptSrc\n";
 
-      $scriptsList[$scriptName]=$script->src;
+        if (file_exists("$baseDir/$scriptSrc")) {
+          $scriptsList[$scriptName]=$scriptSrc;      
+        } else {
+          if ($toDebug) echo "\tfalta\n";
+        }
+      }
       $html=str_replace($script, "", $html);
     }
 
     foreach($elem->find('link') as $style) {
       $styleName = basename($style->href).'?';
       $styleName = substr($styleName, 0, strpos($styleName, '?'));
+      $styleHREF  = $script->src."?";
+      $styleHREF  = substr($styleHREF, 0, strpos($styleHREF, "?"));
 
-      $stylesList[$styleName]=$style->href;
+      if ($styleHREF>'') {        
+        if ($toDebug) echo "$styleHREF\n";
+
+        if (file_exists("$baseDir/$styleHREF")) {
+          $stylesList[$styleName]=$styleHREF;
+        } else {
+          if ($toDebug) echo "\tfalta\n";
+        }
+      }
       $html=str_replace($style, "", $html);
 
     }

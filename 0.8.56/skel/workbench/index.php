@@ -157,7 +157,7 @@
       $tnTabs=array();
 
       foreach($html_processor->find('*') as $elem) {
-        getScripts($html, $elem);
+        getScripts($html, $elem, "production");
       }
 
       $html_processor = str_get_html($html);
@@ -170,7 +170,7 @@
           if (!$xErase) {
             $page_html=str_get_html($pageBody);
             foreach($page_html -> find('div') as $divElem) {
-              getScripts($pageBody, $divElem);
+              getScripts($pageBody, $divElem, "production");
             }
             $tnTabs[$_ndx]=$pageBody;
             $subst++;
@@ -187,7 +187,7 @@
         if ($subst==0) {
           $html_processor=str_get_html($pageBody);
           foreach($html_processor->find('div.tnTab') as $elem) {
-            getScripts($pageBody, $elem);
+            getScripts($pageBody, $elem, "production");
             $elemId = $elem->id;
             $_ndx=($elemId=="vw_".$tp_config['first_page'])?0:++$tabNdx;
             $tnTabs[$_ndx]=$pageBody;
@@ -403,7 +403,6 @@
     $html=processString($html, $GLOBALS);
 
     echo $html;
-
   } else {
     chdir("www");
     processFile("tp_testPage");
