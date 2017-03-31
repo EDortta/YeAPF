@@ -3,10 +3,15 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script type="text/javascript" src="js/jquery.min.js"></script>
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
-    <script charset="utf-8" type="text/javascript" src="js/bootstrap-dialog.min.js"></script>
-    <script charset="utf-8" type="text/javascript" src="js/yloader.js"></script>
+
+    <script charset="utf-8" src="js/jquery.min.js"></script>
+    <script charset="utf-8" src="js/bootstrap.min.js"></script>
+    <script charset="utf-8" src="js/bootbox.min.js"></script>
+    <script charset="utf-8" src="js/bootstrap-switch.js"></script>
+    <script charset="utf-8" src="js/bootbox.min.js"></script>
+    <script charset="utf-8" src="js/bootstrap-dialog.min.js"></script>
+    <script charset="utf-8" src="js/yloader.js"></script>
+
     <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
     <link href="css/bootstrap-dialog.css" rel="stylesheet" type="text/css">
@@ -125,14 +130,14 @@
             </div>
           </div>
 
-          <div><small>YeAPF 0.8.56-78 built on 2017-03-31 13:29 (-3 DST)</small></div>
+          <div><small>YeAPF 0.8.56-80 built on 2017-03-31 13:49 (-3 DST)</small></div>
 
         </div>
       </div>
     </div>
   </body>
   <script>
-    var missedFiles="#(missedList)";
+    var lastError="#nl2br(lastError)";
 
     var showWaitIcon = function() {
       var waitIcon = document.getElementById('waitIcon');
@@ -214,10 +219,10 @@
 
         addEvent("tp_btnDeletePageConfirmation", "click", _tp_deletePageAction);
 
-        if (missedFiles>'') {
+        if (lastError>'') {
           BootstrapDialog.show({
-            title: 'Arquivos n&atilde;o localizados',
-            message: missedFiles
+            title: 'Warnings and Errors',
+            message: lastError
           });
         }
       }

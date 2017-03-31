@@ -197,8 +197,9 @@
 
     $missedList='';
     foreach (array_merge($scriptsList, $stylesList, $missedFiles) as $key => $value) {
-      if (!file_exists("$baseDir/$value"))
-        $missedList.="production/$value<br>";
+      if (!file_exists("$baseDir/$value")) {
+        _recordError("'production/$value' <b>Missed file</b>");
+      }
     }
 
   }

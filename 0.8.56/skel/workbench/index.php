@@ -215,7 +215,7 @@
 
     if (!file_exists("e_index_sample.html")) {
       copy("tp_app_index.html", "e_index_sample.html");
-      echo "<div>e_index_sample.html file created on workbench folder</div>";
+      _recordError("e_index_sample.html file created on workbench folder");
     }
 
     prepareScriptsAndStyles("production");
