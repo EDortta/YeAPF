@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misctools.php
-    YeAPF 0.8.56-18 built on 2017-03-20 08:40 (-3 DST)
+    YeAPF 0.8.56-78 built on 2017-03-31 13:29 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-16 13:36:14 (-3 DST)
+    2017-03-31 12:31:02 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -660,8 +660,16 @@
         $content .= "[".$key."]\n";
         foreach ($elem as $key2=>$elem2) {
           if(is_array($elem2)) {
+            foreach($elem2 as $k=>$v) {
+              $v=trim($v);
+              if ($v>'') {
+                $content .= $key2."[] = \"$v\"\n";
+              }
+            }
+            /*
             for($i=0;$i<count($elem2);$i++)
               $content .= $key2."[] = \"".$elem2[$i]."\"\n";
+            */
           } else {
             if ($elem2=="")
               $content .= $key2." = \n";
@@ -674,8 +682,12 @@
     } else {
       foreach ($assoc_arr as $key=>$elem) {
         if(is_array($elem)) {
-          for($i=0;$i<count($elem);$i++)
-            $content .= $key."[] = \"".$elem[$i]."\"\n";
+          foreach($elem as $k=>$v) {
+            $v=trim($v);
+            if ($v>'') {
+              $content .= $key."[] = \"$v\"\n";
+            }
+          }
         } else {
           if ($elem=="")
             $content .= $key." = \n";

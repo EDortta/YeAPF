@@ -2,19 +2,74 @@
   (@include_once("simple_html_dom/simple_html_dom.php")) or die("This software requires 'simple_html_dom'");
   (@include_once("mecha-cms/minifier.php")) or die("This software requires 'mecha-cms' minifier");
 
-  function getEssentialKey($fileName) {
-    global $tp_config;
+  function getEssentialKey($fileName, &$moreThanEssential) {
+    global $tp_config, $toDebug;
     $ret=false;
-    foreach($tp_config['essentials'] as $key=>$value) {
-      $file=substr("$value", 0, strpos($value, ":"));
+    if ($toDebug) echo "\n<!-- Inicio da busca por '$fileName'  -->\n";
+    foreach($tp_config['essentials'] as $key=>$essentialFile) {
+      $essentialFile = explode(":", $essentialFile);
+      $file=$essentialFile[0];
+      $path=$essentialFile[1];
+      $moreThanEssential=isset($essentialFile[2])?intval($essentialFile[2]):0;
+
+      if ($toDebug) {
+        echo "\n<!-- \nkey: $key\n";
+        print_r($essentialFile);
+        echo "\n-->";
+      }
+
       if ($file==$fileName) {
         $ret=$key;
+        break;
       }
     }
+    if ($toDebug) echo "\n<!-- Fim '$fileName' $moreThanEssential at $ret -->\n";
     return $ret;
   }
 
-  function declareAsEssential($fileName, $filePath) {
+  function cleanupEssentialFiles() {
+    global $tp_config;
+
+    foreach ($tp_config['essentials'] as $key => $value) {
+      if (strlen(trim($value))==0) {
+        unset($tp_config['essentials'][$key]);
+      }
+    }
+  }
+
+  function declareAsEssential($essentialFilename, $essentialFilepath, $moreThanEssential=false) {
+    global $tp_config, $toDebug;
+    $moreThanEssential=intval($moreThanEssential);
+
+    $toDebug=true;
+
+    cleanupEssentialFiles();
+
+    if ($toDebug) echo "\n<!-- declarando $essentialFilename at $essentialFilepath as 'essential:$moreThanEssential' -->\n";
+
+    $key=getEssentialKey($essentialFilename, $aux);
+    if ($key===FALSE) {
+      $key=-1;
+      foreach($tp_config['essentials'] as $k => $v) {
+        if ($toDebug) echo "<!-- chave: $k -->\n";
+        if ($k>$key) {
+          $key=$k;
+        }
+      }
+      $key++;
+    }
+
+    if ($toDebug) echo "\n<!-- colocando $essentialFilename na posicao $key -->\n";
+
+    $tp_config['essentials'][$key]="$essentialFilename:$essentialFilepath:$moreThanEssential";
+
+    // $tp_config['essentials'] = array_unique($tp_config['essentials']);
+
+    if ($toDebug) {
+      echo "\n<!--\n";
+      print_r($tp_config);
+      echo "\n-->\n";
+    }
 
   }
 
@@ -34,10 +89,10 @@
       $bName=basename($fileName);
       $filePath=dirname($fileName);
 
-      $essential=(getEssentialKey($bName)!==FALSE);
+      $essential=(getEssentialKey($bName, $moreThanEssential)!==FALSE);
 
       $boxClass=$essential?"square":"square-o";
-      $fileNameClass=$essential?"file-tag-essential":"file-tag";
+      $fileNameClass=$essential?($moreThanEssential?"file-tag-basement":"file-tag-essential"):"file-tag";
 
       $extra="";
       if ($modified)
@@ -85,13 +140,19 @@
     unlink("download/$dBody.zip");
   }
 
-  function prepareScriptsAndStyles($fileList) {
-    global $tp_config, $scripts, $styles, $scriptsList, $stylesList;
+  function prepareScriptsAndStyles($baseDir='') {
+    global $tp_config, $scripts, $styles, $missedList, $scriptsList, $stylesList, $missedFiles, $toDebug;
+
+    if ($baseDir=='') {
+      $baseDir=getcwd();
+    }
 
     foreach($tp_config['essentials'] as $essentialFile) {
       if ($essentialFile>'') {
-        $file=substr($essentialFile,0,strpos($essentialFile, ":"));
-        $path=substr($essentialFile,strpos($essentialFile,":")+1);
+        $essentialFile = explode(":", $essentialFile);
+        $file=$essentialFile[0];
+        $path=$essentialFile[1];
+        $moreThanEssential=isset($essentialFile[2])?intval($essentialFile[2]):0;
         $ext=strtolower(substr($file, strrpos($file, ".")+1));
         if ($ext=='css')
           $stylesList[$file]=$path;
@@ -103,8 +164,12 @@
     $scriptsList = array_unique($scriptsList);
     $stylesList  = array_unique($stylesList);
 
-    if ($toDebug) print_r($scriptsList);
-    if ($toDebug) print_r($stylesList);
+    if ($toDebug) {
+      echo "<!--";
+      print_r($scriptsList);
+      print_r($stylesList);
+      echo "-->";
+    }
 
     $scripts='';
     $ts=md5(time('U'));
@@ -129,15 +194,24 @@
         $location.="?$ts";
       $styles.="\n\t<link href='$location' charset='utf-8' rel='stylesheet' type='text/css'>";
     }
+
+    $missedList='';
+    foreach (array_merge($scriptsList, $stylesList, $missedFiles) as $key => $value) {
+      if (!file_exists("$baseDir/$value"))
+        $missedList.="production/$value<br>";
+    }
+
   }
 
-  function getScripts(&$html, $elem, $baseDir='') {
-    global $scriptsList, $stylesList;
+  function getScripts(&$html, $baseDir='') {
+    global $scriptsList, $stylesList, $toDebug, $missedFiles;
+
+    $elem = str_get_html($html);
 
     if ($baseDir=='') {
       $baseDir=getcwd();
     }
-    if ($toDebug) echo "$baseDir------------\n";
+    if ($toDebug) echo "\n<!-- $baseDir------------\n";
 
     foreach($elem->find('script') as $script) {
       $scriptName = basename($script->src).'?';
@@ -148,9 +222,10 @@
         if ($toDebug) echo "$scriptSrc\n";
 
         if (file_exists("$baseDir/$scriptSrc")) {
-          $scriptsList[$scriptName]=$scriptSrc;      
+          $scriptsList[$scriptName]=$scriptSrc;
         } else {
           if ($toDebug) echo "\tfalta\n";
+          $missedFiles[$scriptName]=$scriptSrc;
         }
       }
       $html=str_replace($script, "", $html);
@@ -159,27 +234,31 @@
     foreach($elem->find('link') as $style) {
       $styleName = basename($style->href).'?';
       $styleName = substr($styleName, 0, strpos($styleName, '?'));
-      $styleHREF  = $script->src."?";
+      $styleHREF  = $style->href."?";
       $styleHREF  = substr($styleHREF, 0, strpos($styleHREF, "?"));
 
-      if ($styleHREF>'') {        
+      if ($styleHREF>'') {
         if ($toDebug) echo "$styleHREF\n";
 
         if (file_exists("$baseDir/$styleHREF")) {
           $stylesList[$styleName]=$styleHREF;
         } else {
           if ($toDebug) echo "\tfalta\n";
+          $missedFiles[$styleName]=$styleHREF;
         }
       }
       $html=str_replace($style, "", $html);
 
     }
+
+    if ($toDebug)  echo "-->\n";
   }
 
   function initialize() {
-    global $scriptsList, $stylesList, $tp_config;
+    global $scriptsList, $stylesList, $tp_config, $missedFiles;
     $scriptsList=array();
     $stylesList=array();
+    $missedFiles=array();
 
     $wbTitle = basename(getcwd());
     if (file_exists(dirname(__DIR__)."/tp.config")) {

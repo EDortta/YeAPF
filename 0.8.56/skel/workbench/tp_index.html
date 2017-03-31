@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script type="text/javascript" src="js/jquery.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script charset="utf-8" type="text/javascript" src="js/bootstrap-dialog.min.js"></script>
     <script charset="utf-8" type="text/javascript" src="js/yloader.js"></script>
     <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="css/bootstrap-dialog.css" rel="stylesheet" type="text/css">
     <link href="css/bootstrap-theme.css" rel="stylesheet" type="text/css">
     <title>#(wbTitle)</title>
   </head>
@@ -18,7 +20,7 @@
       overflow: hidden;
     }
 
-    .file-tag, .file-tag-essential {
+    .file-tag, .file-tag-essential, .file-tag-basement {
       font-size: 80%;
       color: rgb(88, 88, 88);
       /* text-shadow: 1px 1px 2px #000; */
@@ -27,9 +29,16 @@
       border-left: dotted 1px #A6A6A6;
     }
 
-    .file-tag-essential {
+    .file-tag-essential, .file-tag-basement {
       font-weight: 800;
       color: #2C699E;
+    }
+
+    .file-tag-basement {
+      color: #AE1B72;
+      text-shadow: 2px 0 #888888;
+      letter-spacing:2px;
+      font-weight:bold;
     }
 
     .highlight-blue {
@@ -116,13 +125,15 @@
             </div>
           </div>
 
-          <div><small>YeAPF 0.8.56-73 built on 2017-03-28 17:24 (-3 DST)</small></div>
+          <div><small>YeAPF 0.8.56-78 built on 2017-03-31 13:29 (-3 DST)</small></div>
 
         </div>
       </div>
     </div>
   </body>
   <script>
+    var missedFiles="#(missedList)";
+
     var showWaitIcon = function() {
       var waitIcon = document.getElementById('waitIcon');
       if (waitIcon)
@@ -202,6 +213,13 @@
         addEvent(".btnFirstPage",                "click", _tp_setFirstPage);
 
         addEvent("tp_btnDeletePageConfirmation", "click", _tp_deletePageAction);
+
+        if (missedFiles>'') {
+          BootstrapDialog.show({
+            title: 'Arquivos n&atilde;o localizados',
+            message: missedFiles
+          });
+        }
       }
     );
   </script>

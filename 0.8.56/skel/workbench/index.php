@@ -113,9 +113,10 @@
           impedir a geração/eliminação de página de forma concomitante
           indicar a ordem das páginas (ao menos qual é a inicial)
           indicar quais os js e css obrigatorios em 'todas' as paginas (ou -o que é o mesmo- no projeto)
+        inseguro:
+          impedir que um mesmo js seja carregado mais de uma vez no aplicativo
         falta:
           indicar se https é obrigatorio
-          impedir que um mesmo js seja carregado mais de uma vez no aplicativo
           manter o cabeçalho feito pelo usuário. ou seja, a parte entre o <body> e o 'tnContainer'
           avisar ao aplicativo sobre uma pagina modificada. compilar essa página imediatamente.
           botao para compilacao em cada pagina
@@ -156,9 +157,13 @@
       $tabNdx=1;
       $tnTabs=array();
 
+      getScripts($html, "production");
+
+      /*
       foreach($html_processor->find('*') as $elem) {
         getScripts($html, $elem, "production");
       }
+      */
 
       $html_processor = str_get_html($html);
 
@@ -169,9 +174,11 @@
         if ($elemId=="vw_$xBody") {
           if (!$xErase) {
             $page_html=str_get_html($pageBody);
+            /*
             foreach($page_html -> find('div') as $divElem) {
               getScripts($pageBody, $divElem, "production");
             }
+            */
             $tnTabs[$_ndx]=$pageBody;
             $subst++;
           }
@@ -185,9 +192,12 @@
       if (!$xErase) {
         /* add the page */
         if ($subst==0) {
+          getScripts($pageBody, "production");
           $html_processor=str_get_html($pageBody);
           foreach($html_processor->find('div.tnTab') as $elem) {
+            /*
             getScripts($pageBody, $elem, "production");
+            */
             $elemId = $elem->id;
             $_ndx=($elemId=="vw_".$tp_config['first_page'])?0:++$tabNdx;
             $tnTabs[$_ndx]=$pageBody;
@@ -208,7 +218,7 @@
       echo "<div>e_index_sample.html file created on workbench folder</div>";
     }
 
-    prepareScriptsAndStyles();
+    prepareScriptsAndStyles("production");
 
     $e_index_sample=_file("e_index_sample.html");
     file_put_contents("production/e_index_sample.html", $e_index_sample);
@@ -263,8 +273,13 @@
       if ($_key!==FALSE) {
         unset($tp_config['essentials'][$_key]);
       } else {
-        $tp_config['essentials'][]="$essentialFilename:$essentialFilepath";
+        declareAsEssential($essentialFilename, $essentialFilepath);
       }
+
+      /* more-than-essential files */
+      declareAsEssential("yloader.js", "js/yloader.js", true);
+      declareAsEssential("appbase.js", "js/appbase.js", true);
+
       write_ini_file($tp_config, "tp.config");
     }
 
@@ -295,10 +310,15 @@
       $scriptsList=array();
       $stylesList=array();
       $html=file_get_contents($fileName);
+
+      getScripts($html);
+
+      /*
       $html_processor = str_get_html($html);
       foreach ($html_processor->find('*') as $elem) {
         getScripts($html, $elem);
       }
+      */
 
       $fmList     = "";
       $fmModified = false;
@@ -395,11 +415,15 @@
     $tabNdx=1;
     $tnTabs=array();
 
+    getScripts($html);
+
+    /*
     foreach ($html_processor->find('*') as $elem) {
       getScripts($html, $elem);
     }
+    */
 
-    prepareScriptsAndStyles();
+    prepareScriptsAndStyles("production");
     $html=processString($html, $GLOBALS);
 
     echo $html;
