@@ -406,6 +406,8 @@
 
     $menu=str_replace("%cssBlockHeight%", "$cssBlockHeight", $menu);
 
+    $lastError=str_replace("\n", "<br>", $lastError);
+
     processFile("tp_index");
   } else if (isset($tPage) && ($tPage>'')) {
     $html = file_get_contents($tPage);
