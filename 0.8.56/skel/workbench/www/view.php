@@ -7,17 +7,26 @@
   initialize();
   if (isset($tPage) && ($tPage>'')) {
     $html = file_get_contents($tPage);
-    $html_processor = str_get_html($html);
 
     $subst=0;
     $tabNdx=1;
     $tnTabs=array();
 
+    $scriptsList=array();
+    $stylesList=array();
+
+    $toDebug=true;
+
+    getScripts($html);
+    /*
+    $html_processor = str_get_html($html);
     foreach ($html_processor->find('*') as $elem) {
       getScripts($html, $elem);
     }
+    */
 
     prepareScriptsAndStyles();
+
     $html=processString($html, $GLOBALS);
 
     while (strpos($html, " \n")>0) {
