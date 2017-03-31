@@ -73,6 +73,15 @@
 
   }
 
+  function declareBasementFiles() {
+    /* more-than-essential files */
+    declareAsEssential("yloader.js", "js/yloader.js", true);
+    declareAsEssential("appbase.js", "js/appbase.js", true);
+
+    write_ini_file($tp_config, "tp.config");
+  }
+
+
   function fileModified($base, $fileName) {
     $ret=false;
     if (file_exists("$fileName")) {
@@ -271,6 +280,8 @@
     if (!isset($tp_config['essentials'])) {
       $tp_config['essentials']=[];
     }
+
+    declareBasementFiles();
   }
 
 ?>
