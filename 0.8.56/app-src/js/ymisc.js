@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.56-77 built on 2017-03-30 15:49 (-3 DST)
+ * YeAPF 0.8.56-87 built on 2017-04-03 17:56 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-03-30 15:48:38 (-3 DST)
+ * 2017-04-03 17:55:46 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -1006,6 +1006,7 @@ function time2minutes(aTime) {
   var h=0;
   var m=0;
   if (aTime>'') {
+    aTime=""+aTime+" ";
     var p=aTime.indexOf('h');
     if (p<0)
       p=aTime.indexOf(':');
