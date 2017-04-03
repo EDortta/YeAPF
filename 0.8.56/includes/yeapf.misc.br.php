@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misc.br.php
-    YeAPF 0.8.56-15 built on 2017-03-16 09:54 (-3 DST)
+    YeAPF 0.8.56-86 built on 2017-04-03 14:27 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-09 09:56:11 (-3 DST)
+    2017-04-03 14:25:25 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -234,7 +234,8 @@
   function formatarCNPJ($cnpj)
   {
     $cnpj = ereg_replace("[^0-9]", "", $cnpj);
-    $cnpj = substr(str_repeat('0',14).$cnpj,strlen($cnpj)-14);
+    $cnpj = str_repeat('0',14).$cnpj;
+    $cnpj = substr($cnpj,strlen($cnpj)-14);
     if ($cnpj>'')
       $cnpj = substr($cnpj,strlen($cnpj)-14,2).'.'.substr($cnpj,strlen($cnpj)-12,3).'.'.substr($cnpj,strlen($cnpj)-9,3).'/'.substr($cnpj,strlen($cnpj)-6,4).'-'.substr($cnpj,strlen($cnpj)-2,2);
     else

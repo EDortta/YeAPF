@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webSocket/configure.php
-    YeAPF 0.8.56-84 built on 2017-03-31 14:13 (-3 DST)
+    YeAPF 0.8.56-86 built on 2017-04-03 14:27 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-31 14:13:59 (-3 DST)
+    2017-04-03 14:27:52 (-3 DST)
 */
 
 
@@ -275,7 +275,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.56-84 built on 2017-03-31 14:13 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.56-86 built on 2017-04-03 14:27 (-3 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -315,9 +315,9 @@
 
 
   echo sayStep("<div class=cpyrght><strong><big><I>skel/webSocket/configure.php</I></big></strong><br>
-    YeAPF 0.8.56-84 built on 2017-03-31 14:13 (-3 DST)<br>
+    YeAPF 0.8.56-86 built on 2017-04-03 14:27 (-3 DST)<br>
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    2017-03-31 14:13:59 (-3 DST)</div>");
+    2017-04-03 14:27:52 (-3 DST)</div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     die(sayStep("<div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
