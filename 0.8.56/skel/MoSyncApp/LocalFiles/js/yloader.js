@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.56-87 built on 2017-04-03 17:56 (-3 DST)
+  * YeAPF 0.8.56-88 built on 2017-04-07 09:34 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-04-03 17:56:17 (-3 DST)
+  * 2017-04-07 09:34:34 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.56-87 built on 2017-04-03 17:56 (-3 DST)");
+ console.log("YeAPF 0.8.56-88 built on 2017-04-07 09:34 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -449,6 +449,23 @@
          return arrReturnElements;
        }
      }
+     
+     function getStyleRuleValue(className, styleItemName) {
+       /* original from http://stackoverflow.com/questions/6338217/get-a-css-value-with-javascript */
+         for (var i = 0; i < document.styleSheets.length; i++) {
+             var mysheet = document.styleSheets[i];
+             var myrules = mysheet.cssRules ? mysheet.cssRules : mysheet.rules;
+             for (var j = 0; j < myrules.length; j++) {
+                 if (myrules[j].selectorText && myrules[j].selectorText.toLowerCase() === className) {
+                   if (typeof styleItemName=="string")
+                     return myrules[j].style[styleItemName];
+                   else
+                     return myrules[j];
+                 }
+             }
+     
+         }
+     };
      
      var getClientSize = function () {
        var auxDE = (document && document.documentElement)?document.documentElement:{clientWidth:800, clientHeight: 600};
