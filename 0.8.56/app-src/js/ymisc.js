@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.56-88 built on 2017-04-07 09:34 (-3 DST)
+ * YeAPF 0.8.56-89 built on 2017-04-07 09:54 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-04-07 09:31:07 (-3 DST)
+ * 2017-04-07 09:53:52 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -210,7 +210,7 @@ function getStyleRuleValue(className, styleItemName) {
               if (typeof styleItemName=="string")
                 return myrules[j].style[styleItemName];
               else
-                return myrules[j];
+                return myrules[j].style;
             }
         }
 
