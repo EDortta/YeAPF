@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.56-91 built on 2017-04-21 14:02 (-3 DST)
+  * YeAPF 0.8.56-92 built on 2017-04-21 15:10 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-04-21 14:02:33 (-3 DST)
+  * 2017-04-21 15:10:13 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.56-91 built on 2017-04-21 14:02 (-3 DST)");
+ console.log("YeAPF 0.8.56-92 built on 2017-04-21 15:10 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -694,12 +694,49 @@
        {
          maxLength=str2int(maxLength);
          if (this.indexOf(' ')>0) {
-           var name=this.substr(0,this.indexOf(' '));
-           var lastname=this.substr(this.lastIndexOf(' '));
-           while ((lastname>'') && (name.length+lastname.length>maxLength))
-             lastname=lastname.substr(0,lastname.length-1);
+           var ni,li,piece=this.toString(), name='', lastname='', p1, p2, changes;
+           while (name.length+lastname.length+1<=maxLength) {
+             piece=trim(piece);
+             ni=piece.indexOf(' ');
+             if (ni<0)
+               ni=piece.length;
+             li=piece.lastIndexOf(' ');
+             p1=trim(piece.substr(0,ni));
+             p2='';
      
-           return name+' '+lastname;
+             if (ni<li) {
+               p2=trim(piece.substr(li));
+               piece=trim(piece.substr(0,li));
+             }
+     
+             piece=trim(piece.substr(ni));
+             changes=0
+             if (p1>'') {
+               if (name.length+lastname.length+p1.length+(name.length>0?1:0+lastname.length>0?1:0)<maxLength) {
+                 name=trim(name+' '+p1);
+                 changes++;
+               } else {
+                 if (name.length+lastname.length+(name.length>0?1:0+lastname.length>0?1:0+1)<maxLength) {
+                   name=trim(name+' '+p1.substr(0,1)+'.');
+                   changes++;
+                 }
+               }
+             }
+             if (p1!=p2) {
+               if (p2>'') {
+                 if (name.length+lastname.length+p2.length+(name.length>0?1:0+lastname.length>0?1:0)<maxLength) {
+                   lastname=trim(p2+' '+lastname);
+                   changes++;
+                 } else if (name.length+lastname.length+(name.length>0?1:0+lastname.length>0?1:0+1)<maxLength) {
+                   lastname=trim(p2.substr(0,1)+'.'+lastname);
+                   changes++;
+                 }
+               }
+             }
+             if (changes==0)
+               break;
+           }
+           return trim(name+' '+lastname);
          } else
            return this.substr(0,maxLength);
        };
