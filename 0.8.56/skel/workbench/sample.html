@@ -1,0 +1,31 @@
+<html>
+  <script src='js/yloader.js'></script>
+  <style>
+    .hightlight {
+      background: #FFFF98;
+    }
+  </style>
+  <body>
+    <div droppable='yes' 
+         style='border: solid 1px black; width: 400px; height: 200px; float:left'
+         id=areaDestino>
+      Solte os elementos aqui
+    </div>
+    <div style='width: 400px; float:left'>
+      <ul>
+        <li draggable=yes>Primeira coisa</li>
+        <li draggable=yes id=coisa2>Segunda coisa</li>
+        <li draggable=yes id=coisa3>Terceira coisa</li>
+      </ul> 
+    </div>
+  </body>
+  <script>
+    var areaDestino = document.getElementById('areaDestino');
+    areaDestino.ondrop = function(aDraggedElement) {
+      alert("Recebi "+aDraggedElement.innerHTML);
+    }
+    areaDestino.ondragover = function(aDraggedElement) {
+      return aDraggedElement.id!='coisa2';
+    }
+  </script>
+</html>
