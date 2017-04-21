@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yanalise.js
- * YeAPF 0.8.56-90 built on 2017-04-21 11:44 (-3 DST)
+ * YeAPF 0.8.56-93 built on 2017-04-21 15:50 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-04-21 11:43:10 (-3 DST)
+ * 2017-04-21 15:26:27 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yLexObj introduced in 2016-08-22 0.8.50-0
 **********************************************/
@@ -120,8 +120,8 @@ function yAnalise(aLine, aStack)
             aValue = aValue.replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + '<br>' + '$2');
             break;
 
-          case 'abreviated':
-            aValue = aValue.abreviated(funcParams[1] || 20);
+          case 'abbreviate':
+            aValue = aValue.abbreviate(funcParams[1] || 20);
             break;
 
           case 'words':

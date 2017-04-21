@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.56-92 built on 2017-04-21 15:10 (-3 DST)
+  * YeAPF 0.8.56-93 built on 2017-04-21 15:50 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-04-21 15:10:13 (-3 DST)
+  * 2017-04-21 15:50:05 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.56-92 built on 2017-04-21 15:10 (-3 DST)");
+ console.log("YeAPF 0.8.56-93 built on 2017-04-21 15:50 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -689,8 +689,8 @@
          return true;
      }
      
-     if (!String.prototype.abreviated) {
-       String.prototype.abreviated=function(maxLength)
+     if (!String.prototype.abbreviate) {
+       String.prototype.abbreviate=function(maxLength)
        {
          maxLength=str2int(maxLength);
          if (this.indexOf(' ')>0) {
@@ -2584,8 +2584,8 @@
                  aValue = aValue.replace(/([^>\r\n]?)(\r\n|\n\r|\r|\n)/g, '$1' + '<br>' + '$2');
                  break;
      
-               case 'abreviated':
-                 aValue = aValue.abreviated(funcParams[1] || 20);
+               case 'abbreviate':
+                 aValue = aValue.abbreviate(funcParams[1] || 20);
                  break;
      
                case 'words':
