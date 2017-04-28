@@ -1,8 +1,8 @@
 /*********************************************
   * skel/workbench/js/yloader.js
-  * YeAPF 0.8.56-93 built on 2017-04-21 15:50 (-3 DST)
+  * YeAPF 0.8.56-94 built on 2017-04-28 11:07 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-04-21 15:50:05 (-3 DST)
+  * 2017-04-28 11:07:32 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.56-93 built on 2017-04-21 15:50 (-3 DST)");
+ console.log("YeAPF 0.8.56-94 built on 2017-04-28 11:07 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -711,25 +711,26 @@
      
              piece=trim(piece.substr(ni));
              changes=0
-             if (p1>'') {
-               if (name.length+lastname.length+p1.length+(name.length>0?1:0+lastname.length>0?1:0)<maxLength) {
-                 name=trim(name+' '+p1);
+             if (p2>'') {
+               if (name.length+lastname.length+p2.length+(name.length>0?1:0+lastname.length>0?1:0)<maxLength) {
+                 lastname=trim(p2+' '+lastname);
                  changes++;
-               } else {
-                 if (name.length+lastname.length+(name.length>0?1:0+lastname.length>0?1:0+1)<maxLength) {
-                   name=trim(name+' '+p1.substr(0,1)+'.');
-                   changes++;
-                 }
+               } else if (name.length+lastname.length+(name.length>0?1:0+lastname.length>0?1:0+1)<maxLength) {
+                 lastname=trim(p2.substr(0,1)+'.'+lastname);
+                 changes++;
                }
              }
+     
              if (p1!=p2) {
-               if (p2>'') {
-                 if (name.length+lastname.length+p2.length+(name.length>0?1:0+lastname.length>0?1:0)<maxLength) {
-                   lastname=trim(p2+' '+lastname);
+               if (p1>'') {
+                 if (name.length+lastname.length+p1.length+(name.length>0?1:0+lastname.length>0?1:0)<maxLength) {
+                   name=trim(name+' '+p1);
                    changes++;
-                 } else if (name.length+lastname.length+(name.length>0?1:0+lastname.length>0?1:0+1)<maxLength) {
-                   lastname=trim(p2.substr(0,1)+'.'+lastname);
-                   changes++;
+                 } else {
+                   if (name.length+lastname.length+(name.length>0?1:0+lastname.length>0?1:0+1)<maxLength) {
+                     name=trim(name+' '+p1.substr(0,1)+'.');
+                     changes++;
+                   }
                  }
                }
              }
