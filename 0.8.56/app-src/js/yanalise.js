@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yanalise.js
- * YeAPF 0.8.56-93 built on 2017-04-21 15:50 (-3 DST)
+ * YeAPF 0.8.56-96 built on 2017-04-28 11:55 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-04-21 15:26:27 (-3 DST)
+ * 2017-04-28 11:55:26 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yLexObj introduced in 2016-08-22 0.8.50-0
 **********************************************/
@@ -121,7 +121,7 @@ function yAnalise(aLine, aStack)
             break;
 
           case 'abbreviate':
-            aValue = aValue.abbreviate(funcParams[1] || 20);
+            aValue = aValue.abbreviate(funcParams[1] || 20, funcParams[2] || false);
             break;
 
           case 'words':

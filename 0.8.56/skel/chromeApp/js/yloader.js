@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.56-95 built on 2017-04-28 11:53 (-3 DST)
+  * YeAPF 0.8.56-96 built on 2017-04-28 11:55 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-04-28 11:53:57 (-3 DST)
+  * 2017-04-28 11:55:49 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.56-95 built on 2017-04-28 11:53 (-3 DST)");
+ console.log("YeAPF 0.8.56-96 built on 2017-04-28 11:55 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -2602,7 +2602,7 @@
                  break;
      
                case 'abbreviate':
-                 aValue = aValue.abbreviate(funcParams[1] || 20);
+                 aValue = aValue.abbreviate(funcParams[1] || 20, funcParams[2] || false);
                  break;
      
                case 'words':
