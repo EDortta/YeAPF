@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.56-94 built on 2017-04-28 11:07 (-3 DST)
+  * YeAPF 0.8.56-95 built on 2017-04-28 11:53 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-04-28 11:07:32 (-3 DST)
+  * 2017-04-28 11:53:57 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.56-94 built on 2017-04-28 11:07 (-3 DST)");
+ console.log("YeAPF 0.8.56-95 built on 2017-04-28 11:53 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -434,7 +434,7 @@
      
      if (typeof getElementsByClassName=="undefined") {
        console.log("Using own 'getElementsByClassName()' function");
-       function getElementsByClassName(oRootElem, strTagName, aClassName) {    
+       function getElementsByClassName(oRootElem, strTagName, aClassName) {
          var arrElements = oRootElem.getElementsByTagName(strTagName);
          var arrReturnElements = [];
          var oCurrent;
@@ -660,7 +660,7 @@
          var a=this;
          return  a.filter(function(item, pos) {
              return a.indexOf(item) == pos;
-         })    
+         })
        }
      }
      
@@ -690,8 +690,35 @@
      }
      
      if (!String.prototype.abbreviate) {
-       String.prototype.abbreviate=function(maxLength)
+       String.prototype.abbreviate=function(maxLength, prioritizeFirstName)
        {
+         var addLastName = function() {
+           if (p2>'') {
+             if (name.length+lastname.length+p2.length+(name.length>0?1:0+lastname.length>0?1:0)<maxLength) {
+               lastname=trim(p2+' '+lastname);
+               changes++;
+             } else if (name.length+lastname.length+(name.length>0?1:0+lastname.length>0?1:0+1)<maxLength) {
+               lastname=trim(p2.substr(0,1)+'.'+lastname);
+               changes++;
+             }
+           }
+         };
+     
+         var addName = function() {
+           if (p1>'') {
+             if (name.length+lastname.length+p1.length+(name.length>0?1:0+lastname.length>0?1:0)<maxLength) {
+               name=trim(name+' '+p1);
+               changes++;
+             } else {
+               if (name.length+lastname.length+(name.length>0?1:0+lastname.length>0?1:0+1)<maxLength) {
+                 name=trim(name+' '+p1.substr(0,1)+'.');
+                 changes++;
+               }
+             }
+           }
+         };
+     
+         prioritizeFirstName = prioritizeFirstName || false;
          maxLength=str2int(maxLength);
          if (this.indexOf(' ')>0) {
            var ni,li,piece=this.toString(), name='', lastname='', p1, p2, changes;
@@ -710,31 +737,20 @@
              }
      
              piece=trim(piece.substr(ni));
-             changes=0
-             if (p2>'') {
-               if (name.length+lastname.length+p2.length+(name.length>0?1:0+lastname.length>0?1:0)<maxLength) {
-                 lastname=trim(p2+' '+lastname);
-                 changes++;
-               } else if (name.length+lastname.length+(name.length>0?1:0+lastname.length>0?1:0+1)<maxLength) {
-                 lastname=trim(p2.substr(0,1)+'.'+lastname);
-                 changes++;
-               }
-             }
+             changes=0;
+     
+             if (prioritizeFirstName)
+               addName();
+             else
+               addLastName();
      
              if (p1!=p2) {
-               if (p1>'') {
-                 if (name.length+lastname.length+p1.length+(name.length>0?1:0+lastname.length>0?1:0)<maxLength) {
-                   name=trim(name+' '+p1);
-                   changes++;
-                 } else {
-                   if (name.length+lastname.length+(name.length>0?1:0+lastname.length>0?1:0+1)<maxLength) {
-                     name=trim(name+' '+p1.substr(0,1)+'.');
-                     changes++;
-                   }
-                 }
-               }
+               if (prioritizeFirstName)
+                 addLastName();
+               else
+                 addName();
              }
-             if (changes==0)
+             if (changes===0)
                break;
            }
            return trim(name+' '+lastname);
@@ -855,16 +871,16 @@
          var n10 = 0;
          var n11 = 0;
          var n12 = 1;
-          
+     
          var aux = n1 * 5 + n2 * 4 + n3 * 3 + n4 * 2 + n5 * 9 + n6 * 8 + n7 * 7 + n8 * 6 + n9 * 5 + n10 * 4 + n11 * 3 + n12 * 2;
          aux = _mod_(aux, 11);
-         var nv1 = aux < 2 ? 0 : 11 - aux;    
-      
+         var nv1 = aux < 2 ? 0 : 11 - aux;
+     
          aux = n1 * 6 + n2 * 5 + n3 * 4 + n4 * 3 + n5 * 2 + n6 * 9 + n7 * 8 + n8 * 7 + n9 * 6 + n10 * 5 + n11 * 4 + n12 * 3 + nv1 * 2;
          aux = _mod_(aux, 11);
-         var nv2 = aux < 2 ? 0 : 11 - aux;    
-          
-         return ""+n1+n2+"."+n3+n4+n5+"."+n6+n7+n8+"/"+n9+n10+n11+n12+"-"+nv1+nv2;       
+         var nv2 = aux < 2 ? 0 : 11 - aux;
+     
+         return ""+n1+n2+"."+n3+n4+n5+"."+n6+n7+n8+"/"+n9+n10+n11+n12+"-"+nv1+nv2;
        };
      
        //+ Johny W.Alves
@@ -879,15 +895,15 @@
          var n7 = Math.round(Math.random()*9);
          var n8 = Math.round(Math.random()*9);
          var n9 = Math.round(Math.random()*9);
-          
+     
          var aux = n1 * 10 + n2 * 9 + n3 * 8 + n4 * 7 + n5 * 6 + n6 * 5 + n7 * 4 + n8 * 3 + n9 * 2;
          aux = _mod_(aux, 11);
-         var nv1 = aux < 2 ? 0 : 11 - aux;    
-                  
+         var nv1 = aux < 2 ? 0 : 11 - aux;
+     
          aux = n1 * 11 + n2 * 10 + n3 * 9 + n4 * 8 + n5 * 7 + n6 * 6 + n7 * 5 + n8 * 4 + n9 * 3 + nv1 * 2;
          aux = _mod_(aux, 11);
          var nv2 = aux < 2 ? 0 : 11 - aux;
-          
+     
          return ""+n1+n2+n3+"."+n4+n5+n6+"."+n7+n8+n9+"-"+nv1+nv2;
        };
      
@@ -924,7 +940,7 @@
            if (p<c) {
              n=n.replace(".", "");
            }
-           n=n.replace(",", ".");    
+           n=n.replace(",", ".");
            return parseFloat(n);
          } else {
            return NaN;
@@ -952,14 +968,14 @@
      
      /*
      if (typeof Object.prototype.copyObj !== 'function') {
-       Object.prototype.copyObj = function() { 
+       Object.prototype.copyObj = function() {
          var JThis;
          try {
            JThis=JSON.stringify(this);
          } catch(e) {
            JThis={};
          }
-         return (JSON.parse(JThis)); 
+         return (JSON.parse(JThis));
        };
      }
      */
@@ -990,7 +1006,7 @@
      
      array_intersect = function(a, b) {
          var t=b;
-         if (b.length > a.length) { b = a; a = t }; 
+         if (b.length > a.length) { b = a; a = t };
          return a.filter(function (e) {
              if (b.indexOf(e) !== -1) return true;
          });
@@ -1068,7 +1084,7 @@
        Date.prototype.monthFirstDOW = function(aDate) {
          var auxDate = new Date((aDate || this).getTime());
          auxDate.setDate(1);
-         return auxDate.getDay();    
+         return auxDate.getDay();
        };
      }
      
@@ -1581,7 +1597,7 @@
        if (typeof n === 'string') {
          var f=n.toFloat();
          if (!isNaN(f))
-           n=f;      
+           n=f;
        }
        return !isNaN(parseFloat(n)) && isFinite(n);
      }
@@ -1589,7 +1605,7 @@
      function isOperator(n) {
        var ret=false;
        if (typeof n == 'string') {
-         ret = ((n=='<') || (n=='>') || (n=='!') || (n=='!==') || (n=='!=') || 
+         ret = ((n=='<') || (n=='>') || (n=='!') || (n=='!==') || (n=='!=') ||
                 (n=='>') || (n=='<=') || (n=='>=') || (n=='=='));
        }
        return ret;
@@ -1717,7 +1733,7 @@
        } else {
          suffix=positive?'E':'W';
        }
-       return D+"&deg; "+M+"' "+S+"'' "+suffix;  
+       return D+"&deg; "+M+"' "+S+"'' "+suffix;
      }
      
      function str2double(aStr) {
@@ -1725,7 +1741,7 @@
          aStr = '0';
      
        aStr=""+aStr;
-       
+     
        var a="";
        if ((aStr.indexOf(',')>0) && (aStr.indexOf('.')>0))
          a=aStr.replace('.','');
@@ -2113,7 +2129,7 @@
        }
       }
       return out;
-     } 
+     }
      
      /*=====================================================================
       * http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
@@ -2155,13 +2171,13 @@
          a = ++a % num;
      
          if (!a) {
-           b = ++b % num; 
+           b = ++b % num;
      
            if (!b) {
-             c = ++c % num; 
+             c = ++c % num;
            }
          }
-         nextIndex = [a, b, c]; 
+         nextIndex = [a, b, c];
          return id;
        }
      }());
@@ -2395,19 +2411,19 @@
      
        document.addEventListener(
            "DOMContentLoaded",
-           function(event) {        
+           function(event) {
              if (mTabNav) mTabNav.init();
            }
        );
      
-       window.addEventListener("load", function() {    
+       window.addEventListener("load", function() {
          for(var i=0; i<_onLoadMethods.length; i++)
            if (_onLoadMethods.hasOwnProperty(i))
              if (_onLoadMethods[i]!==undefined)
                _onLoadMethods[i]();
          if (!isOnMobile()) {
            var event = new Event('deviceready');
-           document.dispatchEvent(event);      
+           document.dispatchEvent(event);
          }
        }, false);
      
