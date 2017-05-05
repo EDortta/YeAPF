@@ -1,8 +1,8 @@
 /*********************************************
   * skel/electron/js/yloader.js
-  * YeAPF 0.8.56-103 built on 2017-05-05 11:06 (-3 DST)
+  * YeAPF 0.8.56-104 built on 2017-05-05 11:09 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-05-05 11:06:40 (-3 DST)
+  * 2017-05-05 11:09:11 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.56-103 built on 2017-05-05 11:06 (-3 DST)");
+ console.log("YeAPF 0.8.56-104 built on 2017-05-05 11:09 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -1878,9 +1878,9 @@
      function rgb2hex (rgb) {
        var res;
        if (typeof rgb.b ==='undefined') {
-         res=dec2hex(dc[0])+dec2hex(dc[1])+dec2hex(dc[2]);
+         res=dec2hex(rgb[0])+dec2hex(rgb[1])+dec2hex(rgb[2]);
        } else {
-         res=dec2hex(dc.r)+dec2hex(dc.g)+dec2hex(dc.b);
+         res=dec2hex(rgb.r)+dec2hex(rgb.g)+dec2hex(rgb.b);
        }
        return res;
      }
