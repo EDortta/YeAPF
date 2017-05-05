@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.56-101 built on 2017-05-05 10:59 (-3 DST)
+  * YeAPF 0.8.56-102 built on 2017-05-05 11:01 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-05-05 10:59:12 (-3 DST)
+  * 2017-05-05 11:01:37 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.56-101 built on 2017-05-05 10:59 (-3 DST)");
+ console.log("YeAPF 0.8.56-102 built on 2017-05-05 11:01 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -1900,7 +1900,7 @@
              var aux = { r: rgb[0], g: rgb[1], b: rgb[2] };
              rgb=aux;
            }
-           max3(rgb.r,rgb.g,rgb.b);
+           max=max3(rgb.r,rgb.g,rgb.b);
            var dif=max-min3(rgb.r,rgb.g,rgb.b);
            hsv.saturation=(max===0.0)?0:(100*dif/max);
            if (hsv.saturation===0) hsv.hue=0;

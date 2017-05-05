@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.56-101 built on 2017-05-05 10:59 (-3 DST)
+ * YeAPF 0.8.56-102 built on 2017-05-05 11:01 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-05-05 10:58:46 (-3 DST)
+ * 2017-05-05 11:01:04 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -1638,7 +1638,7 @@ var hsmColorBase = function() {
         var aux = { r: rgb[0], g: rgb[1], b: rgb[2] };
         rgb=aux;
       }
-      max3(rgb.r,rgb.g,rgb.b);
+      max=max3(rgb.r,rgb.g,rgb.b);
       var dif=max-min3(rgb.r,rgb.g,rgb.b);
       hsv.saturation=(max===0.0)?0:(100*dif/max);
       if (hsv.saturation===0) hsv.hue=0;
