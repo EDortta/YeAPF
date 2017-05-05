@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.56-105 built on 2017-05-05 12:37 (-3 DST)
+  * YeAPF 0.8.56-106 built on 2017-05-05 15:25 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-05-05 12:37:56 (-3 DST)
+  * 2017-05-05 15:25:07 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.56-105 built on 2017-05-05 12:37 (-3 DST)");
+ console.log("YeAPF 0.8.56-106 built on 2017-05-05 15:25 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -1886,11 +1886,12 @@
      }
      
      function brighterColor(color, percent){
+         percent=percent || 50;
          color=decomposeColor(color);
      
-         var r = color[0],
-             g = color[1],
-             b = color[2];
+         var r = parseInt(color[0]),
+             g = parseInt(color[1]),
+             b = parseInt(color[2]);
      
          return '#' +
             ((0|(1<<8) + r + (256 - r) * percent / 100).toString(16)).substr(1) +
