@@ -1,8 +1,8 @@
 /*********************************************
   * skel/workbench/www/js/yloader.js
-  * YeAPF 0.8.56-106 built on 2017-05-05 15:25 (-3 DST)
+  * YeAPF 0.8.56-107 built on 2017-05-05 15:48 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-05-05 15:25:07 (-3 DST)
+  * 2017-05-05 15:47:59 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.56-106 built on 2017-05-05 15:25 (-3 DST)");
+ console.log("YeAPF 0.8.56-107 built on 2017-05-05 15:48 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -194,7 +194,7 @@
    that.isMobile = (!that.isWorker) && (typeof window.orientation !== 'undefined');
    that.isChromeExtension = (!that.isWorker) && ((window.chrome && chrome.runtime && chrome.runtime.id) || (that.selfLocation.substr(0,17)=='chrome-extension:'));
    that.isChromeSandbox = (!that.isWorker) && ((that.isChromeExtension) && !(chrome.storage));
-   that.loadLibrary = function (jsFileName, elementId) {
+   that.loadLibrary = function (jsFileName, elementId, onload) {
      var libFileName;
      if (jsFileName>'') {
        if (that.selfLocation.substr(0,17)!='chrome-extension:')
@@ -222,17 +222,19 @@
        else {
          var head  = document.getElementsByTagName('head')[0];
          if (jsFileName.indexOf('.css')<0) {
-           var _script = document.createElement('script');
-           _script.type=(jsFileName.indexOf('.js')>0)?'text/javascript':'text/text';
-           _script.src=jsFileName;
+           var _script    =  document.createElement('script');
+           _script.type   = (jsFileName.indexOf('.js')>0)?'text/javascript':'text/text';
+           _script.onload = onload;
+           _script.src    = jsFileName;
            head.appendChild(_script);
          } else {
-           var _link  = document.createElement('link');
-           _link.id   = elementId || libFileName;
-           _link.rel  = 'stylesheet';
-           _link.type = 'text/css';
-           _link.href = jsFileName;
-           _link.media = 'all';
+           var _link    = document.createElement('link');
+           _link.id     = elementId || libFileName;
+           _link.rel    = 'stylesheet';
+           _link.type   = 'text/css';
+           _link.media  = 'all';
+           _link.onload = onload;
+           _link.href   = jsFileName;
            head.appendChild(_link);
          }
        }
