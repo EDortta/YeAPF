@@ -4,7 +4,7 @@
  *      slotEmptyImplementation.php
  *      This file is part of YeAPF
  *      (Yet Another PHP Framework)
- *      YeAPF 0.8.56-15 built on 2017-03-16 09:54 (-3 DST)
+ *      YeAPF 0.8.56-100 built on 2017-05-05 10:47 (-3 DST)
  *      Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
  *      2017-03-10 15:34:05 (-3 DST)
  *
@@ -130,7 +130,7 @@
     // your code goes here as in the example below
     switch($a) {
       case 'getVersion':
-        $ret='YeAPF 0.8.56-15 built on 2017-03-16 09:54 (-3 DST)';
+        $ret='YeAPF 0.8.56-100 built on 2017-05-05 10:47 (-3 DST)';
         break;
     }
 
