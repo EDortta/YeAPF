@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yloader-src.js
- * YeAPF 0.8.56-15 built on 2017-03-16 09:54 (-3 DST)
+ * YeAPF 0.8.56-99 built on 2017-05-05 10:17 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-01-11 15:48:09 (-3 DST)
+ * 2017-05-05 08:47:40 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * Purpose:  Build a monolitic YeAPF script so
  *           it can be loaded at once
@@ -29,7 +29,7 @@ if (typeof console === 'undefined')
   }
 )();
 
-console.log("YeAPF 0.8.56-15 built on 2017-03-16 09:54 (-3 DST)");
+console.log("YeAPF 0.8.56-99 built on 2017-05-05 10:17 (-3 DST)");
 
 #include('yopcontext.js')
 #include('ydebug.js')
@@ -38,12 +38,13 @@ var yloaderBase = function () {
   var that = {};
 
   (function () {
+    var mydir;
     if (typeof document=='object') {
       var scripts= document.getElementsByTagName('script');
       var path= scripts[scripts.length-1].src.split('?')[0];
-      var mydir= path.split('/').slice(0, -1).join('/')+'/';
+      mydir= path.split('/').slice(0, -1).join('/')+'/';
     } else
-      var mydir='./';
+      mydir='./';
     that.selfLocation = mydir;
     _dump("Loading from "+mydir);
   })();
@@ -53,7 +54,7 @@ var yloaderBase = function () {
   that.isChromeExtension = (!that.isWorker) && ((window.chrome && chrome.runtime && chrome.runtime.id) || (that.selfLocation.substr(0,17)=='chrome-extension:'));
   that.isChromeSandbox = (!that.isWorker) && ((that.isChromeExtension) && !(chrome.storage));
 
-  that.loadLibrary = function (jsFileName) {
+  that.loadLibrary = function (jsFileName, elementId) {
 
     var libFileName;
     if (jsFileName>'') {
@@ -81,10 +82,21 @@ var yloaderBase = function () {
       if (typeof importScripts == 'function')
         importScripts(jsFileName);
       else {
-        var _script = document.createElement('script');
-        _script.type=(jsFileName.indexOf('.js')>0)?'text/javascript':(jsFileName.indexOf('.css')>0)?'text/css':'text/text';
-        _script.src=jsFileName;
-        document.getElementsByTagName('head')[0].appendChild(_script);
+        var head  = document.getElementsByTagName('head')[0];
+        if (jsFileName.indexOf('.css')<0) {
+          var _script = document.createElement('script');
+          _script.type=(jsFileName.indexOf('.js')>0)?'text/javascript':'text/text';
+          _script.src=jsFileName;
+          head.appendChild(_script);
+        } else {
+          var _link  = document.createElement('link');
+          _link.id   = elementId || libFileName;
+          _link.rel  = 'stylesheet';
+          _link.type = 'text/css';
+          _link.href = jsFileName;
+          _link.media = 'all';
+          head.appendChild(_link);
+        }
       }
       _dump(libFileName+' added');
 

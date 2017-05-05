@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.56-97 built on 2017-05-01 10:54 (-3 DST)
+  * YeAPF 0.8.56-99 built on 2017-05-05 10:17 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-05-01 10:54:21 (-3 DST)
+  * 2017-05-05 10:17:10 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.56-97 built on 2017-05-01 10:54 (-3 DST)");
+ console.log("YeAPF 0.8.56-99 built on 2017-05-05 10:17 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -180,12 +180,13 @@
  var yloaderBase = function () {
    var that = {};
    (function () {
+     var mydir;
      if (typeof document=='object') {
        var scripts= document.getElementsByTagName('script');
        var path= scripts[scripts.length-1].src.split('?')[0];
-       var mydir= path.split('/').slice(0, -1).join('/')+'/';
+       mydir= path.split('/').slice(0, -1).join('/')+'/';
      } else
-       var mydir='./';
+       mydir='./';
      that.selfLocation = mydir;
      _dump("Loading from "+mydir);
    })();
@@ -193,7 +194,7 @@
    that.isMobile = (!that.isWorker) && (typeof window.orientation !== 'undefined');
    that.isChromeExtension = (!that.isWorker) && ((window.chrome && chrome.runtime && chrome.runtime.id) || (that.selfLocation.substr(0,17)=='chrome-extension:'));
    that.isChromeSandbox = (!that.isWorker) && ((that.isChromeExtension) && !(chrome.storage));
-   that.loadLibrary = function (jsFileName) {
+   that.loadLibrary = function (jsFileName, elementId) {
      var libFileName;
      if (jsFileName>'') {
        if (that.selfLocation.substr(0,17)!='chrome-extension:')
@@ -219,10 +220,21 @@
        if (typeof importScripts == 'function')
          importScripts(jsFileName);
        else {
-         var _script = document.createElement('script');
-         _script.type=(jsFileName.indexOf('.js')>0)?'text/javascript':(jsFileName.indexOf('.css')>0)?'text/css':'text/text';
-         _script.src=jsFileName;
-         document.getElementsByTagName('head')[0].appendChild(_script);
+         var head  = document.getElementsByTagName('head')[0];
+         if (jsFileName.indexOf('.css')<0) {
+           var _script = document.createElement('script');
+           _script.type=(jsFileName.indexOf('.js')>0)?'text/javascript':'text/text';
+           _script.src=jsFileName;
+           head.appendChild(_script);
+         } else {
+           var _link  = document.createElement('link');
+           _link.id   = elementId || libFileName;
+           _link.rel  = 'stylesheet';
+           _link.type = 'text/css';
+           _link.href = jsFileName;
+           _link.media = 'all';
+           head.appendChild(_link);
+         }
        }
        _dump(libFileName+' added');
      }
@@ -1812,15 +1824,19 @@
      var rowColorSpec = rowColorSpecBase();
      
      function decomposeColor(color) {
-       if (color.substr(0,1)=='#')
-         color=color.substr(1);
+       if (color.substr(0,4)=='rgb(') {
+         return color.replace(/[^\d,]/g, '').split(',');
+       } else {
+         if (color.substr(0,1)=='#')
+           color=color.substr(1);
      
      
-       var r=hex2dec(color.substr(0,2));
-       var g=hex2dec(color.substr(2,2));
-       var b=hex2dec(color.substr(4,2));
+         var r=hex2dec(color.substr(0,2));
+         var g=hex2dec(color.substr(2,2));
+         var b=hex2dec(color.substr(4,2));
      
-       return [r, g, b];
+         return [r, g, b];
+       }
      }
      
      function complementaryColor(color) {
@@ -1859,6 +1875,72 @@
        return res;
      }
      
+     
+     var hsmColor = function() {
+       function min3(a,b,c) {
+           return (a<b)?((a<c)?a:c):((b<c)?b:c);
+       }
+     
+       function max3(a,b,c) {
+           return (a>b)?((a>c)?a:c):((b>c)?b:c);
+       }
+     
+       var that = {};
+     
+       that.HueShift = function(h,s) {
+           h+=s; while (h>=360.0) h-=360.0; while (h<0.0) h+=360.0; return h;
+       };
+     
+       /* original source: http://color.twysted.net/  and  http://colormatch.dk/ */
+     
+       that.RGB2HSV = function(rgb) {
+           hsv = {};
+           max=max3(rgb.r,rgb.g,rgb.b);
+           dif=max-min3(rgb.r,rgb.g,rgb.b);
+           hsv.saturation=(max===0.0)?0:(100*dif/max);
+           if (hsv.saturation===0) hsv.hue=0;
+           else if (rgb.r==max) hsv.hue=60.0*(rgb.g-rgb.b)/dif;
+           else if (rgb.g==max) hsv.hue=120.0+60.0*(rgb.b-rgb.r)/dif;
+           else if (rgb.b==max) hsv.hue=240.0+60.0*(rgb.r-rgb.g)/dif;
+           if (hsv.hue<0.0) hsv.hue+=360.0;
+           hsv.value=Math.round(max*100/255);
+           hsv.hue=Math.round(hsv.hue);
+           hsv.saturation=Math.round(hsv.saturation);
+           return hsv;
+       };
+     
+       that.HSV2RGB = function(hsv) {
+           var rgb=new Object();
+           if (hsv.saturation==0) {
+               rgb.r=rgb.g=rgb.b=Math.round(hsv.value*2.55);
+           } else {
+               hsv.hue/=60;
+               hsv.saturation/=100;
+               hsv.value/=100;
+               i=Math.floor(hsv.hue);
+               f=hsv.hue-i;
+               p=hsv.value*(1-hsv.saturation);
+               q=hsv.value*(1-hsv.saturation*f);
+               t=hsv.value*(1-hsv.saturation*(1-f));
+               switch(i) {
+               case 0: rgb.r=hsv.value; rgb.g=t; rgb.b=p; break;
+               case 1: rgb.r=q; rgb.g=hsv.value; rgb.b=p; break;
+               case 2: rgb.r=p; rgb.g=hsv.value; rgb.b=t; break;
+               case 3: rgb.r=p; rgb.g=q; rgb.b=hsv.value; break;
+               case 4: rgb.r=t; rgb.g=p; rgb.b=hsv.value; break;
+               default: rgb.r=hsv.value; rgb.g=p; rgb.b=q;
+               }
+               rgb.r=Math.round(rgb.r*255);
+               rgb.g=Math.round(rgb.g*255);
+               rgb.b=Math.round(rgb.b*255);
+           }
+           return rgb;
+       }
+     
+     
+     
+       return that;
+     }
      
      /*
       * The original source code was picked from
