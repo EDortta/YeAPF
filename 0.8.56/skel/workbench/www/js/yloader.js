@@ -1,8 +1,8 @@
 /*********************************************
   * skel/workbench/www/js/yloader.js
-  * YeAPF 0.8.56-100 built on 2017-05-05 10:47 (-3 DST)
+  * YeAPF 0.8.56-101 built on 2017-05-05 10:59 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-05-05 10:47:35 (-3 DST)
+  * 2017-05-05 10:59:11 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.56-100 built on 2017-05-05 10:47 (-3 DST)");
+ console.log("YeAPF 0.8.56-101 built on 2017-05-05 10:59 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -1894,9 +1894,14 @@
        /* original source: http://color.twysted.net/  and  http://colormatch.dk/ */
      
        that.RGB2HSV = function(rgb) {
-           hsv = {};
-           max=max3(rgb.r,rgb.g,rgb.b);
-           dif=max-min3(rgb.r,rgb.g,rgb.b);
+           var hsv = {};
+           var max;
+           if (typeof rgb.r =='undefined') {
+             var aux = { r: rgb[0], g: rgb[1], b: rgb[2] };
+             rgb=aux;
+           }
+           max3(rgb.r,rgb.g,rgb.b);
+           var dif=max-min3(rgb.r,rgb.g,rgb.b);
            hsv.saturation=(max===0.0)?0:(100*dif/max);
            if (hsv.saturation===0) hsv.hue=0;
            else if (rgb.r==max) hsv.hue=60.0*(rgb.g-rgb.b)/dif;
@@ -1909,30 +1914,40 @@
            return hsv;
        };
      
-       that.HSV2RGB = function(hsv) {
-           var rgb=new Object();
+       that.HSV2RGB = function(hsv, positionalRGB) {
+           positionalRGB = positionalRGB || true;
+     
+           var aux={}, rgb={};
            if (hsv.saturation==0) {
-               rgb.r=rgb.g=rgb.b=Math.round(hsv.value*2.55);
+               aux.r=aux.g=aux.b=Math.round(hsv.value*2.55);
            } else {
                hsv.hue/=60;
                hsv.saturation/=100;
                hsv.value/=100;
-               i=Math.floor(hsv.hue);
-               f=hsv.hue-i;
-               p=hsv.value*(1-hsv.saturation);
-               q=hsv.value*(1-hsv.saturation*f);
-               t=hsv.value*(1-hsv.saturation*(1-f));
+               var i=Math.floor(hsv.hue);
+               var f=hsv.hue-i;
+               var p=hsv.value*(1-hsv.saturation);
+               var q=hsv.value*(1-hsv.saturation*f);
+               var t=hsv.value*(1-hsv.saturation*(1-f));
                switch(i) {
-               case 0: rgb.r=hsv.value; rgb.g=t; rgb.b=p; break;
-               case 1: rgb.r=q; rgb.g=hsv.value; rgb.b=p; break;
-               case 2: rgb.r=p; rgb.g=hsv.value; rgb.b=t; break;
-               case 3: rgb.r=p; rgb.g=q; rgb.b=hsv.value; break;
-               case 4: rgb.r=t; rgb.g=p; rgb.b=hsv.value; break;
-               default: rgb.r=hsv.value; rgb.g=p; rgb.b=q;
+               case 0: aux.r=hsv.value; aux.g=t; aux.b=p; break;
+               case 1: aux.r=q; aux.g=hsv.value; aux.b=p; break;
+               case 2: aux.r=p; aux.g=hsv.value; aux.b=t; break;
+               case 3: aux.r=p; aux.g=q; aux.b=hsv.value; break;
+               case 4: aux.r=t; aux.g=p; aux.b=hsv.value; break;
+               default: aux.r=hsv.value; aux.g=p; aux.b=q;
                }
-               rgb.r=Math.round(rgb.r*255);
-               rgb.g=Math.round(rgb.g*255);
-               rgb.b=Math.round(rgb.b*255);
+               aux.r=Math.round(aux.r*255);
+               aux.g=Math.round(aux.g*255);
+               aux.b=Math.round(aux.b*255);
+           }
+     
+           if (positionalRGB) {
+             rgb[0]=aux.r;
+             rgb[1]=aux.g;
+             rgb[2]=aux.b;
+           } else {
+             rgb = aux;
            }
            return rgb;
        };
