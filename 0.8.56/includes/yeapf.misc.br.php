@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misc.br.php
-    YeAPF 0.8.56-100 built on 2017-05-05 10:47 (-3 DST)
+    YeAPF 0.8.56-129 built on 2017-05-11 17:33 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-04-03 14:25:25 (-3 DST)
+    2017-05-08 10:21:45 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -133,15 +133,15 @@
 
   function inventarCPF($compontos=false)
   {
-    $n1 = rand(0, 9);
-    $n2 = rand(0, 9);
-    $n3 = rand(0, 9);
-    $n4 = rand(0, 9);
-    $n5 = rand(0, 9);
-    $n6 = rand(0, 9);
-    $n7 = rand(0, 9);
-    $n8 = rand(0, 9);
-    $n9 = rand(0, 9);
+    $n1 = y_rand(0, 9);
+    $n2 = y_rand(0, 9);
+    $n3 = y_rand(0, 9);
+    $n4 = y_rand(0, 9);
+    $n5 = y_rand(0, 9);
+    $n6 = y_rand(0, 9);
+    $n7 = y_rand(0, 9);
+    $n8 = y_rand(0, 9);
+    $n9 = y_rand(0, 9);
     $d1 = $n9 * 2 + $n8 * 3 + $n7 * 4 + $n6 * 5 + $n5 * 6 + $n4 * 7 + $n3 * 8 + $n2 * 9 + $n1 * 10;
     $d1 = 11 - (_mod_($d1, 11));
     if ($d1 >= 10) {
@@ -245,14 +245,14 @@
 
   function inventarCNPJ($compontos=false)
   {
-    $n1 = rand(0, 9);
-    $n2 = rand(0, 9);
-    $n3 = rand(0, 9);
-    $n4 = rand(0, 9);
-    $n5 = rand(0, 9);
-    $n6 = rand(0, 9);
-    $n7 = rand(0, 9);
-    $n8 = rand(0, 9);
+    $n1 = y_rand(0, 9);
+    $n2 = y_rand(0, 9);
+    $n3 = y_rand(0, 9);
+    $n4 = y_rand(0, 9);
+    $n5 = y_rand(0, 9);
+    $n6 = y_rand(0, 9);
+    $n7 = y_rand(0, 9);
+    $n8 = y_rand(0, 9);
     $n9 = 0;
     $n10 = 0;
     $n11 = 0;

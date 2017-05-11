@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.56-106 built on 2017-05-05 15:25 (-3 DST)
+ * YeAPF 0.8.56-129 built on 2017-05-11 17:33 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-05-05 15:24:30 (-3 DST)
+ * 2017-05-11 15:41:53 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -2293,7 +2293,7 @@ if ((typeof window=='object') && (typeof _onLoadMethods == 'undefined')) {
 
     var i;
 
-    if (elem.length) {
+    if (isArray(elem)) {
       for(i=0; i<elem.length; i++)
         addEvent(elem[i], eventName, eventHandler);
     } else {
@@ -2301,7 +2301,7 @@ if ((typeof window=='object') && (typeof _onLoadMethods == 'undefined')) {
       for(i=0; i<eventList.length; i++) {
         aEventName=eventList[i];
         if ( elem.addEventListener ) {
-          elem.addEventListener( aEventName, eventHandler, false );
+          elem.addEventListener( aEventName, eventHandler, aEventName.toUpperCase()=="change" );
         } else if ( elem.attachEvent ) {
           elem.attachEvent( "on" + aEventName, eventHandler );
         } else {

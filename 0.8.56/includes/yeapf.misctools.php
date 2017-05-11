@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misctools.php
-    YeAPF 0.8.56-100 built on 2017-05-05 10:47 (-3 DST)
+    YeAPF 0.8.56-129 built on 2017-05-11 17:33 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-31 12:31:02 (-3 DST)
+    2017-05-11 15:10:25 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -762,6 +762,57 @@
     }
 
     return $shortUrl;
+  }
+
+  function remoteIp() 
+  {
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        $ip = $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+    } else {
+        $ip = $_SERVER['REMOTE_ADDR'];
+    }
+    return $ip;
+  }
+
+  function getCurrentIp() 
+  {
+    global $sgugIni;
+
+    $services = array("http://icanhazip.com/", "http://ipecho.net/plain");
+
+    $secondsPerDay = 24 * 60 * 60;
+    
+    $cfgName = dirname($sgugIni)."/.config/ifconfig.me";
+    $d = date('U');
+    $o = @filemtime($cfgName);
+    $dif = $d-$o;
+    
+    if ($dif > $secondsPerDay / 6) {
+      $ch=curl_init();
+      curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2); 
+      curl_setopt($ch, CURLOPT_TIMEOUT, 4);
+      curl_setopt($ch, CURLOPT_URL, $services[0]);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+      $currentIP=preg_replace('/[[:^print:]]/', '', curl_exec($ch));
+      curl_close($ch);
+      file_put_contents($cfgName, $currentIP);
+    } else
+      $currentIP=file_get_contents($cfgName);
+    return $currentIP;
+  }
+
+  function getGEOip($currentIP) 
+  {
+    $ch=curl_init();
+    curl_setopt($ch, CURLOPT_URL, "https://freegeoip.net/json/$currentIP");
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $geoInfo=curl_exec($ch);
+    curl_close($ch);
+
+    $g=json_decode($geoInfo, true);    
+    return $g;
   }
 
 

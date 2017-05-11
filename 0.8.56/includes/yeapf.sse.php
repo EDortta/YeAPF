@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.56-100 built on 2017-05-05 10:47 (-3 DST)
+    YeAPF 0.8.56-129 built on 2017-05-11 17:33 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-07 10:32:54 (-3 DST)
+    2017-05-08 10:21:04 (-3 DST)
    */
 
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -313,7 +313,7 @@
         $usr_folder = ".sse/$w_target/$u_target";
         if (is_dir($usr_folder)) {
           mt_srand();
-          $msg_ndx = date("U")."-".mt_rand(1000,9999)."-".mt_rand(1000,9999);
+          $msg_ndx = date("U")."-".y_rand(1000,9999)."-".y_rand(1000,9999);
           // file_put_contents("$ndxFile", "$w_target\n$msg_ndx\n$sse_session_id\n".date("U"));
           $messageFileI = "$usr_folder/$msg_ndx.new";
           $messageFileF = "$usr_folder/$msg_ndx.msg";

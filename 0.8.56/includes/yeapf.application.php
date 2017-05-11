@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.56-100 built on 2017-05-05 10:47 (-3 DST)
+    YeAPF 0.8.56-129 built on 2017-05-11 17:33 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-06 09:40:33 (-3 DST)
+    2017-05-11 15:56:32 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -847,7 +847,7 @@
 
   function produceRestOutput($jsonData)
   {
-    global $callback, $callbackId, $scriptSequence, $userMsg, $_xq_context_;
+    global $callback, $callbackId, $scriptSequence, $userMsg, $_xq_context_, $ts;
 
     if ((!isset($callbackId)) || ($callbackId==''))
       $callbackId = 'null';
@@ -861,26 +861,123 @@
 
     $context=json_encode($_xq_context_);
 
-    $script="
-      if (typeof $callback == 'function') {
-        $callback(200, 0, $jsonData, '$userMsg', $context);
-      } else
-        console.warn(\"'$callback' callback function was not found\");
-    ";
+    $returnAsScript=false;
+    /* 0.9.0 */
+    if (isset($GLOBALS['_rap_'.$ts])) {
+      if ($GLOBALS['_rap_'.$ts]==1)
+        $returnAsScript=true;
+    }
+
+    if (isset($GLOBALS['fieldName']) && isset($GLOBALS['fieldValue']) && isset($GLOBALS['ts']))
+      $returnAsScript=true;
+
+    if ($returnAsScript) {
+      $script=
+        "if (typeof $callback == 'function') {
+           $callback(200, 0, $jsonData, '$userMsg', $context);
+         } else
+           console.warn(\"'$callback' callback function was not found\");
+        ";
+    } else {
+      $script = $jsonData;
+    }
+
     return $script;
+  }
+
+  function thisNodeExists($onlyEnabled=true)
+  {
+    global $cfgNodePrefix;
+    if ($onlyEnabled)
+      $w="n.enabled='Y' and s.enabled='Y' and ";
+    else
+      $w="";
+
+    $sql="select count(*) 
+                from is_node_control n, is_server_control s 
+                where $w nodePrefix='$cfgNodePrefix' 
+                  and s.serverKey=n.serverKey";
+
+    $cc=db_sql($sql);  
+    return ($cc==1);  
+  }
+
+  function disableThisNode()
+  {
+    global $cfgNodePrefix;
+    db_sql("update is_node_control set enabled='N' where nodePrefix='$cfgNodePrefix'");    
+  }
+
+  function enableThisNode()
+  {
+    global $cfgNodePrefix;
+    db_sql("update is_node_control set enabled='Y' where nodePrefix='$cfgNodePrefix'");
   }
 
   function ryeapf($a)
   {
-    global $callback;
+    global $callback, $sgugIni, $cfgNodePrefix, $cfgClientConfig, $_ydb_ready;
     extract(xq_extractValuesFromQuery());
 
     $ret=array();
 
     if ($a=='ping') {
       $ret['serverTime'] = date('U');
+      $ret['timezone'] = date('Z');
+      $ret['ip'] = getCurrentIp();
     } else if ($a=='serverTime') {
       $ret['serverTime'] = date('Y-m-d H:i:s');
+    } else if ($a=='nodeKeepAlive') {
+      $baseFolder = dirname($sgugIni);
+      if (db_status(_DB_LOCKED)==0) {
+        if (db_tableExists('is_node_control')) {
+          if (thisNodeExists()) {
+            $dbNodeInfo = db_sql("select enabled, last_verification, ipv4 
+                                  from is_node_control 
+                                  where nodePrefix='$cfgNodePrefix'", false);
+            extract($dbNodeInfo);
+
+            $currentIP = getCurrentIp();
+            if ($currentIP==$ipv4) {
+              $t=date('U');
+              $reverse_ip = gethostbyaddr($currentIP);
+              db_sql("update is_node_control 
+                      set last_verification=$t, 
+                          reverse_ip='$reverse_ip' 
+                      where nodePrefix='$cfgNodePrefix'");
+              $ret['reverse_ip'] = $reverse_ip;
+              $ret['last_verification'] = $t;
+            } else {
+              $ret['error'] = "Current ip '$currentIP' differs from '$ip4'";
+            }
+          } else {
+            $ret['error'] = "No configuration enabled at 'is_node_control'";
+          }
+        } else {
+          $ret['error'] = "Table 'is_node_control' not found in database";
+        }
+      } else {
+        $ret['flags']=$_ydb_ready;
+
+        if (db_status(_DB_LOCK_DISABLED)==_DB_LOCK_DISABLED) 
+          $ret['error'] = "Node disabled";
+        if (db_status(_DB_LOCK_TIME_MISTAKE)==_DB_LOCK_TIME_MISTAKE) 
+          $ret['error'] = "Node timestamp mistake";
+        if (db_status(_DB_LOCK_IPV4_MISTAKE)==_DB_LOCK_IPV4_MISTAKE) 
+          $ret['error'] = "Node ipv4 mistake";
+        if (db_status(_DB_LOCK_WRONG_SERVER_PREFIX)==_DB_LOCK_WRONG_SERVER_PREFIX) 
+          $ret['error'] = "Node with wrong server prefix";
+        if (db_status(_DB_LOCK_SERVER_PREFIX_MISTAKE)==_DB_LOCK_SERVER_PREFIX_MISTAKE) 
+          $ret['error'] = "Node server prefix mistake";
+
+        $ret['lastError']=$GLOBALS['lastError'];
+
+      }
+      /*
+      $ret['folder'] = $baseFolder;
+      $ret['cfgNodePrefix'] = $cfgNodePrefix;
+      $ret['cfgClientConfig'] = $cfgClientConfig;
+      */
     }
 
     $jsonRet = json_encode($ret);
@@ -932,5 +1029,10 @@
   }
 
   addEventHandler('yeapfAppEvents');
+
+  if (function_exists('db_checkNodeConfig')) {
+    db_checkNodeConfig();
+    _recordWastedTime("db_checkNodeConfig()");
+  }
 
 ?>

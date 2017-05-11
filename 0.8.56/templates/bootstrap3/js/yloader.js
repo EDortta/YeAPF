@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.56-107 built on 2017-05-05 15:48 (-3 DST)
+  * YeAPF 0.8.56-129 built on 2017-05-11 17:33 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-05-05 15:47:59 (-3 DST)
+  * 2017-05-11 17:33:40 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.56-107 built on 2017-05-05 15:48 (-3 DST)");
+ console.log("YeAPF 0.8.56-129 built on 2017-05-11 17:33 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -2557,7 +2557,7 @@
      
          var i;
      
-         if (elem.length) {
+         if (isArray(elem)) {
            for(i=0; i<elem.length; i++)
              addEvent(elem[i], eventName, eventHandler);
          } else {
@@ -2565,7 +2565,7 @@
            for(i=0; i<eventList.length; i++) {
              aEventName=eventList[i];
              if ( elem.addEventListener ) {
-               elem.addEventListener( aEventName, eventHandler, false );
+               elem.addEventListener( aEventName, eventHandler, aEventName.toUpperCase()=="change" );
              } else if ( elem.attachEvent ) {
                elem.attachEvent( "on" + aEventName, eventHandler );
              } else {
@@ -4197,8 +4197,9 @@
      
            var aURL="s={0}&a={1}&u={2}&fieldName={3}&fieldValue={4}".format(s, a, u || '', fieldName, fieldValue);
      
-           var ts=new Date();
-           aURL+='&ts='+ts.getTime();
+           var ts=(new Date()).getTime();
+           aURL+='&ts='+ts;
+           aURL+='&_rap_'+ts+'=1';
            // aURL=aURL.replace('%','%25');
            return aURL;
          };

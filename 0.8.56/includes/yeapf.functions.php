@@ -1,19 +1,19 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.56-100 built on 2017-05-05 10:47 (-3 DST)
+    YeAPF 0.8.56-129 built on 2017-05-11 17:33 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-28 11:43:22 (-3 DST)
+    2017-05-11 13:42:14 (-3 DST)
    */
 
   /*
 
-    usar addUserFunc($funcName) para acrescentar um processador de funÁıes
-    usar _recordError($errorDesc, $warnLevel) para acrescentar uma indicaÁ„o de erro ao usu·rio
-    usar _recordAction($actionDesc) para acrescentar uma indicaÁ„o de aÁ„o bem-sucedida ao usu·rio
-    usar _record($var, $descripion) para registrar aÁıes pequenas (linhas)
+    usar addUserFunc($funcName) para acrescentar um processador de fun√ß√µes
+    usar _recordError($errorDesc, $warnLevel) para acrescentar uma indica√ß√£o de erro ao usu√°rio
+    usar _recordAction($actionDesc) para acrescentar uma indica√ß√£o de a√ß√£o bem-sucedida ao usu√°rio
+    usar _record($var, $descripion) para registrar a√ß√µes pequenas (linhas)
 
-    indica se todos os formul·rios processados precisam ser recompilados
+    indica se todos os formul√°rios processados precisam ser recompilados
   */
 
   function serverSafeVarValue($aName)
@@ -180,7 +180,11 @@
 
   $cfgDBCureFields=true;
 
-  $cfgServerPrefix=file_exists("flags/cfgServerPrefix")?file_get_contents("flags/cfgServerPrefix"):"";
+  // These values will be initializated in two stages: 
+  //   cfgNodePrefix in db_startup() and 
+  //   cfgSegmentPrefix in afterDBCOnnect event
+  $cfgNodePrefix="UNK";
+  $cfgSegmentPrefix="UNDF";
 
 
   function _whoiam_()
@@ -207,12 +211,12 @@
   // if it fails, this flag is turned off, so we don't trigger the same event again
   $canDoLog=true;
 
-  // indica a profundidade de depuraÁ„o que quer nos erros de SQL
+  // indica a profundidade de depura√ß√£o que quer nos erros de SQL
   // 0 - mostra nada
   // 1 - mostra a linha errada
-  // 2 - faz 1 e mostra o traÁado de diagnostico
-  // 3 - faz 2 e mostra os argumentos das chamadas ‡s funÁıes
-  // 4 - faz 3 e para a execuÁ„o do script
+  // 2 - faz 1 e mostra o tra√ßado de diagnostico
+  // 3 - faz 2 e mostra os argumentos das chamadas √†s fun√ß√µes
+  // 4 - faz 3 e para a execu√ß√£o do script
   $SQLdebugLevel = 0;
   if (!isset($SQLDieOnError))
     $SQLDieOnError = true;
@@ -257,7 +261,7 @@
 
 
   /*
-  // configuraÁ„o da tabela de seguranÁa de acesso do usuario
+  // configura√ß√£o da tabela de seguran√ßa de acesso do usuario
   // ;usrTableName;usrSessionIDField;usrSuperField;usrNicknameField;usrUniqueIDField
   $usrTableName = 'is_usuarios';
   $usrSessionIDField = 'userID';
@@ -352,7 +356,7 @@
            */
            $__EventBuffer, $__EventBufferFilled;
 
-    _recordWastedTime("Starting YeAPF stage: $functionName($a, $a)");
+    _recordWastedTime("Starting YeAPF stage: $functionName($s, $a)");
 
     if ($functionName>'')
       $fe = function_exists("$functionName");
@@ -421,6 +425,7 @@
                       'yeapf.userContext.php',
                       'yeapf.eventHandler.php',
                       'yeapf.application.php',
+                      
                       'yeapf.tasks.php',
                       'yeapf.sse.php',
                       'yeapf.colors.php',
@@ -655,7 +660,7 @@
   $lastAccess = 0;  // so aos efeitos que seja global $yeapfLogFlags,.  o valor mesmo sera colocado por usuario valido
 
   function __extractInputValues__ () {
-    global $user_IP, $safe_user_IP;
+    global $user_IP, $safe_user_IP, $queryString;
 
     /*
     $qs = getenv("QUERY_STRING").'&';
@@ -720,16 +725,18 @@
     }
 
     if (!$GLOBALS['isCLI']) {
-      $url='';
+      $queryString='';
       foreach($request as $qsn => $qsv) {
-        if ($url>'')
-          $url.='&';
-        $url.="$qsn=".$GLOBALS[$qsn];
+        if ($queryString>'')
+          $queryString.='&';
+        $queryString.="$qsn";
+        if ($GLOBALS[$qsn]>'')
+          $queryString.="=".$GLOBALS[$qsn];
       }
       $request_uri = "http".(!empty($_SERVER['HTTPS'])?"s":"")."://".$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'].'?';
       $request_uri=substr($request_uri,0,strpos($request_uri,'?'));
       //$url=basename($_SERVER["SCRIPT_FILENAME"]).'?'.$url;
-      $url=$request_uri.'?'.$url;
+      $url=$request_uri.'?'.$queryString;
       /*
       https://wadl.java.net
       https://en.wikipedia.org/wiki/Web_Application_Description_Language 
@@ -1148,7 +1155,7 @@
      */
     $strCharset=detect_encoding($str);
     $str=iconv($strCharset, 'ISO-8859-1', $str);
-    $str1="·ÈÌÛ˙‡ËÏÚ˘„ı‚ÍÓÙ˚‰ÎÔˆ¸ÁÒ¡…Õ”⁄¿»Ã“Ÿ√’¬ Œ‘€ƒÀœ÷‹«—";
+    $str1="√°√©√≠√≥√∫√†√®√¨√≤√π√£√µ√¢√™√Æ√¥√ª√§√´√Ø√∂√º√ß√±√Å√â√ç√ì√ö√Ä√à√å√í√ô√É√ï√Ç√ä√é√î√õ√Ñ√ã√è√ñ√ú√á√ë";
     $str2="aeiouaeiouaoaeiouaeioucnAEIOUAEIOUAOAEIOUAEIOUCN";
 
     for ($i=0; $i<strlen($str1); $i++){
@@ -1164,11 +1171,11 @@
 
   function suggestVarName($aStr)
   {
-    // compactar, rebaixar e deixar sÛ caracteres sem acentuaÁ„o
+    // compactar, rebaixar e deixar s√≥ caracteres sem acentua√ß√£o
     $aux=trim(strtolower(cleanString(rawChars($aStr))));
     if ($aux>'') {
 
-      // eliminar carateres inv·lidos
+      // eliminar carateres inv√°lidos
       $aux1='';
       for($i=0; $i<strlen($aux); $i++) {
         $c=substr($aux,$i,1);
@@ -1177,11 +1184,11 @@
       }
       $aux=$aux1; unset($aux1);
 
-      // permitir sÛ inicio com letras
+      // permitir s√≥ inicio com letras
       while ((!((substr($aux,0,1)>='a') && (substr($aux,0,1)<='z'))) && ($aux>''))
         $aux=trim(substr($aux,1));
 
-      // eliminar espaÁos duplicados
+      // eliminar espa√ßos duplicados
       $aux=str_replace('  ', ' ',$aux);
 
       // subir a caixa das primeiras letas das palavras (menos a primeira)
@@ -1505,7 +1512,7 @@
 
       if ($protocolIdentifier) {
         if (substr($formFile,0,2)=='./') {
-          // È buildForm se chamando a sim mesmo...
+          // √© buildForm se chamando a sim mesmo...
           $aux=substr($myself,strlen($thisServer));
           if (strpos($aux,'?')>0)
             $aux=substr($aux,0,strpos($aux,'?')).'?';
@@ -1602,12 +1609,12 @@
   {
     global $appName;
 
-    /* O programador pode criar seus scripts que ser„o carregados de
-     * autom·tica pelo YeAPF mas sÛ apÛs a autenticaÁ„o.
+    /* O programador pode criar seus scripts que ser√£o carregados de
+     * autom√°tica pelo YeAPF mas s√≥ ap√≥s a autentica√ß√£o.
      * Baseado no nome do script chamado (body.php) ele procura
      * por um script que comece com o nome do aplicativo.
      * Assim se o aplicativo se chama teste o script a ser carregado
-     * desde o body levar· o nome de teste.body.php
+     * desde o body levar√° o nome de teste.body.php
      */
 
     $sn=serverSafeVarValue("SCRIPT_NAME");
@@ -1837,7 +1844,7 @@
       } else if (isCondition($linha, $pos)) {
         $tipoToken = 4;
         while (($pos<strlen($linha)) and (substr($linha, $pos, 1)!=',')) {
-          if (strpos('∑<>=!', substr($linha, $pos, 1))==0)
+          if (strpos('¬∑<>=!', substr($linha, $pos, 1))==0)
             break;
           else
            $pos++;
@@ -2457,7 +2464,7 @@
 
   function dateFromTimeStamp($v)
   {
-    showDebugBackTrace("Chamada a funÁ„o obsoleta",TRUE);
+    showDebugBackTrace("Chamada a fun√ß√£o obsoleta",TRUE);
     /*
 
 
@@ -2487,7 +2494,7 @@
   {
 
 
-    $mNames = array("","janeiro", "fevereiro","marÁo","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro");
+    $mNames = array("","janeiro", "fevereiro","mar√ßo","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro");
 
     $bg='#ffffff';
 
@@ -2612,7 +2619,7 @@
   {
 
 
-    $meses = array("","janeiro", "fevereiro","marÁo","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro");
+    $meses = array("","janeiro", "fevereiro","mar√ßo","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro");
 
     if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_))) {
       $aDate=substr($aDate,0,8);
@@ -2862,10 +2869,10 @@
     return $res;
   }
 
-  // processa um diretÛrio
-  // pega os nomes que comeÁem com "SEED"
+  // processa um diret√≥rio
+  // pega os nomes que come√ßem com "SEED"
   // passa esses nomes para a "FUNCAO"
-  // e devolve a concatenaÁ„o dos resultados de cada chamada ‡ funÁ„o separado pelo hifen
+  // e devolve a concatena√ß√£o dos resultados de cada chamada √† fun√ß√£o separado pelo hifen
   function doFileList($diretorio, $colunas, $hifen='&#32;', $seed = '', $funcao = '', $inicio=0, $limite=9999)
   {
     global $fundoImagem;

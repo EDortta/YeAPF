@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.uuid.php
-    YeAPF 0.8.56-100 built on 2017-05-05 10:47 (-3 DST)
+    YeAPF 0.8.56-129 built on 2017-05-11 17:33 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-13 10:45:46 (-3 DST)
+    2017-05-11 09:45:52 (-3 DST)
 */
 
   /*
@@ -13,6 +13,35 @@
    */
 
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
+
+  function y_rand($min=0, $max=null) {
+    if ($max===null)
+      $max=getrandmax();
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      $t = mt_rand($min, $max);
+    } else {
+      do {
+        $f=fopen("/dev/urandom", "r");
+        if ($f)
+          break;
+        else
+         sleep(1);
+      } while(true);
+      $t=$max / mt_rand(1,64);
+      $n=mt_rand(7,21);
+      while ($n>0) {
+        $n--;
+        for($i=0; $i<7; $i++) {
+          $x=ord(fread( $f, 1 ));
+          $t+=$x;
+        }
+      }
+      fclose($f);
+      $t = $min + $t % ($max - $min + 1);
+    }
+    return $t;
+  }
+
 
   class UUID {
     public static function v3($namespace, $name) {
@@ -59,22 +88,22 @@
       return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
 
         // 32 bits for "time_low"
-        mt_rand(0, 0xffff), mt_rand(0, 0xffff),
+        y_rand(0, 0xffff), y_rand(0, 0xffff),
 
         // 16 bits for "time_mid"
-        mt_rand(0, 0xffff),
+        y_rand(0, 0xffff),
 
         // 16 bits for "time_hi_and_version",
         // four most significant bits holds version number 4
-        mt_rand(0, 0x0fff) | 0x4000,
+        y_rand(0, 0x0fff) | 0x4000,
 
         // 16 bits, 8 bits for "clk_seq_hi_res",
         // 8 bits for "clk_seq_low",
         // two most significant bits holds zero and one for variant DCE1.1
-        mt_rand(0, 0x3fff) | 0x8000,
+        y_rand(0, 0x3fff) | 0x8000,
 
         // 48 bits for "node"
-        mt_rand(0, 0xffff), mt_rand(0, 0xffff), mt_rand(0, 0xffff)
+        y_rand(0, 0xffff), y_rand(0, 0xffff), y_rand(0, 0xffff)
       );
     }
 
@@ -125,12 +154,53 @@
 
   function y_uniqid()
   {
-    global $cfgServerPrefix;
+    global $cfgNodePrefix;
     $ret = UUID::v4();
-    return $cfgServerPrefix.preg_replace("/[^A-Za-z0-9 ]/", '', $ret);
+    return $cfgNodePrefix.preg_replace("/[^A-Za-z0-9 ]/", '', $ret);
   }
 
-  mt_srand(mktime()*mt_rand(1000,2000));
+  function y_sequence($clientPrefix, $nodePrefix) 
+  {
+    /*
+        sssCCCC000000nnnnnnnnnnnnnnnnnnn
+    theoretical max  9999999999999999999
+    real bigint max  9223372036854775807
+    */
+    global $cfgNodePrefix, $cfgSegmentPrefix;
+
+    $ret=null;
+    $erroGrave=false;
+
+    if (!isset($nodePrefix))
+      $nodePrefix = "$cfgNodePrefix";
+    if (!isset($clientPrefix))
+      $clientPrefix="$cfgSegmentPrefix";
+
+    $clientPrefix = strcopy(str_repeat("_", 4).$clientPrefix, -4);
+    $nodePrefix   = strcopy(str_repeat("_", 3).$nodePrefix, -3);
+    $flagName="sequencer-$clientPrefix-$nodePrefix";
+    
+    if (lock($flagName)) {
+      $sequence=db_sql("select value from is_sequence where nodePrefix='$nodePrefix' and clientPrefix='$clientPrefix'");
+      if ($sequence>0) {
+        $sequence++;
+        db_sql("update is_sequence set value=$sequence where nodePrefix='$nodePrefix' and clientPrefix='$clientPrefix'");
+        $sequence=str_repeat("0", 19-strlen($sequence));
+        $ret=$nodePrefix.$clientPrefix."000000".$sequence;
+      } else {
+        $erroGrave=true;
+      }
+      unlock($flagName);
+    }
+
+    if ($erroGrave) {
+      _die("Sequencer not initialized. You're trying to generate a sequencer for '$clientPrefix' at '$nodePrefix'. Create an entry at is_sequence table");
+    }
+
+    return $ret;
+  }
+
+  mt_srand(mktime()*y_rand(1000,2000));
 
 
 ?>

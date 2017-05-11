@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xForms.php
-    YeAPF 0.8.56-100 built on 2017-05-05 10:47 (-3 DST)
+    YeAPF 0.8.56-129 built on 2017-05-11 17:33 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-11-07 15:58:05 (-3 DST)
+    2017-05-09 16:15:46 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
   /*
@@ -27,7 +27,7 @@
       queries { name = "select ..." };
 
       key { field_name: key_type[(key_generator)] };
-         key_type = ( auto, numeric, unique, uniquemd5, user_defined )
+         key_type = ( auto, numeric, unique, uniquemd5, sequence32, user_defined )
          key_generator = user_defined_function
          field_name = identifier
 
@@ -1319,6 +1319,7 @@
             break;
           case 'unique':
           case 'uniquemd5':
+          case 'sequence32':
           case 'unique40':
             $v="'$v'";
             break;
@@ -1360,6 +1361,7 @@
                 break;
               case 'unique':
               case 'uniquemd5':
+              case 'sequence32':
               case 'unique40':
                 $v="'$v'";
                 break;
@@ -1540,7 +1542,7 @@
                          $decodeURL=true)
   {
     /* Get the unique seed indicated in config file */
-    $auxSeed = getArrayValueIfExists($GLOBALS, 'unique_id_seed', 'rnd'.rand(10000,99999));
+    $auxSeed = getArrayValueIfExists($GLOBALS, 'unique_id_seed', 'rnd'.y_rand(10000,99999));
 
     $fieldsSourceMap = array();
 
@@ -1627,6 +1629,9 @@
               $idValue=md5("$auxSeed".y_uniqid());
               $aux=substr("$auxSeed".str_repeat('0',40),0,40);
               $idValue=substr($aux,0,40-strlen($idValue)).$idValue;
+              break;
+            case 'sequence32':
+              $idValue=y_sequence($GLOBALS['cfgSegmentPrefix']);
               break;
             case 'user_defined':
               $aux="key_generator_$tableName";

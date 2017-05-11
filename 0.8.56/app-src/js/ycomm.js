@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm.js
- * YeAPF 0.8.56-100 built on 2017-05-05 10:47 (-3 DST)
+ * YeAPF 0.8.56-129 built on 2017-05-11 17:33 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-09-09 17:04:46 (-3 DST)
+ * 2017-05-10 18:36:55 (-3 DST)
  * First Version (C) 2010 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm.js
@@ -154,8 +154,9 @@
 
       var aURL="s={0}&a={1}&u={2}&fieldName={3}&fieldValue={4}".format(s, a, u || '', fieldName, fieldValue);
 
-      var ts=new Date();
-      aURL+='&ts='+ts.getTime();
+      var ts=(new Date()).getTime();
+      aURL+='&ts='+ts;
+      aURL+='&_rap_'+ts+'=1';
       // aURL=aURL.replace('%','%25');
       return aURL;
     };

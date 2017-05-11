@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.56-100 built on 2017-05-05 10:47 (-3 DST)
+    YeAPF 0.8.56-129 built on 2017-05-11 17:33 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-02-20 07:21:36 (-3 DST)
+    2017-05-10 14:50:56 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -646,6 +646,46 @@
           _die("'wbp_printers' table not found");
         }
       }
+
+      if (_db_upd_canReviewVersion(15)) {
+        _recordWastedTime("checking v15");
+        if (!db_tableExists("is_server_control")) {
+          $sql="create table is_server_control(
+            serverKey char(16) not null,
+            enabled char(1) default 'N',
+            last_verification integer
+          )";
+          db_sql("$sql");
+        }
+
+        if (!db_tableExists("is_node_control")) {
+          $sql="create table is_node_control(
+            serverKey char(16) not null,
+            nodePrefix char(3) not null,
+            enabled char(1) default 'N',
+            ipv4 char(15),
+            reverse_ip varchar(255),
+            last_verification integer
+          )";
+          db_sql("$sql");
+        }
+
+        if (!db_tableExists("is_sequence")) {
+          $sql="CREATE TABLE is_sequence (
+                  nodePrefix char(2) NOT NULL,
+                  clientPrefix char(3) NOT NULL,
+                  value bigint NOT NULL
+                )";
+          db_sql($sql);
+          $sql="create index idx_sequence on is_sequence(nodePrefix, clientPrefix)";
+          db_sql($sql);
+        }
+        $currentDBVersion=15;
+        _db_grantSetupIni();
+        $setupIni->setValue('currentDBVersion',$currentDBVersion);
+        $setupIni->commit();
+      }
+
     }
 
     if ($flagDBStructureReviewed) {
@@ -661,5 +701,6 @@
       }
     }
 
+      
   }
 ?>

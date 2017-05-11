@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.userContext.php
-    YeAPF 0.8.56-100 built on 2017-05-05 10:47 (-3 DST)
+    YeAPF 0.8.56-129 built on 2017-05-11 17:33 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-08-23 06:35:12 (-3 DST)
+    2017-05-11 17:28:59 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -445,7 +445,7 @@
         $this->userContext['user']['IDFieldName']=$IDFieldName>''?$IDFieldName:$usrSessionIDField;
         $this->userContext['user']['logon']=$sysTimeStamp;
         $this->userContext['user']['logonRights']=$logonRights;
-        $this->userContext['user']['remote_addr']=serverSafeVarValue('REMOTE_ADDR');
+        $this->userContext['user']['remote_addr']=getRemoteIp();
         $this->userContext['user']['user_name']=db_sql($sql);
 
         $this->validUser=true;
