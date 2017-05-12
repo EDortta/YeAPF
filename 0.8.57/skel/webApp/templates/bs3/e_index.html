@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="#(appLang)">
+<head>
+  <!--
+      skel/webApp/templates/bs3/e_index.html
+      YeAPF 0.8.57-1 built on 2017-05-12 19:12 (-3 DST)
+      Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
+      2016-01-23 22:00:41 (-3 DST)
+      Bootstrap3 / YeAPF application template
+      First version: May, 2015 Esteban D.Dortta
+  -->
+  <meta charset="utf-8">
+  <title>#(appTitle)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="#(appName)">
+  <meta name="author" content="#(appAuthor)">
+
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+
+  <!--[if lt IE 9]>
+    <script src="js/html5shiv.js"></script>
+  <![endif]-->
+
+  <link rel="shortcut icon" href="img/favicon.png">
+
+  <script src="js/jquery.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/bootbox.min.js"></script>
+  <script src="js/yloader.min.js"></script>
+  <script src="js/yapp.min.js"></script>
+</head>
+
+<body>
+    #include('e_main_menu.html')
+    <div class=tnContainer>
+        <div class=tnTab id=vwSample01>
+            #include('f_sampleEvent01.html')
+        </div>
+        <div class=tnTab id=vwSample02>
+            #include('f_sampleEvent02.html')
+        </div>
+        <div class=tnTab id=vwDummySample>
+            #include('f_sampleEvent02.html')
+        </div>
+    </div>
+</body>
+  <!-- Your app script goes here -->
+  <script src="js/script.js"></script>
+</html>
