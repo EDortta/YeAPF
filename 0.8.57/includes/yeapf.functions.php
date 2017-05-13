@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.57-1 built on 2017-05-12 19:12 (-3 DST)
+    YeAPF 0.8.57-3 built on 2017-05-13 11:28 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-12 13:10:43 (-3 DST)
+    2017-05-13 09:24:54 (-3 DST)
    */
 
   /*
@@ -193,6 +193,11 @@
     $arrStr = explode("/", $_SERVER['SCRIPT_NAME'] );
     $arrStr = array_reverse($arrStr );
     $_MYSELF_=$arrStr[0];
+  }
+
+  function isSSL() 
+  {
+    return $GLOBALS['isHTTPS'];
   }
 
   _whoiam_();

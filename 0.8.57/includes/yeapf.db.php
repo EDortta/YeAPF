@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.57-1 built on 2017-05-12 19:12 (-3 DST)
+    YeAPF 0.8.57-3 built on 2017-05-13 11:28 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-12 18:49:27 (-3 DST)
+    2017-05-13 10:17:16 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -556,6 +556,15 @@
               db_die("'.htaccess' required via cfgHtPasswdRequired='yes' but not present");
             }
           }
+        }
+
+        if (isset($cfgHttpsRequired)) {
+          $cfgHttpsRequired=strtolower(trim((($cfgHttpsRequired==1) || (strtoupper($cfgHttpsRequired)=='TRUE')|| (strtoupper($cfgHttpsRequired)=='YES'))?'yes':'no'));
+          if ($cfgHttpsRequired=='yes')
+            if (!isSSL()) {
+              _recordError("This site requires a SSL connection");
+              $dbConnect='no';
+            }
         }
 
         $dontUpdate=intval($dontUpdate);
