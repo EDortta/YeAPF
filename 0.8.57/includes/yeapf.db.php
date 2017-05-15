@@ -1,24 +1,24 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.57-7 built on 2017-05-15 14:19 (-3 DST)
+    YeAPF 0.8.57-10 built on 2017-05-15 17:41 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-15 13:59:22 (-3 DST)
+    2017-05-15 17:37:36 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
   function getConfigFileName()
   {
-    global $sgugPath, $sgugIni, $yeapfConfig;
+    global $sgugPath, $dbCSVFilename, $yeapfConfig;
 
     if (($yeapfConfig) && (isset($yeapfConfig['yeapfDB']))) {
-      $sgugIni=$yeapfConfig['yeapfDB'];
-      if (!file_exists("$sgugIni"))
-        $sgugIni='';
+      $dbCSVFilename=$yeapfConfig['yeapfDB'];
+      if (!file_exists("$dbCSVFilename"))
+        $dbCSVFilename='';
     } else
-      $sgugIni='';
+      $dbCSVFilename='';
 
-    if ($sgugIni=='') {
+    if ($dbCSVFilename=='') {
       if ($sgugPath) {
         if (!is_array($sgugPath))
           $sgugPath=explode(',',$sgugPath);
@@ -40,13 +40,13 @@
         // echo "$aux<BR>";
         if (file_exists($aux)) {
           $achado=true;
-          $sgugIni=$sp.'/db.csv';
+          $dbCSVFilename=$sp.'/db.csv';
           break;
         }
       }
     }
-    // die("<hr>$sgugIni");
-    return ($sgugIni);
+    // die("<hr>$dbCSVFilename");
+    return ($dbCSVFilename);
   }
 
 
@@ -308,7 +308,7 @@
 
   function db_connect($dbType, $dbServer, $dbName, $dbUser, $dbPassword)
   {
-    global $ydb_conn, $_ydb_ready, $sgugIni, $server_IP, $_ydb_connection_info, $dbCharset;
+    global $ydb_conn, $_ydb_ready, $dbCSVFilename, $server_IP, $_ydb_connection_info, $dbCharset;
 
     $computerName=getenv("COMPUTERNAME");
     $servidor = "LOCAL [$server_IP]";
@@ -320,7 +320,7 @@
         $mysqlConn="mysqli_connect";
 
         $ydb_conn = $mysqlConn("$dbServer", "$dbUser", "$dbPassword", "$dbName") or
-             _yLoaderDie(false, "N&atilde;o foi possivel conectar-se como '$dbUser' ao servidor de dados.","Servidor: $dbServer","db.csv: $sgugIni");
+             _yLoaderDie(false, "N&atilde;o foi possivel conectar-se como '$dbUser' ao servidor de dados.","Servidor: $dbServer","db.csv: $dbCSVFilename");
 
         $_ydb_ready=_DB_ANALYZED_ + _DB_CONNECTED_;
 
@@ -340,7 +340,7 @@
       _recordWastedTime("......ready to '$mysqlConn' on $dbServer as $dbUser");
 
       $ydb_conn = $mysqlConn("$dbServer", "$dbUser", "$dbPassword") or
-           _yLoaderDie(false, "N&atilde;o foi possivel conectar-se como '$dbUser' ao servidor de dados.","Servidor: $dbServer","db.csv: $sgugIni");
+           _yLoaderDie(false, "N&atilde;o foi possivel conectar-se como '$dbUser' ao servidor de dados.","Servidor: $dbServer","db.csv: $dbCSVFilename");
 
       _recordWastedTime("......ready to mysql_select_db $dbName");
       mysql_select_db("$dbName", $ydb_conn) or
@@ -372,7 +372,7 @@
       }
 
       $ydb_conn = ibase_connect("$dbDef", "$dbUser", "$dbPassword", "$connDBCharset") or
-                  _yLoaderDie(false, "N&atilde;o foi possivel conectar-se como '$dbUser' ao servidor de dados.","Servidor: $dbDef","db.csv: $sgugIni<br>\n".db_errormsg());
+                  _yLoaderDie(false, "N&atilde;o foi possivel conectar-se como '$dbUser' ao servidor de dados.","Servidor: $dbDef","db.csv: $dbCSVFilename<br>\n".db_errormsg());
       $_ydb_ready=_DB_ANALYZED_ + _DB_CONNECTED_;
       yeapfStage("afterDBConnect");
 
@@ -390,7 +390,7 @@
 
     } else
       _yLoaderDie(false, "Database type '$dbType' is not recognized by the system",
-                  "Check your database connection<br><small>$sgugIni</small>");
+                  "Check your database connection<br><small>$dbCSVFilename</small>");
 
     if ($_ydb_ready & _DB_CONNECTED_) {
       $_ydb_connection_info['dbType']=$dbType;
@@ -409,14 +409,14 @@
 
   function db_createDBConfig()
   {
-    global $sgugIni;
+    global $dbCSVFilename;
 
-    _recordWastedTime("Creating cache copy of $sgugIni");
+    _recordWastedTime("Creating cache copy of $dbCSVFilename");
     $dbKeys=array();
     $dbActive='';
 
     /* open text file */
-    $setupIni=createDBText($sgugIni);
+    $setupIni=createDBText($dbCSVFilename);
 
     /* go to top of text file */
     $setupIni->goTop();
@@ -479,7 +479,7 @@
            $dontCrashWhenNoDB, $dbConnect, $dontUpdate,
            $dontConnect, $dbOnline,
            $silentQuit,
-           $_ydb_ready, $sgugIni, $setupIni, $sgugPath,
+           $_ydb_ready, $dbCSVFilename, $dbCSVPath, $setupIni, $sgugPath,
            $lastError,
            $yeapfConfig,
            $user_IP, $server_IP,
@@ -507,11 +507,11 @@
     // echo "$msg $dbConnect\n";
     _recordWastedTime("Connecting to db: $dbConnect");
     if ((strtolower($dbConnect)=='yes') || ($dbConnect=='')) {
-      $original=filemtime($sgugIni);
-      $dir=dirname($sgugIni);
+      $original=filemtime($dbCSVFilename);
+      $dbCSVPath=dirname($dbCSVFilename);
 
       $cfgNodePrefix="UNK";
-      if (file_exists("$dir/.config/cloudAppNode.ini")) {
+      if (file_exists("$dbCSVPath/.config/cloudAppNode.ini")) {
         /*
           [node]
           key="6GZALM55FMQ5MY7W"
@@ -520,7 +520,7 @@
           external_ip="192.168.200.1"
           enabled="Y"
         */
-        $GLOBALS['cfgDBNode']=parse_ini_file("$dir/.config/cloudAppNode.ini");
+        $GLOBALS['cfgDBNode']=parse_ini_file("$dbCSVPath/.config/cloudAppNode.ini");
         $cfgNodePrefix=$GLOBALS['cfgDBNode']['node_prefix'];
       }
       
@@ -547,8 +547,8 @@
           $cfgHtPasswdRequired=strtolower(trim((($cfgHtPasswdRequired==1) || (strtoupper($cfgHtPasswdRequired)=='TRUE')|| (strtoupper($cfgHtPasswdRequired)=='YES'))?'yes':'no'));
 
           if ($cfgHtPasswdRequired=='yes') {
-            if (file_exists("$dir/.htaccess"))
-              $htaccessFilename="$dir/.htaccess";
+            if (file_exists("$dbCSVPath/.htaccess"))
+              $htaccessFilename="$dbCSVPath/.htaccess";
             else
               $htaccessFilename=getcwd()."/.htaccess";
 
@@ -561,11 +561,11 @@
                 }
               }
               if (!$ok) {
-                _recordError("cfgHtPasswdRequired but AuthType not defined in '$dir/.htaccess'");
+                _recordError("cfgHtPasswdRequired but AuthType not defined in '$dbCSVPath/.htaccess'");
                 $dbConnect='no';
               }
             } else {
-              _recordError("cfgHtPasswdRequired is defined but '$dir/.htaccess' was not found");
+              _recordError("cfgHtPasswdRequired is defined but '$dbCSVPath/.htaccess' was not found");
               $dbConnect='no';
             }
             if ($lastError>'') {
@@ -587,7 +587,7 @@
       } else {
         $cwd=getcwd();
         _recordError("Define database to be used");
-        _recordError("(CWD: $cwd | db.csv: $sgugIni | appRegistry: $appRegistry | db.active=".$dbINI['db']['active'].")");
+        _recordError("(CWD: $cwd | db.csv: $dbCSVFilename | appRegistry: $appRegistry | db.active=".$dbINI['db']['active'].")");
         _recordError("cache=$cache original=$original");
 
         if (!$dontCrashWhenNoDB) {
@@ -1880,6 +1880,8 @@
     }
   }
 
+  global $cfgMainFolder;
+
   /*
    * sqlite3 extensions
    */
@@ -1894,7 +1896,7 @@
     }
   }
 
-  if (file_exists("flags/flag.dbgloader")) error_log(basename(__FILE__)." 0.8.57 ".date("i:s").": yeapf.db.php ready\n",3,"logs/yeapf.loader.log");
+  if (file_exists("$cfgMainFolder/flags/flag.dbgloader")) error_log(basename(__FILE__)." 0.8.57 ".date("i:s").": yeapf.db.php ready\n",3,"$cfgMainFolder/logs/yeapf.loader.log");
 
   _recordWastedTime("Iniciando yeapf.db.php");
   getConfigFileName();

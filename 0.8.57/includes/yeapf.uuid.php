@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.uuid.php
-    YeAPF 0.8.57-1 built on 2017-05-12 19:12 (-3 DST)
+    YeAPF 0.8.57-10 built on 2017-05-15 17:41 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-11 09:45:52 (-3 DST)
+    2017-05-15 16:26:05 (-3 DST)
 */
 
   /*
@@ -176,8 +176,8 @@
     if (!isset($clientPrefix))
       $clientPrefix="$cfgSegmentPrefix";
 
-    $clientPrefix = strcopy(str_repeat("_", 4).$clientPrefix, -4);
-    $nodePrefix   = strcopy(str_repeat("_", 3).$nodePrefix, -3);
+    $clientPrefix = substr(str_repeat("_", 4).$clientPrefix, -4);
+    $nodePrefix   = substr(str_repeat("_", 3).$nodePrefix, -3);
     $flagName="sequencer-$clientPrefix-$nodePrefix";
     
     if (lock($flagName)) {
@@ -194,7 +194,9 @@
     }
 
     if ($erroGrave) {
-      _die("Sequencer not initialized. You're trying to generate a sequencer for '$clientPrefix' at '$nodePrefix'. Create an entry at is_sequence table");
+      $errMsg="Sequencer not initialized. You're trying to generate a sequencer for '$clientPrefix' at '$nodePrefix'. Create an entry at is_sequence table";
+      _dump($errMsg);
+      throw new Exception($errMsg);
     }
 
     return $ret;

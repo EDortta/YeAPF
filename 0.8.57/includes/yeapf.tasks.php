@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.tasks.php
-    YeAPF 0.8.57-1 built on 2017-05-12 19:12 (-3 DST)
+    YeAPF 0.8.57-10 built on 2017-05-15 17:41 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-10 15:54:06 (-3 DST)
+    2017-05-15 17:40:10 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -77,12 +77,13 @@
 
     private function setTaskCanRun($enable)
     {
+      global $cfgMainFolder;
       $ret=false;
       if ($this->initialized) {
         $taskId=$this->getTaskId();
-        $runFlag="flags/task-".$taskId.".run";
-        if (!is_dir("flags"))
-          mkdir("flags", 0777);
+        $runFlag="$cfgMainFolder/flags/task-".$taskId.".run";
+        if (!is_dir("$cfgMainFolder/flags"))
+          mkdir("$cfgMainFolder/flags", 0777);
         if ($enable)
           $ret=touch($runFlag);
         else {
@@ -97,10 +98,11 @@
 
     public function taskCanRun($deep=true)
     {
+      global $cfgMainFolder;
       $ret=false;
       if ($this->initialized) {
         $taskId=$this->getTaskId();
-        $runFlag="flags/task-".$taskId.".run";
+        $runFlag="$cfgMainFolder/flags/task-".$taskId.".run";
         $ret=file_exists($runFlag);
         if ($ret && $deep) {
           $task_info=db_sql("select coalesce(iteraction_ts,creation_ts) as i_ts, iteraction_ttl from is_tasks where id=$taskId",false);

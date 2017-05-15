@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xForms.php
-    YeAPF 0.8.57-1 built on 2017-05-12 19:12 (-3 DST)
+    YeAPF 0.8.57-10 built on 2017-05-15 17:41 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-09 16:15:46 (-3 DST)
+    2017-05-15 17:32:23 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
   /*
@@ -1828,6 +1828,8 @@
     return $date;
   }
 
-  if (file_exists("flags/flag.dbgloader")) error_log(basename(__FILE__)." 0.8.57 ".date("i:s").": xForms.php ready\n",3,"logs/yeapf.loader.log");
+  global $cfgMainFolder;
+
+  if (file_exists("$cfgMainFolder/flags/flag.dbgloader")) error_log(basename(__FILE__)." 0.8.57 ".date("i:s").": xForms.php ready\n",3,"$cfgMainFolder/logs/yeapf.loader.log");
 
 ?>

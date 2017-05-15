@@ -1,9 +1,9 @@
 <?php
 /*
     includes/mutex.php
-    YeAPF 0.8.57-1 built on 2017-05-12 19:12 (-3 DST)
+    YeAPF 0.8.57-10 built on 2017-05-15 17:41 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2012-07-04 10:27:31 (-3 DST)
+    2017-05-15 17:17:11 (-3 DST)
 */
 
     class Mutex
@@ -23,6 +23,8 @@
 
         function init($id='xmutex', $filename = '')
         {
+            global $cfgMainFolder;
+
             $this->id = $id;
 
             $this->is_windows=$filename>'';
@@ -34,9 +36,9 @@
                     return false;
                 }
                 else {
-                    $this->filename = getcwd().'/lock/'.$filename;
-                    if (!is_dir(getcwd().'/lock'))
-                      mkdir(getcwd().'/lock',0766);
+                    $this->filename = "$cfgMainFolder/lock/$filename";
+                    if (!is_dir("$cfgMainFolder/lock"))
+                      mkdir("$cfgMainFolder/lock",0766, true);
                 }
             }
             else

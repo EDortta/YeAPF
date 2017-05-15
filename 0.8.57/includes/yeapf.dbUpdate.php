@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.57-7 built on 2017-05-15 14:19 (-3 DST)
+    YeAPF 0.8.57-10 built on 2017-05-15 17:41 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-15 14:18:42 (-3 DST)
+    2017-05-15 16:04:47 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -26,8 +26,8 @@
 
   function _db_grantSetupIni()
   {
-    global $setupIni, $sgugIni;
-    if (!isset($setupIni)) $setupIni=createDBText($sgugIni);
+    global $setupIni, $dbCSVFilename;
+    if (!isset($setupIni)) $setupIni=createDBText($dbCSVFilename);
   }
 
   function _db_upd_createAuditingTrackTable() 

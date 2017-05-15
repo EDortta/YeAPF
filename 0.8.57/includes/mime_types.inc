@@ -4,7 +4,7 @@
     0.8.57
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
 */
-  error_log(date("YmdHis ").$GLOBALS['debugTag']." ".basename(__FILE__)." ".__LINE__." 0.8.57 ".$dbgErrCount++."\n",3,'logs/c.log');
+  error_log(date("YmdHis ").$GLOBALS['debugTag']." ".basename(__FILE__)." ".__LINE__." 0.8.57 ".$dbgErrCount++."\n",3,"$cfgMainFolder/logs/c.log");
     $mimeExtensions= array ( ".3dm" => "x-world/x-3dmf",
                               ".3dmf" => "x-world/x-3dmf",
                               ".a" => "application/octet-stream",

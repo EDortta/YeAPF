@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.57-3 built on 2017-05-13 11:28 (-3 DST)
+    YeAPF 0.8.57-10 built on 2017-05-15 17:41 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-13 09:24:54 (-3 DST)
+    2017-05-15 17:34:32 (-3 DST)
    */
 
   /*
@@ -32,16 +32,19 @@
     return $ret;
   }
 
-  if (file_exists("flags/flag.dbgloader")) error_log(date("YmdHis ").globalSafeVarValue('_debugTag')." ".basename(__FILE__)." 0.8.57 ".": START\n",3,"logs/yeapf.loader.log");
+  if (!isset($cfgMainFolder))
+    $cfgMainFolder=getcwd();
 
-  if (file_exists("flags/flag.nodb"))
+  if (file_exists("$cfgMainFolder/flags/flag.dbgloader")) error_log(date("YmdHis ").globalSafeVarValue('_debugTag')." ".basename(__FILE__)." 0.8.57 ".": START\n",3,"$cfgMainFolder/logs/yeapf.loader.log");
+
+  if (file_exists("$cfgMainFolder/flags/flag.nodb"))
     $dbConnect='no';
 
   function _recordWastedTime()
   {
-    global $_lastTimeMark, $_debugTag, $_debugSequence;
+    global $_lastTimeMark, $_debugTag, $_debugSequence, $cfgMainFolder;
 
-    if (file_exists("logs/wastedTime.log")) {
+    if (file_exists("$cfgMainFolder/logs/wastedTime.log")) {
       $_debugSequence++;
       $aux=microtime(true)*1000;
       $wt=number_format($aux-$_lastTimeMark,4);
@@ -65,7 +68,7 @@
         $argList.=$a;
       }
 
-      error_log(date('i:s').": ($wt) ".$argList."\n", 3, 'logs/wastedTime.log');
+      error_log(date('i:s').": ($wt) ".$argList."\n", 3, "$cfgMainFolder/logs/wastedTime.log");
       $_lastTimeMark=microtime(true)*1000;;
     }
   }
@@ -103,9 +106,9 @@
 
   $flgCanContinueWorking=true;
 
-  if (file_exists("logs/wastedTime.log"))
-    error_log("\n\n\n",3,"logs/wastedTime.log");
-  $recordLoaderWastedTime = (file_exists('logs/wastedTime.log')) && (function_exists('_recordWastedTime'));
+  if (file_exists("$cfgMainFolder/logs/wastedTime.log"))
+    error_log("\n\n\n",3,"$cfgMainFolder/logs/wastedTime.log");
+  $recordLoaderWastedTime = (file_exists("$cfgMainFolder/logs/wastedTime.log")) && (function_exists('_recordWastedTime'));
 
   _recordWastedTime("STARTUP 0.8.57 -----------------------------------------");
 
@@ -280,7 +283,7 @@
   $usrIPField='lastIP';
   */
 
-  $sgugLog="logs/yeapf.log";
+  $sgugLog="$cfgMainFolder/logs/yeapf.log";
 
   $intoFormFile=0;
   $formErr=0;
@@ -292,7 +295,7 @@
   // in order to avoid ipv6 ':' that mess with windows file system
   $safe_user_IP=str_replace(":", "", $user_IP);
 
-  if (file_exists("flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." 0.8.57 ".": loading $user_IP config file\n",3,"logs/yeapf.loader.log");
+  if (file_exists("$cfgMainFolder/flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." 0.8.57 ".": loading $user_IP config file\n",3,"$cfgMainFolder/logs/yeapf.loader.log");
 
 
   if (file_exists(".config/yeapf.config.files.$safe_user_IP"))
@@ -346,8 +349,8 @@
     // }
   }
 
-  if (!is_dir("logs"))
-    mkdir("logs");
+  if (!is_dir("$cfgMainFolder/logs"))
+    mkdir("$cfgMainFolder/logs");
 
   global $__EventBuffer, $__EventBufferFilled;
   $__EventBuffer=array();
@@ -554,16 +557,16 @@
     }
   }
 
-  if (file_exists("flags/flag.dbgphp"))
-    if (file_exists("logs/yeapf.loader.log"))
-      unlink("logs/yeapf.loader.log");
+  if (file_exists("$cfgMainFolder/flags/flag.dbgphp"))
+    if (file_exists("$cfgMainFolder/logs/yeapf.loader.log"))
+      unlink("$cfgMainFolder/logs/yeapf.loader.log");
 
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
   function _recordSuspiciousIP($ip)
   {
-    global $dbTEXT_EOF;
-    $dbt=createDBText('logs/suspicious-ip.txt', true);
+    global $dbTEXT_EOF, $cfgMainFolder;
+    $dbt=createDBText("$cfgMainFolder/logs/suspicious-ip.txt", true);
     $dbt->goTop();
     $dbt->addField('IP');
     $dbt->addField('lastSeen');
@@ -582,7 +585,7 @@
   }
 
 
-  if (file_exists("logs/yeapf.loader.log"))
+  if (file_exists("$cfgMainFolder/logs/yeapf.loader.log"))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
   foreach($yeapfLibrary as $libName) {
@@ -596,14 +599,14 @@
       if (!file_exists($libName))
         _yLoaderDie(true, "Error loading '$libName'","File not found. path: ".$GLOBALS["__yeapfPath"]);
       else {
-        if (file_exists("flags/flag.dbgphp")) {
+        if (file_exists("$cfgMainFolder/flags/flag.dbgphp")) {
           $userFuncs=get_defined_functions();
           if (isset($userFuncs['user']))
             $_definedFunctions_ = join(';',$userFuncs['user']);
           else
             $_definedFunctions_ = "";
-          file_put_contents('logs/yeapf.loader.functions', $_definedFunctions_);
-          error_log("Loading $libName ... ",3,'logs/yeapf.loader.log');
+          file_put_contents("$cfgMainFolder/logs/yeapf.loader.functions", $_definedFunctions_);
+          error_log("Loading $libName ... ",3,"$cfgMainFolder/logs/yeapf.loader.log");
           $t1=decimalMicrotime();
         }
         $loadOk=@include_once "$libName";
@@ -611,15 +614,15 @@
           _recordWastedTime(basename($libName)." lib_ready");
         if (!$loadOk)
           _yLoaderDie(false, "Fatal error trying to load $libName");
-        if (file_exists("flags/flag.dbgphp")) {
+        if (file_exists("$cfgMainFolder/flags/flag.dbgphp")) {
           $t2=decimalMicrotime()-$t1;
-          error_log("    wasted time: $t2\n",3,'logs/yeapf.loader.log');
+          error_log("    wasted time: $t2\n",3,"$cfgMainFolder/logs/yeapf.loader.log");
         }
       }
     }
   }
-  if (file_exists("flags/flag.dbgphp"))
-    error_log("Ready...\n\n",3,'logs/yeapf.loader.log');
+  if (file_exists("$cfgMainFolder/flags/flag.dbgphp"))
+    error_log("Ready...\n\n",3,"$cfgMainFolder/logs/yeapf.loader.log");
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
   $secondsPerHour = 60 * 60;
@@ -665,7 +668,7 @@
   $lastAccess = 0;  // so aos efeitos que seja global $yeapfLogFlags,.  o valor mesmo sera colocado por usuario valido
 
   function __extractInputValues__ () {
-    global $user_IP, $safe_user_IP, $queryString;
+    global $user_IP, $safe_user_IP, $queryString, $cfgMainFolder;
 
     /*
     $qs = getenv("QUERY_STRING").'&';
@@ -712,7 +715,7 @@
       }
 
       if ($qOutOfPattern) {
-        error_log("$user_IP:$qsn:$patternRequired:[ $qsv ]:".date('YmdHis')."\n",3,"logs/out-of-pattern.log");
+        error_log("$user_IP:$qsn:$patternRequired:[ $qsv ]:".date('YmdHis')."\n",3,"$cfgMainFolder/logs/out-of-pattern.log");
         $outOfPattern++;
       } else
         $GLOBALS[$qsn]=$qsv;
@@ -746,12 +749,12 @@
       https://wadl.java.net
       https://en.wikipedia.org/wiki/Web_Application_Description_Language 
       */
-      error_log(date("YmdHis ").$GLOBALS['_debugTag']." "."$url\n", 3, "logs/access.$safe_user_IP.log");
+      error_log(date("YmdHis ").$GLOBALS['_debugTag']." "."$url\n", 3, "$cfgMainFolder/logs/access.$safe_user_IP.log");
     }
   };
 
   // parse_str($qs);
-  if (file_exists("flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." ".__LINE__." 0.8.57 ".": publishing form request\n",3,"logs/yeapf.loader.log");
+  if (file_exists("$cfgMainFolder/flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." ".__LINE__." 0.8.57 ".": publishing form request\n",3,"$cfgMainFolder/logs/yeapf.loader.log");
 
   __extractInputValues__();
 
@@ -778,9 +781,9 @@
 
   function __log($text, $logType=3)
   {
-    global $canDoLog;
+    global $canDoLog, $cfgMainFolder;
     if ($canDoLog)
-      if (!error_log("$text\n",$logType,'logs/yeapf.log'))
+      if (!error_log("$text\n",$logType,"$cfgMainFolder/logs/yeapf.log"))
         $canDoLog=false;
   }
 
@@ -988,7 +991,7 @@
     return $ret;
   }
 
-  if (file_exists("flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." ".__LINE__." 0.8.57 ".": function block #1\n",3,"logs/yeapf.loader.log");
+  if (file_exists("$cfgMainFolder/flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." ".__LINE__." 0.8.57 ".": function block #1\n",3,"$cfgMainFolder/logs/yeapf.loader.log");
 
   //========================================================================
   function binMask($mask)
@@ -1108,7 +1111,7 @@
 
   function closeApplication($debugLevel=0)
   {
-    global $u,$lastCommands, $includeHistory, $qs, $sgugIni;
+    global $u,$lastCommands, $includeHistory, $qs, $dbCSVFilename;
 
     // salvarVariavel($u,'lastError, lastAction');
 
@@ -1121,7 +1124,7 @@
       if ($debugLevel>2)
         echo " | ".publicarPost(false,false);
       if ($debugLevel>3) {
-        $setupIni=createDBText($sgugIni);
+        $setupIni=createDBText($dbCSVFilename);
         if (($setupIni->locate("active",1))==$dbTEXT_NO_ERROR) {
           $dbType=$setupIni->getValue('dbType');
           $dbServer=$setupIni->getValue('dbServer');
@@ -1634,7 +1637,7 @@
       return '';
   }
 
-  if (file_exists("flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." ".__LINE__." 0.8.57 ".": function block #2\n",3,"logs/yeapf.loader.log");
+  if (file_exists("$cfgMainFolder/flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." ".__LINE__." 0.8.57 ".": function block #2\n",3,"$cfgMainFolder/logs/yeapf.loader.log");
 
   function implementation($s, $a='', $prefix='f', $onlyTest=false)
   {
@@ -2190,7 +2193,7 @@
     $list.=$word;
   }
 
-  if (file_exists("flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." ".__LINE__." 0.8.57 ".": function block #3\n",3,"logs/yeapf.loader.log");
+  if (file_exists("$cfgMainFolder/flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." ".__LINE__." 0.8.57 ".": function block #3\n",3,"$cfgMainFolder/logs/yeapf.loader.log");
 
   function decimalSQL($v)
   {
@@ -2493,7 +2496,7 @@
     return $resultado;
   }
 
-  if (file_exists("flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." ".__LINE__." 0.8.57 ".": function block #4\n",3,"logs/yeapf.loader.log");
+  if (file_exists("$cfgMainFolder/flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." ".__LINE__." 0.8.57 ".": function block #4\n",3,"$cfgMainFolder/logs/yeapf.loader.log");
 
   function buildCalendar($aDate, $aContext='', $aID='', $eachCell='#monthCell', $colFormat='', $rowFormat='', $colDef='', $rowDef='', $daysPerWeek=7, $firstDayOfWeek=0)
   {
@@ -3192,7 +3195,7 @@
     return $aux;
   }
 
-  if (file_exists("flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." ".__LINE__." 0.8.57 ".": function block #?\n",3,"logs/yeapf.loader.log");
+  if (file_exists("$cfgMainFolder/flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." ".__LINE__." 0.8.57 ".": function block #?\n",3,"$cfgMainFolder/logs/yeapf.loader.log");
 
 
   function canIncludeDebugInfo($fileName)
@@ -3411,7 +3414,7 @@
 
   function processFile($fileName, $pegarDadosDaTabela=0, $nomeTabela='', $campoChave='', $valorChave='', $valores='', $curarCharset=true)
   {
-    global $_CurrentFileName, $user_IP, $aDebugIP, $yeapfConfig, $sessionCWD;
+    global $_CurrentFileName, $user_IP, $aDebugIP, $yeapfConfig, $sessionCWD, $cfgMainFolder;
 
     // echo "*$fileName<br>";
     _dumpY(1,1,"looking for $fileName");
@@ -3440,7 +3443,7 @@
       $fcontents=str_replace("\n", "\n\t\t",$fcontents);
 
       if (strpos($auxFileName,"logoff")>0) {
-        if (($user_IP==$aDebugIP) && (file_exists('flags/flag.develop'))) {
+        if (($user_IP==$aDebugIP) && (file_exists("$cfgMainFolder/flags/flag.develop"))) {
           echo "\n<code>$fcontents</code>";
           $GLOBALS['SQLdebugLevel']=8;
           showDebugBackTrace("User logged off",true);
@@ -3461,7 +3464,7 @@
       }
     }
   }
-  if (file_exists("flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." 0.8.57 ".": yeapf.functions.php loaded and ready\n",3,"logs/yeapf.loader.log");
+  if (file_exists("$cfgMainFolder/flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." 0.8.57 ".": yeapf.functions.php loaded and ready\n",3,"$cfgMainFolder/logs/yeapf.loader.log");
 
   _recordWastedTime("READY 0.8.57 ---------------------------------------- ");
 

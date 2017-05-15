@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.userContext.php
-    YeAPF 0.8.57-1 built on 2017-05-12 19:12 (-3 DST)
+    YeAPF 0.8.57-10 built on 2017-05-15 17:41 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-11 17:28:59 (-3 DST)
+    2017-05-15 17:37:32 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -594,7 +594,7 @@
           $err="Required fiels:<br>";
           foreach($reqFields as $rf1)
             $err.="&nbsp;&nbsp;$rf1<br>";
-          _die("$err<hr>'$rf' not defined in '".$GLOBALS['sgugIni']."'");
+          _die("$err<hr>'$rf' not defined in '".$GLOBALS['dbCSVFilename']."'");
         }
       }
 
@@ -710,7 +710,7 @@
     {
       global $sysTimeStamp, $s, $a, $u, $sua,
              $usrTableName, $usrSessionIDField, $usrLastAccess, $usrSessionIDFieldType,
-             $developmentStage, $appFolderInsecureEvents;
+             $developmentStage, $appFolderInsecureEvents, $cfgMainFolder;
 
       if (!isset($this->validUser)) {
         $ret=false;
@@ -719,7 +719,7 @@
 
         $auxInsecureEvents = $appFolderInsecureEvents.','.$myAppInsecureEvents;
 
-        if (($auxInsecureEvents>'') || ($sua>'') || (file_exists('flags/flag.develop'))) {
+        if (($auxInsecureEvents>'') || ($sua>'') || (file_exists("$cfgMainFolder/flags/flag.develop"))) {
           /*
            * ARQUIVO DE CONFIG: appFolderName.def
            * A terceira linha contém uma lista de "sujeito.acao" separados por ','
@@ -747,7 +747,7 @@
            * não é bom pois abre as pernas para todo o sistema.
            * 2013-12-28 - Os eventos 'yeapf:develop.'
            * ('bd7b5ca48f3bfda678c90d7945910ecf') devem ser liberados
-           * quando a bandeira 'flags/flag.develop' está ligada.  Caso
+           * quando a bandeira '$cfgMainFolder/flags/flag.develop' está ligada.  Caso
            * queira liberar sempre, tem que estar anotado no arquivo
            * appFolderName.def
           */
@@ -757,7 +757,7 @@
           _dumpY(8,0,"$s.$a = $mySua ($sua)");
           if ($sua==$mySua)
             $ret="$u"=='';
-          if (file_exists('flags/flag.develop'))
+          if (file_exists("$cfgMainFolder/flags/flag.develop"))
             $ret=(($ret) || ($mySuaJoker=='bd7b5ca48f3bfda678c90d7945910ecf'));
           if (!$ret) {
             $aux = explode(',', $auxInsecureEvents);
@@ -1109,12 +1109,12 @@
      * Só aparece se ele estiver rodando no '127.0.0.1' ou '::1' ou
      * se o IP do servidor coincidir com a global aDebugIP.
      * Para aparecer o menu para criação de menu de entrada e de implementações
-     * deve a bandeira 'flags/flag.develop' estar criada (mesmo que zerada)
+     * deve a bandeira '$cfgMainFolder/flags/flag.develop' estar criada (mesmo que zerada)
      */
 
     function menuFooter()
     {
-      global $s, $_Ys_, $u, $aBody, $isTablet, $aDebugIP, $yImplementedAction, $user_IP, $server_IP;
+      global $s, $_Ys_, $u, $aBody, $isTablet, $aDebugIP, $yImplementedAction, $user_IP, $server_IP, $cfgMainFolder;
 
       // echo "<hr>isTablet: ".!$isTablet."<br>ServerIP: $server_IP<br>UserIP: '$user_IP'<br>DebugIP: '$aDebugIP'";
       if ((!$isTablet) && (($server_IP=="::1") || ($server_IP=="127.0.0.1") || ($user_IP==$aDebugIP)) && ($_Ys_!='createSubMenu')) {
@@ -1126,7 +1126,7 @@
         echo "<div id='_ydbg_container'>";
         echo "<span id='_ydbg_container_relocator' style='color:#900; font-weight:800'><B>@</B></span>";
         echo "<span id='_ydbg_container_closer' style='color:#900; font-weight:800'><B>X</B></span>";
-        if (file_exists('flags/flag.develop')) {
+        if (file_exists("$cfgMainFolder/flags/flag.develop")) {
           echo "  <table><tr><td valign=top><b>Criação</b>";
           echo "  <form action='$myself' method=post>";
           echo "    <small>Criação rápida de submenu sob <em><u>$s</u></em><br>";
@@ -1220,7 +1220,7 @@
           }
           echo "  <big><a href='?_Ys_=deleteMenuEntry&u=$u&s=$s'>Eliminar <B>$s</B> de Menú</a></big><br>";
         }
-        echo "  aBody: $aBody | s: $s | a: $a<br>";
+        echo "  aBody: $aBody | s: ".isset($s)?$s:''." | a: ".isset($a)?$a:''."<br>";
         echo "</div>";
 
         echo "\n<script>

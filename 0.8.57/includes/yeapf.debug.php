@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.debug.php
-    YeAPF 0.8.57-1 built on 2017-05-12 19:12 (-3 DST)
+    YeAPF 0.8.57-10 built on 2017-05-15 17:41 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-23 17:22:41 (-3 DST)
+    2017-05-15 17:37:36 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -32,7 +32,7 @@
 
   function _echo()
   {
-    global $logOutput, $user_IP, $canDoLog, $_echoCount, $isCLI;
+    global $logOutput, $user_IP, $canDoLog, $_echoCount, $isCLI, $cfgMainFolder;
 
     $args=func_get_args();
     $argList='';
@@ -50,13 +50,15 @@
       $canDoLog=true;
     if ($canDoLog) {
       if ($logOutput<0) {
-        $canDoLog=((!$isCLI) && (is_dir('logs') && (is_writable("logs")))) ||
-                   (($isCLI) && (is_dir('/var/log') && (is_writable("/var/log/yeapfApp.log"))));
+        $canDoLog=((!$isCLI) && (is_dir("$cfgMainFolder/logs") && 
+                                (is_writable("$cfgMainFolder/logs")))) ||
+                   (($isCLI) && (is_dir('/var/log') && 
+                                (is_writable("/var/log/yeapfApp.log"))));
         if ($canDoLog) {
           if ($isCLI)
             $logLocation = "/var/log/yeapfApp.log";
           else
-            $logLocation = "logs/c.$user_IP.log";
+            $logLocation = "$cfgMainFolder/logs/c.$user_IP.log";
           $logLocation = str_replace('..', '.', $logLocation);
           @error_log($argList, 3, $logLocation);
         }
@@ -227,7 +229,7 @@
   function showDebugBackTrace($msg, $forceExit=false)
   {
     global $logOutput, $SQLdebugLevel, $includedFiles, $lastCommands,
-           $sgugIni, $dbTEXT_NO_ERROR, $debugNotifierSevice, $appName,
+           $dbCSVFilename, $dbTEXT_NO_ERROR, $debugNotifierSevice, $appName,
            $ydb_conn, $isCLI, $appCharset;
 
     $xCores = array("#000000","#009900","#3366CC","#FF6600","#CC66CC","#999999");
@@ -393,7 +395,7 @@
         if ($logOutput==2)
           xq_printXML($debugOutput,"sys.sqlError","$errno:$error");
 
-        $setupIni=createDBText($sgugIni);
+        $setupIni=createDBText($dbCSVFilename);
         if (($setupIni->locate("active",1))==$dbTEXT_NO_ERROR) {
           $dbType=$setupIni->getValue('dbType');
           $dbServer=$setupIni->getValue('dbServer');
@@ -445,9 +447,9 @@
       }
 
       if ($logOutput<0)
-        $debugOutput.="\n$sgugIni\n";
+        $debugOutput.="\n$dbCSVFilename\n";
       else if ($logOutput==1)
-        $debugOutput.= "<div><b>$sgugIni</b></div>";
+        $debugOutput.= "<div><b>$dbCSVFilename</b></div>";
 
       if ($SQLdebugLevel>3)
         $forceExit=true;

@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.57-7 built on 2017-05-15 14:19 (-3 DST)
+    YeAPF 0.8.57-10 built on 2017-05-15 17:41 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-15 14:03:00 (-3 DST)
+    2017-05-15 16:12:19 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -916,7 +916,7 @@
 
   function verifyNodeSequence() 
   {
-    global $cfgIdServerURL, $sgugIni, $cfgNodePrefix;
+    global $cfgIdServerURL, $dbCSVFilename, $cfgNodePrefix;
 
     $ret=-1;
     $ok=false;
@@ -953,7 +953,7 @@
         if ($toTest) {
           $validServerURL = (isset($cfgIdServerURL)) && (!filter_var($cfgIdServerURL, FILTER_VALIDATE_URL) === false);
           if ($validServerURL) {
-            $baseFolder = dirname($sgugIni);
+            $baseFolder = dirname($dbCSVFilename);
             $urlBase="$cfgIdServerURL/rest.php";
 
             $nodeSeq=@file_get_contents("$baseFolder/.config/cloudAppNode.seq");
@@ -961,7 +961,6 @@
             $a=$nodeSeq[0];
             $b=$nodeSeq[1];
             $r=$a+$b;
-
 
             $serverKey=$GLOBALS['cfgDBNode']['server_key'];
             $nodeName=$GLOBALS['cfgDBNode']['node_name'];
@@ -1038,7 +1037,7 @@
 
   function ryeapf($a)
   {
-    global $callback, $sgugIni, $cfgNodePrefix, $cfgClientConfig, $_ydb_ready, $server_IP;
+    global $callback, $dbCSVFilename, $cfgNodePrefix, $cfgClientConfig, $_ydb_ready, $server_IP;
     extract(xq_extractValuesFromQuery());
 
     $ret=array();
@@ -1050,7 +1049,7 @@
     } else if ($a=='serverTime') {
       $ret['serverTime'] = date('Y-m-d H:i:s');
     } else if ($a=='nodeKeepAlive') {
-      $baseFolder = dirname($sgugIni);
+      $baseFolder = dirname($dbCSVFilename);
       if (db_status(_DB_LOCKED)==0) {
         if (db_tableExists('is_node_control')) {
           if (thisNodeExists()) {
