@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.57-1 built on 2017-05-12 19:12 (-3 DST)
+    YeAPF 0.8.57-7 built on 2017-05-15 14:19 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-11 18:32:50 (-3 DST)
+    2017-05-15 14:18:42 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -77,6 +77,8 @@
     }
     $flagDBStructureReviewed=true;
   }
+
+  global $setupIni;
 
   if ((isset($_ydb_ready)) && ($_ydb_ready & _DB_CONNECTED_)) {
     if ((isset($_ydb_ready)) && ($_ydb_ready & _DB_UPDATABLE)) {

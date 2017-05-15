@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.57-1 built on 2017-05-12 19:12 (-3 DST)
+    YeAPF 0.8.57-7 built on 2017-05-15 14:19 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-12 19:11:44 (-3 DST)
+    2017-05-15 14:03:00 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -923,93 +923,95 @@
 
     $toDebug=true;
 
-    if (lock('verify-node-sequence',true)) {
+    if (db_isWorkingAsAppNode()) {
+      if (lock('verify-node-sequence',true)) {
 
-      $tempTimeMark=sys_get_temp_dir()."/ctrl-tm-seq";
-      $toTest=false;
+        $tempTimeMark=sys_get_temp_dir()."/ctrl-tm-seq";
+        $toTest=false;
 
-      if ($toDebug) echo "$tempTimeMark \n";
+        if ($toDebug) _dump("$tempTimeMark");
 
-      if (file_exists($tempTimeMark)) {
-        $tm=filemtime($tempTimeMark);
-        $desired=intval(file_get_contents($tempTimeMark));
-        $maxT = $tm + (4 * 60 * 60);
-        $dtm=min(max($now,$maxT), $desired);
-        $now=date('U');
-        $toTest=intval(($now>=$dtm));
+        if (file_exists($tempTimeMark)) {
+          $tm=filemtime($tempTimeMark);
+          $desired=intval(file_get_contents($tempTimeMark));
+          $maxT = $tm + (4 * 60 * 60);
+          $dtm=min(max($now,$maxT), $desired);
+          $now=date('U');
+          $toTest=intval(($now>=$dtm));
 
-        if ($toDebug) {
-          $xmaxT=date("Y-m-d H:i:s", $maxT);
-          $xdesired=date("Y-m-d H:i:s", $desired);
-          $xdtm=date("Y-m-d H:i:s", $dtm);
-          $xnow=date("Y-m-d H:i:s", $now);
-          echo "maxT=$xmaxT |desired=$xdesired | dtm=$xdtm | now=$xnow | toTest=$toTest\n";
+          if ($toDebug) {
+            $xmaxT=date("Y-m-d H:i:s", $maxT);
+            $xdesired=date("Y-m-d H:i:s", $desired);
+            $xdtm=date("Y-m-d H:i:s", $dtm);
+            $xnow=date("Y-m-d H:i:s", $now);
+            _dump("maxT=$xmaxT |desired=$xdesired | dtm=$xdtm | now=$xnow | toTest=$toTest");
+          }
+        } else {
+          $toTest=true;
         }
-      } else {
-        $toTest=true;
-      }
 
-      if ($toTest) {
-        $validServerURL = (isset($cfgIdServerURL)) && (!filter_var($cfgIdServerURL, FILTER_VALIDATE_URL) === false);
-        if ($validServerURL) {
-          $baseFolder = dirname($sgugIni);
-          $urlBase="$cfgIdServerURL/rest.php";
+        if ($toTest) {
+          $validServerURL = (isset($cfgIdServerURL)) && (!filter_var($cfgIdServerURL, FILTER_VALIDATE_URL) === false);
+          if ($validServerURL) {
+            $baseFolder = dirname($sgugIni);
+            $urlBase="$cfgIdServerURL/rest.php";
 
-          $nodeSeq=@file_get_contents("$baseFolder/.config/cloudAppNode.seq");
-          $nodeSeq=explode(":", $nodeSeq);
-          $a=$nodeSeq[0];
-          $b=$nodeSeq[1];
-          $r=$a+$b;
+            $nodeSeq=@file_get_contents("$baseFolder/.config/cloudAppNode.seq");
+            $nodeSeq=explode(":", $nodeSeq);
+            $a=$nodeSeq[0];
+            $b=$nodeSeq[1];
+            $r=$a+$b;
 
 
-          $serverKey=$GLOBALS['cfgDBNode']['server_key'];
-          $nodeName=$GLOBALS['cfgDBNode']['node_name'];
+            $serverKey=$GLOBALS['cfgDBNode']['server_key'];
+            $nodeName=$GLOBALS['cfgDBNode']['node_name'];
 
-          $url="$urlBase?s=ctrl&a=checkSeq&r=$r&serverKey=$serverKey&nodeName=$nodeName";
+            $url="$urlBase?s=ctrl&a=checkSeq&r=$r&serverKey=$serverKey&nodeName=$nodeName";
 
-          $ch=curl_init();
-          curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,2); 
-          curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-          curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-          curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-          curl_setopt($ch, CURLOPT_URL, $url);
-          curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-          $canContinue=true;
-          if (($ret=curl_exec($ch))===false) {
-            $errorMsg="Error: #".curl_errno($ch).", ".curl_error($ch);
-            _dump($errorMsg);
-            $canContinue=false;
-          }
-          curl_close($ch);
+            $ch=curl_init();
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,2); 
+            curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+            $canContinue=true;
+            if (($ret=curl_exec($ch))===false) {
+              $errorMsg="Error: #".curl_errno($ch).", ".curl_error($ch);
+              _dump($errorMsg);
+              $canContinue=false;
+            }
+            curl_close($ch);
 
-          if ($canContinue) {
-            $ret=json_decode($ret, true);
+            if ($canContinue) {
+              $ret=json_decode($ret, true);
 
-            $check=md5($ret['a'].':'.$ret['b'].':1');
+              $check=md5($ret['a'].':'.$ret['b'].':1');
 
 
-            if ($check==$ret['c']) {
-              @file_put_contents("$baseFolder/.config/cloudAppNode.seq", $ret['a'].':'.$ret['b']);
-              $dt=$now+y_rand(15,60*60);
-              @file_put_contents($tempTimeMark, $dt);
-              $ok=true;
+              if ($check==$ret['c']) {
+                @file_put_contents("$baseFolder/.config/cloudAppNode.seq", $ret['a'].':'.$ret['b']);
+                $dt=$now+y_rand(15,60*60);
+                @file_put_contents($tempTimeMark, $dt);
+                $ok=true;
+              } else {
+                _dump("Is this a clone node?");
+              }            
             } else {
-              _dump("Is this a clone node?");
-            }            
-          } else {
-            $toTest=false;
-          }
-        }      
+              $toTest=false;
+            }
+          }      
+        }
+
+        if (($toTest) && (!$ok)) {
+          disableThisNode();
+          _dump("Node out of sequence.\nNode disabled. IdServerURL:'$cfgIdServerURL'");
+        }
+
+        $ret=$toTest?intval($ok):-1;
+
+        unlock('verify-node-sequence');
       }
-
-      if (($toTest) && (!$ok)) {
-        disableThisNode();
-        _die("Node disabled. IdServerURL:'$cfgIdServerURL'");
-      }
-
-      $ret=$toTest?intval($ok):-1;
-
-      unlock('verify-node-sequence');
     }
 
     return $ret;
