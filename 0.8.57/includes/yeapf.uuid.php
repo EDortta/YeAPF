@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.uuid.php
-    YeAPF 0.8.57-10 built on 2017-05-15 17:41 (-3 DST)
+    YeAPF 0.8.57-12 built on 2017-05-16 07:31 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-15 16:26:05 (-3 DST)
+    2017-05-16 07:24:45 (-3 DST)
 */
 
   /*
@@ -181,10 +181,10 @@
     $flagName="sequencer-$clientPrefix-$nodePrefix";
     
     if (lock($flagName)) {
-      $sequence=db_sql("select value from is_sequence where nodePrefix='$nodePrefix' and clientPrefix='$clientPrefix'");
+      $sequence=db_sql("select seq_value from is_sequence where nodePrefix='$nodePrefix' and clientPrefix='$clientPrefix'");
       if ($sequence>0) {
         $sequence++;
-        db_sql("update is_sequence set value=$sequence where nodePrefix='$nodePrefix' and clientPrefix='$clientPrefix'");
+        db_sql("update is_sequence set seq_value=$sequence where nodePrefix='$nodePrefix' and clientPrefix='$clientPrefix'");
         $sequence=str_repeat("0", 19-strlen($sequence));
         $ret=$nodePrefix.$clientPrefix."000000".$sequence;
       } else {
