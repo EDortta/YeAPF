@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.57-10 built on 2017-05-15 17:41 (-3 DST)
+    YeAPF 0.8.57-13 built on 2017-05-17 16:01 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-15 16:12:19 (-3 DST)
+    2017-05-17 15:50:19 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -916,7 +916,7 @@
 
   function verifyNodeSequence() 
   {
-    global $cfgIdServerURL, $dbCSVFilename, $cfgNodePrefix;
+    global $cfgIdServerURL, $dbCSVPath, $cfgNodePrefix;
 
     $ret=-1;
     $ok=false;
@@ -953,10 +953,9 @@
         if ($toTest) {
           $validServerURL = (isset($cfgIdServerURL)) && (!filter_var($cfgIdServerURL, FILTER_VALIDATE_URL) === false);
           if ($validServerURL) {
-            $baseFolder = dirname($dbCSVFilename);
             $urlBase="$cfgIdServerURL/rest.php";
 
-            $nodeSeq=@file_get_contents("$baseFolder/.config/cloudAppNode.seq");
+            $nodeSeq=@file_get_contents("$dbCSVPath/.config/cloudAppNode.seq");
             $nodeSeq=explode(":", $nodeSeq);
             $a=$nodeSeq[0];
             $b=$nodeSeq[1];
@@ -989,7 +988,7 @@
 
 
               if ($check==$ret['c']) {
-                @file_put_contents("$baseFolder/.config/cloudAppNode.seq", $ret['a'].':'.$ret['b']);
+                @file_put_contents("$dbCSVPath/.config/cloudAppNode.seq", $ret['a'].':'.$ret['b']);
                 $dt=$now+y_rand(15,60*60);
                 @file_put_contents($tempTimeMark, $dt);
                 $ok=true;
@@ -1016,28 +1015,9 @@
     return $ret;
   }
 
-  function explainDBLockError() 
-  {
-    global $_ydb_ready;
-    $ret="Unknonw error";
-    if (db_status(_DB_LOCK_DISABLED)==_DB_LOCK_DISABLED) 
-      $ret = "Node disabled";
-    if (db_status(_DB_LOCK_TIME_MISTAKE)==_DB_LOCK_TIME_MISTAKE) 
-      $ret = "Node timestamp mistake";
-    if (db_status(_DB_LOCK_EXTERNAL_IP_MISTAKE)==_DB_LOCK_EXTERNAL_IP_MISTAKE) 
-      $ret = "Node external_ip mistake";
-    if (db_status(_DB_LOCK_INTERNAL_IP_MISTAKE)==_DB_LOCK_INTERNAL_IP_MISTAKE) 
-      $ret = "Node internal_ip mistake";
-    if (db_status(_DB_LOCK_WRONG_SERVER_PREFIX)==_DB_LOCK_WRONG_SERVER_PREFIX) 
-      $ret = "Node with wrong server prefix";
-    if (db_status(_DB_LOCK_SERVER_PREFIX_MISTAKE)==_DB_LOCK_SERVER_PREFIX_MISTAKE) 
-      $ret = "Node server prefix mistake";
-    return $ret;
-  }
-
   function ryeapf($a)
   {
-    global $callback, $dbCSVFilename, $cfgNodePrefix, $cfgClientConfig, $_ydb_ready, $server_IP;
+    global $callback, $dbCSVPath, $cfgNodePrefix, $cfgClientConfig, $_ydb_ready, $server_IP;
     extract(xq_extractValuesFromQuery());
 
     $ret=array();
@@ -1049,7 +1029,6 @@
     } else if ($a=='serverTime') {
       $ret['serverTime'] = date('Y-m-d H:i:s');
     } else if ($a=='nodeKeepAlive') {
-      $baseFolder = dirname($dbCSVFilename);
       if (db_status(_DB_LOCKED)==0) {
         if (db_tableExists('is_node_control')) {
           if (thisNodeExists()) {
@@ -1084,12 +1063,12 @@
         }
       } else {
         $ret['flags']=$_ydb_ready;
-        $ret['error'] = explainDBLockError();
+        $ret['error'] = explainDBError();
         $ret['lastError']=$GLOBALS['lastError'];
 
       }
       /*
-      $ret['folder'] = $baseFolder;
+      $ret['folder'] = $dbCSVPath;
       $ret['cfgNodePrefix'] = $cfgNodePrefix;
       $ret['cfgClientConfig'] = $cfgClientConfig;
       */

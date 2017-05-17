@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misctools.php
-    YeAPF 0.8.57-10 built on 2017-05-15 17:41 (-3 DST)
+    YeAPF 0.8.57-13 built on 2017-05-17 16:01 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-15 16:04:49 (-3 DST)
+    2017-05-17 15:59:45 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -778,28 +778,38 @@
 
   function getCurrentIp() 
   {
-    global $dbCSVFilename;
+    global $dbCSVPath;
 
-    $services = array("http://icanhazip.com/", "http://ipecho.net/plain");
+    $services = array("http://icanhazip.com/", "http://ipecho.net/plain", "http://checkip.dyndns.org");
 
     $secondsPerDay = 24 * 60 * 60;
     
-    $cfgName = dirname($dbCSVFilename)."/.config/ifconfig.me";
+    $cfgName = "$dbCSVPath/.config/ifconfig.me";
+    $cfgSeqName = "$dbCSVPath/.config/ifconfig.seq";
     $d = date('U');
     $o = @filemtime($cfgName);
     $dif = $d-$o;
-    
-    if ($dif > $secondsPerDay / 6) {
+
+    $seq=intval(@file_get_contents($cfgSeqName) || 0);
+    $seq=($seq+1)%count($services);
+
+    $currentIP=@file_get_contents($cfgName)||'';
+  
+    if (($dif > $secondsPerDay / 6) || ($currentIP=='')) {
       $ch=curl_init();
       curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2); 
       curl_setopt($ch, CURLOPT_TIMEOUT, 4);
-      curl_setopt($ch, CURLOPT_URL, $services[0]);
+      curl_setopt($ch, CURLOPT_URL, $services[$seq]);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-      $currentIP=preg_replace('/[[:^print:]]/', '', curl_exec($ch));
+      if ($aux=curl_exec($ch)) {
+        if (preg_match('/\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}/', $aux, $ip_match)) {
+           $aux = $ip_match[0];
+        }
+        $currentIP=preg_replace('/[[:^print:]]/', '', $aux);
+        file_put_contents($cfgName, $currentIP);
+      }
       curl_close($ch);
-      file_put_contents($cfgName, $currentIP);
-    } else
-      $currentIP=file_get_contents($cfgName);
+    }
     return $currentIP;
   }
 

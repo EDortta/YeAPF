@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.57-10 built on 2017-05-15 17:41 (-3 DST)
+    YeAPF 0.8.57-13 built on 2017-05-17 16:01 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-15 17:37:36 (-3 DST)
+    2017-05-17 15:45:31 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -66,6 +66,36 @@
   define('_DB_LOCK_WRONG_SEQUENCE',        8192+ 10485776);
 
   $_ydb_ready=0;
+
+  function explainDBError() 
+  {
+    global $_ydb_ready;
+    $ret="";
+    if (db_status(_DB_DIRTY_)==_DB_DIRTY_) 
+      $ret .= "DB dirty\n";
+    if (db_status(_DB_CONNECTED_)==_DB_CONNECTED_) 
+      $ret .= "DB connected\n";
+    if (db_status(_DB_ANALYZED_)==_DB_ANALYZED_) 
+      $ret .= "DB was analised\n";
+    if (db_status(_DB_UPDATABLE)==_DB_UPDATABLE) 
+      $ret .= "DB can be updated\n";
+
+    if (db_status(_DB_LOCKED)==_DB_LOCKED) 
+      $ret .= "Node locked\n";
+    if (db_status(_DB_LOCK_DISABLED)==_DB_LOCK_DISABLED) 
+      $ret .= "Node disabled\n";
+    if (db_status(_DB_LOCK_TIME_MISTAKE)==_DB_LOCK_TIME_MISTAKE) 
+      $ret .= "Node timestamp mistake\n";
+    if (db_status(_DB_LOCK_EXTERNAL_IP_MISTAKE)==_DB_LOCK_EXTERNAL_IP_MISTAKE) 
+      $ret .= "Node external_ip mistake\n";
+    if (db_status(_DB_LOCK_INTERNAL_IP_MISTAKE)==_DB_LOCK_INTERNAL_IP_MISTAKE) 
+      $ret .= "Node internal_ip mistake\n";
+    if (db_status(_DB_LOCK_WRONG_SERVER_PREFIX)==_DB_LOCK_WRONG_SERVER_PREFIX) 
+      $ret .= "Node with wrong server prefix\n";
+    if (db_status(_DB_LOCK_SERVER_PREFIX_MISTAKE)==_DB_LOCK_SERVER_PREFIX_MISTAKE) 
+      $ret .= "Node server prefix mistake\n";
+    return $ret;
+  }
 
   define('_MYSQL_',1);
   define('_FIREBIRD_',2);
@@ -894,7 +924,12 @@
       }
 
     } else {
-      $msgErr="TENTATIVA DE USO ANTECIPADA OU <BR>\nSEM CONFIGURA&CCEDIL;&ATILDE;O DE BANCO DE DADOS<br>\n Ao tentar fazer [$sql].<br>\nConex&atilde;o com o banco de dados inexistente.<br>\nBandeira _ydb_ready em $_ydb_ready<br>\n";
+      $dbErrMsg=nl2br(explainDBError());
+      $sql="    ".trim($sql);
+      while (strpos($sql, "\n ")>0)
+        $sql=str_replace("\n ", "\n", $sql);
+      $sql=str_replace("\n", "\n    ", $sql);
+      $msgErr="Error when doing [<pre>$sql</pre>].<BR />\n$dbErrMsg<BR />\n:".getCurrentIp();
       _dumpY(4,0,$msgErr);
       $SQLdebugLevel=4;
       showDebugBackTrace($msgErr,true);
