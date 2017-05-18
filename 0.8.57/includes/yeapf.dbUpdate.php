@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.57-12 built on 2017-05-16 07:31 (-3 DST)
+    YeAPF 0.8.57-14 built on 2017-05-18 16:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-16 07:24:47 (-3 DST)
+    2017-05-18 07:50:06 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -682,6 +682,34 @@
           db_sql($sql);
           $sql="create index idx_sequence on is_sequence(nodePrefix, clientPrefix)";
           db_sql($sql);
+        }
+
+        if (!db_tableExists("is_segment_control")) {
+          $sql="CREATE TABLE is_segment_control (
+                  serverKey char(16) NOT NULL,
+                  nodePrefix char(3) NOT NULL,
+                  identity char(32) NOT NULL,
+                  segment char(4),
+                  creation char(14) not null,
+                  regulation char(14)
+                )";
+          db_sql($sql);
+          db_sql("ALTER TABLE is_segment_control ADD PRIMARY KEY ( serverKey , nodePrefix )");
+          if (db_connectionTypeIs(_FIREBIRD_)) {
+            db_sql("create unique index ndxIdentity on is_segment_control (identity)");
+          } else {
+            db_sql("ALTER TABLE is_segment_control ADD UNIQUE ndxIdentity ( identity )");
+          }
+        }
+
+        if (!db_tableExists("is_segment_reservation")) {
+          $sql="CREATE TABLE is_segment_reservation (
+                  serverKey char(16) NOT NULL,
+                  nodePrefix char(3) NOT NULL,
+                  segment char(4)
+                )";
+          db_sql($sql);
+          db_sql("ALTER TABLE is_segment_reservation ADD PRIMARY KEY ( serverKey , nodePrefix )");
         }
         $currentDBVersion=15;
         _db_grantSetupIni();

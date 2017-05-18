@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.57-13 built on 2017-05-17 16:01 (-3 DST)
+    YeAPF 0.8.57-14 built on 2017-05-18 16:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-17 15:50:19 (-3 DST)
+    2017-05-18 10:39:24 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -883,6 +883,219 @@
     }
 
     return $script;
+  }
+
+  function db_isWorkingAsAppController() {
+    $cc1=db_sql("select count(*) form is_node_control");
+    $cc1=db_sql("select count(*) form is_server_control");
+    return (!db_isWorkingAsAppNode() && ($cc1==0) && ($cc2==0));
+  }
+
+  function db_isWorkingAsAppNode() {
+    global $cfgNodePrefix, $_ydb_ready;
+    $ret=false;
+    if (($_ydb_ready & _DB_CONNECTED_)==_DB_CONNECTED_) {
+      if (db_tableExists("is_node_control")) {
+        $cc=db_sql("select count(*) from is_node_control");
+        $ret = (($db_checkNodeConfig!="UNK") || ($cc>0));
+      }
+    }
+    return $ret;
+  }
+
+  function db_generateKey($maxLen=7)
+  {
+    $seq="QWERTYUIOPASDFGHJKLZXCVBNM0123456789";
+    $key="";
+
+    /* falta verificar que a key nao exista */
+    while (strlen($key)<$maxLen) {
+      $n=y_rand(0,strlen($seq));
+      $key.=substr($seq,$n,1);
+    }
+
+    return $key;
+  }
+
+  $GLOBALS['cfgMaxSegmentReservationChunkCount']=10;
+
+  function db_reserveSegments($serverKey, $nodePrefix, $count=10) {
+    if (db_isWorkingAsAppController()) {
+      $ret=false;
+      $cc=db_sql("select count(*) 
+                  from is_segment_control 
+                  where serverKey='$serverKey' 
+                    and nodePrefix='$nodePrefix' 
+                    and regulation is null");
+      /* no es posible pedir más que cincuenta ni mantener reservados más que cinquenta */
+      $count=min($count,$GLOBALS['cfgMaxSegmentReservationChunkCount']-$cc);
+      if (lock("reserve-segments")) {
+        $ret=0;
+        while ($count>0) {
+          $count--;
+          do {
+            $key=db_generateKey(4);
+            $cc=db_sql("select count(*) from is_segment_control where segment='$key'");
+          } while ($cc>0);
+          $now=date("YmdHis");
+          db_sql("insert into is_segment_control(serverKey, nodePrefix, identity, segment, creation, regulation) values ('$serverKey', '$nodePrefix', null, '$key', '$now', null) ");
+          $ret++;
+        }  
+        unlock("reserve-segments");      
+      }
+    }
+    return $ret;
+  }
+
+  function db_associateSegment($serverKey, $nodePrefix, $segment, $identity) {
+    $ret=false;
+    if (db_isWorkingAsAppController()) {
+      if (lock("associate-segment")) {
+
+        $ret=0;
+        $cc=db_sql("select count(*) 
+                    from is_segment_control 
+                    where serverKey='$serverKey'
+                      and nodePrefix='$nodePrefix'
+                      and segment='$segment'
+                      and regulation is null");
+        if ($cc==1) {
+          $now=date("YmdHis");
+          db_sql("update is_segment_control 
+                  set regulation='$now', identity='$identity' 
+                  where serverKey='$serverKey'
+                    and nodePrefix='$nodePrefix'
+                    and segment='$segment'
+                    and regulation is null");
+          $ret=1;
+        } else {
+          /* verifico se a identdade ya existe y si si, devuelvo la cuenta */
+          $ret=db_sql("select count(*) 
+                        from is_segment_control 
+                        where serverKey='$serverKey'
+                          and nodePrefix='$nodePrefix'
+                          and segment='$segment'
+                          and identity='$identity'
+                          and regulation is not null");
+        }
+        unlock("associate-segment");
+      }
+    }
+    return $ret;
+  }
+
+  function db_requestSegmentReservation($count) {
+    global $cfgIdServerURL;
+
+    if (!db_isWorkingAsAppController()) {
+      if (db_isWorkingAsAppNode()) {
+        $validServerURL = (isset($cfgIdServerURL)) && (!filter_var($cfgIdServerURL, FILTER_VALIDATE_URL) === false);
+        if ($validServerURL) {
+          $urlBase="$cfgIdServerURL/rest.php";
+          $serverKey=$GLOBALS['cfgDBNode']['server_key'];
+          $nodeName=$GLOBALS['cfgDBNode']['node_name'];
+
+          $count=min($count,$GLOBALS['cfgMaxSegmentReservationChunkCount']);
+
+          $url="$urlBase?s=ctrl&a=requestSegmentReservation&r=$r&serverKey=$serverKey&nodeName=$nodeName&count=$count";
+
+          $ch=curl_init();
+          curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,2); 
+          curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+          curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+          curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+          curl_setopt($ch, CURLOPT_URL, $url);
+          curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+          $canContinue=true;
+          if (($ret=curl_exec($ch))===false) {
+            $errorMsg="Error: #".curl_errno($ch).", ".curl_error($ch);
+            _dump($errorMsg);
+            $canContinue=false;
+          }
+          curl_close($ch);
+
+        }
+      }
+    }
+  }
+
+  function db_checkNodeConfig() 
+  {
+    global $cfgNodePrefix, $_ydb_ready;
+
+    $ret=true;
+
+    $secondsPerDay = 24 * 60 * 60;
+
+    _recordWastedTime("db_checkNodeConfig()");
+
+
+    if (db_isWorkingAsAppNode()) {
+
+      $ret=false;
+
+      $now=date('U');
+      $dbNodeInfo = db_sql("select n.serverKey, n.enabled as nodeEnabled, 
+                                   n.last_verification, n.external_ip,
+                                   n.nodePrefix,
+                                   s.enabled as serverEnabled, 
+                                   s.serverKey as sp2
+                            from      is_node_control n 
+                            left join is_server_control s on s.serverKey=n.serverKey
+                            where nodePrefix='$cfgNodePrefix'",false);
+      extract($dbNodeInfo);
+
+      if ($serverKey>'') {
+        $currentIP = getCurrentIp();
+        if ($last_verification=='')
+          $last_verification=$now;
+
+        $dif = intval(intval($now) - intval($last_verification));
+
+        if ($currentIP!=$external_ip) {
+          _recordError("Error: node_control says '$external_ip' while your current ip is '$currentIP'");
+          db_close();
+          $_ydb_ready |= _DB_LOCKED | _DB_LOCK_EXTERNAL_IP_MISTAKE;
+
+        } else if ($dif > $secondsPerDay) {
+          $difHours = floor($dif / 60 / 60);
+          _recordError("Error: node_control has been checked $difHours hours ago. It need to be checked each 24 hours");
+          db_close();
+          $_ydb_ready |= _DB_LOCKED | _DB_LOCK_TIME_MISTAKE;
+
+        } else if ($serverEnabled!='Y') {
+          _recordError("Error: server_control has been disabled");
+          db_close();
+          $_ydb_ready |= _DB_LOCKED | _DB_LOCK_DISABLED;
+
+        } else if ($nodeEnabled=='N') {
+          _recordError("Error: node_control has been disabled");
+          db_close();
+          $_ydb_ready |= _DB_LOCKED | _DB_LOCK_DISABLED;
+
+        } else if ($nodePrefix!=$cfgNodePrefix) {
+          _recordError("Error: node_control server prefix '$nodePrefix' differs from '$cfgNodePrefix' declared in .config/cloudAppNode.ini");
+          db_close();
+          $_ydb_ready |= _DB_LOCKED | _DB_LOCK_SERVER_PREFIX_MISTAKE;
+          
+        }
+      } else if ($cfgNodePrefix!='UNK') {
+        _recordError("Error: there is a server prefix '$nodePrefix' defined in .config/cloudAppNode.ini but none in is_node_control");
+        db_close();
+        $_ydb_ready |= _DB_LOCKED | _DB_LOCK_WRONG_SERVER_PREFIX;
+      } else if (verifyNodeSequence()===false) {
+        _recordError("Error: this node is out of sequence with id controller");
+        db_close();
+        $_ydb_ready |= _DB_LOCKED | _DB_LOCK_WRONG_SEQUENCE;
+
+      }
+
+      $ret=(db_status(_DB_LOCKED) == 0);
+    }
+
+    _recordWastedTime("is_node_control checked");
+
+    return $ret;
   }
 
   function thisNodeExists($onlyEnabled=true)

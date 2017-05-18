@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.57-13 built on 2017-05-17 16:01 (-3 DST)
+    YeAPF 0.8.57-14 built on 2017-05-18 16:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-17 15:45:31 (-3 DST)
+    2017-05-18 16:40:01 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -242,97 +242,6 @@
       $ch=substr($codedExpirationDate,$i*2,2) ^ (7+$i);
       $ret.=chr($ch);
     }
-    return $ret;
-  }
-
-  function db_isWorkingAsAppNode() {
-    global $cfgNodePrefix, $_ydb_ready;
-    $ret=false;
-    if (($_ydb_ready & _DB_CONNECTED_)==_DB_CONNECTED_) {
-      if (db_tableExists("is_node_control")) {
-        $cc=db_sql("select count(*) from is_node_control");
-        $ret = (($db_checkNodeConfig!="UNK") || ($cc>0));
-      }
-    }
-    return $ret;
-  }
-
-  function db_checkNodeConfig() 
-  {
-    global $cfgNodePrefix, $_ydb_ready;
-
-    $ret=true;
-
-    $secondsPerDay = 24 * 60 * 60;
-
-    _recordWastedTime("db_checkNodeConfig()");
-
-
-    if (db_isWorkingAsAppNode()) {
-
-      $ret=false;
-
-      $now=date('U');
-      $dbNodeInfo = db_sql("select n.serverKey, n.enabled as nodeEnabled, 
-                                   n.last_verification, n.external_ip,
-                                   n.nodePrefix,
-                                   s.enabled as serverEnabled, 
-                                   s.serverKey as sp2
-                            from      is_node_control n 
-                            left join is_server_control s on s.serverKey=n.serverKey
-                            where nodePrefix='$cfgNodePrefix'",false);
-      extract($dbNodeInfo);
-
-      if ($serverKey>'') {
-        $currentIP = getCurrentIp();
-        if ($last_verification=='')
-          $last_verification=$now;
-
-        $dif = intval(intval($now) - intval($last_verification));
-
-        if ($currentIP!=$external_ip) {
-          _recordError("Error: node_control says '$external_ip' while your current ip is '$currentIP'");
-          db_close();
-          $_ydb_ready |= _DB_LOCKED | _DB_LOCK_EXTERNAL_IP_MISTAKE;
-
-        } else if ($dif > $secondsPerDay) {
-          $difHours = floor($dif / 60 / 60);
-          _recordError("Error: node_control has been checked $difHours hours ago. It need to be checked each 24 hours");
-          db_close();
-          $_ydb_ready |= _DB_LOCKED | _DB_LOCK_TIME_MISTAKE;
-
-        } else if ($serverEnabled!='Y') {
-          _recordError("Error: server_control has been disabled");
-          db_close();
-          $_ydb_ready |= _DB_LOCKED | _DB_LOCK_DISABLED;
-
-        } else if ($nodeEnabled=='N') {
-          _recordError("Error: node_control has been disabled");
-          db_close();
-          $_ydb_ready |= _DB_LOCKED | _DB_LOCK_DISABLED;
-
-        } else if ($nodePrefix!=$cfgNodePrefix) {
-          _recordError("Error: node_control server prefix '$nodePrefix' differs from '$cfgNodePrefix' declared in .config/cloudAppNode.ini");
-          db_close();
-          $_ydb_ready |= _DB_LOCKED | _DB_LOCK_SERVER_PREFIX_MISTAKE;
-          
-        }
-      } else if ($cfgNodePrefix!='UNK') {
-        _recordError("Error: there is a server prefix '$nodePrefix' defined in .config/cloudAppNode.ini but none in is_node_control");
-        db_close();
-        $_ydb_ready |= _DB_LOCKED | _DB_LOCK_WRONG_SERVER_PREFIX;
-      } else if (verifyNodeSequence()===false) {
-        _recordError("Error: this node is out of sequence with id controller");
-        db_close();
-        $_ydb_ready |= _DB_LOCKED | _DB_LOCK_WRONG_SEQUENCE;
-
-      }
-
-      $ret=(db_status(_DB_LOCKED) == 0);
-    }
-
-    _recordWastedTime("is_node_control checked");
-
     return $ret;
   }
 

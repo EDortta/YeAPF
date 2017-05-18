@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misctools.php
-    YeAPF 0.8.57-13 built on 2017-05-17 16:01 (-3 DST)
+    YeAPF 0.8.57-14 built on 2017-05-18 16:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-17 15:59:45 (-3 DST)
+    2017-05-17 16:17:29 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -796,6 +796,7 @@
     $currentIP=@file_get_contents($cfgName)||'';
   
     if (($dif > $secondsPerDay / 6) || ($currentIP=='')) {
+      @file_put_contents($cfgSeqName, $seq);
       $ch=curl_init();
       curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2); 
       curl_setopt($ch, CURLOPT_TIMEOUT, 4);
