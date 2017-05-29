@@ -1,0 +1,50 @@
+#!/usr/bin/php
+<?php
+/*
+    tools/ydbviewconfig
+    YeAPF 0.8.58-6 built on 2017-05-29 15:54 (-3 DST)
+    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
+    2017-05-29 15:53:49 (-3 DST)
+*/
+  $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
+  $cmRequired=false;
+  $dbConnect='no';
+  (@include_once "$mydir/yclilib.php") or die("yclilib.php not found\n");
+
+  $args = new ArgumentsProcessor(false);
+  $onlyActive = $args->argValue('a', __FALSE__)==__TRUE__;
+  $help = $args->argValue('h', __FALSE__)==__TRUE__;
+  // $help=($args->argValue('h;help')==true)  tb funfa
+
+  echo "ydbviewconfig\n(c)2012-2015 esteban daniel dortta\n";
+  if ($help) {
+    $myself=$argv[0];
+    echo "simple usage:\n\t".basename("tools/ydbviewconfig")." [path-to-sgug.ini] [-a]\n\t-a\tonly active connection\n";
+    exit(0);
+  }
+  _LOAD_YEAPF_();
+
+  $yeapfDB=isset($argv[1])?$argv[1]:'';
+  if ($yeapfDB=='')
+    $yeapfDB=getConfigFileName();
+
+  echo "yeapfDB config file: '$yeapfDB'\n";
+
+  if (file_exists($yeapfDB)) {
+    $ini=file($yeapfDB);
+    $campos=explode(';',$ini[0]);
+    for($i=1;$i<count($ini);$i++) {
+      $data=explode(';',$ini[$i]);
+      $n=0;
+      if ((!$onlyActive) || ($campos['active']==1)) {
+        echo "\n REG $i\n";
+        foreach($campos as $c) {
+          $c=str_replace("\n","",$c);
+          echo "$c: ".$data[$n]."\n";
+          $n++;
+        }
+      }
+    }
+  }
+
+?>

@@ -1,0 +1,9 @@
+table='#(dbTable)';
+
+fields{
+#(formFieldList)	
+};
+
+key {
+#(primaryKey): #(primaryType)	
+};
