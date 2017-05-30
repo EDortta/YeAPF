@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.58-6 built on 2017-05-29 15:54 (-3 DST)
+    YeAPF 0.8.58-13 built on 2017-05-30 11:50 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-26 18:51:44 (-3 DST)
+    2017-05-30 11:45:21 (-3 DST)
    */
 
   /*
@@ -35,6 +35,7 @@
   if (isset($yeapfConfig)) {
     $cfgMainFolder=dirname($yeapfConfig['yeapfDB']);
     $cfgCurrentFolder=$yeapfConfig['cfgCurrentFolder'];
+    $cfgDebugIP=$yeapfConfig['cfgDebugIP'];
   }
 
   if (!isset($cfgMainFolder))
@@ -189,7 +190,7 @@
             strtolower(getenv('TERM'))=='cygwin' ||
             strpos(strtolower(getenv('TEMP')),'cygwin')!==FALSE;
   $isHTTPS= (!$isCLI) && ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443);
-
+  
   $cfgSOAPInstalled=function_exists("is_soap_fault");
 
   $cfgDBCureFields=true;
@@ -304,6 +305,7 @@
 
   $user_IP=serverSafeVarValue("REMOTE_ADDR");
   $server_IP=serverSafeVarValue("SERVER_ADDR", gethostbyname(serverSafeVarValue('SERVER_NAME')));
+  $isDebugging=intval($server_IP==$cfgDebugIP);
   // in order to avoid ipv6 ':' that mess with windows file system
   $safe_user_IP=str_replace(":", "", $user_IP);
 
@@ -3318,7 +3320,7 @@
   {
     global $intoFormFile, $includedFiles, $appName, $includeHistory,
            $lastCommands, $yeapfConfig, $appCharset,
-           $_IncludedFiles, $cfgCurrentFile;
+           $_IncludedFiles, $cfgCurrentFile, $isDebugging;
 
     $s=null;
     $priorFile = $cfgCurrentFile;
@@ -3379,6 +3381,60 @@
             }
           }
 
+          if ($isDebugging) {
+            $position=0;
+            do {
+              //@AQUI 20170530
+              $auxP1=stripos($s, 'type="hidden"', $position);
+              $auxP2=stripos($s, "type='hidden'", $position);
+              $position=min(($auxP1!==false)?$auxP1:strlen($s)+1,($auxP1!==false)?$auxP1:strlen($s)+1);
+              if ($position>=strlen($s))
+                $position=false;
+              if (($position!==false)) {
+                $pi=$position;
+                while (($pi>0) && (substr($s,$pi,1)!="<")) {
+                  $pi--;
+                }
+                $pf=$position;
+                while (($pf<strlen($s)) && (substr($s,$pf,1)!=">")) {
+                  $pf++;
+                }
+                $pl=$pf-$pi+1;
+
+                $oldString=substr($s, $pi, $pl);
+                $newString=preg_replace("/\bhidden\b/i","text", $oldString);
+                $auxString=$newString;
+                $title="";
+                $newString='';
+                preg_match_all('/[a-zA-Z0-9_]*\=[\'|\"][a-zA-Z0-9_]*[\'|\"]/i', $auxString, $matches);
+                if (is_array($matches)) { 
+                  foreach($matches[0] as $k=>$v) {
+                    $_attrName=getNextValue($v,'=');
+                    $_attrValue=unquote($v);
+                    // echo "$_attrName = '$_attrValue'\n";
+                    if (in_array(strtolower($_attrName), array('id','name'))) {
+                      $title.="$_attrName:$_attrValue ";
+                    }
+                    if ($_attrName!='title') 
+                      $newString.="$_attrName='$_attrValue' ";
+                  }
+                }
+                $newString.="title='$title'";
+                $newString="<input $newString class='dbg-show-id' read-only='yes'>";
+
+                $s=str_replace($oldString, $newString, $s);
+
+                // echo "p1: $auxP1 | p2: $auxP2 | pos: $position | pi: $pi | pf: $pf | pl: $pl | len: ".strlen($s). " | $oldString | $newString\n";
+                $position=$position+strlen($newString);
+              }
+            } while ($position!==false);
+
+            // if ($newString>'') die();
+            
+            $s=str_replace('type="hidden"', 'type="text" class="dbg-show-id" read-only="yes"', $s);
+            $s=str_replace("type='hidden'", 'type="text" class="dbg-show-id" read-only="yes"', $s);
+          }
+
           $s=analisarString($s, $pegarDadosDaTabela, $nomeTabela, $campoChave, $valorChave);
 
           if (isset($yeapfConfig['cfgCurrentFolder'])) {
@@ -3428,7 +3484,7 @@
 
   function processFile($fileName, $pegarDadosDaTabela=0, $nomeTabela='', $campoChave='', $valorChave='', $valores='', $curarCharset=true)
   {
-    global $_CurrentFileName, $user_IP, $aDebugIP, $yeapfConfig, $sessionCWD, $cfgMainFolder;
+    global $_CurrentFileName, $user_IP, $cfgDebugIP, $yeapfConfig, $sessionCWD, $cfgMainFolder;
 
     // echo "*$fileName<br>";
     _dumpY(1,1,"looking for $fileName");
@@ -3457,15 +3513,16 @@
       $fcontents=str_replace("\n", "\n\t\t",$fcontents);
 
       if (strpos($auxFileName,"logoff")>0) {
-        if (($user_IP==$aDebugIP) && (file_exists("$cfgMainFolder/flags/flag.develop"))) {
+        if (($user_IP==$cfgDebugIP) && (file_exists("$cfgMainFolder/flags/flag.develop"))) {
           echo "\n<code>$fcontents</code>";
           $GLOBALS['SQLdebugLevel']=8;
           showDebugBackTrace("User logged off",true);
           die("");
         } else
           echo $fcontents;
-      } else
+      } else {
         echo $fcontents;
+      }
 
       $_CurrentFileName=$aux;
 

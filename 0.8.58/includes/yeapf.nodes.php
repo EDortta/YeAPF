@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.nodes.php
-    YeAPF 0.8.58-6 built on 2017-05-29 15:54 (-3 DST)
+    YeAPF 0.8.58-13 built on 2017-05-30 11:50 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-29 15:11:15 (-3 DST)
+    2017-05-30 11:29:20 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -388,7 +388,11 @@
           }
         } 
         
-        $ret=db_queryAndFillArray("$sqlGetRegulation",false)[0];
+        $ret=db_queryAndFillArray("$sqlGetRegulation",false);
+        if (is_array($ret))
+          $ret=$ret[0];
+        else
+          $ret=false;
       }
       return $ret;
     }

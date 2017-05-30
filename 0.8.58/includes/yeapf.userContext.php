@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.userContext.php
-    YeAPF 0.8.58-6 built on 2017-05-29 15:54 (-3 DST)
+    YeAPF 0.8.58-13 built on 2017-05-30 11:50 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-26 18:51:44 (-3 DST)
+    2017-05-30 07:29:43 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -1107,17 +1107,17 @@
      * menuFooter()
      * Cria um pequeno menu de ajuda ao desenvolvimento
      * Só aparece se ele estiver rodando no '127.0.0.1' ou '::1' ou
-     * se o IP do servidor coincidir com a global aDebugIP.
+     * se o IP do servidor coincidir com a global cfgDebugIP.
      * Para aparecer o menu para criação de menu de entrada e de implementações
      * deve a bandeira '$cfgMainFolder/flags/flag.develop' estar criada (mesmo que zerada)
      */
 
     function menuFooter()
     {
-      global $s, $_Ys_, $u, $aBody, $isTablet, $aDebugIP, $yImplementedAction, $user_IP, $server_IP, $cfgMainFolder;
+      global $s, $_Ys_, $u, $aBody, $isTablet, $cfgDebugIP, $yImplementedAction, $user_IP, $server_IP, $cfgMainFolder;
 
-      // echo "<hr>isTablet: ".!$isTablet."<br>ServerIP: $server_IP<br>UserIP: '$user_IP'<br>DebugIP: '$aDebugIP'";
-      if ((!$isTablet) && (($server_IP=="::1") || ($server_IP=="127.0.0.1") || ($user_IP==$aDebugIP)) && ($_Ys_!='createSubMenu')) {
+      // echo "<hr>isTablet: ".!$isTablet."<br>ServerIP: $server_IP<br>UserIP: '$user_IP'<br>DebugIP: '$cfgDebugIP'";
+      if ((!$isTablet) && (($server_IP=="::1") || ($server_IP=="127.0.0.1") || ($user_IP==$cfgDebugIP)) && ($_Ys_!='createSubMenu')) {
         $myself=basename($_MYSELF_);
         echo "<style>
           #_ydbg_container {margin-top:128px; font-size: 12px; position: fixed; bottom: 0px; background-color: #E5E5E5; border: 1px solid #7F7F7F; border-radius: 3px; padding: 4px; font-size: 10px;opacity: 0.6;}
