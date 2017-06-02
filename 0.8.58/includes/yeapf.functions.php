@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.58-13 built on 2017-05-30 11:50 (-3 DST)
+    YeAPF 0.8.58-16 built on 2017-06-02 11:37 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-30 11:45:21 (-3 DST)
+    2017-05-31 13:31:31 (-3 DST)
    */
 
   /*
@@ -305,7 +305,7 @@
 
   $user_IP=serverSafeVarValue("REMOTE_ADDR");
   $server_IP=serverSafeVarValue("SERVER_ADDR", gethostbyname(serverSafeVarValue('SERVER_NAME')));
-  $isDebugging=intval($server_IP==$cfgDebugIP);
+  $isDebugging=intval(($server_IP==$cfgDebugIP) && ($server_IP!='') && ($cfgDebugIP!=''));
   // in order to avoid ipv6 ':' that mess with windows file system
   $safe_user_IP=str_replace(":", "", $user_IP);
 
@@ -3381,7 +3381,7 @@
             }
           }
 
-          if ($isDebugging) {
+          if (($isDebugging) && (strpos($fileName, ".htm")>0)) {
             $position=0;
             do {
               //@AQUI 20170530
