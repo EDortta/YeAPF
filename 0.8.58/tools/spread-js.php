@@ -1,9 +1,9 @@
 <?php
   /*
     tools/spread-js.php
-    YeAPF 0.8.58-16 built on 2017-06-02 11:37 (-3 DST)
+    YeAPF 0.8.58-22 built on 2017-06-08 09:10 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-31 11:49:07 (-3 DST)
+    2017-06-07 07:12:48 (-3 DST)
 
     This script will distribute monolite version of yloader.js
     among different application skeletons
@@ -36,7 +36,7 @@
       grantDirectory($tgtFolder);
       $auxFile = _file($srcFileName);
       if ($addHeader) {
-        $auxFile = "/* YeAPF 0.8.58-16 built on 2017-06-02 11:37 (-3 DST) Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
+        $auxFile = "/* YeAPF 0.8.58-22 built on 2017-06-08 09:10 (-3 DST) Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
       }
       $tgtFileName=basename($srcFileName);
       if (file_put_contents("$tgtFolder/$tgtFileName", $auxFile))
@@ -96,7 +96,7 @@
   if (file_exists($minJS)) {
     echo "Minified version source: $minJS\n";
     $yeapf_minJS = join("", file($minJS));
-    $yeapf_minJS = "/* YeAPF 0.8.58-16 built on 2017-06-02 11:37 (-3 DST) Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
+    $yeapf_minJS = "/* YeAPF 0.8.58-22 built on 2017-06-08 09:10 (-3 DST) Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
   }
 
   grantDirectory("skel/chromeApp/js");
@@ -105,6 +105,7 @@
   grantDirectory("skel/webApp/js");
   grantDirectory("templates/bootstrap3/js");
   grantDirectory("skel/webSocket");
+  grantDirectory("skel/service");
   grantDirectory("skel/workbench");
   grantDirectory("skel/workbench/www");
   
@@ -114,6 +115,14 @@
     copy("skel/webApp/$script", "skel/webSocket/$script");
     copy("skel/webApp/$script", "skel/workbench/$script");
     copy("skel/webApp/$script", "skel/workbench/www/$script");
+  }
+
+  /* service skeleton
+     YEAPF.DB.INI REST.PHP, QUERY.PHP, E_BODY.XML, TASKS.PHP, YEAPF_TICKER.PHP, CONFIGURE.PHP and SSE.PHP */
+  $phpSpreadList=array('yeapf.db.ini', 'rest.php', 'query.php', 'e_body.xml', 
+                       'tasks.php', 'yeapf_ticker.php', 'configure.php', 'sse.php');
+  foreach($phpSpreadList as $script) {
+    copy("skel/webApp/$script", "skel/service/$script");
   }
 
   /* slotEmptyImplementation.php */

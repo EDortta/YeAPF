@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.58-16 built on 2017-06-02 11:37 (-3 DST)
+  * YeAPF 0.8.58-22 built on 2017-06-08 09:10 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-06-02 11:37:42 (-3 DST)
+  * 2017-06-08 09:10:35 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.58-16 built on 2017-06-02 11:37 (-3 DST)");
+ console.log("YeAPF 0.8.58-22 built on 2017-06-08 09:10 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -284,9 +284,16 @@
        y$ = function (aElementId, aTagName, aIndex) {
          var ret=undefined, auxRet;
          if (aElementId>'') {
-           if (aElementId.substr(0,1)=='#')
-             aElementId = aElementId.substr(1);
-           ret = document.getElementById(aElementId);
+           if (aElementId.substr(0,1)=='#') {
+             if (aElementId.indexOf(' ')>0) {
+               ret=document.querySelector(aElementId);
+             } else {
+               aElementId = aElementId.substr(1);
+             }
+           }
+           if (!ret)
+             ret = document.getElementById(aElementId);
+      
            if (!ret) {
              ret = document.getElementsByName(aElementId);
              if (ret.length) {
@@ -4846,7 +4853,7 @@
                _dumpy(4,1,aURL);
                ycomm.bring(aURL, displayWaitIcon);
              } else
-               setTimeout("ycomm.bring('"+aURL+"');", (0.5 + abs(ycomm.getLoad() - ycomm._maxDirectCall)) * ycomm.wd_interval * 2);
+               setTimeout("ycomm.bring('"+aURL+"');", (0.5 + Math.abs(ycomm.getLoad() - ycomm._maxDirectCall)) * ycomm.wd_interval * 2);
            }
      
          }

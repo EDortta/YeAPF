@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-rest.js
- * YeAPF 0.8.58-13 built on 2017-05-30 11:50 (-3 DST)
+ * YeAPF 0.8.58-22 built on 2017-06-08 09:10 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-01-25 17:51:30 (-3 DST)
+ * 2017-06-05 17:54:11 (-3 DST)
  *
  * ycomm-rest.js is a set of prototyped functions
  * build in order to use REST protocol
@@ -166,7 +166,7 @@
           _dumpy(4,1,aURL);
           ycomm.bring(aURL, displayWaitIcon);
         } else
-          setTimeout("ycomm.bring('"+aURL+"');", (0.5 + abs(ycomm.getLoad() - ycomm._maxDirectCall)) * ycomm.wd_interval * 2);
+          setTimeout("ycomm.bring('"+aURL+"');", (0.5 + Math.abs(ycomm.getLoad() - ycomm._maxDirectCall)) * ycomm.wd_interval * 2);
       }
 
     }
