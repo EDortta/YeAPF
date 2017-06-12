@@ -1,9 +1,9 @@
 <?php
   /*
     tools/spread-js.php
-    YeAPF 0.8.58-22 built on 2017-06-08 09:10 (-3 DST)
+    YeAPF 0.8.58-39 built on 2017-06-12 17:18 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-06-07 07:12:48 (-3 DST)
+    2017-06-12 12:05:17 (-3 DST)
 
     This script will distribute monolite version of yloader.js
     among different application skeletons
@@ -36,7 +36,7 @@
       grantDirectory($tgtFolder);
       $auxFile = _file($srcFileName);
       if ($addHeader) {
-        $auxFile = "/* YeAPF 0.8.58-22 built on 2017-06-08 09:10 (-3 DST) Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
+        $auxFile = "/* YeAPF 0.8.58-39 built on 2017-06-12 17:18 (-3 DST) Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
       }
       $tgtFileName=basename($srcFileName);
       if (file_put_contents("$tgtFolder/$tgtFileName", $auxFile))
@@ -96,7 +96,7 @@
   if (file_exists($minJS)) {
     echo "Minified version source: $minJS\n";
     $yeapf_minJS = join("", file($minJS));
-    $yeapf_minJS = "/* YeAPF 0.8.58-22 built on 2017-06-08 09:10 (-3 DST) Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
+    $yeapf_minJS = "/* YeAPF 0.8.58-39 built on 2017-06-12 17:18 (-3 DST) Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
   }
 
   grantDirectory("skel/chromeApp/js");
@@ -179,10 +179,12 @@
   copyFile("app-src/js/min/ycomm-worker.min.js",      "skel/webApp/js", false);
   copyFile("app-src/js/min/ystorage.min.js",          "skel/webApp/js", false);
 
-  copyFile("app-src/js/min/ystorage.min.js",          "samples/key-admin/js", false);
-  copyFile("skel/webApp/js/yloader.min.js",           "samples/key-admin/js", false);
+  /* samples */
+  $jsSpreadTargets = array("samples/key-admin", "samples/yIndexedDB", "skel/cordova");
+  foreach($jsSpreadTargets as $targetFolder) {
+    copyFile("app-src/js/min/ystorage.min.js",          "$targetFolder/js", false);
+    copyFile("skel/webApp/js/yloader.min.js",           "$targetFolder/js", false);
 
-  copyFile("app-src/js/min/ystorage.min.js",          "skel/cordova/js", false);
-  copyFile("skel/webApp/js/yloader.min.js",           "skel/cordova/js", false);
+  }
 
 ?>

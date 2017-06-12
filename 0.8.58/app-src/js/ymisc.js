@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.58-22 built on 2017-06-08 09:10 (-3 DST)
+ * YeAPF 0.8.58-39 built on 2017-06-12 17:18 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-06-07 10:08:44 (-3 DST)
+ * 2017-06-12 15:22:40 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -268,8 +268,6 @@ if ((isOnMobile()) && (parseInt(getAndroidVersion(), 10)<3)) {
   _expectedType="object";
 } else
   _expectedType="function";
-_dump("ExpectedType="+_expectedType);
-_dump("typeof HTMLElement = "+typeof HTMLElement);
 
 if (typeof HTMLElement==_expectedType) {
   HTMLElement.prototype.hasClass = function (aClassName) {

@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.58-22 built on 2017-06-08 09:10 (-3 DST)
+  * YeAPF 0.8.58-39 built on 2017-06-12 17:18 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-06-08 09:10:35 (-3 DST)
+  * 2017-06-12 17:18:06 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.58-22 built on 2017-06-08 09:10 (-3 DST)");
+ console.log("YeAPF 0.8.58-39 built on 2017-06-12 17:18 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -64,7 +64,6 @@
       
      function isOnMobile() {
        var ret=false;
-       _dump(navigator.userAgent);
        if (typeof mosync != 'undefined') {
          ret = mosync.isAndroid || mosync.isIOS || mosync.isWindowsPhone;
        } else
@@ -533,8 +532,6 @@
        _expectedType="object";
      } else
        _expectedType="function";
-     _dump("ExpectedType="+_expectedType);
-     _dump("typeof HTMLElement = "+typeof HTMLElement);
      
      if (typeof HTMLElement==_expectedType) {
        HTMLElement.prototype.hasClass = function (aClassName) {

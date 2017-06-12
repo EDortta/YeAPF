@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.nodes.php
-    YeAPF 0.8.58-13 built on 2017-05-30 11:50 (-3 DST)
+    YeAPF 0.8.58-39 built on 2017-06-12 17:18 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-30 11:29:20 (-3 DST)
+    2017-06-08 16:50:57 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -200,14 +200,19 @@
             $ret['a']=$ax;
             $ret['b']=$bx;
             $ret['error']=0;
+          } else {
+            $ret['error']=2;
           }
         } else {
           $ret['auth']=md5(1);
+          $ret['error']=3;
         }
       } else {
         $ret['auth']=md5(0);
         $ret['rn']=0;
       }
+
+      return $ret;
     }
 
     /* appNode side */

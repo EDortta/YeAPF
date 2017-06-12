@@ -1,8 +1,8 @@
 /*********************************************
  * skel/MoSyncApp/LocalFiles/js/ystorage.js
- * YeAPF 0.8.58-22 built on 2017-06-08 09:10 (-3 DST)
+ * YeAPF 0.8.58-39 built on 2017-06-12 17:18 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-06-08 09:10:35 (-3 DST)
+ * 2017-06-12 17:18:06 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -19,10 +19,11 @@
     window.ystorage = (function() {
 
       var aKeys = [],
-        oStorage = {};
+        oStorage = {},
+        that = {};
       Object.defineProperty(oStorage, "getItem", {
         value: function(sKey) {
-          return sKey ? this[sKey] : null; },
+          return sKey ? that[sKey] : null; },
         writable: false,
         configurable: false,
         enumerable: false
@@ -60,7 +61,7 @@
         configurable: false,
         enumerable: false
       });
-      this.get = function() {
+      that.get = function() {
         var iThisIndx;
         for (var sKey in oStorage) {
           iThisIndx = aKeys.indexOf(sKey);
@@ -79,8 +80,9 @@
         }
         return oStorage;
       };
-      this.configurable = false;
-      this.enumerable = true;
+      that.configurable = false;
+      that.enumerable = true;
+      return that;
     })();
   }
 
@@ -109,15 +111,16 @@
       };
 
       that.setItem = function(id, jData, aFieldsToPreserve) {
+        var i, k, oldData;
         id = String(id);
 
         jData._id = jData._id || generateUUID();
         jData._ts_update = (new Date()).getTime() / 1000;
 
         if (isArray(aFieldsToPreserve)) {
-          var oldData=that.getItem(id);
+          oldData=that.getItem(id);
           if (!isEmpty(oldData)) {
-            for(var i=0; i<aFieldsToPreserve.length; i++) {
+            for(i=0; i<aFieldsToPreserve.length; i++) {
               if (typeof oldData[aFieldsToPreserve[i]] !== 'undefined') {
                 jData[aFieldsToPreserve[i]]=oldData[aFieldsToPreserve[i]];
               }
@@ -126,13 +129,13 @@
         }
 
         if (jData._linked) {
-          for(var i=0; i<jData._linked.length; i++) {
+          for(i=0; i<jData._linked.length; i++) {
             delete jData[jData._linked[i]];
           }
           delete jData._linked;
         }
 
-        for(var k in jData) {
+        for(k in jData) {
           if (jData.hasOwnProperty(k)) {
             if (k.substr(0,1)!='_') {
               if (isArray(jData[k]))
@@ -211,13 +214,18 @@
         haltOnFirst = false || haltOnFirst;
         if (typeof onitem == "function") {
           condition = condition || true;
-          var ylex = yLexObj(condition);
-          ylex.parse();
+          var allValues=false, ylex;
+          if (true === condition)
+            allValues=true;
+          else {
+            ylex = yLexObj(condition);
+            ylex.parse();            
+          }
           var i, lista = that.getList(),
-            item, canCall;
+              item, canCall;
           for (i = 0; i < lista.length; i++) {
             item = that.getItem(lista[i]);
-            canCall = ylex.solve(item);
+            canCall = allValues || ylex.solve(item);
             if (canCall) {
               onitem(item);
               if (haltOnFirst)
@@ -395,6 +403,204 @@
       return that.init(dbTag, aKeyName);
     };
     console.log("ystorage ready!");
+  }
+
+  if (!window.yIndexedDB) {
+    if (!window.indexedDB)
+      window.indexedDB = window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
+    window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
+    window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
+
+    window.yIndexedDB = function (dbTag, aKeyName, onready_callback) {
+      var that={};
+
+      that._newTransaction = function(mode, callback, txCallback) {
+        mode=mode || "readonly";
+        
+        txCallback = txCallback || 
+                     function(errCode) { 
+                      if(errCode!==0) {
+                        if (canCheck) {
+                          canCheck=false; 
+                          if ("function" == typeof callback)
+                            callback(520, errCode, {});
+                        }
+                      }
+                    };
+
+        var tx = that._db.transaction([that._dbTag_], "readwrite"),
+            waiting = true, error,
+            canCheck = true;
+
+        tx.oncomplete = function () {
+          error=0;
+          waiting = false;
+          if ("function" == typeof txCallback)
+            txCallback(error);
+        };
+
+        tx.onerror = function() {
+          error=1;
+          waiting = false;
+          if ("function" == typeof txCallback)
+            txCallback(error);
+        };
+
+        var objectStore = tx.objectStore(that._dbTag_);
+        return objectStore;
+      };
+
+      that.setItem =function (keyValue, data, callback) {
+        var ret=false;
+        if (3==that.status) {
+          var objectStore = that._newTransaction("readwrite", callback),
+              request = objectStore.put(data);
+          request.onsuccess = function() {
+            if ("function" == typeof callback)
+              callback(200, 0, request.result);
+          };
+          ret=true;
+        }
+        return ret;
+      };
+
+      that.getItem =function (keyValue, callback) {
+        var ret=false;
+        if (3==that.status) {
+          var objectStore = that._newTransaction("readonly", callback),
+              request=objectStore.get(keyValue);
+          request.onsuccess = function () {
+            if ("function" == typeof callback)
+              callback(200, 0, request.result);
+          };
+          ret=true;
+        }
+        return ret;
+      };
+
+      that.insertData = function(data, aFieldsToPreserve) {
+
+      };
+
+      that.filter = function(onitem, oncomplete, condition, haltOnFirst) {
+        if (3==that.status) {
+          haltOnFirst = false || haltOnFirst;
+          
+          var _filter_end = function(errCode) {
+            if (errCode===0)
+              if (typeof oncomplete == "function")
+                oncomplete();
+          };
+
+          if (typeof onitem == "function") {
+            condition = condition || true;
+            var allValues=false;
+            if (true===condition) {
+              allValues=true;
+            } else {
+              var ylex = yLexObj(condition);
+              ylex.parse();
+            }
+
+            var objectStore = that._newTransaction("readonly", undefined, _filter_end);
+            var request = objectStore.openCursor();
+            request.onsuccess = function (e) {
+              var canCall, cursor = e.target.result;
+              if (cursor) {
+                canCall = allValues || ylex.solve(cursor.value);
+                if (canCall)
+                  onitem(cursor.value);          
+                if (!haltOnFirst)
+                  cursor.continue();
+              }
+            };
+            
+            request.onerror = function() {
+
+            };
+          } else {
+            _filter_end(0);
+          }
+        }
+
+      };
+
+
+      that.removeItem = function(keyValue, callback) {
+        var ret=false;
+        if (3==that.status) {
+          var objectStore = that._newTransaction("readonly", callback),
+              request=objectStore.delete(keyValue);
+          request.onsuccess = function () {
+            if ("function" == typeof callback)
+              callback(200, 0, request.result);
+          };
+          ret=true;
+        }
+        return ret;
+
+      };
+
+      that.onDBRequestError = function(event) {
+        that._status = -1;
+        console.error("yIndexedDB error trying to open '{0}'".format(dbTag));
+      };
+
+      that.onDBRequestSuccess = function(event) {
+        that._status = 3;
+        that._db = event.target.result;
+        if ("function" == typeof onready_callback)
+          onready_callback();
+      };
+
+      that.onDBUpgradeNeeded = function(event) {
+        that._status = 2;
+        that._db = event.target.result;
+        that._objectStore = that._db.createObjectStore(that._dbTag_, {keyPath: that._keyName_[0]});
+        for (var n=1; n<that._keyName_.length; n++) {
+          that._objectStore.createIndex(that._keyName_[n]+'_ndx', that._keyName_[n], {unique: false});
+        }
+        that._status = 3;
+      };
+
+      that.init = function(dbTag, aKeyName) {
+        that._dbTag_ = dbTag;
+        /* prepare index key names */
+        aKeyName = aKeyName || '_id';
+        if (!isArray(aKeyName)) {
+          var sep=(aKeyName.indexOf(",")>=0)?',':';';
+          aKeyName = aKeyName.split(sep);
+        }
+        that._keyName_ = aKeyName.slice();
+        if (that._keyName_.length===0)
+          that._keyName_[0]='_id';
+
+        /* status */
+        that._status = 0;
+        Object.defineProperty(
+          that,
+          'status',
+          {
+            get: function() { return that._status; },
+            configurable: false,
+            enumerable: false
+          }
+        );
+
+        if (window.indexedDB) {
+          that._status = 1;
+          /* request an indexedDB instance */
+          that._DBOpenRequest = window.indexedDB.open(dbTag, 1);
+          that._DBOpenRequest.onerror         = that.onDBRequestError;
+          that._DBOpenRequest.onsuccess       = that.onDBRequestSuccess;
+          that._DBOpenRequest.onupgradeneeded = that.onDBUpgradeNeeded;
+        }
+
+        return that;
+      };
+
+      return that.init(dbTag, aKeyName);
+    };
   }
 
   /*
