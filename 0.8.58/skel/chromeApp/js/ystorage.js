@@ -1,8 +1,8 @@
 /*********************************************
  * skel/chromeApp/js/ystorage.js
- * YeAPF 0.8.58-39 built on 2017-06-12 17:18 (-3 DST)
+ * YeAPF 0.8.58-59 built on 2017-06-21 09:10 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-06-12 17:18:06 (-3 DST)
+ * 2017-06-21 09:10:32 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -219,7 +219,7 @@
             allValues=true;
           else {
             ylex = yLexObj(condition);
-            ylex.parse();            
+            ylex.parse();
           }
           var i, lista = that.getList(),
               item, canCall;
@@ -416,14 +416,14 @@
 
       that._newTransaction = function(mode, callback, txCallback) {
         mode=mode || "readonly";
-        
-        txCallback = txCallback || 
-                     function(errCode) { 
+
+        txCallback = txCallback ||
+                     function(errCode) {
                       if(errCode!==0) {
                         if (canCheck) {
-                          canCheck=false; 
+                          canCheck=false;
                           if ("function" == typeof callback)
-                            callback(520, errCode, {});
+                            callback(520, errCode, [{}]);
                         }
                       }
                     };
@@ -450,14 +450,27 @@
         return objectStore;
       };
 
+      that.count = function (callback) {
+        var objectStore = that._newTransaction("readonly");
+        var request = objectStore.count();
+        request.onsuccess = function() {
+          if ("function" == typeof callback) {
+            callback(200, 0, [request.result]);
+          }
+        };
+      };
+
       that.setItem =function (keyValue, data, callback) {
         var ret=false;
         if (3==that.status) {
+          data._id = data._id || generateUUID();
+          data._ts_update = (new Date()).getTime() / 1000;
+
           var objectStore = that._newTransaction("readwrite", callback),
               request = objectStore.put(data);
           request.onsuccess = function() {
             if ("function" == typeof callback)
-              callback(200, 0, request.result);
+              callback(200, 0, [request.result]);
           };
           ret=true;
         }
@@ -471,21 +484,51 @@
               request=objectStore.get(keyValue);
           request.onsuccess = function () {
             if ("function" == typeof callback)
-              callback(200, 0, request.result);
+              callback(200, 0, [request.result]);
           };
           ret=true;
         }
         return ret;
       };
 
-      that.insertData = function(data, aFieldsToPreserve) {
+      that.insertData = function(dataArray, aFieldsToPreserve, callback) {
+        var ret=false;
+        if (3==that.status) {
+          var objectStore = that._newTransaction("readwrite", callback),
+              completed = 0, errorCount = 0;
 
+          for (var n=0; n<dataArray.length; n++) {
+            var data = dataArray[n], request;
+            data._id = data._id || generateUUID();
+            data._ts_update = (new Date()).getTime() / 1000;
+            request=objectStore.put(data);
+            request.onsuccess = function (e) {
+              var ret = e.target;
+              completed++;
+              if (completed + errorCount>=dataArray.length) {
+                if ("function" == typeof callback)
+                  callback(200, { errorCount: errorCount }, [ret.result]);
+              }
+            };
+
+            request.onerror = function(e) {
+              var ret = e.target;
+              errorCount++;
+              if (completed + errorCount>=dataArray.length) {
+                if ("function" == typeof callback)
+                  callback(200, { errorCount: errorCount }, [{}]);
+              }
+            };
+          }
+          ret=true;
+        }
+        return ret;
       };
 
       that.filter = function(onitem, oncomplete, condition, haltOnFirst) {
         if (3==that.status) {
           haltOnFirst = false || haltOnFirst;
-          
+
           var _filter_end = function(errCode) {
             if (errCode===0)
               if (typeof oncomplete == "function")
@@ -508,13 +551,14 @@
               var canCall, cursor = e.target.result;
               if (cursor) {
                 canCall = allValues || ylex.solve(cursor.value);
-                if (canCall)
-                  onitem(cursor.value);          
+                if (canCall) {
+                  onitem(cursor.value);
+                }
                 if (!haltOnFirst)
                   cursor.continue();
               }
             };
-            
+
             request.onerror = function() {
 
             };
@@ -522,9 +566,60 @@
             _filter_end(0);
           }
         }
-
       };
 
+      that.slice = function(onitem, oncomplete, first, last, haltOnFirst) {
+        if (3==that.status) {
+          haltOnFirst = false || haltOnFirst;
+
+          var _filter_end = function(errCode) {
+            if (errCode===0)
+              if (typeof oncomplete == "function")
+                oncomplete();
+          };
+
+          if (typeof onitem == "function") {
+
+            var objectStore = that._newTransaction("readonly", undefined, _filter_end);
+            var request = objectStore.openCursor();
+            var p=0, count = 0;
+            first = Math.max(0, first);
+            request.onsuccess = function (e) {
+              var cursor = e.target.result, jumpThis=false;
+              if (cursor) {
+                if (p<first) {
+                  p=first;
+                  console.log("Advancing to {0}".format(first));
+                  if (first>0) {
+                    cursor.advance(first);
+                    jumpThis=true;
+                  }
+                } else {
+                  p++;
+                  if (p<=last) {
+                    if ("function" === typeof onitem) {
+                      if (!jumpThis)
+                        onitem(cursor.value);
+                    }
+
+                    if (!haltOnFirst) {
+                      if (p<last) {
+                        cursor.continue();
+                      }
+                    }
+                  }
+                }
+              }
+            };
+
+            request.onerror = function() {
+
+            };
+          } else {
+            _filter_end(0);
+          }
+        }
+      };
 
       that.removeItem = function(keyValue, callback) {
         var ret=false;
@@ -538,7 +633,6 @@
           ret=true;
         }
         return ret;
-
       };
 
       that.onDBRequestError = function(event) {
@@ -650,7 +744,7 @@
   }
 
   if (!window.yInfoObj) {
-    /* prior to 0.8.55 the parameter sequence was: (restServer, aDBName, aKeyName, aDataTemplate) 
+    /* prior to 0.8.55 the parameter sequence was: (restServer, aDBName, aKeyName, aDataTemplate)
        on 0.8.55 it expected (aDBSpec, aServerSpec)
            aDBSpec { dbName: string,
                      keyName: string,

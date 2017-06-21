@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.58-22 built on 2017-06-08 09:10 (-3 DST)
+    YeAPF 0.8.58-59 built on 2017-06-21 09:10 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-06-07 07:14:19 (-3 DST)
+    2017-06-19 15:21:44 (-3 DST)
    */
 
   /*
@@ -3406,7 +3406,7 @@
                 $auxString=$newString;
                 $title="";
                 $newString='';
-                preg_match_all('/[a-zA-Z0-9_]*\=[\'|\"][a-zA-Z0-9_]*[\'|\"]/i', $auxString, $matches);
+                preg_match_all('/([a-zA-Z0-9_]*)=(("[^"]*")|(\'[^\']*\'))/i', $auxString, $matches);
                 if (is_array($matches)) { 
                   foreach($matches[0] as $k=>$v) {
                     $_attrName=getNextValue($v,'=');

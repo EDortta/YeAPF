@@ -1,12 +1,12 @@
   /********************************************************************
   * app-src/js/ycomm-sse.js
-  * YeAPF 0.8.58-13 built on 2017-05-30 11:50 (-3 DST)
+  * YeAPF 0.8.58-59 built on 2017-06-21 09:10 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-05-25 09:15:08 (-3 DST)
+  * 2017-06-16 07:45:34 (-3 DST)
   ********************************************************************/
   var ycommSSEBase = function (workgroup, user, dataLocation, pollTimeout, preferredGateway) {
     var that = {
-      
+
       /* pollTimeout must be between 1 and 60 seconds */
       pollTimeout: Math.min(60000, Math.max(typeof pollTimeout=='number'?pollTimeout:1000, 1000)),
       prefGateway: (preferredGateway || 'SSE').toUpperCase(),
@@ -72,10 +72,10 @@
             _userOffline();
           } else {
             console.log("SSE: User is alive");
-            setTimeout(that.userAlive, that.userAliveInterval); 
+            setTimeout(that.userAlive, that.userAliveInterval);
           }
         };
-        
+
         var _userOffline = function(e) {
           console.log("SSE: User logged out");
           that.close(e);

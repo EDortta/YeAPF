@@ -1,9 +1,9 @@
 <?php
 /*
     skel/workbench/configure.php
-    YeAPF 0.8.58-39 built on 2017-06-12 17:18 (-3 DST)
+    YeAPF 0.8.58-59 built on 2017-06-21 09:10 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-06-12 17:18:06 (-3 DST)
+    2017-06-21 09:10:31 (-3 DST)
 */
 
 
@@ -52,6 +52,7 @@
 
   $isCLI=(php_sapi_name() == "cli");
   $curStep=0;
+  clearstatcache(true);
 
   function sayStep()
   {
@@ -275,7 +276,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.58-39 built on 2017-06-12 17:18 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.58-59 built on 2017-06-21 09:10 (-3 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -315,9 +316,9 @@
 
 
   echo sayStep("<div class=cpyrght><strong><big><I>skel/workbench/configure.php</I></big></strong><br>
-    YeAPF 0.8.58-39 built on 2017-06-12 17:18 (-3 DST)<br>
+    YeAPF 0.8.58-59 built on 2017-06-21 09:10 (-3 DST)<br>
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    2017-06-12 17:18:06 (-3 DST)</div>");
+    2017-06-21 09:10:31 (-3 DST)</div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     die(sayStep("<div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
