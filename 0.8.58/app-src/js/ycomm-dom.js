@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.58-13 built on 2017-05-30 11:50 (-3 DST)
+ * YeAPF 0.8.58-61 built on 2017-06-22 10:31 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-02-10 10:37:54 (-3 DST)
+ * 2017-06-22 10:24:36 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -1035,13 +1035,13 @@ ycomm.dom.getFormElements = function(aFormId, aLineSpec, aOnReady) {
 
     for (var i = 0; i < aElements.length; i++) {
         if (aElements[i].getAttribute) {
-            editMask = aElements[i].getAttribute('editMask') || '';
+            editMask    = aElements[i].getAttribute('editMask') || '';
             storageMask = aElements[i].getAttribute('storageMask') || '';
-            valueType = aElements[i].getAttribute('valueType') || 'text';
+            valueType   = aElements[i].getAttribute('valueType') || 'text';
         } else {
-            editMask = '';
+            editMask    = '';
             storageMask = '';
-            valueType = 'text';
+            valueType   = 'text';
         }
         canChangeRetValue = true;
 
@@ -1076,8 +1076,6 @@ ycomm.dom.getFormElements = function(aFormId, aLineSpec, aOnReady) {
                     case "datetime":
                     case "datetime-local":
                     case "month":
-                    case "number":
-                    case "range":
                     case "search":
                     case "tel":
                     case "time":
@@ -1090,6 +1088,12 @@ ycomm.dom.getFormElements = function(aFormId, aLineSpec, aOnReady) {
                                 fieldValue = fieldValue ? fieldValue + "" : "";
                             }
                         }
+                        break;
+                    case "number":
+                    case "range":
+                      fieldValue = aElements[i].value;
+                      if (isNumber(fieldValue))
+                        fieldValue = fieldValue.toFloat();
                         break;
 
                     case "radio":
@@ -1130,12 +1134,8 @@ ycomm.dom.getFormElements = function(aFormId, aLineSpec, aOnReady) {
                         break;
                 }
                 if (typeof fieldValue == 'string') {
-                    if (isNumber(fieldValue))
-                        fieldValue = fieldValue.toFloat();
-                    else {
-                        if (fieldValue.indexOf(',') >= 0)
-                            fieldValue = encodeURIComponent(fieldValue);
-                    }
+                    if (fieldValue.indexOf(',') >= 0)
+                        fieldValue = encodeURIComponent(fieldValue);
                 }
 
                 if (canChangeRetValue)

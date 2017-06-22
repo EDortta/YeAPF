@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.58-59 built on 2017-06-21 09:10 (-3 DST)
+  * YeAPF 0.8.58-61 built on 2017-06-22 10:31 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-06-21 09:10:32 (-3 DST)
+  * 2017-06-22 10:31:23 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.58-59 built on 2017-06-21 09:10 (-3 DST)");
+ console.log("YeAPF 0.8.58-61 built on 2017-06-22 10:31 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -5900,13 +5900,13 @@
      
          for (var i = 0; i < aElements.length; i++) {
              if (aElements[i].getAttribute) {
-                 editMask = aElements[i].getAttribute('editMask') || '';
+                 editMask    = aElements[i].getAttribute('editMask') || '';
                  storageMask = aElements[i].getAttribute('storageMask') || '';
-                 valueType = aElements[i].getAttribute('valueType') || 'text';
+                 valueType   = aElements[i].getAttribute('valueType') || 'text';
              } else {
-                 editMask = '';
+                 editMask    = '';
                  storageMask = '';
-                 valueType = 'text';
+                 valueType   = 'text';
              }
              canChangeRetValue = true;
      
@@ -5941,8 +5941,6 @@
                          case "datetime":
                          case "datetime-local":
                          case "month":
-                         case "number":
-                         case "range":
                          case "search":
                          case "tel":
                          case "time":
@@ -5955,6 +5953,12 @@
                                      fieldValue = fieldValue ? fieldValue + "" : "";
                                  }
                              }
+                             break;
+                         case "number":
+                         case "range":
+                           fieldValue = aElements[i].value;
+                           if (isNumber(fieldValue))
+                             fieldValue = fieldValue.toFloat();
                              break;
      
                          case "radio":
@@ -5995,12 +5999,8 @@
                              break;
                      }
                      if (typeof fieldValue == 'string') {
-                         if (isNumber(fieldValue))
-                             fieldValue = fieldValue.toFloat();
-                         else {
-                             if (fieldValue.indexOf(',') >= 0)
-                                 fieldValue = encodeURIComponent(fieldValue);
-                         }
+                         if (fieldValue.indexOf(',') >= 0)
+                             fieldValue = encodeURIComponent(fieldValue);
                      }
      
                      if (canChangeRetValue)
@@ -6479,7 +6479,7 @@
                console.log("SSE: CLOSE");
                that.state=-1;
                that.pollEnabled = false;
-               that.dispatchEvent('close');
+               that.dispatchEvent('onclose');
                if (that.evtSource)
                  that.evtSource.close();
                that.closing=false;
@@ -6488,10 +6488,12 @@
      
            open: function (e) {
              console.log("SSE: OPEN");
+             that.dispatchEvent('onopen');
            },
      
            error: function(e) {
              console.error("SSE: ERROR using SSE");
+             that.dispatchEvent('onerror');
            },
      
            message: function (e) {
@@ -6511,7 +6513,7 @@
                    }
                  }
                }
-               that.dispatchEvent("ready", {"gateway": "SSE"});
+               that.dispatchEvent("onready", {"gateway": "SSE"});
                console.log("SSE: userAliveInterval: {0}ms".format(that.userAliveInterval));
                /* the first UAI happens in half of the planned time */
                setTimeout(that.userAlive, that.userAliveInterval / 2);
