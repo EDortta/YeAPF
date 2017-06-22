@@ -1,6 +1,6 @@
 <?php
 /*
-    skel/workbench/configure.php
+    skel/cli/configure.php
     YeAPF 0.8.58-62 built on 2017-06-22 17:24 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
     2017-06-22 17:24:55 (-3 DST)
@@ -315,7 +315,7 @@
   }
 
 
-  echo sayStep("<div class=cpyrght><strong><big><I>skel/workbench/configure.php</I></big></strong><br>
+  echo sayStep("<div class=cpyrght><strong><big><I>skel/cli/configure.php</I></big></strong><br>
     YeAPF 0.8.58-62 built on 2017-06-22 17:24 (-3 DST)<br>
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com<br>
     2017-06-22 17:24:55 (-3 DST)</div>");
