@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.uuid.php
-    YeAPF 0.8.58-13 built on 2017-05-30 11:50 (-3 DST)
+    YeAPF 0.8.58-63 built on 2017-06-23 08:54 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-29 15:38:21 (-3 DST)
+    2017-06-23 08:53:33 (-3 DST)
 */
 
   /*
@@ -176,6 +176,21 @@
     } else
       $ret=false;
     return $ret;
+  }
+
+  function y_sequence_enabled($segment='', $nodePrefix='') {
+    global $cfgNodePrefix, $cfgSegmentPrefix;
+
+    if ($nodePrefix=='')
+      $nodePrefix = "$cfgNodePrefix";
+    if ($segment=='')
+      $segment="$cfgSegmentPrefix";
+
+    $segment = substr(str_repeat("_", 4).$segment, -4);
+    $nodePrefix   = substr(str_repeat("_", 3).$nodePrefix, -3);
+
+    $sequence=db_sql("select seq_value from is_sequence where nodePrefix='$nodePrefix' and segment='$segment'");
+    return $sequence>0;
   }
 
   function y_sequence($segment='', $nodePrefix='') 
