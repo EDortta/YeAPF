@@ -1,8 +1,8 @@
   /********************************************************************
   * app-src/js/ycomm-sse.js
-  * YeAPF 0.8.58-61 built on 2017-06-22 10:31 (-3 DST)
+  * YeAPF 0.8.58-64 built on 2017-06-23 11:21 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-06-22 10:30:56 (-3 DST)
+  * 2017-06-23 11:20:00 (-3 DST)
   ********************************************************************/
   var ycommSSEBase = function (workgroup, user, dataLocation, pollTimeout, preferredGateway) {
     var that = {
@@ -254,7 +254,7 @@
                 that.evtSource.addEventListener("message", that.message, false);
                 that.evtSource.addEventListener("close",   that.close,   false);
 
-                that.evtGuardian = setTimeout(that.guardianTimeout, 1500);
+                that.evtGuardian = setTimeout(that.guardianTimeout, 30000);
               } else {
                 that.startPolling();
               }
