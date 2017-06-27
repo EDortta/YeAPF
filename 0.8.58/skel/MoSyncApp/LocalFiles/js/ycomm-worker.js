@@ -1,8 +1,8 @@
 /*********************************************
  * skel/MoSyncApp/LocalFiles/js/ycomm-worker.js
- * YeAPF 0.8.58-86 built on 2017-06-27 06:52 (-3 DST)
+ * YeAPF 0.8.58-87 built on 2017-06-27 12:36 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-06-27 06:52:26 (-3 DST)
+ * 2017-06-27 12:36:03 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=skel/MoSyncApp/LocalFiles/js/ycomm-worker.js

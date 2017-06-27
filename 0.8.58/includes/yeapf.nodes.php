@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.nodes.php
-    YeAPF 0.8.58-86 built on 2017-06-27 06:52 (-3 DST)
+    YeAPF 0.8.58-87 built on 2017-06-27 12:36 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-06-26 18:06:52 (-3 DST)
+    2017-06-27 12:35:02 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -229,7 +229,8 @@
       $canEvaluate = true;
       if (($ret = curl_exec($ch)) === false) {
         $errorMsg = "Error: #" . curl_errno($ch) . ", " . curl_error($ch);
-        _dump("NODE: errorMsg");
+        _dump("NODE: $errorMsg");
+        _recordError($errorMsg);
         $canEvaluate = false;
       }
       return $ret;
@@ -262,7 +263,8 @@
             $canEvaluate = true;
             if (($retSegments = curl_exec($ch)) === false) {
               $errorMsg = "Error: #" . curl_errno($ch) . ", " . curl_error($ch);
-              _dump($errorMsg);
+              _dump("NODE: $errorMsg");
+              _recordError($errorMsg);
               $canEvaluate = false;
             } else {
               $ret=false;
@@ -460,7 +462,8 @@
               $canEvaluate = true;
               if (($ret = curl_exec($ch)) === false) {
                 $errorMsg = "Error: #" . curl_errno($ch) . ", " . curl_error($ch);
-                _dump("NODE: errorMsg");
+                _dump("NODE: $errorMsg");
+                _recordError($errorMsg);
                 $canEvaluate = false;
               }
 
