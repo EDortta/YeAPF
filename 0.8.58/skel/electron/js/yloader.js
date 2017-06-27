@@ -1,8 +1,8 @@
 /*********************************************
   * skel/electron/js/yloader.js
-  * YeAPF 0.8.58-72 built on 2017-06-24 07:36 (-3 DST)
+  * YeAPF 0.8.58-86 built on 2017-06-27 06:52 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-06-24 07:36:07 (-3 DST)
+  * 2017-06-27 06:52:26 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.58-72 built on 2017-06-24 07:36 (-3 DST)");
+ console.log("YeAPF 0.8.58-86 built on 2017-06-27 06:52 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -473,19 +473,21 @@
      
      function getStyleRuleValue(className, styleItemName) {
        /* original from http://stackoverflow.com/questions/6338217/get-a-css-value-with-javascript */
-         for (var i = 0; i < document.styleSheets.length; i++) {
-             var mysheet = document.styleSheets[i];
-             var myrules = mysheet.cssRules ? mysheet.cssRules : mysheet.rules;
-             for (var j = 0; j < myrules.length; j++) {
-                 if (myrules[j].selectorText && myrules[j].selectorText.toLowerCase() === className) {
-                   if (typeof styleItemName=="string")
-                     return myrules[j].style[styleItemName];
-                   else
-                     return myrules[j].style;
-                 }
-             }
+       className=className || '';
      
-         }
+       for (var i = 0; i < document.styleSheets.length; i++) {
+           var mysheet = document.styleSheets[i];
+           var myrules = mysheet.cssRules ? mysheet.cssRules : mysheet.rules;
+           for (var j = 0; j < myrules.length; j++) {
+               if (myrules[j].selectorText && myrules[j].selectorText.toLowerCase() === className) {
+                 if (typeof styleItemName=="string")
+                   return myrules[j].style[styleItemName];
+                 else
+                   return myrules[j].style;
+               }
+           }
+     
+       }
      };
      
      var getClientSize = function () {
@@ -544,6 +546,12 @@
            }
          }
          return ret;
+       };
+     
+       HTMLElement.prototype.setOpacity = function(value) {
+         value = Math.max(0, Math.min(value,100));
+         this.style.opacity = value/100;
+         this.style.filter = "alpha(opacity={0})".format(value);
        };
      
        HTMLElement.prototype.deleteClass = function(aClassName) {
@@ -4630,7 +4638,7 @@
                      xmlDoc=null;
      
                      if (r.status==200) {
-                       if (typeof('ycomm.msg.notifyServerOnline')=='function')
+                       if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOnline =='function'))
                          ycomm.msg.notifyServerOnline();
      
      
@@ -4648,8 +4656,8 @@
      
                      } else {
                        console.log(r.statusText);
-                       if (typeof('_notifyServerOffline')=='function')
-                         setTimeout(_notifyServerOffline,500);
+                       if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOffline =='function'))
+                         ycomm.msg.notifyServerOffline();
                      }
      
                      ycomm.waitIconControl(false);
@@ -6139,7 +6147,7 @@
          msgProcs: [],
          _dbgFlag_noMessageProcessorPresent: false,
          msgCount: 0,
-         serverOfflineFlag: 0
+         serverOfflineFlag: null
        };
      
        that.grantMsgProc = function(aInterval) {
@@ -6192,7 +6200,7 @@
            }
      
          }
-         grantMsgProc(messagePeekerInterval);
+         that.grantMsgProc(messagePeekerInterval);
        };
      
        that.peek = function() {
@@ -6212,7 +6220,7 @@
                  _QUERY_RETURN(transport);
                else {
                  _dumpy(4, 1, "*** XMLHttpRequest call failure");
-                 setTimeout('_notifyServerOffline()', 500);
+                 setTimeout(that.notifyServerOffline, 500);
                }
              }
            }
@@ -6244,48 +6252,48 @@
        };
      
        that.notifyServerOnline = function() {
-         if (that.serverOfflineFlag > 0) {
+         if ((that.serverOfflineFlag==null) || (that.serverOfflineFlag > 0)) {
            that.serverOfflineFlag = 0;
-           var mainBody = __getMainBody();
-           var isReady = (typeof mainBody.$ == 'function') && (mainBody.document.body != null);
-           if (isReady) {
-             var notificationArea = mainBody.y$('notificationArea');
-             if (notificationArea)
-               notificationArea.style.display = 'none';
-           }
+           var notificationArea = y$('notificationArea');
+           if (notificationArea)
+             notificationArea.style.display = 'none';
+     
+           if (typeof _notifyServerOnline =='function')
+             setTimeout(_notifyServerOnline,500);        
          }
        };
      
        that.notifyServerOffline = function() {
-         that.serverOfflineFlag++;
-         var mainBody = __getMainBody();
-         var isReady = (typeof mainBody.$ == 'function') && (mainBody.document.body != null);
-         if (isReady) {
-           var notificationArea = mainBody.y$('notificationArea');
-           if (!notificationArea) {
-             notificationArea = mainBody.document.createElement('div');
-             notificationArea.id = 'notificationArea';
-             setOpacity(notificationArea, 90);
-             mainBody.document.body.appendChild(notificationArea);
-             if (!existsCSS('notificationArea')) {
-               notificationArea.style.zIndex = 1000;
-               notificationArea.style.position = 'absolute';
-               notificationArea.style.left = '0px';
-               notificationArea.style.top = '0px';
-               notificationArea.style.border = '1px #900 solid';
-               notificationArea.style.backgroundColor = '#fefefe';
-             } else
-               notificationArea.className = 'notificationArea';
+         that.serverOfflineFlag=(that.serverOfflineFlag || 0)+1;
+         
+         var notificationArea = y$('notificationArea');
+         if (!notificationArea) {
+           notificationArea = document.createElement('div');
+           notificationArea.id = 'notificationArea';
+           notificationArea.setOpacity(90);
+           document.body.appendChild(notificationArea);
+           if (!getStyleRuleValue('.notificationArea')) {
+             notificationArea.style.zIndex = 1000;
+             notificationArea.style.position = 'absolute';
+             notificationArea.style.left = '0px';
+             notificationArea.style.top = '0px';
+             notificationArea.style.border = '1px #900 solid';
+             notificationArea.style.backgroundColor = '#fefefe';
+           } else {
+             notificationArea.className = 'notificationArea';
            }
      
-           notificationArea.style.width = mainBody.innerWidth + 'px';
-           notificationArea.style.height = mainBody.innerHeight + 'px';
-           notificationArea.style.display = 'block';
-     
-           notificationArea.innerHTML = "<div style='padding: 32px'><big><b>Server Offline</b></big><hr>Your server has become offline or is mispeling answers when requested.<br>Wait a few minutes and try again later, or wait while YeAPF try again by itself</div>&nbsp;";
+           notificationArea.innerHTML = "<div style='padding: 32px'><big><b>Server Offline</b></big><hr>Your server has become offline or is misspelling answers when requested.<br>Wait a few minutes and try again later, or wait while YeAPF try again by itself</div>&nbsp;<br><img src='http://yeapf.com/images/yeapf-logo.png' style='width: 128px'>";
          }
      
-         grantMsgProc();
+         notificationArea.style.width = document.body.clientWidth + 'px';
+         notificationArea.style.height = document.body.clientHeight + 'px';
+         notificationArea.style.display = '';
+       
+         if (typeof _notifyServerOffline =='function')
+           setTimeout(_notifyServerOffline,500);
+     
+         that.grantMsgProc();
        };
      
        that.registerMsgProc = function(aFunctionName) {
@@ -6298,7 +6306,7 @@
          if (canAdd)
            that.msgProcs[that.msgProcs.length] = aFunctionName;
      
-         grantMsgProc(messagePeekerInterval);
+         that.grantMsgProc(messagePeekerInterval);
        };
      
        that.stopMsgProc = function() {
@@ -6308,6 +6316,25 @@
        return that;
      }
      
+     addOnLoadManager(
+       function()
+       {
+         if (typeof messagePeekerInterval=="undefined") {
+           /*
+            *  Si existe la bandera flags/debug.javascript, entonces, el tiempo de latencia es mayor
+            *  para permitir poder depurar los eventos con calma
+            */
+           if (typeof jsDumpEnabled == "undefined")
+             jsDumpEnabled = 0;
+     
+           if (jsDumpEnabled==1)
+             messagePeekerInterval=15000;
+           else
+             messagePeekerInterval=750;
+         }
+     
+       }
+     );
      
      ycomm.msg = ycommMsgBase();
      
@@ -6521,10 +6548,13 @@
              /* the first UAI happens in 50ms after OPEN */
              setTimeout(that.userAlive, that.userAliveInterval/100);
              that.dispatchEvent('onopen');
+             
+             if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOnline =='function'))
+               ycomm.msg.notifyServerOnline();
            },
      
            error: function(e) {
-             that.debug("ERROR: using SSE", e);
+             that.debug("ERROR: while using SSE");
              that.dispatchEvent('onerror');
            },
      

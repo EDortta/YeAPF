@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.58-39 built on 2017-06-12 17:18 (-3 DST)
+ * YeAPF 0.8.58-86 built on 2017-06-27 06:52 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-06-12 15:22:40 (-3 DST)
+ * 2017-06-24 09:35:39 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -209,19 +209,21 @@ if (typeof getElementsByClassName=="undefined") {
 
 function getStyleRuleValue(className, styleItemName) {
   /* original from http://stackoverflow.com/questions/6338217/get-a-css-value-with-javascript */
-    for (var i = 0; i < document.styleSheets.length; i++) {
-        var mysheet = document.styleSheets[i];
-        var myrules = mysheet.cssRules ? mysheet.cssRules : mysheet.rules;
-        for (var j = 0; j < myrules.length; j++) {
-            if (myrules[j].selectorText && myrules[j].selectorText.toLowerCase() === className) {
-              if (typeof styleItemName=="string")
-                return myrules[j].style[styleItemName];
-              else
-                return myrules[j].style;
-            }
-        }
+  className=className || '';
 
-    }
+  for (var i = 0; i < document.styleSheets.length; i++) {
+      var mysheet = document.styleSheets[i];
+      var myrules = mysheet.cssRules ? mysheet.cssRules : mysheet.rules;
+      for (var j = 0; j < myrules.length; j++) {
+          if (myrules[j].selectorText && myrules[j].selectorText.toLowerCase() === className) {
+            if (typeof styleItemName=="string")
+              return myrules[j].style[styleItemName];
+            else
+              return myrules[j].style;
+          }
+      }
+
+  }
 };
 
 var getClientSize = function () {
@@ -280,6 +282,12 @@ if (typeof HTMLElement==_expectedType) {
       }
     }
     return ret;
+  };
+
+  HTMLElement.prototype.setOpacity = function(value) {
+    value = Math.max(0, Math.min(value,100));
+    this.style.opacity = value/100;
+    this.style.filter = "alpha(opacity={0})".format(value);
   };
 
   HTMLElement.prototype.deleteClass = function(aClassName) {

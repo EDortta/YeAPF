@@ -1,8 +1,8 @@
   /********************************************************************
    * app-src/js/ycomm-ajax.js
-   * YeAPF 0.8.58-13 built on 2017-05-30 11:50 (-3 DST)
+   * YeAPF 0.8.58-86 built on 2017-06-27 06:52 (-3 DST)
    * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2017-03-06 09:01:13 (-3 DST)
+   * 2017-06-24 08:39:09 (-3 DST)
    *
    * Com o advento do WebSocket, precisamos de novas formas para
    * provocar o servidor.
@@ -310,7 +310,7 @@
                 xmlDoc=null;
 
                 if (r.status==200) {
-                  if (typeof('ycomm.msg.notifyServerOnline')=='function')
+                  if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOnline =='function'))
                     ycomm.msg.notifyServerOnline();
 
 
@@ -328,8 +328,8 @@
 
                 } else {
                   console.log(r.statusText);
-                  if (typeof('_notifyServerOffline')=='function')
-                    setTimeout(_notifyServerOffline,500);
+                  if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOffline =='function'))
+                    ycomm.msg.notifyServerOffline();
                 }
 
                 ycomm.waitIconControl(false);

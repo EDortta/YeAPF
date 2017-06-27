@@ -1,8 +1,8 @@
   /********************************************************************
   * app-src/js/ycomm-sse.js
-  * YeAPF 0.8.58-72 built on 2017-06-24 07:36 (-3 DST)
+  * YeAPF 0.8.58-86 built on 2017-06-27 06:52 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-06-24 07:33:34 (-3 DST)
+  * 2017-06-24 09:38:34 (-3 DST)
   ********************************************************************/
   var ycommSSEBase = function (workgroup, user, dataLocation, pollTimeout, preferredGateway) {
     var that = {
@@ -209,10 +209,13 @@
         /* the first UAI happens in 50ms after OPEN */
         setTimeout(that.userAlive, that.userAliveInterval/100);
         that.dispatchEvent('onopen');
+        
+        if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOnline =='function'))
+          ycomm.msg.notifyServerOnline();
       },
 
       error: function(e) {
-        that.debug("ERROR: using SSE", e);
+        that.debug("ERROR: while using SSE");
         that.dispatchEvent('onerror');
       },
 

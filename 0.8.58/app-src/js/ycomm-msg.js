@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-msg.js
- * YeAPF 0.8.58-13 built on 2017-05-30 11:50 (-3 DST)
+ * YeAPF 0.8.58-86 built on 2017-06-27 06:52 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-01-13 14:17:08 (-3 DST)
+ * 2017-06-26 10:49:22 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * These routines were written in order to help interprocess process messages
  * but as an remote process messages implementation.
@@ -21,7 +21,7 @@ var ycommMsgBase = function() {
     msgProcs: [],
     _dbgFlag_noMessageProcessorPresent: false,
     msgCount: 0,
-    serverOfflineFlag: 0
+    serverOfflineFlag: null
   };
 
   that.grantMsgProc = function(aInterval) {
@@ -74,7 +74,7 @@ var ycommMsgBase = function() {
       }
 
     }
-    grantMsgProc(messagePeekerInterval);
+    that.grantMsgProc(messagePeekerInterval);
   };
 
   that.peek = function() {
@@ -94,7 +94,7 @@ var ycommMsgBase = function() {
             _QUERY_RETURN(transport);
           else {
             _dumpy(4, 1, "*** XMLHttpRequest call failure");
-            setTimeout('_notifyServerOffline()', 500);
+            setTimeout(that.notifyServerOffline, 500);
           }
         }
       }
@@ -126,48 +126,48 @@ var ycommMsgBase = function() {
   };
 
   that.notifyServerOnline = function() {
-    if (that.serverOfflineFlag > 0) {
+    if ((that.serverOfflineFlag==null) || (that.serverOfflineFlag > 0)) {
       that.serverOfflineFlag = 0;
-      var mainBody = __getMainBody();
-      var isReady = (typeof mainBody.$ == 'function') && (mainBody.document.body != null);
-      if (isReady) {
-        var notificationArea = mainBody.y$('notificationArea');
-        if (notificationArea)
-          notificationArea.style.display = 'none';
-      }
+      var notificationArea = y$('notificationArea');
+      if (notificationArea)
+        notificationArea.style.display = 'none';
+
+      if (typeof _notifyServerOnline =='function')
+        setTimeout(_notifyServerOnline,500);        
     }
   };
 
   that.notifyServerOffline = function() {
-    that.serverOfflineFlag++;
-    var mainBody = __getMainBody();
-    var isReady = (typeof mainBody.$ == 'function') && (mainBody.document.body != null);
-    if (isReady) {
-      var notificationArea = mainBody.y$('notificationArea');
-      if (!notificationArea) {
-        notificationArea = mainBody.document.createElement('div');
-        notificationArea.id = 'notificationArea';
-        setOpacity(notificationArea, 90);
-        mainBody.document.body.appendChild(notificationArea);
-        if (!existsCSS('notificationArea')) {
-          notificationArea.style.zIndex = 1000;
-          notificationArea.style.position = 'absolute';
-          notificationArea.style.left = '0px';
-          notificationArea.style.top = '0px';
-          notificationArea.style.border = '1px #900 solid';
-          notificationArea.style.backgroundColor = '#fefefe';
-        } else
-          notificationArea.className = 'notificationArea';
+    that.serverOfflineFlag=(that.serverOfflineFlag || 0)+1;
+    
+    var notificationArea = y$('notificationArea');
+    if (!notificationArea) {
+      notificationArea = document.createElement('div');
+      notificationArea.id = 'notificationArea';
+      notificationArea.setOpacity(90);
+      document.body.appendChild(notificationArea);
+      if (!getStyleRuleValue('.notificationArea')) {
+        notificationArea.style.zIndex = 1000;
+        notificationArea.style.position = 'absolute';
+        notificationArea.style.left = '0px';
+        notificationArea.style.top = '0px';
+        notificationArea.style.border = '1px #900 solid';
+        notificationArea.style.backgroundColor = '#fefefe';
+      } else {
+        notificationArea.className = 'notificationArea';
       }
 
-      notificationArea.style.width = mainBody.innerWidth + 'px';
-      notificationArea.style.height = mainBody.innerHeight + 'px';
-      notificationArea.style.display = 'block';
-
-      notificationArea.innerHTML = "<div style='padding: 32px'><big><b>Server Offline</b></big><hr>Your server has become offline or is mispeling answers when requested.<br>Wait a few minutes and try again later, or wait while YeAPF try again by itself</div>&nbsp;";
+      notificationArea.innerHTML = "<div style='padding: 32px'><big><b>Server Offline</b></big><hr>Your server has become offline or is misspelling answers when requested.<br>Wait a few minutes and try again later, or wait while YeAPF try again by itself</div>&nbsp;<br><img src='http://yeapf.com/images/yeapf-logo.png' style='width: 128px'>";
     }
 
-    grantMsgProc();
+    notificationArea.style.width = document.body.clientWidth + 'px';
+    notificationArea.style.height = document.body.clientHeight + 'px';
+    notificationArea.style.display = '';
+  
+    if (typeof _notifyServerOffline =='function')
+      setTimeout(_notifyServerOffline,500);
+
+    that.grantMsgProc();
   };
 
   that.registerMsgProc = function(aFunctionName) {
@@ -180,7 +180,7 @@ var ycommMsgBase = function() {
     if (canAdd)
       that.msgProcs[that.msgProcs.length] = aFunctionName;
 
-    grantMsgProc(messagePeekerInterval);
+    that.grantMsgProc(messagePeekerInterval);
   };
 
   that.stopMsgProc = function() {
@@ -190,5 +190,24 @@ var ycommMsgBase = function() {
   return that;
 }
 
+addOnLoadManager(
+  function()
+  {
+    if (typeof messagePeekerInterval=="undefined") {
+      /*
+       *  Si existe la bandera flags/debug.javascript, entonces, el tiempo de latencia es mayor
+       *  para permitir poder depurar los eventos con calma
+       */
+      if (typeof jsDumpEnabled == "undefined")
+        jsDumpEnabled = 0;
+
+      if (jsDumpEnabled==1)
+        messagePeekerInterval=15000;
+      else
+        messagePeekerInterval=750;
+    }
+
+  }
+);
 
 ycomm.msg = ycommMsgBase();

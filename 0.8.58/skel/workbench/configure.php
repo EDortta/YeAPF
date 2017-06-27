@@ -1,9 +1,9 @@
 <?php
 /*
     skel/workbench/configure.php
-    YeAPF 0.8.58-72 built on 2017-06-24 07:36 (-3 DST)
+    YeAPF 0.8.58-86 built on 2017-06-27 06:52 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-06-24 07:36:07 (-3 DST)
+    2017-06-27 06:52:26 (-3 DST)
 */
 
 
@@ -276,7 +276,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.58-72 built on 2017-06-24 07:36 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.58-86 built on 2017-06-27 06:52 (-3 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -311,14 +311,14 @@
   $yeapfLogLevel = 10;
 
   if (!$isCLI) {
-    echo "<style>body{padding:8px; font-size:12px; font-family: 'Trebuchet MS', Helvetica, sans-serif; } pre{font-family: '\"Lucida Console\", Monaco, monospace'} * {border-radius: 3px;} .info{margin:2px; padding-bottom:8px; width: 800px} .warn{border-top:dotted 1px #900; border-bottom:dotted 1px #900; color:#A86D00;  font-weight:800; margin:2px; padding:8px; background-color:#FFEAC0} .cpyrght{font-size:14px; border-bottom:solid 2px #BFBFBF; padding-bottom:4px} .code { font-family:Consolas,monospace;  background-color: #E5E5E5;  margin: 8px;  padding: 4px;  border: dotted 1px #7F7F7F} .err {background-color:#FFC0CB;  border-style:solid;  border-width:2px;  border-color:#FF0000; margin:32px; padding:32px; border-radius:4px; width: 800px; font-weigth: 800; color: #900} .errItem {border-bottom: dotted 1px #FF0000;  margin-bottom:4px; }</style>";
+    echo "<style>body{padding:8px; font-size:12px; font-family: 'Trebuchet MS', Helvetica, sans-serif; } pre{font-family: '\"Lucida Console\", Monaco, monospace'} * {border-radius: 3px;} .info{margin:2px; padding-bottom:8px; width: 800px} .severeWarn {border-top: dotted 1px #590000; border-bottom: dotted 1px #590000; color: #590000; font-weight: 800; margin: 2px; padding: 8px; background-color: #FFB9AF} .warn{border-top:dotted 1px #900; border-bottom:dotted 1px #900; color:#A86D00;  font-weight:800; margin:2px; padding:8px; background-color:#FFEAC0} .cpyrght{font-size:14px; border-bottom:solid 2px #BFBFBF; padding-bottom:4px} .code { font-family:Consolas,monospace;  background-color: #E5E5E5;  margin: 8px;  padding: 4px;  border: dotted 1px #7F7F7F} .err {background-color:#FFC0CB;  border-style:solid;  border-width:2px;  border-color:#FF0000; margin:32px; padding:32px; border-radius:4px; width: 800px; font-weigth: 800; color: #900} .errItem {border-bottom: dotted 1px #FF0000;  margin-bottom:4px; }</style>";
   }
 
 
   echo sayStep("<div class=cpyrght><strong><big><I>skel/workbench/configure.php</I></big></strong><br>
-    YeAPF 0.8.58-72 built on 2017-06-24 07:36 (-3 DST)<br>
+    YeAPF 0.8.58-86 built on 2017-06-27 06:52 (-3 DST)<br>
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    2017-06-24 07:36:07 (-3 DST)</div>");
+    2017-06-27 06:52:26 (-3 DST)</div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     die(sayStep("<div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
@@ -463,6 +463,21 @@
 
       if (!file_exists('includes/security.php'))
         echo echoStep("<div class=warn>'includes/security.php' was not found!<br>Verify appFolderName.def file</div>");
+
+      $severeFunction = array("utf8_decode", "mb_convert_encoding", "ibase_connect", "pg_connect", "mysql_connect", "mysqli_connect");
+      $notFoundSF="";
+
+      foreach($severeFunction as $severe)  {
+        if (!function_exists($severe))  {
+          if ($notFoundSF>'')
+            $notFoundSF.=", ";
+          $notFoundSF.=$severe."()";
+        }
+      }
+
+      if ($notFoundSF>'') {
+        echo echoStep("<div class='severeWarn'>At least one important function was not found in your php installation.<br>The severity of this warning depends on how your application has been built.<br>'$notFoundSF'</div>");
+      }
       $lockCanBeCreated=0;
       if ((is_writable('./')) && (touch('flag.test'))) {
         $lockCanBeCreated=1;
@@ -1137,7 +1152,7 @@
                 else
                   $developLink='';
 
-                echo sayStep("<div style='box-shadow: 5px 5px 2px #888888; background: #90EE90; border-style: solid; border-width: 2px; border-color: #00BD00; padding: 32px'><big><u>YeAPF 0.8.58 well configured!</u></big><div style='padding-left: 16px'>Location: <b>$__PL__</b><br>DB config: <b>$dbCSVFilename</b><br>Debug IP: <b>".(isset($cfgDebugIP)?$cfgDebugIP:'none')."</b></div><br>Click <a href='$referer_uri'>here</a> to go back.<br>Click <a href='configure.php?debugSteps=1'>here</a> to debug configure process.<br> Click <a href='index.php'>here</a> to start your app.<br>$developLink<small style='margin: 16px'>If you wish to destroy database connection an recreate it, click <a href='configure.php?destroydb=yes'>here</a><br><i>It will preserve your database data but will remove all other definitions except the one contained in<em>yeapf.db.ini</em></i></small></div>");
+                echo sayStep("<div style='box-shadow: 5px 5px 2px #888888; background: #90EE90; border-style: solid; border-width: 2px; border-color: #00BD00; padding: 32px'><big><u>YeAPF 0.8.58 well configured!</u></big><div style='padding-left: 16px'>Location: <b>$__PL__</b><br>DB config: <b>$dbCSVFilename</b><br>Debug IP: <b>".(isset($cfgDebugIP)?$cfgDebugIP:'none')."</b></div><br>Click <a href='$referer_uri'>here</a> to go back.<br>Click <a href='configure.php?debugSteps=1'>here</a> to debug configure process.<br> Click <a href='index.php'>here</a> to start your app.<br>$developLink<div style='margin: 16px'>If you wish to destroy database connection an recreate it, click <a href='configure.php?destroydb=yes'>here</a><br><i>It will preserve your database data but will remove all other definitions except the one contained in<em>yeapf.db.ini</em></i></div></div>");
 
                 $aux=join(file('.config/yeapf.config'),'<br>');
                 // echo echoStep("<div class=code>$aux</div>");
