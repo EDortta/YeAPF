@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.nodes.php
-    YeAPF 0.8.58-89 built on 2017-06-27 14:19 (-3 DST)
+    YeAPF 0.8.58-91 built on 2017-06-27 16:13 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-06-27 14:19:25 (-3 DST)
+    2017-06-27 16:11:39 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -82,10 +82,12 @@
                       and regulation is null";
         // echo "$sql\n";
         $cc = db_sql($sql);
+        $count = min($count, $cfgMaxSegmentReservationChunkCount);
+        _dumpy(512,1,"NODE: reserveSegments() cc: $cc |  count: $count | cfgMaxUnattachedSegments: $cfgMaxUnattachedSegments");
         if ($cc<$cfgMaxUnattachedSegments) {
           // echo "cc=$cc | cfgMaxUnattachedSegments=$cfgMaxUnattachedSegments | cfgMaxSegmentReservationChunkCount=$cfgMaxSegmentReservationChunkCount\n";
-          $count = min($count, $cfgMaxSegmentReservationChunkCount);
           $count = min($count, $cfgMaxUnattachedSegments-$cc);
+          _dumpy(512,1,"NODE: Reserving $count segments");
           if (lock("reserve-segments")) {
             $ret = array();
             while ($count > 0) {
@@ -100,6 +102,21 @@
             }
 
             unlock("reserve-segments");
+          }
+        } else {
+          _dumpy(512,1,"NODE: fetching already reserved $count segment(s)");
+          $sql="select segment 
+                from is_segment_control
+                where serverKey='$serverKey'
+                  and nodePrefix='$nodePrefix'
+                  and regulation is null
+                limit 0, $count";
+          $ret = array();
+          $q=db_query($sql);
+          while ($d=db_fetch_array($q)) {
+            extract($d);
+            _dumpy(512,1,"NODE: segment: $segment");
+            $ret[] = $segment;
           }
         }
       }
@@ -229,7 +246,7 @@
     public function _request($url, &$canEvaluate) {
       $ret=false;
       $url=urlAntiCache($url);
-      _dump("NODE: url '$url'");
+      _dumpy(512,1,"NODE: url '$url'");
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
       curl_setopt($ch, CURLOPT_TIMEOUT, 5);
@@ -240,7 +257,7 @@
       $canEvaluate = true;
       if (($ret = curl_exec($ch)) === false) {
         $errorMsg = "Error: #" . curl_errno($ch) . ", " . curl_error($ch);
-        _dump("NODE: $errorMsg");
+        _dumpy(512,1,"NODE: $errorMsg");
         _recordError($errorMsg);
         $canEvaluate = false;
       }
@@ -265,7 +282,7 @@
             $count = min(intval($count), $GLOBALS['cfgMaxSegmentReservationChunkCount']);
             $url = "$urlBase?s=ynode&a=requestSegmentsId&serverKey=$serverKey&nodeName=$nodeName&count=$count";
             $url=urlAntiCache($url);
-            _dump("NODE: url '$url'");
+            _dumpy(512,1,"NODE: url '$url'");
 
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
@@ -277,7 +294,7 @@
             $canEvaluate = true;
             if (($retSegments = curl_exec($ch)) === false) {
               $errorMsg = "Error: #" . curl_errno($ch) . ", " . curl_error($ch);
-              _dump("NODE: $errorMsg");
+              _dumpy(512,1,"NODE: $errorMsg");
               _recordError($errorMsg);
               $canEvaluate = false;
             } else {
@@ -302,7 +319,7 @@
 
             curl_close($ch);
           } else {
-            _dump("NODE: '$cfgIdServerURL' is not a valid URL");
+            _dumpy(512,1,"NODE: '$cfgIdServerURL' is not a valid URL");
           }
         }
       }
@@ -336,15 +353,15 @@
                              from is_segment_reservation
                             where identity='$identity'";
         $aux=intval(db_sql("select count(*) from ($sqlGetRegulation) t"));
-        _dump("NODE: count for identity '$identity' = $aux");
+        _dumpy(512,1,"NODE: count for identity '$identity' = $aux");
         if ($aux==0) {
           $cc = self::unassignedSegmentCount();
           if ($cc==0) {
-            _dump("NODE: requesting segment reservation");
+            _dumpy(512,1,"NODE: requesting segment reservation");
             self::requestSegmentReservation();
             $cc = self::unassignedSegmentCount();
           }
-          _dump("NODE: unassignedSegmentCount() = $cc");
+          _dumpy(512,1,"NODE: unassignedSegmentCount() = $cc");
 
           if ($cc>0) {
             $ret = -2;
@@ -369,18 +386,18 @@
                   $validServerURL = (isset($cfgIdServerURL)) && (!filter_var($cfgIdServerURL, FILTER_VALIDATE_URL) === false);
                   if ($validServerURL) {
                     $urlBase = "$cfgIdServerURL/rest.php";
-                    _dump("NODE: urlBase '$urlBase'");
+                    _dumpy(512,1,"NODE: urlBase '$urlBase'");
 
                     $serverKey = $GLOBALS['cfgDBNode']['server_key'];
                     $nodeName = $GLOBALS['cfgDBNode']['node_name'];
                     $url = "$urlBase?s=ynode&a=associateSegment&serverKey=$serverKey&nodeName=$nodeName&segment=$segment&identity=$identity";
-                    _dump("NODE: url '$url'");
+                    _dumpy(512,1,"NODE: url '$url'");
 
                     $canEvaluate=null;
                     $regulationInfo=self::_request($url, $canEvaluate);
                     if ($canEvaluate) {
                       $ret=false;
-                      _dump("NODE: regulationInfo=$regulationInfo ".gettype($regulationInfo));
+                      _dumpy(512,1,"NODE: regulationInfo=$regulationInfo ".gettype($regulationInfo));
 
                     
                       $regulationInfo=json_decode($regulationInfo, true);
@@ -404,7 +421,7 @@
                     }
                   }
                 } catch(Exception $e) {
-                  _dump("NODE: Error trying to associate a segment with an identity: ".$e->getMessage());
+                  _dumpy(512,1,"NODE: Error trying to associate a segment with an identity: ".$e->getMessage());
                 }
               }  
 
@@ -435,7 +452,7 @@
           $tempTimeMark = sys_get_temp_dir() . "/ctrl-tm-seq";
           $toTest = false;
           $now = date('U');
-          if ($toDebug) _dump("NODE: $tempTimeMark");
+          if ($toDebug) _dumpy(512,1,"NODE: $tempTimeMark");
           if (file_exists($tempTimeMark)) {
             $tm = filemtime($tempTimeMark);
             $desired = intval(file_get_contents($tempTimeMark));
@@ -447,20 +464,20 @@
               $xdesired = date("Y-m-d H:i:s", $desired);
               $xdtm = date("Y-m-d H:i:s", $dtm);
               $xnow = date("Y-m-d H:i:s", $now);
-              _dump("NODE: maxT=$xmaxT |desired=$xdesired | dtm=$xdtm | now=$xnow | toTest=$toTest");
+              _dumpy(512,1,"NODE: maxT=$xmaxT |desired=$xdesired | dtm=$xdtm | now=$xnow | toTest=$toTest");
             }
           } else {
             $toTest = true;
           }
 
           $toTest = $toTest || $force;
-          if ($force) _dump("NODE: checked enforced");
+          if ($force) _dumpy(512,1,"NODE: checked enforced");
 
           if ($toTest) {
             $validServerURL = (isset($cfgIdServerURL)) && (!filter_var($cfgIdServerURL, FILTER_VALIDATE_URL) === false);
             if ($validServerURL) {
               $urlBase = "$cfgIdServerURL/rest.php";
-              _dump("NODE: urlBase '$urlBase'");
+              _dumpy(512,1,"NODE: urlBase '$urlBase'");
               $nodeSeq = @file_get_contents("$cfgMainFolder/.config/cloudAppNode.seq");
               $nodeSeq = explode(":", $nodeSeq);
               $a = $nodeSeq[0];
@@ -470,7 +487,7 @@
               $nodeName = $GLOBALS['cfgDBNode']['node_name'];
               $url = "$urlBase?s=ynode&a=validateSequence&r=$r&serverKey=$serverKey&nodeName=$nodeName";
               $url=urlAntiCache($url);
-              _dump("NODE: url '$url'");
+              _dumpy(512,1,"NODE: url '$url'");
               $ch = curl_init();
               curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
               curl_setopt($ch, CURLOPT_TIMEOUT, 5);
@@ -481,7 +498,7 @@
               $canEvaluate = true;
               if (($ret = curl_exec($ch)) === false) {
                 $errorMsg = "Error: #" . curl_errno($ch) . ", " . curl_error($ch);
-                _dump("NODE: $errorMsg");
+                _dumpy(512,1,"NODE: $errorMsg");
                 _recordError($errorMsg);
                 $canEvaluate = false;
               }
@@ -501,12 +518,12 @@
                   @file_put_contents($tempTimeMark, $dt);
                   $ok = true;
                 } else {
-                  _dump("NODE: Is this a clone node?");
+                  _dumpy(512,1,"NODE: Is this a clone node?");
                   if (is_array($ret))
-                    foreach($ret as $k => $v) _dump("NODE: $k = '$v'");
+                    foreach($ret as $k => $v) _dumpy(512,1,"NODE: $k = '$v'");
                 }
               } else {
-                _dump("NODE: '$cfgIdServerURL' is not a valid url");
+                _dumpy(512,1,"NODE: '$cfgIdServerURL' is not a valid url");
                 $toTest = false;
               }
             }
@@ -514,14 +531,14 @@
 
           if ($canEvaluate) {
             if (!$ok) {
-              _dump("NODE: Node out of sequence.\nNode disabled. IdServerURL:'$cfgIdServerURL'");
+              _dumpy(512,1,"NODE: Node out of sequence.\nNode disabled. IdServerURL:'$cfgIdServerURL'");
               self::disableThisNode();
             }
           }
 
           $ret = ($canEvaluate) ? ((bool)$ok) : -1;
 
-          _dump("NODE: canEvaluate: $canEvaluate | toTest: $toTest | ok: $ok | ret: $ret");
+          _dumpy(512,1,"NODE: canEvaluate: $canEvaluate | toTest: $toTest | ok: $ok | ret: $ret");
 
           unlock('verify-node-sequence');
         }
