@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.nodes.php
-    YeAPF 0.8.58-87 built on 2017-06-27 12:36 (-3 DST)
+    YeAPF 0.8.58-89 built on 2017-06-27 14:19 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-06-27 12:35:02 (-3 DST)
+    2017-06-27 14:19:25 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -15,6 +15,15 @@
 
   if (!isset($cfgMaxUnattachedSegments)) $cfgMaxUnattachedSegments = 5;
   $cfgMaxUnattachedSegments = max(0, min(intval($cfgMaxUnattachedSegments) , 5));
+
+  function urlAntiCache($url) {
+    if (strpos($url,"?")===false)
+      $url.="?";
+    else
+      $url.="&";
+    $url.="r".y_rand(11,99)."z=".y_uniqid();
+    return $url; 
+  }
 
   class yNode {
     public function __construct() {
@@ -219,6 +228,8 @@
 
     public function _request($url, &$canEvaluate) {
       $ret=false;
+      $url=urlAntiCache($url);
+      _dump("NODE: url '$url'");
       $ch = curl_init();
       curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
       curl_setopt($ch, CURLOPT_TIMEOUT, 5);
@@ -253,6 +264,9 @@
             $request=date("YmdHis");
             $count = min(intval($count), $GLOBALS['cfgMaxSegmentReservationChunkCount']);
             $url = "$urlBase?s=ynode&a=requestSegmentsId&serverKey=$serverKey&nodeName=$nodeName&count=$count";
+            $url=urlAntiCache($url);
+            _dump("NODE: url '$url'");
+
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
             curl_setopt($ch, CURLOPT_TIMEOUT, 5);
@@ -287,6 +301,8 @@
             }
 
             curl_close($ch);
+          } else {
+            _dump("NODE: '$cfgIdServerURL' is not a valid URL");
           }
         }
       }
@@ -324,9 +340,11 @@
         if ($aux==0) {
           $cc = self::unassignedSegmentCount();
           if ($cc==0) {
+            _dump("NODE: requesting segment reservation");
             self::requestSegmentReservation();
             $cc = self::unassignedSegmentCount();
           }
+          _dump("NODE: unassignedSegmentCount() = $cc");
 
           if ($cc>0) {
             $ret = -2;
@@ -451,6 +469,7 @@
               $serverKey = $GLOBALS['cfgDBNode']['server_key'];
               $nodeName = $GLOBALS['cfgDBNode']['node_name'];
               $url = "$urlBase?s=ynode&a=validateSequence&r=$r&serverKey=$serverKey&nodeName=$nodeName";
+              $url=urlAntiCache($url);
               _dump("NODE: url '$url'");
               $ch = curl_init();
               curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
