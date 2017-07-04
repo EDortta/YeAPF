@@ -1,9 +1,9 @@
 <?php
 /*
     skel/service/yeapf_ticker.php
-    YeAPF 0.8.58-91 built on 2017-06-27 16:13 (-3 DST)
+    YeAPF 0.8.58-96 built on 2017-07-04 16:28 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-06-27 16:13:07 (-3 DST)
+    2017-07-04 16:28:30 (-3 DST)
 */
 
   require_once "yeapf.php";
@@ -17,7 +17,9 @@
         /* if the task can be played, play it */
         if ($ytasker->playTask()) {
           set_time_limit(0);
-          implementation($taskContext['s'], $taskContext['a'], 't');          
+          yeapfStage("beforeImplementation");
+          implementation($taskContext['s'], $taskContext['a'], 't'); 
+          yeapfStage("afterImplementation");         
         }
       } catch (Exception $e) {
 

@@ -1,9 +1,9 @@
 <?php
 /*
     skel/workbench/configure.php
-    YeAPF 0.8.58-91 built on 2017-06-27 16:13 (-3 DST)
+    YeAPF 0.8.58-96 built on 2017-07-04 16:28 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-06-27 16:13:07 (-3 DST)
+    2017-07-04 16:28:29 (-3 DST)
 */
 
 
@@ -276,7 +276,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.58-91 built on 2017-06-27 16:13 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.58-96 built on 2017-07-04 16:28 (-3 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -316,9 +316,9 @@
 
 
   echo sayStep("<div class=cpyrght><strong><big><I>skel/workbench/configure.php</I></big></strong><br>
-    YeAPF 0.8.58-91 built on 2017-06-27 16:13 (-3 DST)<br>
+    YeAPF 0.8.58-96 built on 2017-07-04 16:28 (-3 DST)<br>
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    2017-06-27 16:13:07 (-3 DST)</div>");
+    2017-07-04 16:28:29 (-3 DST)</div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     die(sayStep("<div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
@@ -464,19 +464,26 @@
       if (!file_exists('includes/security.php'))
         echo echoStep("<div class=warn>'includes/security.php' was not found!<br>Verify appFolderName.def file</div>");
 
-      $severeFunction = array("utf8_decode", "mb_convert_encoding", "ibase_connect", "pg_connect", "mysql_connect", "mysqli_connect");
+      $severeFunction = array(
+           "utf8_decode"        => "Your application send/receive e-mail, is served from UTF8 and/or the DB is UTF8", 
+           "mb_convert_encoding"=> "Your application uses different charset for db and app", 
+           "ibase_connect"      => "Your database is Firebird/Interbase", 
+           "pg_connect"         => "Your database is POSTGRES", 
+           "mysql_connect"      => "Your database is mysql", 
+           "mysqli_connect"     => "Your database is mysql (using mysqli)", 
+           "curl_init"          => "Applications running in appNode mode");
       $notFoundSF="";
 
-      foreach($severeFunction as $severe)  {
+      foreach($severeFunction as $severe => $explanation)  {
         if (!function_exists($severe))  {
           if ($notFoundSF>'')
             $notFoundSF.=", ";
-          $notFoundSF.=$severe."()";
+          $notFoundSF.="<div>$severe"."() is required if $explanation</div>";
         }
       }
 
       if ($notFoundSF>'') {
-        echo echoStep("<div class='severeWarn'>At least one important function was not found in your php installation.<br>The severity of this warning depends on how your application has been built.<br>'$notFoundSF'</div>");
+        echo sayStep("<div class='severeWarn'>At least one important function was not found in your php installation.<br>The severity of this warning depends on how your application has been built.<br>'$notFoundSF'</div>");
       }
       $lockCanBeCreated=0;
       if ((is_writable('./')) && (touch('flag.test'))) {

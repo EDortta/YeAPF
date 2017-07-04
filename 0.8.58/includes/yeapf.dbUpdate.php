@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.58-13 built on 2017-05-30 11:50 (-3 DST)
+    YeAPF 0.8.58-96 built on 2017-07-04 16:28 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-29 15:37:08 (-3 DST)
+    2017-06-28 19:11:53 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -432,10 +432,10 @@
             else
               $sql.="  buffer varchar(2048),";
             $sql.="  creationDate integer ,";
-            $sql.="  lastAccess integer NOT NULL ,";
+            $sql.="  lastAccess integer DEFAULT NULL ,";
             $sql.="  status integer ,";
             $sql.="  erro varchar(240) ,";
-            $sql.="  valor float NOT NULL ,";
+            $sql.="  valor float DEFAULT NULL ,";
             $sql.="  PRIMARY KEY (id)";
             if (db_connectionTypeIs(_MYSQL_))
               $sql.="  ,KEY printer (printer)";

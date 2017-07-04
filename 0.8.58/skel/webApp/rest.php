@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/rest.php
-    YeAPF 0.8.58-13 built on 2017-05-30 11:50 (-3 DST)
+    YeAPF 0.8.58-96 built on 2017-07-04 16:28 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-12 14:11:25 (-3 DST)
+    2017-07-04 16:26:03 (-3 DST)
 
     skel/webApp / rest.php
     This file cannot be modified within skel/webApp
@@ -34,9 +34,11 @@
       }
       */
 
+      yeapfStage("beforeImplementation");
       yeapfStage("beforeOutput");
       implementation($s, $a, 'r');
       yeapfStage("afterOutput");
+      yeapfStage("afterImplementation");
     } else
       yeapfStage("afterWrongAuthentication");
 
