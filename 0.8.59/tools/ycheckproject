@@ -1,0 +1,139 @@
+#!/usr/bin/php
+<?php
+  /*
+   * tools
+   * tools/ycheckproject
+   * YeAPF 0.8.59-9 built on 2017-07-27 17:40 (-3 DST)
+   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
+   * 2014-12-03 17:38:37 (-3 DST)
+   */
+
+  function detect_encoding($string)
+  {
+    global $php_errormsg;
+    static $list = array('UTF-8', 'ISO-8859-1', 'WINDOWS-1251');
+
+    foreach ($list as $item) {
+      $sample = @iconv($item, $item, $string);
+      if (!($sample===false))
+        if (md5($sample) == md5($string)) {
+          // iconv devolve ok quando são dados iso-8859-1
+          // então precisamos de um passo mais
+
+          $ok=true;
+
+          if ($item=='ISO-8859-1') {
+            for($a=0; $a<strlen($sample); $a++) {
+              $c=substr($sample, $a, 1);
+              if (!((($c>=' ') && (ord($c)<254)) || (($c==chr(13)) || ($c==chr(10)))))
+                $ok=false;
+            }
+          }
+          if ($ok)
+            return $item;
+        }
+    }
+    return null;
+  }
+
+  function is_target_file($fileName)
+  {
+    $textFiles=array('js','php','htm','html','text','txt','inc','css');
+    $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+
+    return (in_array($ext, $textFiles));
+  }
+
+  function checkFileIntegrity($fileName)
+  {
+    $output='';
+    $output.="$fileName;\n";
+    // check existence
+    $fileOk=true;
+    if (file_exists($fileName)) {
+      if (is_target_file($fileName)) {
+        $aux=join(' ',file($fileName));
+        $auxCharset=detect_encoding($aux);
+        if ($auxCharset!=null) {
+          $secAux=iconv($auxCharset, $auxCharset, $aux);
+          if ($aux!=$secAux) {
+            $output.="Error; Bad charset ";
+            $fileOk=false;
+          }
+        } else {
+          $output.="Error; Bad charset ";
+          $fileOk=false;
+        }
+      }
+
+      if ($fileOk) {
+        $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        if ($ext=='php') {
+            $op=array();
+            $output = exec("php -l $fileName> /dev/null",$op,$ret_val);
+            if ($ret_val!=0) {
+              $output.="Error; Cannot be parsed";
+              foreach($op as $v)
+                $output.="** $v\n";
+              $fileOk=false;
+            }
+        }
+      }
+
+      if ($fileOk)
+        $output.="OK!";
+    } else {
+      $output.="Error; not found";
+      $fileOk=false;
+    }
+
+    if (!$fileOk)
+      echo str_replace("\n","\n\t",$output)."\n";
+  }
+
+
+  function checkFolderIntegrity($folder, $recursive) {
+    global $args;
+
+    if ($recursive) {
+      $dirs = array_filter(glob("$folder/*"), 'is_dir');
+      foreach($dirs as $d)
+        checkFolderIntegrity("$d", $recursive);
+
+      echo "$folder                     \r";
+      $files = array_filter(glob("$folder/*"), 'is_target_file');
+      foreach($files as $f)
+        checkFileIntegrity($f);
+
+    }
+  }
+
+  $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
+  $cmRequired=false;
+  (@include_once "$mydir/yclilib.php") or die("yclilib.php not found\n");
+
+
+  $cwd=getcwd();
+  $args = new ArgumentsProcessor(false);
+  $recursive = $args->argValue('R', __FALSE__)==__TRUE__;
+
+  // help the user with command line arguments.
+  if (($args->argValue('h;help')==true) || (($args->optionCount()==0) && ($args->srcCount()==0))) {
+    $myself=$argv[0];
+    echo "\n$myself \n(C)2013 dortta@yahoo.com\nYeAPF tools\nusage samples:";
+    echo "\n$myself *.html\t\tcheck all .html files. Display a list of non text well coded files";
+    echo "\n$myself *.php *.js\tsame of the above but with all .js and .php files";
+    echo "\n$myself -R\ttest all files on all folders\n";
+  } else {
+    echo "Checking...\n";
+    checkFolderIntegrity(getcwd(), $recursive);
+
+    for($a=0; $a<$args->srcCount(); $a++) {
+      $fileName=$args->getSrc($a);
+      checkFileIntegrity("$fileName");
+    }
+
+    echo "\n";
+  }
+
+?>

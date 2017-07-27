@@ -1,0 +1,182 @@
+<!doctype html>
+<html>
+
+<!-- 
+
+RENAME THIS FILE!  RENAME THIS FILE!  RENAME THIS FILE!  RENAME THIS FILE!
+In order to use this sample, you need to rename this file to e_index.html
+You can make changes in that file and still will be able to update all 
+the folder without worring of burning up your modifications
+The same applies to label.default.inc and i_management_welcome_default.html
+
+
+THIS APPLICATION REQUIRES cfgHtPasswdRequired=yes IN DB.CSV
+-->
+
+<head>
+  <meta charset="utf-8">
+  <title>#(appName)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script type="text/javascript" src="js/jquery.min.js"></script>
+  <script type="text/javascript" src="js/bootstrap.min.js"></script>
+  <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
+  <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+  <link href="css/bootstrap-theme.css" rel="stylesheet" type="text/css">
+  <link rel="stylesheet" href="css/animate.css"> 
+  <link rel="stylesheet" href="css/style.css"> 
+  <link rel="stylesheet" href="css/leaflet.css" />
+</head>
+
+
+<style>
+  #mapid { height: 80vh; }
+</style>
+
+#if(#fileExists("labels.inc")==1,#include("labels.inc"),#include("labels.default.inc"))
+<script>
+  window.lblDownloadProjectData = '#(lblDownloadProjectData)';
+  window.lblUploadProjectData   = '#(lblUploadProjectData)';
+  window.lblCleanProjectData    = '#(lblCleanProjectData)';
+</script>
+
+<body>
+  <div class="navbar navbar-inverse navbar-static-top">
+    <div class="container">
+      <div class="navbar-header">
+        <a class="navbar-brand" href="#"><span>#(appName)</span></a> </div>
+      <div class="collapse navbar-collapse" id="navbar-ex-collapse">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a id="btnDownloads" target="Download" href="../downloads/">Download</a> </li>
+          <li><a id="btnProjetos">#(lblProjects)</a> </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class="section">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="tnContainer">
+            <div class="tnTab animated bounceInUp" id="vw_welcome">
+              <div class="jumbotron">
+              #if(#fileExists("i_management_welcome.html")==1,#include("i_management_welcome.html"),#include("i_management_welcome_default.html"))
+              <p>&copy; 2015-2017 Esteban D.Dortta</p>
+              </div>
+            </div>
+
+            <div class="tnTab" id="vw_aguarde"> <img src="img/wait.gif" width=24> <big>#(lblWait)...</big> 
+            </div>
+
+            <div class="tnTab animated bounceInUp" id="vw_projects">
+              <h2>#(lblClientProjectList)</h2>
+              <table id="tbl_projects" class="table">
+                <thead>
+                  <tr>
+                    <th>#(lblSequence)</th>
+                    <th>#(lblProjectKeyName)</th>
+                    <th>#(lblProjectName)</th>
+                </thead>
+                <tbody> </tbody>
+              </table>
+
+              <div class="row">
+                <div class="col-md-12">
+                  <div class="input-group">
+                    <input type="text" class="form-control" placeholder="#(lblNewProjectPlaceHolder)" id="newProjectName">
+                    <span class="input-group-btn">
+                      <button type="button" class="btn btn-default" id="btnNewProject">#(lblNewProject)</button>
+                    </span>
+                  </div>                                  
+                </div>
+              </div>
+
+            </div>
+            
+            <div class="tnTab animated bounceInUp" id="vw_devices">
+              <h2>#(lblProjectName): <b id='lblProjectKey'></b> <a class="btn btn-default fa fa-refresh" id="btnRefreshDeviceList"></a>&nbsp;<a class="btn btn-default fa fa-database" id="btnViewDatabase"></a>&nbsp;<a class="btn btn-default fa fa-area-chart" id="btnViewStats"></a>&nbsp;</h2>
+
+              <div class="tnContainer">
+                <div class="row tnTab" id="vwDevicesPerProject">
+                  <div class="col-md-12">
+                    <table id="tbl_devices" class="table">
+                      <thead>
+                        <tr>
+                          <th>#(lblDevice)</th>
+                          <th colspan=2>#(lblDeviceKeyName)</th>
+                        </tr>
+                      </thead>
+                      <tbody></tbody>
+                    </table>
+                  </div>
+
+                  <div class="col-md-12">
+                    <div class="input-group">
+                      #if(#(lblUSR)>'',{
+                        <span class="input-group-addon" id="sizing-addon1">#(lblUSR)_</span>
+                      })
+                      <input type="text" class="form-control" placeholder="#(lblNewDevicePlaceHolder)" id="newDeviceName" data-usr='#(lblUSR)'>
+                      <span class="input-group-btn">
+                        <button type="button" class="btn btn-default" id="btnNewDevice">#(lblNewDevice)</button>
+                      </span>
+                    </div>                                  
+                  </div>
+                </div>
+
+                <div class="row tnTab" id="vwProjectStats">
+                  <h4>#(lblProjectStats)</h4>
+                  <table class="table" id="tbl_project_stats">
+                    <thead>
+                      <tr>
+                        <th>#(lblProjectName)</th>
+                        <th>Label1</th>
+                        <th>Label2</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>%(sampleStatData01)</td>
+                        <td>%(sampleStatData02)</td>
+                        <td align=right>%(CC)</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="row tnTab" id="vwProjectData">
+                  <h4>#(lblProjectDataList)</h4>
+                  <table class="table" id="tbl_project_data">
+                    <thead>
+                      <tr>
+                        <th>Column1</th>
+                        <th>Column2</th>
+                        <th>Column3</th>
+                        <th></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td align=right>%int(sampleData01)</td>
+                        <td align=center>%date(sampleData02)</td>
+                        <td align=left>%(sampleData03)</td>
+                        <td><button class="btn btn-default"><i class="fa fa-map-marker btnShowDataItem"></i></button></td>
+                      </tr>                    
+                    </tbody>
+                  </table>
+                </div>
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+<script src="js/yloader.min.js"></script>
+<script src="js/ystorage.min.js"></script>
+<script src="js/leaflet.js"></script>
+<script src="js/management.js"></script>
+
+</html>

@@ -1,0 +1,23 @@
+#!/bin/bash
+
+can=0
+d=`dirname $1`
+a=`basename $1`
+ext="${a##*.}"
+fNameGZ=`echo $a | rev | cut -d"." -f2- | rev`.min.$ext.gz
+fName=`echo $a | rev | cut -d"." -f2- | rev`.min.$ext
+if [ -f "$d/$fNameGZ" ]; then
+  b=s/$a/$fNameGZ/g
+  echo Subst $a as $fNameGZ
+  can=1
+else
+  if [ -f "$d/$fName" ]; then
+    b=s/$a/$fName/g
+    echo Subst $a as $fName
+    can=1
+  fi
+fi
+
+if [ $can -eq 1 ]; then
+  grep --include=*.html --include=*.php --include=*.js --exclude-dir=lib -lR $a | xargs --no-run-if-empty sed -i $b
+fi
