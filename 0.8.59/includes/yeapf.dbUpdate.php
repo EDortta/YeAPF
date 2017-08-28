@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.59-9 built on 2017-07-27 17:40 (-3 DST)
+    YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-07-27 17:33:37 (-3 DST)
+    2017-08-28 19:37:13 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -51,7 +51,7 @@
                   sqlVerb char(6),
                   yeapfContext varchar(120),
                   eventDescription varchar(250) DEFAULT NULL, ";
-        if (db_connectionTypeIs(_MYSQL_))
+        if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
           $sql.="prevRecord text,
                  newRecord text ";
         else
@@ -107,13 +107,13 @@
 
           if (!db_tableExists('is_menu')) {
             $sql ="CREATE TABLE is_menu (";
-            if (db_connectionTypeIs(_MYSQL_))
+            if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
               $sql.="  ID int  NOT NULL AUTO_INCREMENT,";
             else
               $sql.="  ID int  NOT NULL ,";
             $sql.="  enabled char(1) DEFAULT 'Y',";
             $sql.="  attr int  DEFAULT '0',";
-            if (db_connectionTypeIs(_MYSQL_))
+            if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
               $sql.="  o tinyint  DEFAULT '0',";
             else
               $sql.="  o smallint  DEFAULT '0',";
@@ -137,7 +137,7 @@
             $sql.="  app int DEFAULT '0',";
             $sql.="  permiteAtivacao int DEFAULT '0',";
             $sql.="  permiteCriarItems int DEFAULT '0',";
-            if (db_connectionTypeIs(_MYSQL_))
+            if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
               $sql.="  explanation text,";
             else
               $sql.="  explanation varchar(4096),";
@@ -208,7 +208,7 @@
             $sql="create table is_sqlcache_content  (";
             $sql.="  id CHAR(32) NOT NULL,";
             $sql.="  o integer,";
-            if (db_connectionTypeIs(_MYSQL_)) {
+            if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_))) {
               $sql.="  content text,";
               $sql.="  comp text);";
             } else {
@@ -234,7 +234,7 @@
             $sql.="  appLevel integer, ";
             $sql.="  g smallint default 0, ";
             $sql.="  o smallint default 0, ";
-            if (db_connectionTypeIs(_MYSQL_)) {
+            if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_))) {
               $sql.="  description text, ";
               $sql.="  examples text)";
             } else {
@@ -250,7 +250,7 @@
             $sql.="  paramNdx smallint, ";
             $sql.="  paramName varchar(60), ";
             $sql.="  isOptional char(1) default 'N', ";
-            if (db_connectionTypeIs(_MYSQL_))
+            if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
               $sql.="  paramDescription text)";
             else
               $sql.="  paramDescription varchar(2048))";
@@ -329,7 +329,7 @@
             if (!db_fieldExists('is_menu','permiteCriarItems'))
               db_sql("alter table is_menu add permiteCriarItems  integer default 0");
             if (!db_fieldExists('is_menu','explanation')) {
-              if (db_connectionTypeIs(_MYSQL_))
+              if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
                 db_sql("alter table is_menu add explanation text");
               else
                 db_sql("alter table is_menu add explanation varchar(2048)");
@@ -400,7 +400,7 @@
 
             $sql ="create table is_jails (";
             $sql.="  userID integer, ";
-            if (db_connectionTypeIs(_MYSQL_))
+            if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
             $sql.="  jails text ";
             else
             $sql.="  jails varchar(512) ";
@@ -427,7 +427,7 @@
             $sql.="  printer varchar(48) ,";
             $sql.="  description varchar(120) ,";
             $sql.="  orientation char(1) DEFAULT NULL,";
-            if (db_connectionTypeIs(_MYSQL_))
+            if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
               $sql.="  buffer text,";
             else
               $sql.="  buffer varchar(2048),";
@@ -437,7 +437,7 @@
             $sql.="  erro varchar(240) ,";
             $sql.="  valor float DEFAULT NULL ,";
             $sql.="  PRIMARY KEY (id)";
-            if (db_connectionTypeIs(_MYSQL_))
+            if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
               $sql.="  ,KEY printer (printer)";
             $sql.=")";
             db_sql($sql);
@@ -460,7 +460,7 @@
             $sql.="  id varchar(48) NOT NULL,";
             $sql.="  fileName varchar(120) ,";
             $sql.="  sequence integer,";
-            if (db_connectionTypeIs(_MYSQL_))
+            if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
               $sql.="  data text,";
             else
               $sql.="  data varchar(2048),";
@@ -484,7 +484,7 @@
           }
 
           if (!db_fieldExists('wbp_printers','sid')) {
-            if (db_connectionTypeIs(_MYSQL_))
+            if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
               db_sql("ALTER TABLE wbp_printers ADD sid INT  DEFAULT NULL NULL after ID");
             else
               db_sql("ALTER TABLE wbp_printers ADD sid INTEGER DEFAULT NULL");
@@ -506,7 +506,7 @@
             $sql.="realization varchar(14) DEFAULT NULL, ";
             $sql.="s varchar(50) DEFAULT NULL, ";
             $sql.="layer varchar(78) DEFAULT NULL, ";
-            if (db_connectionTypeIs(_MYSQL_))
+            if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
               $sql.="description text, ";
             else
               $sql.="description varchar(8192), ";
@@ -612,7 +612,7 @@
                   $sql="create view is_auditing_track as select * from is_auditingTrack";
                   db_sql($sql);
                 }
-              } else if (db_connectionTypeIs(_MYSQL_)) {
+              } else if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_))) {
                 $sql="RENAME TABLE `is_auditingTrack` TO `is_auditing_track`";
                 db_sql($sql);
               } else if (db_connectionTypeIs(_PGSQL_))  {
@@ -684,6 +684,8 @@
               last_verification integer
             )";
             db_sql("$sql");
+            $sql="create index idx_node_control on is_node_control(serverKey, nodePrefix)";
+            db_sql($sql);
           }
 
           if (!db_tableExists("is_sequence")) {

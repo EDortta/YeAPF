@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xForms.php
-    YeAPF 0.8.59-9 built on 2017-07-27 17:40 (-3 DST)
+    YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-26 18:51:44 (-3 DST)
+    2017-08-28 19:37:13 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
   /*
@@ -1707,7 +1707,7 @@
             if (($fieldFixMask & 2)==2)
               $f=fixFieldName($f, $fieldPrefix, $fieldPostfix);
 
-            if (db_connectionTypeIs(_MYSQL_))
+            if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
               $f="`$f`";
             $aux01.=$f;
 
@@ -1753,7 +1753,7 @@
             $aux01.=', ';
           $auxValue=isset($v)?trim(unquote($v)):null;
           $aux03=cleanFieldName($f, $fieldPrefix, $fieldPostfix);
-          if (db_connectionTypeIs(_MYSQL_))
+          if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
             $aux03="`$aux03`";
 
           _dumpY(64,3,"$f '$auxValue'");

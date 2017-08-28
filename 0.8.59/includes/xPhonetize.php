@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xPhonetize.php
-    YeAPF 0.8.59-9 built on 2017-07-27 17:40 (-3 DST)
+    YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-10-04 10:09:48 (-3 DST)
+    2017-08-14 14:31:13 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -14,30 +14,42 @@
     var $HexaFormat=false;
 
     var $phoneticRules = array(
-      array('sh',         0, 0, 'x'),
-      array('chr',        0, 0, 'cr'),
-      array('ch',         0, 0, 'x'),
-      array('eia',        0, 0, 'ea'),
-      array('ean',        0, 0, 'in'),
-      array('ang',        0, 0, 'ain'),
-      array('ph',         0, 0, 'f'),
-      array('iei',        0, 0, 'ie'),
       array('y',          0, 0, 'i'),
+      array('amy@',       0, 0, 'am'),
       array('onca',       0, 0, 'doca'),
       array('mind',       0, 0, 'mend'),
       array('ingo',       0, 0, 'digo'),
       array('rose%',      0, 0, 'rosi%'),
-      array('laire',      0, 0, 'ler'),
-      array('~leo',       0, 0, 'lio'),
-      array('apt',        0, 0, 'at'),
-      array('~p%',        0, 0, '?'),
       array('noel',       0, 0, 'nuel'),
       array('aguina',     0, 0, 'agna'),
       array('edis',       0, 0, 'eds'),
       array('~deividi',   0, 0, 'davi'),
       array('~david',     0, 0, 'davi'),
+      array('~dei',       0, 0, 'dai'),
       array('meir?',      0, 0, 'mar?'),
       array('ia%',        0, 0, 'ai??'),
+      array('~dion',      0, 0, 'jon'),
+      array('tas@',       0, 0, 'tan'),
+      array('tam@',       0, 0, 'tan'),
+      array('ngt',        0, 0, 'nt'),
+      array('hn',         0, 0, 'n'),
+      array('sh',         0, 0, 'x'),
+      array('ch',         0, 0, 'x'),
+      array('chr',        0, 0, 'cr'),
+      array('eira',       0, 0, 'era'),
+      array('eia',        0, 0, 'ea'),
+      array('ean',        0, 0, 'in'),
+      array('ang',        0, 0, 'ain'),
+      array('ge',         0, 0, 'je'),
+      array('ph',         0, 0, 'f'),
+      array('th',         0, 0, 't'),
+      array('ck',         0, 0, 'c'),
+      array('iei',        0, 0, 'ie'),
+      array('laire',      0, 0, 'ler'),
+      array('~leo',       0, 0, 'lio'),
+      array('apt',        0, 0, 'at'),
+      array('~p%',        0, 0, '?'),
+      array('ti@',        0, 0, 'te'),
       array('eth@',       0, 0, 'ete'),
       array('~uil',       0, 0, 'wil'),
       array('e@',         0, 0, 'a'),
@@ -48,7 +60,6 @@
       array('~henr',      0, 0, 'enr'),
       array('~he?k',      0, 0, 're?k'),
       array('~hos?',      0, 0, 'ros?'),
-      array('h',          0, 0, ''),
       array('qu#@',       1, 1, 'k'),
       array('~apare?id#', 1, 1, 'yapd'),
       array('~cid#',      1, 1, 'yapd'),
@@ -59,11 +70,13 @@
       array('ao@',        0, 0, 'an'),
       array('ão',         0, 0, 'an'),
       array('ã@',         0, 0, 'an'),
+      array('nh',         0, 0, 'n'),
       array('w',          0, 0, 'v'),
       array('k',          0, 0, 'c'),
       array('y',          0, 0, 'i'),
       array('ç',          0, 0, 'c'),
-      array('Ç',          0, 0, 'c'),
+      array('ñ',          0, 0, 'n'),
+      array('h',          0, 0, ''),
       array('ss',         0, 0, 'c')
     );
 
@@ -301,18 +314,28 @@
         $res.=$letra;
       }
       */
-      $res=iconv("UTF-8", "ASCII//TRANSLIT", $this->aWord);
-      $this->aWord=strtolower($res);
+
+      $toDebug=false;
+
+      $search = explode(",","ñ,Ñ,ç,õ,Õ,æ,œ,á,é,í,ó,ú,à,è,ì,ò,ù,ä,ë,ï,ö,ü,ÿ,â,ê,î,ô,û,å,ø,Ø,Å,Á,À,Â,Ä,È,É,Ê,Ë,Í,Î,Ï,Ì,Ò,Ó,Ô,Ö,Ú,Ù,Û,Ü,Ÿ,Ç,Æ,Œ");
+      $replace = explode(",","n,N,c,o,O,ae,oe,a,e,i,o,u,a,e,i,o,u,a,e,i,o,u,y,a,e,i,o,u,a,o,O,A,A,A,A,A,E,E,E,E,I,I,I,I,O,O,O,O,U,U,U,U,Y,C,AE,OE");
+
+      if ($toDebug) echo "[ $this->aWord -> ";
+      $res=str_replace($search, $replace, $this->aWord);
+      if ($toDebug) echo " $res -> ";
+      $res=(mb_strtolower($res));
+      if ($toDebug) echo " $res ] ";
+
+      $this->aWord=mb_convert_encoding(mb_strtolower($res), "ASCII");
     }
 
     function doPhonetize()
     {
-      // pegamos só as minusculas
-      $this->aWord=strtolower($this->aWord);
       // eliminamos acentuações
       $this->eliminarAcentuadas();
       // pegamos só as letras
-      $this->aWord=ereg_replace("[^A-Z,^a-z]", "", $this->aWord);
+      /* $this->aWord=ereg_replace("[^A-Z,^a-z]", "", $this->aWord);*/
+      $this->aWord=preg_replace("/[^A-Z,^a-z]/", "", $this->aWord);
       if ($this->aWord>'') {
         $this->passNDX=0;
         // erros de digitação mais comuns
@@ -337,11 +360,14 @@
         $this->aWord=$w;
         $phonetizedWord=$this->doPhonetize();
 
-        $encodedWord.=$this->charsToNum($phonetizedWord);
-        $res.=$phonetizedWord;
+        if ($phonetizedWord>'') {
+          $encodedWord.=$this->charsToNum($phonetizedWord);
+          $res.=$phonetizedWord;
 
-        $encodedWord.='#';
-        $res.='#';
+          $encodedWord.='#';
+          $res.='#';          
+        }
+
       }
       $this->result="$res";
     }

@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.csvTools.php
-    YeAPF 0.8.59-9 built on 2017-07-27 17:40 (-3 DST)
+    YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2016-05-30 09:45:48 (-3 DST)
+    2017-08-28 19:37:13 (-3 DST)
    */
 
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -278,7 +278,7 @@
                             $callBack(0,"-- Refactoring $campos[$n] to hold $tamanho[$n] characters\n");
                             if (db_connectionTypeIs(_FIREBIRD_)) {
                               db_sql_echo($callBack,"alter table $dbTable alter $campos[$n] type varchar($tamanho[$n])");
-                            } else if (db_connectionTypeIs(_MYSQL_)) {
+                            } else if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_))) {
                               db_sql_echo($callBack,"alter table $dbTable modify $campos[$n] varchar($tamanho[$n])");
                             } else {
                               db_sql_echo($callBack,"alter table $dbTable alter column $campos[$n] type character varying($tamanho[$n])");
@@ -394,12 +394,12 @@
                   case 4:
                     $novoTipo="varchar($tamMax[$n])";
                     $mediaTamanho[$n]=$mediaTamanho[$n] / $l;
-                    if (db_connectionTypeIs(_MYSQL_))
+                    if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
                       if ((($tamMax[$n]<48) || (($mediaTamanho[$n] * 100 / $tamMax[$n])<=10)) && ($tamMax[$n]<255))
                         $novoTipo="char($tamMax[$n])";
                     break;
                   case 1:
-                    if (db_connectionTypeIs(_MYSQL_))
+                    if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
                       $novoTipo="char($tamMax[$n])";
                     else
                       $novoTipo="varchar($tamMax[$n])";
@@ -408,7 +408,7 @@
                   case 3:
                     if (db_connectionTypeIs(_PGSQL_))
                       $novoTipo="decimal";
-                    else if (db_connectionTypeIs(_MYSQL_))
+                    else if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
                       $novoTipo="double";
                     break;
                 }
@@ -423,7 +423,7 @@
                   if ($novoNome==strtoupper($novoNome))
                     $novoNome=strtolower($novoNome);
 
-                  if (db_connectionTypeIs(_MYSQL_)) {
+                  if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_))) {
                     $callBack(0,'-- '."Refactoring $campos[$n] to $novoNome as $novoTipo\n");
                     $sql="alter table $dbTable change $campos[$n] $novoNome $novoTipo";
 

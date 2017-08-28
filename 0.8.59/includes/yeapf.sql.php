@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.sql.php
-    YeAPF 0.8.59-9 built on 2017-07-27 17:40 (-3 DST)
+    YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-02-21 18:08:31 (-3 DST)
+    2017-08-28 19:37:13 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -192,9 +192,10 @@
 
         // echo "$sqlCount) $sql<br>";
 
-        if (db_connectionTypeIs(_MYSQL_))
+        if (db_connectionTypeIs(_MYSQL_)) {
+          /* @20170828 falta || (db_connectionTypeIs(_MYSQLI_)) */
           $q = mysql_query($sql,$ydb_conn);
-        else
+        } else
           $q = ibase_query($ydb_conn, $sql);
 
         if ($q) {
@@ -232,9 +233,10 @@
           $__SQL__="insert into is_system_log (id, dt, user, s, a, context, isql) values ('$id', '$dt', '$unique_id', '$s', '$a', '$context', '$asql')";
         // echo "$__SQL__<br>";
 
-        if (db_connectionTypeIs(_MYSQL_))
+        if (db_connectionTypeIs(_MYSQL_)) {
+          /* @20170828 - falta || (db_connectionTypeIs(_MYSQLI_)) */
           mysql_query($__SQL__,$ydb_conn);
-        else
+        } else
           ibase_query($ydb_conn, $__SQL__);
       }
     }
@@ -376,7 +378,7 @@
   {
     global $prepositions;
     /*
-    if (db_connectionTypeIs(_MYSQL_))
+    if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
       $words = rawChars($words);
     */
 

@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misctools.php
-    YeAPF 0.8.59-9 built on 2017-07-27 17:40 (-3 DST)
+    YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-29 13:38:24 (-3 DST)
+    2017-08-10 17:48:26 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -310,6 +310,11 @@
   function soNumeros($valor)
   {
     return preg_replace("/[^0-9]/", '', $valor);
+  }
+
+  function soLetras($valor)
+  {
+    return preg_replace("/[^A-Za-z]/", '', $valor);
   }
 
   function soNumerosELetras($valor)
@@ -728,7 +733,8 @@
     if(!function_exists('curl_init')) {
       die ("Curl PHP package not installed\n");
     }
-
+    
+    set_time_limit(0);
     $curlHandle = curl_init();
     curl_setopt($curlHandle, CURLOPT_URL, $googleURL);
     curl_setopt($curlHandle, CURLOPT_HEADER, false);
@@ -796,6 +802,7 @@
     $currentIP=@file_get_contents($cfgName)||'';
   
     if (($dif > $secondsPerDay / 6) || ($currentIP=='')) {
+      set_time_limit(0);
       @file_put_contents($cfgSeqName, $seq);
       $ch=curl_init();
       curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2); 
@@ -816,6 +823,7 @@
 
   function getGEOip($currentIP) 
   {
+    set_time_limit(0);
     $ch=curl_init();
     curl_setopt($ch, CURLOPT_URL, "https://freegeoip.net/json/$currentIP");
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);

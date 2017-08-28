@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.debug.php
-    YeAPF 0.8.59-9 built on 2017-07-27 17:40 (-3 DST)
+    YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-07-27 17:33:38 (-3 DST)
+    2017-08-28 19:37:13 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -293,25 +293,27 @@
 
           $ln=$aux[$a];
 
-          $currentFile=basename($ln['file']);
-          $dbLine='';
+          if (isset($ln['file'])) {
+            $currentFile=basename($ln['file']);
+            $dbLine='';
 
-          // echo "\n\t$currentFile    \t";
+            // echo "\n\t$currentFile    \t";
 
-          if ($currentFile!=$lastFile) {
-            if ($logOutput<0)
-              $debugOutput.="\t".alignRight($currentFile,40);
-            else if ($logOutput==1)
-              $debugOutput.= "<td valign=top><b>$currentFile</b></td>";
-          } else {
-            if ($logOutput<0)
-              $debugOutput.="\t".alignRight($currentFile,40);
-            else if ($logOutput==1)
-              $debugOutput.= "<td></td>";
+            if ($currentFile!=$lastFile) {
+              if ($logOutput<0)
+                $debugOutput.="\t".alignRight($currentFile,40);
+              else if ($logOutput==1)
+                $debugOutput.= "<td valign=top><b>$currentFile</b></td>";
+            } else {
+              if ($logOutput<0)
+                $debugOutput.="\t".alignRight($currentFile,40);
+              else if ($logOutput==1)
+                $debugOutput.= "<td></td>";
+            }
+
+            if ($logOutput==2)
+              xq_printXML($auxStackXML, "file", $currentFile);            
           }
-
-          if ($logOutput==2)
-            xq_printXML($auxStackXML, "file", $currentFile);
 
           $lastFile=$currentFile;
 
@@ -383,7 +385,7 @@
         else if ($logOutput==2)
           xq_printXML($debugOutput,"sys.sqlTrace",br2nl($lastCommands));
 
-        if (db_connectionTypeIs(_MYSQL_)) {
+        if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_))) {
           $errno = mysql_errno($ydb_conn);
           $error = mysql_error($ydb_conn);
           if ($logOutput<0)

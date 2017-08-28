@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.59-9 built on 2017-07-27 17:40 (-3 DST)
+    YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-07-27 17:33:38 (-3 DST)
+    2017-08-28 19:37:13 (-3 DST)
    */
 
   /*
@@ -2350,7 +2350,7 @@
 
     $data=corrigirDataHora($data);
     $hora=soNumeros($hora);
-    if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || ($internalFormat)) {
+    if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)) || ($internalFormat)) {
       $data=substr($data,4,4).substr($data,2,2).substr($data,0,2);
       while (strlen($data)<8)
         $data.='0';
@@ -2388,9 +2388,9 @@
   {
 
 
-    $valorCampo= ereg_replace("[^0-9]", "", $valorCampo);
+    $valorCampo= preg_replace("/[^0-9]/", "", $valorCampo);
     if (($valorCampo>'') && ($valorCampo!='00000000') && ($valorCampo !='000000000000') && ($valorCampo!='00000000000000')){
-      if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || ($forceInternalFormat))
+      if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)) || ($forceInternalFormat))
         $res=substr($valorCampo,6,2).'-'.substr($valorCampo,4,2).'-'.substr($valorCampo,0,4);
       else
         $res=substr($valorCampo,2,2).'-'.substr($valorCampo,0,2).'-'.substr($valorCampo,4,4);
@@ -2406,7 +2406,7 @@
   {
 
     $data=soNumeros($data);
-    if ((db_connectionTypeIs(_PGSQL_)) ||(db_connectionTypeIs(_MYSQL_)) || ($forceInternalFormat)) {
+    if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)) || ($forceInternalFormat)) {
       $year = substr($data,0,4);
       $month= substr($data,4,2);
       $day  = substr($data,6,2);
@@ -2477,7 +2477,7 @@
 
 
     if ($valorCampo!='') {
-      if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || ($forceInternalFormat))
+      if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)) || ($forceInternalFormat))
         $valorCampo=date("YmdHis",$valorCampo);
       else
         $valorCampo=date("mdYHis",$valorCampo);
@@ -2492,7 +2492,7 @@
     /*
 
 
-    if (db_connectionTypeIs(_MYSQL_))
+    if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
       $v=date("YmdHis",$v);
     else
       $v=date("mdYHis",$v);
@@ -2527,7 +2527,7 @@
     $styleCurrentDay="style='border-color:  #000000; border-style:  dotted; border-width: 1px;'";
     $dayNumberBoxSize=10;
 
-    if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_))) {
+    if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_))) {
       $aDate=substr($aDate,0,8);
       $aDate1=substr($aDate,0,6).'01';
     } else {
@@ -2645,7 +2645,7 @@
 
     $meses = array("","janeiro", "fevereiro","março","abril","maio","junho","julho","agosto","setembro","outubro","novembro","dezembro");
 
-    if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_))) {
+    if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)) ) {
       $aDate=substr($aDate,0,8);
       $aDate1=substr($aDate,0,6).'01';
     } else {

@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.59-9 built on 2017-07-27 17:40 (-3 DST)
+ * YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-07-10 09:39:53 (-3 DST)
+ * 2017-08-21 09:59:59 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -1229,12 +1229,7 @@ function FDate2UDate(a) {
 /* ISO8601 -> javascript date object */
 function UDate2JSDate(aUDate) {
   var aDate=extractDateValues(aUDate,'yyyymmddHHMMSS');
-  var d=new Date();
-  d.setFullYear(aDate['y']);
-  d.setMonth(aDate['m']-1);
-  d.setDate(aDate['d']);
-  d.setHours(aDate['H']);
-  d.setMinutes(aDate['M']);
+  var d=new Date(aDate['y'], aDate['m']-1, aDate['d'], aDate['H'], aDate['M'], aDate['S']);
 
   return d;
 }
@@ -2299,7 +2294,7 @@ if ((typeof window=='object') && (typeof _onLoadMethods == 'undefined')) {
 
     var i;
 
-    if (isArray(elem)) {
+    if ((elem.nodeName!='SELECT') && ((isArray(elem)) || ((typeof elem=="object") && (typeof elem.length=="number")))) {
       for(i=0; i<elem.length; i++)
         addEvent(elem[i], eventName, eventHandler);
     } else {

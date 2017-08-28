@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.pre-processor.php
-    YeAPF 0.8.59-9 built on 2017-07-27 17:40 (-3 DST)
+    YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-03-10 16:00:46 (-3 DST)
+    2017-08-28 19:37:13 (-3 DST)
    */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -230,14 +230,14 @@
           if ($analisarData) {
             if ((tokenValido($s, '#campoMes(',$i)) || (tokenValido($s, '#month(',$i))) {
               $valorCampo= ereg_replace("[^0-9]", "", $valorCampo);
-              if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)))
+              if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
                 $valorCampo=substr($valorCampo,4,2);
               else
                 $valorCampo=substr($valorCampo,0,2);
 
             } else if ((tokenValido($s, '#campoAno(',$i)) || (tokenValido($s, '#year(',$i))) {
               $valorCampo= ereg_replace("[^0-9]", "", $valorCampo);
-              if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)))
+              if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
                 $valorCampo=substr($valorCampo,0,4);
               else
                 $valorCampo=substr($valorCampo,4,4);
@@ -250,7 +250,7 @@
               $meses = array ('Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro');
               $mesesAbreviados = array ('Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez');
               if (strlen($valorCampo)>4) {
-                if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)))
+                if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
                   $m=substr($valorCampo,4,2);
                 else
                   $m=substr($valorCampo,0,2);
@@ -269,7 +269,7 @@
 
             } else if ((tokenValido($s, '#campoDia(',$i)) || (tokenValido($s, '#day(',$i))) {
               $valorCampo= ereg_replace("[^0-9]", "", $valorCampo);
-              if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)))
+              if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
                 $valorCampo=substr($valorCampo,6,2);
               else
                 $valorCampo=substr($valorCampo,2,2);
@@ -936,7 +936,7 @@
 
           $sql = 'select '.$campoResultado.' from '.$nomeTabela;
           $sql.= ' where '.$campoChave.'='.$valorCampoChave;
-          if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_))) {
+          if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_))) {
             $rs = mysql_query($sql, $ydb_conn) or _die ('Impossível fazer <strong>'.$sql.'</strong>');
             $dados = mysql_fetch_row($rs);
           } else if (db_connectionTypeIs(_FIREBIRD_)) {
@@ -1405,7 +1405,7 @@
             $whereClause=analisarString($whereClause,$pegarDadosDaTabela, $nomeTabela, $campoChave, $valorChave, $valores);
             $sql="select $keyName, $fieldName from $tableName $otherTables where $whereClause group by $keyName, $fieldName order by $fieldName";
           }
-          if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)))
+          if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
             $rs=mysql_query($sql, $ydb_conn);
           else
             $rs=ibase_query($sql);
@@ -1785,7 +1785,7 @@
           // sempre devolve em formato interno
           // foi um erro querer misturar os dois formatos
           // para facilitar a vida de alguns
-          if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)))
+          if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
             $auxDate=date("Ymd",$aDate);
           else
             $auxDate=date("mdY",$aDate);

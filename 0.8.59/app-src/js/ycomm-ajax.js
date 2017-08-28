@@ -1,8 +1,8 @@
   /********************************************************************
    * app-src/js/ycomm-ajax.js
-   * YeAPF 0.8.59-9 built on 2017-07-27 17:40 (-3 DST)
+   * YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
    * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2017-06-24 08:39:09 (-3 DST)
+   * 2017-07-28 17:16:30 (-3 DST)
    *
    * Com o advento do WebSocket, precisamos de novas formas para
    * provocar o servidor.
@@ -105,9 +105,7 @@
         xSysMsg = xDataContext['sysMsg'];
 
     /* sysMsg has higher priority, so it is processed prior to user application
-     *
      * sysMsg.msg = ( logoff, alert )
-     *
      * 'logoff' message block all sucessive requests and redirect main URL to 'body.php?s=yeapf&a=logoff'
      */
 

@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webSocket/sse.php
-    YeAPF 0.8.59-9 built on 2017-07-27 17:40 (-3 DST)
+    YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-07-27 17:40:18 (-3 DST)
+    2017-08-28 20:40:56 (-3 DST)
 
     skel/webApp / sse.php
     This file cannot be modified within skel/webApp
@@ -24,13 +24,13 @@
 
   SSE::garbageCollect();
 
-  echo "retry: 5000\n\n";
+  echo "retry: 15000\ndata:welcome\n\n";
   for($n=1000; $n>0; $n--) echo "\n\n";
   while (@ob_end_flush());
   flush();
 
   /* this message will help SSE client to recognizes as valid SSE connection */
-  SSE::sendEvent("message", "welcome");
+  SSE::sendEvent("message", "connected");
 
   _dumpY(8,0,"SSE - conn");
 
@@ -56,6 +56,8 @@
     $sessionInfo = SSE::getSessionInfo($sse_session_id);
     extract($sessionInfo);
 
+    SSE::broadcastMessage('userConnected', array('u'=>$u), $w, $u);
+
     /* run the loop while this session is enabled */
     while (SSE::enabled($sse_session_id, $w, $u)) {
       _dumpY(8,0,"$sse_session_id QUEUE");
@@ -71,9 +73,13 @@
 
       $cTime=date("U");
     }
+    if (SSE::userAttached($w,$u)) {
+      SSE::detachUser($w, $u);      
+    }
   }
 
   SSE::sendEvent("finish");
+  while (@ob_end_flush());
 
   _dumpY(8,0,"SSE - finish");
 

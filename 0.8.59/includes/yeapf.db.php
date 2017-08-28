@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.59-9 built on 2017-07-27 17:40 (-3 DST)
+    YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-07-27 17:33:37 (-3 DST)
+    2017-08-28 19:37:13 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -146,8 +146,15 @@
         $GLOBALS['ydb_type'] = _PGSQL_;
         $dbType='postgresql';
         break;
+
+      case 'pdo':
+        $GLOBALS['ydb_type'] = _PDO_;
+        $dbType='pdo';
+        break;
+
       default:
-        _die("ERROR: $dbType is not knowed as valid database connection type");
+        _dump("ERROR trying to open database");
+        _die("ERROR: '$dbType' is not known as valid database connection type");
     }
     // die("$dbType = ".$GLOBALS['ydb_type']);
   }
@@ -238,6 +245,11 @@
         db_unset_flag(_DB_CONNECTED_);
         unset($GLOBALS['ydb_conn']);
 
+      } else if (db_connectionTypeIs(_PDO_)) {
+        $ydb_conn=null;
+        db_unset_flag(_DB_CONNECTED_);
+        unset($GLOBALS['ydb_conn']);
+
       } else
         _yLoaderDie(false, "Tipo de Conex&atilde;o desconhecida");
     }
@@ -267,6 +279,11 @@
 
     } else if (db_connectionTypeIs(_PGSQL_)) {
       $errMessage=pg_last_error();
+
+    } else if (db_connectionTypeIs(_PDO_)) {
+      $errInfo    = $ydb_conn->errorInfo();
+      $errCode    = $errInfo[1];
+      $errMessage = $errInfo[2];
     }
     return "$errCode:$errMessage";
   }
@@ -291,6 +308,9 @@
     $computerName=getenv("COMPUTERNAME");
     $servidor = "LOCAL [$server_IP]";
 
+    // echo "[ $dbType | $dbServer | $dbName | $dbUser | $dbPassword ]";
+     
+    _dump("set connection type to '$dbType'");
     db_setConnectionType($dbType);
 
     if (db_connectionTypeIs(_MYSQLI_)) {
@@ -309,16 +329,20 @@
 
     } else if (db_connectionTypeIs(_MYSQL_)) {
 
-      if (function_exists("mysql_pconnect"))
+      if (function_exists("mysql_pconnect")) {
         $mysqlConn="mysql_pconnect";
-      else
-        $mysqlConn="mysql_connect";
+      } else {
+        if (function_exists("mysql_connect")) 
+          $mysqlConn="mysql_connect";
+        else 
+          _yLoaderDie(false, "mysql_connect() not present");
+      }
 
 
       _recordWastedTime("......ready to '$mysqlConn' on $dbServer as $dbUser");
 
       $ydb_conn = $mysqlConn("$dbServer", "$dbUser", "$dbPassword") or
-           _yLoaderDie(false, "N&atilde;o foi possivel conectar-se como '$dbUser' ao servidor de dados.","Servidor: $dbServer","db.csv: $dbCSVFilename");
+           _yLoaderDie(false, "Was not possible to connect as '$dbUser' to db server.","Servidor: $dbServer","db.csv: $dbCSVFilename");
 
       _recordWastedTime("......ready to mysql_select_db $dbName");
       mysql_select_db("$dbName", $ydb_conn) or
@@ -366,6 +390,14 @@
         db_sql("SET CLIENT_ENCODING TO '$dbCharset'");
       yeapfStage("afterDBConnect");
 
+    } else if (db_connectionTypeIs(_PDO_)) {
+      $dsn = "$dbPDOType:host=$dbServer;dbname=$dbName;charset=$dbCharset";
+      $opt = array(
+          PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+          PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+          PDO::ATTR_EMULATE_PREPARES   => false,
+      );
+      $ydb_conn = new PDO($dsn, $dbUser, $dbPassword, $opt);
     } else
       _yLoaderDie(false, "Database type '$dbType' is not recognized by the system",
                   "Check your database connection<br><small>$dbCSVFilename</small>");
@@ -380,7 +412,8 @@
     }
 
     if (!is_resource($ydb_conn))
-      _dump("ydb_conn is not a resource!");
+      if (!is_object($ydb_conn))
+        _dump("ydb_conn is not a resource neither an object!");
 
     return $ydb_conn;
   }
@@ -389,49 +422,54 @@
   {
     global $dbCSVFilename;
 
-    _recordWastedTime("Creating cache copy of $dbCSVFilename");
-    $dbKeys=array();
-    $dbActive='';
+    if (is_writable(".config")) {
 
-    /* open text file */
-    $setupIni=createDBText($dbCSVFilename);
+      _recordWastedTime("Creating cache copy of $dbCSVFilename");
+      $dbKeys=array();
+      $dbActive='';
 
-    /* go to top of text file */
-    $setupIni->goTop();
+      /* open text file */
+      $setupIni=createDBText($dbCSVFilename);
 
-    /* recover all appRegistry keys only in order to check they are unique */
-    for($n=0; $n<$setupIni->recCount(); $n++) {
-      $appRegistry=trim(unquote(strtoupper($setupIni->getValue("appRegistry"))));
-      if ($appRegistry>'') {
-        $active=$setupIni->getValue("active");
-        $active=unquote(strtoupper($active));
-        if ($active)
-          if ($dbActive=='') {
-            $dbActive=$appRegistry;
+      /* go to top of text file */
+      $setupIni->goTop();
+
+      /* recover all appRegistry keys only in order to check they are unique */
+      for($n=0; $n<$setupIni->recCount(); $n++) {
+        $appRegistry=trim(unquote(strtoupper($setupIni->getValue("appRegistry"))));
+        if ($appRegistry>'') {
+          $active=$setupIni->getValue("active");
+          $active=unquote(strtoupper($active));
+          if ($active)
+            if ($dbActive=='') {
+              $dbActive=$appRegistry;
+            } else
+              _die("You cannot have two active db connections");
+          if (!isset($dbKeys[$appRegistry])) {
+            foreach($setupIni->data[$n] as $k=>$v)
+              $dbKeys[$appRegistry][$k]=$v;
           } else
-            _die("You cannot have two active db connections");
-        if (!isset($dbKeys[$appRegistry])) {
-          foreach($setupIni->data[$n] as $k=>$v)
-            $dbKeys[$appRegistry][$k]=$v;
-        } else
-          _die("Err. '$appRegistry' is present twice at least");
+            _die("Err. '$appRegistry' is present twice at least");
+        }
+
+        $setupIni->skip();
       }
 
-      $setupIni->skip();
-    }
+      $fConfig=fopen(".config/db.ini","w");
+      if ($fConfig)  {
+        fwrite($fConfig,"[db]\nactive=$dbActive\n");
 
-    $fConfig=fopen(".config/db.ini","w");
-    if ($fConfig)  {
-      fwrite($fConfig,"[db]\nactive=$dbActive\n");
+        foreach($dbKeys as $k=>$v) {
+          fwrite($fConfig,"\n[$k]\n");
+          foreach($v as $k1=>$v1)
+            fwrite($fConfig,"$k1='".escapeString($v1)."'\n");
+        }
 
-      foreach($dbKeys as $k=>$v) {
-        fwrite($fConfig,"\n[$k]\n");
-        foreach($v as $k1=>$v1)
-          fwrite($fConfig,"$k1='".escapeString($v1)."'\n");
+        fclose($fConfig);
+        _recordWastedTime("Copy ready");
       }
-
-      fclose($fConfig);
-      _recordWastedTime("Copy ready");
+    } else {
+      _recordWastedTime(".config not writable");
     }
   }
 
@@ -1574,7 +1612,7 @@
   {
     $triggerName=trim($triggerName);
     $ret=false;
-    if (db_connectionTypeIs(_MYSQL_)) {
+    if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_))) {
       $sql="SHOW TRIGGERS";
       $auxRet=db_queryAndFillArray($sql);
       foreach($auxRet as $trigger) {

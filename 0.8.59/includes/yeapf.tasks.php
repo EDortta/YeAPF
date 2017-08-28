@@ -1,7 +1,7 @@
 <?php
 /*
     includes/yeapf.tasks.php
-    YeAPF 0.8.59-9 built on 2017-07-27 17:40 (-3 DST)
+    YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
     2017-05-15 17:40:10 (-3 DST)
 */

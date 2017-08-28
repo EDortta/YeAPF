@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.59-9 built on 2017-07-27 17:40 (-3 DST)
+    YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-07-27 17:33:38 (-3 DST)
+    2017-08-28 19:37:13 (-3 DST)
    */
 
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -67,7 +67,8 @@
                       /* maximum idle time is eight times the messagePeekerInterval */
                       $maxT = self::getMaxUserAliveInterval() * 8;
                       $ret = ($difT<=$maxT);
-                      _dumpY(8,0,"SSE difT: $difT maxT: $maxT");
+                      $dif = minutes2time((date('U')-self::$__Startup)/60);
+                      _dumpY(8,0,"SSE difT: $difT maxT: $maxT online: $dif");
                     }
                     if ($ret)
                       self::$queue_folder="$cfgMainFolder/.sse/$w/$u";
@@ -223,10 +224,13 @@
 
     }
 
-    public function dettachUser($w, $u)
+    public function detachUser($w='', $u='')
     {
       global $cfgMainFolder;
-      _dumpY(8,1,"SSE::dettachUser('$w', '$u')");
+      if ($u=='')
+        $u=$GLOBALS['u'];
+      
+      _dumpY(8,1,"SSE::detachUser('$u', '$w')");
       $ndxFile="$cfgMainFolder/.sse/$u.ndx";
       if (file_exists($ndxFile)) {
         $ndx = file($ndxFile);
@@ -236,7 +240,28 @@
         $si             = md5($sse_session_id);
         @unlink("$cfgMainFolder/.sse/sessions/$sse_session_id.session");
         @unlink("$cfgMainFolder/.sse/sessions/$si.md5");
+
+        self::broadcastMessage('userDisconnected', array('u'=>$u), $w, $u);
       }
+    }
+
+    public function userAttached($w, $u) 
+    {
+      global $cfgMainFolder;
+      $ret = false;
+      if ($u=='')
+        $u=$GLOBALS['u'];
+      
+      _dumpY(8,1,"SSE::detachUser('$u', '$w')");
+      $ndxFile="$cfgMainFolder/.sse/$u.ndx";
+      if (file_exists($ndxFile)) {
+        $ndx = file($ndxFile);
+        $sse_session_id = preg_replace('/[[:^print:]]/', '', $ndx[2]);
+        $si             = md5($sse_session_id);
+        $ret=(file_exists("$cfgMainFolder/.sse/sessions/$sse_session_id.session") && file_exists("$cfgMainFolder/.sse/sessions/$si.md5"));
+      }
+
+      return $ret;
     }
 
     /* grants that the user folder exists (this function si meant to be called at login time)
@@ -247,7 +272,7 @@
       $w = preg_replace('/[[:^print:]]/', '', $w);
       $u = preg_replace('/[[:^print:]]/', '', $u);
       /* dettach other session for this pair */
-      self::dettachUser($w, $u);
+      self::detachUser($w, $u);
 
       _dumpY(8,1,"SSE::attachUser('$w', '$u')");
       $ret=null;
@@ -290,17 +315,31 @@
 
     public function _garbageCollect($dir)
     {
-      foreach(glob("$dir/*") as $filename) {
+      global $cfgMainFolder;
+
+      // _dumpY(8,0,"SSE:: garbageCollect ".dirname($_SERVER['SCRIPT_FILENAME']));
+      $dir=preg_replace('/[[:^print:]]/', '', $dir);
+
+      _dumpY(8,2,"SSE:: garbageCollect ( ".substr($dir,strlen($cfgMainFolder)+1)." )");
+      foreach(glob("$dir/". '{,.}[!.,!..]*',GLOB_MARK|GLOB_BRACE) as $filename) {
         if (is_dir($filename))
           self::_garbageCollect($filename);
+        
         if (basename($filename)!='sessions'){
-          if (time() - filectime($filename) > 43200) {
-            if (is_dir($filename))
-              self::_garbageCollect($filename);
-            else
-              unlink($filename);
+          $ftime=filectime($filename);
+          $timeDiff=time() - $ftime;
+          if ($timeDiff > 900) {
+            _dumpY(8,5,"SSE:: garbageCollect $timeDiff ".basename($filename));
+            if (is_dir($filename)) {
+              _dumpY(8,10,"SSE:: garbageCollect remove directory ");
+              @rmdir($filename);
+            } else {
+              _dumpY(8,10,"SSE:: garbageCollect remove file ");
+              @unlink($filename);              
+            }
           }  
-        }
+        }          
+      
       }
     }
 
@@ -308,6 +347,7 @@
     {
       global $cfgMainFolder;
       if (lock("sse-garbage-collect")) {
+        _dumpY(8,0,"SSE::garbageCollect()");
         clearstatcache();
         self::_garbageCollect("$cfgMainFolder/.sse");
         unlock("sse-garbage-collect");
@@ -457,9 +497,12 @@
     }
 
     /* post a message to all the workgroup */
-    public function broadcastMessage($message, $data='', $w_target='*')
+    public function broadcastMessage($message, $data='', $w_target='*', $except_u_target='')
     {
       global $cfgMainFolder;
+
+      if (is_array($data))
+        $data=json_encode($data);
 
       _dumpY(8,2,"SSE::broadcastMessage('$message', '$data', '$w_target')");
       $w_target = preg_replace('/[[:^print:]]/', '', $w_target);
@@ -470,7 +513,8 @@
             $fileinfo=pathinfo($f);
             $ok=fnmatch("*.ndx", $fileinfo['basename']);
             if ($ok) {
-              self::postMessage($fileinfo['filename'], $message, $data);
+              if ($fileinfo['filename']!=$except_u_target)
+                self::postMessage($fileinfo['filename'], $message, $data);
             }
           }
           closedir($dh);
@@ -510,7 +554,7 @@
     switch($a)
     {
       case 'attachUser':      
-        $sse_session_id  = SSE::attachUser($w, $user);        
+        $sse_session_id       = SSE::attachUser($w, $user);        
         $userAliveInterval    = SSE::getMaxUserAliveInterval() * 7;
         $ret = array(
               'ok'             => $sse_session_id>'',
@@ -518,6 +562,14 @@
               'userAliveInterval'   => $userAliveInterval
             );
 
+        break;
+
+      case 'detachUser':
+        SSE::detachUser($u, $w);
+        break;
+
+      case 'ping':
+        SSE::broadcastMessage('pong', json_encode(array('serverTime'=>date('U'), 'sender'=>$u)), $w);
         break;
 
       case 'userAlive':

@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.locks.php
-    YeAPF 0.8.59-9 built on 2017-07-27 17:40 (-3 DST)
+    YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-05-27 07:55:51 (-3 DST)
+    2017-08-28 19:37:13 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -62,11 +62,16 @@
    *    1 = shared memory semaphores
    */
   if ($LOCK_VERSION==-1) {
+    /* OBSOLETE AT 2017-08-10 */
+    /*
     if (function_exists("shm_has_var")===FALSE) {
       if (LOCK_DEBUG) _dumpY(2,0,"We're using a local implementation.");
       $LOCK_VERSION=0;
     } else
       $LOCK_VERSION=1;
+    */
+
+    $LOCK_VERSION=0;
 
     if (is_dir('.config')) {
       $auxF=fopen(".config/lock_version",'w');
@@ -276,6 +281,7 @@
        * OBSOLETO em 05/Março/2012 para permitir uso de semaforos SystemV ou sua emulação
        */
       $waitingFlag=1;
+      $diff=0-date('U');
       while ((file_exists("$CFG_LOCK_DIR/$lockName.lck")) and ($waitingFlag<=8)) {
         $lastLock=stat("$CFG_LOCK_DIR/$lockName.lck");
         if ($lastLock) {
