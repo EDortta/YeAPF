@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yloader.js
- * YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
+ * YeAPF 0.8.59-41 built on 2017-08-28 20:59 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-01-11 15:48:34 (-3 DST)
+ * 2017-08-28 19:44:54 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * Purpose:  Detect on which device this app is running
  *           and load wormhole.js library if it is mobile.

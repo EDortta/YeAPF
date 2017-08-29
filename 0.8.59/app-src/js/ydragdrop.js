@@ -1,8 +1,8 @@
 /********************************************************************
  * app-src/js/ydragdrop.js
- * YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
+ * YeAPF 0.8.59-41 built on 2017-08-28 20:59 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2016-02-24 16:27:18 (-3 DST)
+ * 2017-08-28 19:44:54 (-3 DST)
  *
  * Drag and Drop functions were modified from luke beuer ideas at
  * http://luke.breuer.com/tutorial/javascript-drag-and-drop-tutorial.aspx

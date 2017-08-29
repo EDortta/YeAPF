@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-msg.js
- * YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
+ * YeAPF 0.8.59-41 built on 2017-08-28 20:59 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-06-26 10:49:22 (-3 DST)
+ * 2017-08-28 19:44:54 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * These routines were written in order to help interprocess process messages
  * but as an remote process messages implementation.

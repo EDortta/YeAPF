@@ -1,9 +1,9 @@
 <?php
   /*
     tools/compile-yloader.php
-    YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)
+    YeAPF 0.8.59-41 built on 2017-08-28 20:59 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-07-15 08:09:19 (-3 DST)
+    2017-08-28 19:44:55 (-3 DST)
 
     This script will produce monolite version of yloader.js
     to be used with different applications.
@@ -20,9 +20,9 @@
   /* comment lines to be deleted from each .js file */
   $headers = array(
                "* tools/compile-yloader.php",
-               "* YeAPF 0.8.59-41 built on 2017-08-28 20:40 (-3 DST)",
+               "* YeAPF 0.8.59-41 built on 2017-08-28 20:59 (-3 DST)",
                "* Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com",
-               "* 2017-07-15 08:09:19 (-3 DST)"
+               "* 2017-08-28 19:44:55 (-3 DST)"
              );
 
   /* yloader source code */
