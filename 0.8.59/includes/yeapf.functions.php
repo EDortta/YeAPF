@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.59-41 built on 2017-08-28 20:59 (-3 DST)
+    YeAPF 0.8.59-45 built on 2017-09-06 10:44 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-08-28 19:44:55 (-3 DST)
+    2017-09-01 07:16:40 (-3 DST)
    */
 
   /*
@@ -3264,7 +3264,7 @@
   define('PATTERN_REPLACE_IMG_SRC', '/<img[^>]*(?<=\\s)src=("|\')\s*(.*?)\s*\\1.*?>/');
   define('PATTERN_REPLACE_INPUT_SRC', '/<input[^>]*(?<=\\s)src=("|\')\s*(.*?)\s*\\1.*?>/');
 
-  function doChangeRef($aSrc)
+  function doChangeRef($aSrc, $quotes="'")
   {
     global $appName;
     if (!((substr($aSrc,0,1)=='/') ||
@@ -3280,7 +3280,7 @@
       } else
         $aSrc = $aNewSrc;
     } else
-      $aSrc="'$aSrc'";
+      $aSrc="$quotes$aSrc$quotes";
     return $aSrc;
   }
 
@@ -3289,7 +3289,7 @@
     $aStr=str_replace('\"',"'",$aStr);
     $aStr=preg_replace_callback(
               '/src=("|\')\s*(.*?)\s*\\1.*?/',
-              create_function('$matches', 'return "src=\'".doChangeRef($matches[2])."\'";'),
+              create_function('$matches', 'return "src=\'".doChangeRef($matches[2], $matches[1])."\'";'),
               $aStr
           );
 
@@ -3321,7 +3321,6 @@
     global $intoFormFile, $includedFiles, $appName, $includeHistory,
            $lastCommands, $yeapfConfig, $appCharset,
            $_IncludedFiles, $cfgCurrentFile, $isDebugging;
-
     $s=null;
     $priorFile = $cfgCurrentFile;
     try {

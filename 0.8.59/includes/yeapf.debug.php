@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.debug.php
-    YeAPF 0.8.59-41 built on 2017-08-28 20:59 (-3 DST)
+    YeAPF 0.8.59-45 built on 2017-09-06 10:44 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-08-28 19:44:55 (-3 DST)
+    2017-09-01 07:16:40 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -136,6 +136,7 @@
     global $user_IP, $sysDate, $isCLI;
 
     _minimalCSS();
+    $auxArgs='';
 
     $args=func_get_args();
     $argList='';
@@ -214,7 +215,6 @@
     } else {
 
       echo "<div>$argList</div>";
-
     }
     throw new YException("APP DIES:\n$auxArgs");
   }
@@ -386,8 +386,13 @@
           xq_printXML($debugOutput,"sys.sqlTrace",br2nl($lastCommands));
 
         if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_))) {
-          $errno = mysql_errno($ydb_conn);
-          $error = mysql_error($ydb_conn);
+          if (db_connectionTypeIs(_MYSQLI_)) {
+            $errno = mysqli_errno($ydb_conn);
+            $error = mysqli_error($ydb_conn);            
+          } else {
+            $errno = mysql_errno($ydb_conn);
+            $error = mysql_error($ydb_conn);             
+          }
           if ($logOutput<0)
             $debugOutput.="\nLast MySQL Error: $errno:$error\n";
           else if ($logOutput==1)

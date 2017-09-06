@@ -1,9 +1,9 @@
 <?php
 /*
     skel/workbench/configure.php
-    YeAPF 0.8.59-43 built on 2017-08-29 07:14 (-3 DST)
+    YeAPF 0.8.59-45 built on 2017-09-06 10:44 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-08-29 07:14:07 (-3 DST)
+    2017-09-06 10:44:18 (-3 DST)
 */
 
 
@@ -18,7 +18,13 @@
    * 2013-02-12 - add cfgInitialVerb to insecure events
    * 2014-02-21 - invert the searchPath order.  preserve the search.path lines order
    * 2014-03-10 - Check if configure.php and yeapf.functions are using the same version
+   * 2017-09-01 - 'silent' paramenter
    */
+
+  if (isset($silent))
+    $silent=true;
+  else
+    $silent=false;
 
   function getSgugPath($base)
   {
@@ -56,7 +62,7 @@
 
   function sayStep()
   {
-    global $curStep, $isCLI;
+    global $curStep, $isCLI, $silent;
     if ($isCLI)
       $gt=" -> ";
     else
@@ -88,20 +94,19 @@
       $argList=str_ireplace("&nbsp;"," ",$argList);
       $ret="$line1$line: $argList\n";
     } else {
-      $ret="<div class=info>
-              <div style='float:left; width: 40px;'>$curStep)</div>
-              <div style='float:left; width: 760px; overflow: auto'> $argList&nbsp;<span style='color:#BBB'>$line1$line</span></div>
+      $ret="<div style='width: 100%'>
+              <span><b>$curStep)</b>$argList&nbsp;<span style='color:#BBB'>$line1$line</span></span>
             </div>";
     }
 
     if (function_exists('_dump'))
       _dump("$curStep) $argList");
-    return $ret;
+    return $silent?"$curStep.":$ret;
   }
 
   function echoStep()
   {
-    global $curStep, $isCLI, $debugSteps;
+    global $curStep, $isCLI, $debugSteps, $silent;
     if ($isCLI)
       $gt=" -> ";
     else
@@ -133,14 +138,14 @@
       $argList=str_ireplace("&nbsp;"," ",$argList);
       $ret="$line1$line: $argList\n";
     } else {
-      $ret="<div class=info>
-              <div style='float:left; width: 40px;'>$curStep)</div>
-              <div style='float:left; width: 760px; overflow: auto'> $argList&nbsp;<span style='color:#BBB'>$line1$line</span></div>
+      $ret="<div style='width: 100%'>
+              <span><b>$curStep)</b>$argList&nbsp;<span style='color:#BBB'>$line1$line</span></span>
             </div>";
     }
 
     if (function_exists('_dump'))
       _dump("$curStep) $argList");
+    $sret = $silent?"$curStep.":$ret;
     return ($debugSteps?$ret:"");
   }
 
@@ -208,7 +213,7 @@
   {
     $homeURL=dirname($_SERVER['SCRIPT_NAME']);
     if (substr($homeURL,0,2)=='/~') {
-      $absPath=getcwd();
+      $absPath=str_replace("\\" ,"/" ,getcwd());
       $relPath=explode('/',$homeURL);
       array_shift($relPath);
       array_shift($relPath);
@@ -276,7 +281,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.59-43 built on 2017-08-29 07:14 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.59-45 built on 2017-09-06 10:44 (-3 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -316,9 +321,9 @@
 
 
   echo sayStep("<div class=cpyrght><strong><big><I>skel/workbench/configure.php</I></big></strong><br>
-    YeAPF 0.8.59-43 built on 2017-08-29 07:14 (-3 DST)<br>
+    YeAPF 0.8.59-45 built on 2017-09-06 10:44 (-3 DST)<br>
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    2017-08-29 07:14:07 (-3 DST)</div>");
+    2017-09-06 10:44:18 (-3 DST)</div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     die(sayStep("<div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
@@ -415,7 +420,7 @@
       $tmpfname=$folderName.'/'.basename(tempnam($folderName,"cfgTest"));
       echo echoStep("Testing write rights using '$tmpfname' temporary file");
       if (!is_dir($folderName))
-        mkdir($folderName, 0777, true);
+        mkdir($folderName, 0755, true);
       if (touch($tmpfname)) {
         unlink($tmpfname);
         $canConfig=true;
@@ -536,7 +541,7 @@
           $user_IP=$_SERVER["REMOTE_ADDR"];
 
 
-          $_MY_CONTEXT_=getcwd();
+          $_MY_CONTEXT_=str_replace("\\" ,"/" ,getcwd());
           // $_MYSELF_=str_replace('\\','/',$_SERVER["DOCUMENT_ROOT"].$_SERVER["REQUEST_URI"]);
           $_MYSELF_=str_replace('\\','/',dirname($_SERVER["REQUEST_URI"]));
           if (!(($aux1=strpos($_MYSELF_,'?'))===FALSE))
@@ -565,7 +570,7 @@
 
           $yeapfDB='';
 
-          $yeapfDB.=','.getSgugPath(getcwd());
+          $yeapfDB.=','.getSgugPath(str_replace("\\" ,"/" ,getcwd()));
           $yeapfDB.=','.getSgugPath(dirname(getcwd()));
           $yeapfDB.=','.getSgugPath($_httpReferer_);
 
@@ -1166,8 +1171,14 @@
                 else
                   $developLink='';
 
-                echo sayStep("<div style='box-shadow: 5px 5px 2px #888888; background: #90EE90; border-style: solid; border-width: 2px; border-color: #00BD00; padding: 32px'><big><u>YeAPF 0.8.59 well configured!</u></big><div style='padding-left: 16px'>Location: <b>$__PL__</b><br>DB config: <b>$dbCSVFilename</b><br>Debug IP: <b>".(isset($cfgDebugIP)?$cfgDebugIP:'none')."</b></div><br>Click <a href='$referer_uri'>here</a> to go back.<br>Click <a href='configure.php?debugSteps=1'>here</a> to debug configure process.<br> Click <a href='index.php'>here</a> to start your app.<br>$developLink<div style='margin: 16px'>If you wish to destroy database connection an recreate it, click <a href='configure.php?destroydb=yes'>here</a><br><i>It will preserve your database data but will remove all other definitions except the one contained in<em>yeapf.db.ini</em></i></div></div>");
-
+                if ($silent) {
+                  echo "<br>\n<u>YeAPF 0.8.59 well configured!</u>";
+                  echo "<br>\nYeAPF Folder: <b>$__PL__</b>";
+                  echo "<br>\nDB config: <b>$dbCSVFilename</b>";
+                  echo "<br>\nDebug IP: <b>".(isset($cfgDebugIP)?$cfgDebugIP:'none')."</b>";
+                } else {
+                  echo sayStep("<div style='box-shadow: 5px 5px 2px #888888; background: #90EE90; border-style: solid; border-width: 2px; border-color: #00BD00; padding: 32px'><big><u>YeAPF 0.8.59 well configured!</u></big><div style='padding-left: 16px'>Location: <b>$__PL__</b><br>DB config: <b>$dbCSVFilename</b><br>Debug IP: <b>".(isset($cfgDebugIP)?$cfgDebugIP:'none')."</b></div><br>Click <a href='$referer_uri'>here</a> to go back.<br>Click <a href='configure.php?debugSteps=1'>here</a> to debug configure process.<br> Click <a href='index.php'>here</a> to start your app.<br>$developLink<div style='margin: 16px'>If you wish to destroy database connection an recreate it, click <a href='configure.php?destroydb=yes'>here</a><br><i>It will preserve your database data but will remove all other definitions except the one contained in<em>yeapf.db.ini</em></i></div></div>");
+                }
                 $aux=join(file('.config/yeapf.config'),'<br>');
                 // echo echoStep("<div class=code>$aux</div>");
                 $aux=join(file('yeapf.php'),'<br>');
@@ -1175,7 +1186,9 @@
 
               } else {
                 writeConfigFile("cfgMainFolder",getcwd());
-                echo sayStep("<BR>The dbConnection could not be written.<br>Check your access rights to '".getcwd()."' folder ");
+                $errMsg="<BR>The dbConnection could not be written.<br>Check your access rights to '".getcwd()."' folder ";
+                echo sayStep($errMsg);
+                if ($silent) echo $errMsg;
                 echo sayStep("<span class=err>(You can debug configuration process clicking <a href='configure.php?debugSteps=1'>here</a>)</span>");
               }
 
@@ -1183,33 +1196,35 @@
           }
           unlock('configure');
         } else {
-          echo sayStep("<div>LOCK CANNOT BE CREATED</div>");
-          echo sayStep("<div><small>LOCK_VERSION: $LOCK_VERSION</small></div>");
-          echo sayStep("<div><small>CFG_LOCK_DIR: $CFG_LOCK_DIR</small></div>");
+          $errMsg="<div>LOCK CANNOT BE CREATED</div><div><small>LOCK_VERSION: $LOCK_VERSION</small></div><div><small>CFG_LOCK_DIR: $CFG_LOCK_DIR</small></div>";
+          echo sayStep($errMsg);
+          if ($silent)
+            echo $errMsg;
           echo sayStep("<span class=err>(You can debug configuration process clicking <a href='configure.php?debugSteps=1'>here</a>)</span>");
 
         }
       }
 
       if ($lockCanBeCreated<2) {
-        echo sayStep("<div class=err>");
-
-        echo sayStep("<div class=errItem>Was not possible to lock the system (stage $lockCanBeCreated. LOCK_VERSION=$LOCK_VERSION)<br>Check your installation</div>");
+        $errMsg="<div class=err><div class=errItem>Was not possible to lock the system (stage $lockCanBeCreated. LOCK_VERSION=$LOCK_VERSION)<br>Check your installation</div>";
         if ($lockCanBeCreated<1)
-          echo sayStep("<div class=errItem>You have not enough rights to write to the filesystem on <b>".getcwd()."</b><br>Please give write, read and execution rights to this folder and try again</div>");
-
+          $errMsg.="<div class=errItem>You have not enough rights to write to the filesystem on <b>".getcwd()."</b><br>Please give write, read and execution rights to this folder and try again</div>";
+        $errMsg.="</div>";
+        echo sayStep($errMsg);
         echo sayStep("<span class=err>(You can debug configuration process clicking <a href='configure.php?debugSteps=1'>here</a>)</span>");
-        echo sayStep("</div>");
+        if ($silent) echo $errMsg;
       }
 
     } else {
-      echo sayStep("<span class=err>Was not possible to create support folders</span>");
-      echo sayStep("<span class=err>Your main folder ($homeURL) must to have enough rights to be written by httpd server</span>");
+      $errMsg="<span class=err>Was not possible to create support folders</span><span class=err>Your main folder ($homeURL) must to have enough rights to be written by httpd server</span>";
+      echo sayStep($errMsg);
+      if ($silent) echo $errMsg;
       echo sayStep("<span class=err>(You can debug configuration process clicking <a href='configure.php?debugSteps=1'>here</a>)</span>");
     }
 
   } else {
-    echo sayStep("<span class=err>Define PHP timeZone before configure</span>");
-    echo sayStep("<span class=err>UTC is not accepted as default timeZone</span>");
+    $errMsg="<span class=err>Define PHP timeZone before configure</span><span class=err>UTC is not accepted as default timeZone</span>";
+    echo sayStep($errMsg);
+      if ($silent) echo $errMsg;
   }
 ?>
