@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/sse.php
-    YeAPF 0.8.59-41 built on 2017-08-28 20:59 (-3 DST)
+    YeAPF 0.8.59-48 built on 2017-09-11 17:24 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-08-28 19:44:55 (-3 DST)
+    2017-09-11 17:23:41 (-3 DST)
 
     skel/webApp / sse.php
     This file cannot be modified within skel/webApp
@@ -73,9 +73,11 @@
 
       $cTime=date("U");
     }
+    /*
     if (SSE::userAttached($w,$u)) {
       SSE::detachUser($w, $u);      
     }
+    */
   }
 
   SSE::sendEvent("finish");

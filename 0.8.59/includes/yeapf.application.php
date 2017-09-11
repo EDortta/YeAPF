@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.59-41 built on 2017-08-28 20:59 (-3 DST)
+    YeAPF 0.8.59-48 built on 2017-09-11 17:24 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-08-28 19:44:55 (-3 DST)
+    2017-09-11 17:23:41 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -297,19 +297,27 @@
 
 
     if (isset($_REQUEST)) {
-      foreach($_REQUEST as $k=>$v)
+      foreach($_REQUEST as $k=>$v) {
         xq_extractValue($ret, $k, $v, $asGlobals, $xq_prefix, $xq_postfix, $xq_only_composed_names);
+      }
     }
 
-    foreach($_REQUEST2 as $k=>$v)
+    foreach($_REQUEST2 as $k=>$v) {
       xq_extractValue($ret, $k, $v, $asGlobals, $xq_prefix, $xq_postfix, $xq_only_composed_names);
+    }
 
     $fieldName  = unparentesis(xq_varValue($ret, 'fieldName'));
     $fieldValue = unparentesis(xq_varValue($ret, 'fieldValue'));
 
+    $fieldValue=str_replace("'", "<!--Q1-->", $fieldValue);
+    $fieldValue=str_replace('"', "<!--Q2-->", $fieldValue);
+
     while ($fieldName>'') {
       $aFieldName=unquote(getNextValue($fieldName,','));
       $aFieldValue=unquote(getNextValue($fieldValue,','));
+      $aFieldValue=str_replace("<!--Q1-->", "'", $aFieldValue);
+      $aFieldValue=str_replace("<!--Q2-->", '"', $aFieldValue);
+      $aFieldValue=escapeString($aFieldValue);
       xq_extractValue($ret, $aFieldName, $aFieldValue, $asGlobals, $xq_prefix, $xq_postfix, $xq_only_composed_names);
     }
     // die('\n\n');
