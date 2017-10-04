@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dataset.php
-    YeAPF 0.8.59-41 built on 2017-08-28 20:59 (-3 DST)
+    YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-08-28 19:44:55 (-3 DST)
+    2017-09-19 16:45:26 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -342,7 +342,8 @@
     } else if ($s=='yeapfDB') {
       if ($a=='doSQL') {
         $params=xq_extractValuesFromQuery();
-        $sql=$params['sql'];
+        $sql=unescapeString($params['sql']);
+        
         //die(var_dump($params));
         // echo "\n$sql\n";
         $xq_regCount=0;

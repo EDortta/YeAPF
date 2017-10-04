@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.59-48 built on 2017-09-11 17:24 (-3 DST)
+    YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-09-11 17:23:41 (-3 DST)
+    2017-09-19 16:45:26 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -70,6 +70,40 @@
       echo "<script src=".bestName("yloader.js",1)."></script>\n";
       */
       echo "</head>\n";
+    }
+  }
+
+  global $__API_START_TS;
+  $__API_START_TS=0;
+
+  function registerAPIUsageStart() {
+    global $s, $a, $__API_START_TS;
+    if (_db_upd_canReviewVersion(17)) {
+      if (lock("api-usage-$s-$a", true)) {    
+
+        $__API_START_TS=date('U');
+
+        unlock("api-usage-$s-$a");
+      }      
+    }
+  }
+
+  function registerAPIUsageFinish() {
+    global $s, $a, $__API_START_TS;
+    if ($__API_START_TS>0) {
+      if (lock("api-usage-$s-$a")) {    
+        $info=db_sql("select count, wastedTime, avgTime from is_api_usage where s='$s' and a='$a'", false);
+        extract($info);
+        if (!isset($count)) {
+          db_sql("insert into is_api_usage(s,a, disabled, wastedTime, avgTime, count) values ('$s', '$a', 'N', 0, 0, 0)");
+        }
+        $count++;
+        $__API_WASTED_TIME = date('U') - $__API_START_TS; 
+        $wastedTime+=$__API_WASTED_TIME;
+        $avgTime = $wastedTime / $count;
+        db_sql("update is_api_usage set count=$count, wastedTime=$wastedTime, avgTime=$avgTime where s='$s' and a='$a'"); 
+        unlock("api-usage-$s-$a");
+      }
     }
   }
 
@@ -309,14 +343,14 @@
     $fieldName  = unparentesis(xq_varValue($ret, 'fieldName'));
     $fieldValue = unparentesis(xq_varValue($ret, 'fieldValue'));
 
-    $fieldValue=str_replace("'", "<!--Q1-->", $fieldValue);
-    $fieldValue=str_replace('"', "<!--Q2-->", $fieldValue);
+    $fieldValue=str_replace("'", "&#39;", $fieldValue);
+    $fieldValue=str_replace('"', "&#34;", $fieldValue);
 
     while ($fieldName>'') {
       $aFieldName=unquote(getNextValue($fieldName,','));
       $aFieldValue=unquote(getNextValue($fieldValue,','));
-      $aFieldValue=str_replace("<!--Q1-->", "'", $aFieldValue);
-      $aFieldValue=str_replace("<!--Q2-->", '"', $aFieldValue);
+      $aFieldValue=str_replace("&#39;", "'", $aFieldValue);
+      $aFieldValue=str_replace("&#34;", '"', $aFieldValue);
       $aFieldValue=escapeString($aFieldValue);
       xq_extractValue($ret, $aFieldName, $aFieldValue, $asGlobals, $xq_prefix, $xq_postfix, $xq_only_composed_names);
     }

@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.59-45 built on 2017-09-06 10:44 (-3 DST)
+    YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-09-01 07:16:40 (-3 DST)
+    2017-09-19 16:45:26 (-3 DST)
    */
 
   /*
@@ -95,15 +95,28 @@
     /*
      * http://stackoverflow.com/questions/1162491/alternative-to-mysql-real-escape-string-without-connecting-to-db
      */
-      $search = array("\\",  "\x00", "\n",  "\r",  "'",  '"', "\x1a");
-      $replace = array("\\\\","\\0","\\n", "\\r", "\'", '\"', "\\Z");
+    $search = array("\\",  "\x00", "\n",  "\r",  "'",  '"', "\x1a");
+    $replace = array("\\\\","\\0","\\n", "\\r", "\'", '\"', "\\Z");
 
-      $ret= str_replace($search, $replace, $value);
+    $ret= str_replace($search, $replace, $value);
 
-      if (db_connectionTypeIs(_FIREBIRD_))
-        $ret=str_replace("\\'", "''", $ret);
+    if (db_connectionTypeIs(_FIREBIRD_))
+      $ret=str_replace("\\'", "''", $ret);
 
-      return $ret;
+    return $ret;
+  }
+
+  function unescapeString($value) 
+  {
+    $search = array("\\\\","\\0","\\n", "\\r", "\'", '\"', "\\Z");
+    $replace = array("\\",  "\x00", "\n",  "\r",  "'",  '"', "\x1a");
+
+    $ret= str_replace($search, $replace, $value);
+
+    if (db_connectionTypeIs(_FIREBIRD_))
+      $ret=str_replace("''", "\\'", $ret);
+
+    return $ret;    
   }
 
   $_debugTag=decimalMicrotime();
@@ -445,6 +458,7 @@
                       'yeapf.userContext.php',
                       'yeapf.eventHandler.php',
                       'yeapf.application.php',
+                      'yeapf.dbUpdate.php',
 
                       'yeapf.nodes.php',
 
@@ -455,7 +469,6 @@
                       'yeapf.csvTools.php',
                       'yeapf.txtTools.php',
 
-                      'yeapf.dbUpdate.php',
                       'yeapf.auditTrack.php',
                       'yeapf.migrateTools.php',
 
@@ -744,6 +757,8 @@
         http_response_code(404);
         exit();
       }
+    } else {
+      registerAPIUsageStart();
     }
 
     if (!$GLOBALS['isCLI']) {
@@ -836,6 +851,10 @@
       $quote='"';
     if (substr($line,0,1)=="'")
       $quote="'";
+    if (substr($line,0,5)=="&#34;")
+      $quote="&#34;";
+    if (substr($line,0,5)=="&#39;")
+      $quote="&#39;";
     return ($quote>'');
   }
 
@@ -843,7 +862,7 @@
   {
     // """(6MMx20CM)GDC MICROMOLA ESPIRAL DESTACAVEL"
     // "HASTE FEMORAL CIMENTADA POLIDA """" CP3 """""
-    if (($char=='"') || ($char=="'")) {
+    if (($char=='"') || ($char=="'") || ($char=="&#34;") || ($char=="&#39;")) {
       $doubleQuote=$char.$char;
       $escapedQuote="\\".$char;
     } else {
@@ -1910,6 +1929,8 @@
         $v=substr($v,1,strlen($v)-2);
       else if (strtolower(substr($v,0,6))=='&quot;')
         $v=substr($v,6,strlen($v)-12);
+      else if ((strtolower(substr($v,0,5))=='&#39;') || (strtolower(substr($v,0,5))=='&#34;'))
+        $v=substr($v,5,strlen($v)-10);
       else if (substr($v,0,2)=='\\"')
         $v=substr($v,2,strlen($v)-4);
     }

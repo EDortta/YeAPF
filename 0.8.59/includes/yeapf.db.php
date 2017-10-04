@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.59-45 built on 2017-09-06 10:44 (-3 DST)
+    YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-09-01 07:16:40 (-3 DST)
+    2017-10-04 15:54:37 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -186,6 +186,7 @@
 
   function db_setstatus($flag=0) {
     global $_ydb_ready;
+    _recordWastedTime("DBSTATUS $_ydb_ready -> $flag");
     $_ydb_ready=$flag;
 
     /*
@@ -197,18 +198,13 @@
   function db_set_flag($flag)
   {
     global $_ydb_ready;
-    $_ydb_ready = (isset($_ydb_ready)?intval($_ydb_ready):0) | $flag;
-    
-    /*
-    $info=debug_backtrace();
-    echo explainDBError($flag, $info)."\n";
-    */
+    db_setstatus((isset($_ydb_ready)?intval($_ydb_ready):0) | $flag);
   }
 
   function db_unset_flag($flag)
   {
     global $_ydb_ready;
-    $_ydb_ready = (isset($_ydb_ready)?intval($_ydb_ready):0) & (!$flag);
+    db_setstatus((isset($_ydb_ready)?intval($_ydb_ready):0) & (!$flag));
     
     /*
     $info=debug_backtrace();
@@ -508,6 +504,7 @@
            $cfgHtPasswdRequired;
 
     $ret = false;
+    // echo "dbConnect=$dbConnect\n";
     if (isset($dontConnect))
       db_die("'dontConnect=$dontConnect' OBSOLETE!  change for 'dbConnect=no/yes'");
 
@@ -719,6 +716,8 @@
               db_set_flag(1 >> db_getConnectionType());
               if ($dontUpdate==0) {
                 db_set_flag(_DB_UPDATABLE);
+                if (function_exists("_db_upd_checkStructure"))
+                  _db_upd_checkStructure();
               }
             }
           };
@@ -1928,15 +1927,15 @@
 
   if (file_exists("$cfgMainFolder/flags/flag.dbgloader")) error_log(basename(__FILE__)." 0.8.59 ".date("i:s").": yeapf.db.php ready\n",3,"$cfgCurrentFolder/logs/yeapf.loader.log");
 
-  _recordWastedTime("Iniciando yeapf.db.php");
+  _recordWastedTime("Iniciando yeapf.db.php ...");
   getConfigFileName();
-  _recordWastedTime("getConfigFileName()");
+  _recordWastedTime("... getConfigFileName()");
   db_startup();
-  _recordWastedTime("db_startup()");
+  _recordWastedTime("... db_startup()");
 
   if (function_exists('db_checkConfig')) {
     db_checkConfig();
-    _recordWastedTime("db_checkConfig()");
+    _recordWastedTime("... db_checkConfig()");
   }
 
   _recordWastedTime("yeapf.db.php Carregado");

@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.59-41 built on 2017-08-28 20:59 (-3 DST)
+ * YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-08-28 19:44:54 (-3 DST)
+ * 2017-10-04 15:54:37 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -1334,6 +1334,49 @@ var dateTransform = function (aStrDate, srcFormat, destFormat) {
     return ret;
   } else
     return null;
+};
+
+var isValidDate=function(aFrenchDate) {
+  var ok=true;
+  if ("string"==typeof aFrenchDate)  {
+    aFrenchDate = dateTransform(aFrenchDate, "dd/mm/yyyy", "yyyy-mm-dd 00:00:00");
+  }
+
+  try {
+    d = new Date(aFrenchDate);
+  } catch(err) {
+    ok=false;
+  }
+
+  if (ok) {
+    if (!isNaN(d.getTime())) {
+      var f=dateTransform(d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate(), "yyyy/mm/dd", "yyyy-mm-dd 00:00:00");
+      ok=f==aFrenchDate;
+    } else
+      ok=false;
+  }
+
+  return ok;
+};
+
+var dateInRange = function (aFrenchDate, aFrenchMinDate, aFrenchMaxDate) {
+  /* determina se uma data em formato frances (dd/mm/yyyy) está no escopo indicado
+     Na ausencia de um dos parámetros, ele assume hoje para aquele que falta
+     Se faltam os dois, a única data válida é hoje */
+  var ret=false;
+  if (isValidDate(aFrenchDate)) {
+    aFrenchMinDate = aFrenchMinDate || (new Date()).toFrenchString();
+    aFrenchMaxDate = aFrenchMaxDate || (new Date()).toFrenchString();
+    if (isValidDate(aFrenchMinDate)) {
+      if (isValidDate(aFrenchMaxDate)) {
+        aFrenchDate    = dateTransform(aFrenchDate,    "dd/mm/yyyy", "yyyy-mm-dd");
+        aFrenchMinDate = dateTransform(aFrenchMinDate, "dd/mm/yyyy", "yyyy-mm-dd");
+        aFrenchMaxDate = dateTransform(aFrenchMaxDate, "dd/mm/yyyy", "yyyy-mm-dd");
+        ret = ((aFrenchDate>=aFrenchMinDate) && (aFrenchDate<=aFrenchMaxDate));        
+      }
+    }
+  }
+  return ret;
 };
 
 /* discover type of things */

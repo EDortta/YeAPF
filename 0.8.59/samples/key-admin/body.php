@@ -1,9 +1,9 @@
 <?php
 /*
     samples/key-admin/body.php
-    YeAPF 0.8.59-49 built on 2017-09-16 08:25 (-3 DST)
+    YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-09-16 08:25:36 (-3 DST)
+    2017-10-04 15:54:58 (-3 DST)
 
     skel/webApp / body.php
     This file cannot be modified within skel/webApp
@@ -164,6 +164,7 @@
       touch('flags/flag.pausedAfterClick');
 
     finishOutput();
+    registerAPIUsageFinish();
     db_close();
   } catch(Exception $e) {
     _dump("EXCEPTION: ".$e->getMessage());
@@ -176,6 +177,7 @@
   if ($devMsgQueue)
     $devMsgQueue->sendStagedMessage('idle');
   */
+    
   _recordWastedTime("Good bye");
 ?>
 

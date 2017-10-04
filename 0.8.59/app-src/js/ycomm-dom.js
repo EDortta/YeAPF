@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.59-41 built on 2017-08-28 20:59 (-3 DST)
+ * YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-08-28 19:44:54 (-3 DST)
+ * 2017-10-04 15:54:37 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -97,6 +97,10 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
         aFlags.deleteRows = true;
     if (typeof aFlags.paintRows == 'undefined')
         aFlags.paintRows = true;
+    if (typeof aFlags.unlearn == 'undefined')
+        aFlags.unlearn = false;
+    if (typeof aFlags.insertAtTop == 'undefined')
+        aFlags.insertAtTop = true;
 
     var idFieldName, colName, newRow, canCreateRow,
         aElement = y$(aElementID),
@@ -212,7 +216,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
             }
             mergeObject(ycomm.dom._elem_templates[aElementID], aLineSpec, true);
 
-            if (aFlags.deleteRows) {
+            if (aFlags.deleteRows===true) {
                 while (oTable.rows.length > 0)
                     oTable.deleteRow(oTable.rows.length - 1);
             } else {

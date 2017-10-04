@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/js/yloader.js
-  * YeAPF 0.8.59-49 built on 2017-09-16 08:25 (-3 DST)
+  * YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-09-16 08:25:36 (-3 DST)
+  * 2017-10-04 15:54:58 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.59-49 built on 2017-09-16 08:25 (-3 DST)");
+ console.log("YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -1604,6 +1604,49 @@
          return ret;
        } else
          return null;
+     };
+     
+     var isValidDate=function(aFrenchDate) {
+       var ok=true;
+       if ("string"==typeof aFrenchDate)  {
+         aFrenchDate = dateTransform(aFrenchDate, "dd/mm/yyyy", "yyyy-mm-dd 00:00:00");
+       }
+     
+       try {
+         d = new Date(aFrenchDate);
+       } catch(err) {
+         ok=false;
+       }
+     
+       if (ok) {
+         if (!isNaN(d.getTime())) {
+           var f=dateTransform(d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate(), "yyyy/mm/dd", "yyyy-mm-dd 00:00:00");
+           ok=f==aFrenchDate;
+         } else
+           ok=false;
+       }
+     
+       return ok;
+     };
+     
+     var dateInRange = function (aFrenchDate, aFrenchMinDate, aFrenchMaxDate) {
+       /* determina se uma data em formato frances (dd/mm/yyyy) estÃ¡ no escopo indicado
+          Na ausencia de um dos parÃ¡metros, ele assume hoje para aquele que falta
+          Se faltam os dois, a Ãºnica data vÃ¡lida Ã© hoje */
+       var ret=false;
+       if (isValidDate(aFrenchDate)) {
+         aFrenchMinDate = aFrenchMinDate || (new Date()).toFrenchString();
+         aFrenchMaxDate = aFrenchMaxDate || (new Date()).toFrenchString();
+         if (isValidDate(aFrenchMinDate)) {
+           if (isValidDate(aFrenchMaxDate)) {
+             aFrenchDate    = dateTransform(aFrenchDate,    "dd/mm/yyyy", "yyyy-mm-dd");
+             aFrenchMinDate = dateTransform(aFrenchMinDate, "dd/mm/yyyy", "yyyy-mm-dd");
+             aFrenchMaxDate = dateTransform(aFrenchMaxDate, "dd/mm/yyyy", "yyyy-mm-dd");
+             ret = ((aFrenchDate>=aFrenchMinDate) && (aFrenchDate<=aFrenchMaxDate));        
+           }
+         }
+       }
+       return ret;
      };
      
      /* discover type of things */
@@ -4975,6 +5018,10 @@
              aFlags.deleteRows = true;
          if (typeof aFlags.paintRows == 'undefined')
              aFlags.paintRows = true;
+         if (typeof aFlags.unlearn == 'undefined')
+             aFlags.unlearn = false;
+         if (typeof aFlags.insertAtTop == 'undefined')
+             aFlags.insertAtTop = true;
      
          var idFieldName, colName, newRow, canCreateRow,
              aElement = y$(aElementID),
@@ -5090,7 +5137,7 @@
                  }
                  mergeObject(ycomm.dom._elem_templates[aElementID], aLineSpec, true);
      
-                 if (aFlags.deleteRows) {
+                 if (aFlags.deleteRows===true) {
                      while (oTable.rows.length > 0)
                          oTable.deleteRow(oTable.rows.length - 1);
                  } else {

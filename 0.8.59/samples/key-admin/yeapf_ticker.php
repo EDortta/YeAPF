@@ -1,9 +1,9 @@
 <?php
 /*
     samples/key-admin/yeapf_ticker.php
-    YeAPF 0.8.59-49 built on 2017-09-16 08:25 (-3 DST)
+    YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-09-16 08:25:36 (-3 DST)
+    2017-10-04 15:54:58 (-3 DST)
 */
 
   require_once "yeapf.php";

@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/rest.php
-    YeAPF 0.8.59-41 built on 2017-08-28 20:59 (-3 DST)
+    YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-08-28 19:44:55 (-3 DST)
+    2017-09-19 13:03:25 (-3 DST)
 
     skel/webApp / rest.php
     This file cannot be modified within skel/webApp
@@ -54,5 +54,6 @@
     $devMsgQueue->sendStagedMessage('idle');
   */
 
+  registerAPIUsageFinish();
   _recordWastedTime("Good bye rest");
 ?>
