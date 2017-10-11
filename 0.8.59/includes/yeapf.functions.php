@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)
+    YeAPF 0.8.59-68 built on 2017-10-11 11:23 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-09-19 16:45:26 (-3 DST)
+    2017-10-09 19:39:39 (-3 DST)
    */
 
   /*
@@ -1764,6 +1764,7 @@
               _recordWastedTime("Time wasted calling $func($a): $__impt0");
               if (intval($ret)&2==2) {
                 $flgCanContinueWorking=false;
+                _recordWastedTime("flgCanContinueWorking has been dropped by '$s'.'$a' function ($func)");
                 _dumpY(1,0,"flgCanContinueWorking has been dropped by '$s'.'$a' function ($func)");
               }
             }

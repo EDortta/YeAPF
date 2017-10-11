@@ -1,8 +1,8 @@
   /********************************************************************
    * app-src/js/ycomm-ajax.js
-   * YeAPF 0.8.59-41 built on 2017-08-28 20:59 (-3 DST)
+   * YeAPF 0.8.59-68 built on 2017-10-11 11:23 (-3 DST)
    * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2017-08-28 19:44:54 (-3 DST)
+   * 2017-10-06 21:15:44 (-3 DST)
    *
    * Com o advento do WebSocket, precisamos de novas formas para
    * provocar o servidor.
@@ -279,84 +279,92 @@
         ycomm.waitIconControl(true);
 
       var aURL=ycomm.buildCommonURL(s || '', a || '', limits || {}, localU);
+      var promiseRet = new Promise(
+        function(resolve, reject) {
+          if (typeof xAjax!='undefined') {
 
-      if (typeof xAjax!='undefined') {
+            ycomm.registerCall('invoke', s, a);
 
-        ycomm.registerCall('invoke', s, a);
-
-        var aux=xAjax();
-        aux.Request(
-          ycomm.scriptName,
-          {
-            method: ycomm.defaultMethod,
-            asynchronous: !yloader.isWorker,
-            parameters: aURL,
-            onTimeout: function() {
-              console.log('XMLHttpRequest timeout');
-              if (displayWaitIcon)
-                ycomm.waitIconControl(false);
-              callbackFunction(404, {}, [{}], null, null, null);
-            },
-            onComplete: function(r) {
-                var retData = {
-                  data: null,
-                  geometry: null,
-                  dataContext: null,
-                  error: null,
-                  userMsg: null
+            var aux=xAjax();
+            aux.Request(
+              ycomm.scriptName,
+              {
+                method: ycomm.defaultMethod,
+                asynchronous: !yloader.isWorker,
+                parameters: aURL,
+                onTimeout: function() {
+                  console.log('XMLHttpRequest timeout');
+                  if (displayWaitIcon)
+                    ycomm.waitIconControl(false);
+                  callbackFunction(404, {}, [{}], null, null, null);
+                  reject({status: 404, message: "Timeout"});
                 },
-                xmlDoc=null;
+                onComplete: function(r) {
+                    var retData = {
+                      data: null,
+                      geometry: null,
+                      dataContext: null,
+                      error: null,
+                      userMsg: null
+                    },
+                    xmlDoc=null;
 
-                if (r.status==200) {
-                  if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOnline =='function'))
-                    ycomm.msg.notifyServerOnline();
+                    if (r.status==200) {
+                      if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOnline =='function'))
+                        ycomm.msg.notifyServerOnline();
 
 
-                  if (r.responseXML) {
-                    xmlDoc = r.responseXML;
-                  } else {
-                    if (typeof DOMparser == 'function')  {
-                      var parser = new DOMParser();
-                      xmlDoc = parser.parseFromString(r.responseText, "application/xml");
+                      if (r.responseXML) {
+                        xmlDoc = r.responseXML;
+                      } else {
+                        if (typeof DOMparser == 'function')  {
+                          var parser = new DOMParser();
+                          xmlDoc = parser.parseFromString(r.responseText, "application/xml");
+                        }
+                      }
+
+                      if (xmlDoc!==null)
+                        retData = ycomm.explodeData(xmlDoc);
+
+                      resolve({status: 200, return: retData});
+
+                    } else {
+                      console.log(r.statusText);
+                      if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOffline =='function'))
+                        ycomm.msg.notifyServerOffline();
+                      reject({ status: r.status });
                     }
-                  }
 
-                  if (xmlDoc!==null)
-                    retData = ycomm.explodeData(xmlDoc);
+                    ycomm.waitIconControl(false);
 
-                } else {
-                  console.log(r.statusText);
-                  if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOffline =='function'))
-                    ycomm.msg.notifyServerOffline();
-                }
-
-                ycomm.waitIconControl(false);
-
-                if (retData.error) {
-                  if (typeof retData.error == "string")
-                    console.error(retData.error);
-                  else {
-                    for(var k in retData.error) {
-                      if (retData.error.hasOwnProperty(k))
-                        console.error(retData.error[k]);
+                    if (retData.error) {
+                      if (typeof retData.error == "string")
+                        console.error(retData.error);
+                      else {
+                        for(var k in retData.error) {
+                          if (retData.error.hasOwnProperty(k))
+                            console.error(retData.error[k]);
+                        }
+                      }
                     }
+
+                    if (typeof callbackFunction=='function') {
+                      if (yloader.isWorker)
+                        callbackFunction(r.responseText);
+                      else
+                        callbackFunction(r.status, retData.error, retData.data, retData.userMsg, retData.dataContext, retData.geometry);                    
+                    }
+
                   }
-                }
-
-                if (typeof callbackFunction=='function') {
-                  if (yloader.isWorker)
-                    callbackFunction(r.responseText);
-                  else
-                    callbackFunction(r.status, retData.error, retData.data, retData.userMsg, retData.dataContext, retData.geometry);                    
-                }
-
               }
+            );
+          } else {
+            console.log("Not ready to call "+aURL);
+            console.log("prototype library not loaded");
+            reject({ status: -1, message: 'xAjax not found'});
           }
-        );
-      } else {
-        console.log("Not ready to call "+aURL);
-        console.log("prototype library not loaded");
-      }
-
+        }
+      );
+      return promiseRet;
     };
 

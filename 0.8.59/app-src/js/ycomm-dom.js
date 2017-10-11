@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)
+ * YeAPF 0.8.59-68 built on 2017-10-11 11:23 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-10-04 15:54:37 (-3 DST)
+ * 2017-10-04 21:18:54 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -80,9 +80,9 @@ ycomm.dom.getInplaceData = function(aElement) {
  *             onReady(aElementID)
  * aFlags - JSON
  *          deleteRows  (true by default)
- *          paintRows   (true by default) 
+ *          paintRows   (false by default) 
  *          insertAtTop (applies to TR. false by default)
- *          unlearn      (false by default)
+ *          unlearn      (undefined by default)
  */
 ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
     if ((aLineSpec === undefined) || (aLineSpec === null))
@@ -97,10 +97,8 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
         aFlags.deleteRows = true;
     if (typeof aFlags.paintRows == 'undefined')
         aFlags.paintRows = true;
-    if (typeof aFlags.unlearn == 'undefined')
-        aFlags.unlearn = false;
     if (typeof aFlags.insertAtTop == 'undefined')
-        aFlags.insertAtTop = true;
+        aFlags.insertAtTop = false;
 
     var idFieldName, colName, newRow, canCreateRow,
         aElement = y$(aElementID),

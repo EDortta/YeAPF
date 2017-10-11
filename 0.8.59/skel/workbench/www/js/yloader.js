@@ -1,8 +1,8 @@
 /*********************************************
   * skel/workbench/www/js/yloader.js
-  * YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)
+  * YeAPF 0.8.59-68 built on 2017-10-11 11:23 (-3 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-10-04 15:54:58 (-3 DST)
+  * 2017-10-11 11:23:38 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)");
+ console.log("YeAPF 0.8.59-68 built on 2017-10-11 11:23 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -713,6 +713,13 @@
                  return false;
          }
          return true;
+     }
+     
+     if (!String.prototype.asPhone) {
+       String.prototype.asPhone = function() {
+         var aux=this.replace(/\D+/g, ''), i;
+         return aux.replace(/(\d{2,3})(\d{3})(\d{3})/, '$1-$2-$3');
+       }
      }
      
      if (!String.prototype.abbreviate) {
@@ -1510,13 +1517,13 @@
          aFormat="d/m/y";
        var ret='';
        var aDate=extractDateValues(aUDate,'yyyymmddHHMMSS');
-       if (aDate)
-         ret='';
+       if (!(aDate === null)) { 
          for(var i=0; i<aFormat.length; i++)
            if (/^[d,m,y]+$/.test(aFormat[i]))
              ret+=aDate[aFormat[i]];
            else
              ret+=aFormat[i];
+       }
        return ret;
      }
      
@@ -2742,6 +2749,9 @@
                  var aDecimals = Math.max(0,parseInt(funcParams[1]));
                  aValue = str2double(aValue);
                  aValue = aValue.toFixed(aDecimals);
+                 break;
+               case 'phone':
+                 aValue=(aValue || '').asPhone();
                  break;
                case 'lon2deg':
                  aValue=dec2deg(aValue,false);
@@ -4657,85 +4667,93 @@
              ycomm.waitIconControl(true);
      
            var aURL=ycomm.buildCommonURL(s || '', a || '', limits || {}, localU);
+           var promiseRet = new Promise(
+             function(resolve, reject) {
+               if (typeof xAjax!='undefined') {
      
-           if (typeof xAjax!='undefined') {
+                 ycomm.registerCall('invoke', s, a);
      
-             ycomm.registerCall('invoke', s, a);
-     
-             var aux=xAjax();
-             aux.Request(
-               ycomm.scriptName,
-               {
-                 method: ycomm.defaultMethod,
-                 asynchronous: !yloader.isWorker,
-                 parameters: aURL,
-                 onTimeout: function() {
-                   console.log('XMLHttpRequest timeout');
-                   if (displayWaitIcon)
-                     ycomm.waitIconControl(false);
-                   callbackFunction(404, {}, [{}], null, null, null);
-                 },
-                 onComplete: function(r) {
-                     var retData = {
-                       data: null,
-                       geometry: null,
-                       dataContext: null,
-                       error: null,
-                       userMsg: null
+                 var aux=xAjax();
+                 aux.Request(
+                   ycomm.scriptName,
+                   {
+                     method: ycomm.defaultMethod,
+                     asynchronous: !yloader.isWorker,
+                     parameters: aURL,
+                     onTimeout: function() {
+                       console.log('XMLHttpRequest timeout');
+                       if (displayWaitIcon)
+                         ycomm.waitIconControl(false);
+                       callbackFunction(404, {}, [{}], null, null, null);
+                       reject({status: 404, message: "Timeout"});
                      },
-                     xmlDoc=null;
+                     onComplete: function(r) {
+                         var retData = {
+                           data: null,
+                           geometry: null,
+                           dataContext: null,
+                           error: null,
+                           userMsg: null
+                         },
+                         xmlDoc=null;
      
-                     if (r.status==200) {
-                       if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOnline =='function'))
-                         ycomm.msg.notifyServerOnline();
+                         if (r.status==200) {
+                           if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOnline =='function'))
+                             ycomm.msg.notifyServerOnline();
      
      
-                       if (r.responseXML) {
-                         xmlDoc = r.responseXML;
-                       } else {
-                         if (typeof DOMparser == 'function')  {
-                           var parser = new DOMParser();
-                           xmlDoc = parser.parseFromString(r.responseText, "application/xml");
+                           if (r.responseXML) {
+                             xmlDoc = r.responseXML;
+                           } else {
+                             if (typeof DOMparser == 'function')  {
+                               var parser = new DOMParser();
+                               xmlDoc = parser.parseFromString(r.responseText, "application/xml");
+                             }
+                           }
+     
+                           if (xmlDoc!==null)
+                             retData = ycomm.explodeData(xmlDoc);
+     
+                           resolve({status: 200, return: retData});
+     
+                         } else {
+                           console.log(r.statusText);
+                           if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOffline =='function'))
+                             ycomm.msg.notifyServerOffline();
+                           reject({ status: r.status });
                          }
-                       }
      
-                       if (xmlDoc!==null)
-                         retData = ycomm.explodeData(xmlDoc);
+                         ycomm.waitIconControl(false);
      
-                     } else {
-                       console.log(r.statusText);
-                       if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOffline =='function'))
-                         ycomm.msg.notifyServerOffline();
-                     }
-     
-                     ycomm.waitIconControl(false);
-     
-                     if (retData.error) {
-                       if (typeof retData.error == "string")
-                         console.error(retData.error);
-                       else {
-                         for(var k in retData.error) {
-                           if (retData.error.hasOwnProperty(k))
-                             console.error(retData.error[k]);
+                         if (retData.error) {
+                           if (typeof retData.error == "string")
+                             console.error(retData.error);
+                           else {
+                             for(var k in retData.error) {
+                               if (retData.error.hasOwnProperty(k))
+                                 console.error(retData.error[k]);
+                             }
+                           }
                          }
+     
+                         if (typeof callbackFunction=='function') {
+                           if (yloader.isWorker)
+                             callbackFunction(r.responseText);
+                           else
+                             callbackFunction(r.status, retData.error, retData.data, retData.userMsg, retData.dataContext, retData.geometry);                    
+                         }
+     
                        }
-                     }
-     
-                     if (typeof callbackFunction=='function') {
-                       if (yloader.isWorker)
-                         callbackFunction(r.responseText);
-                       else
-                         callbackFunction(r.status, retData.error, retData.data, retData.userMsg, retData.dataContext, retData.geometry);                    
-                     }
-     
                    }
+                 );
+               } else {
+                 console.log("Not ready to call "+aURL);
+                 console.log("prototype library not loaded");
+                 reject({ status: -1, message: 'xAjax not found'});
                }
-             );
-           } else {
-             console.log("Not ready to call "+aURL);
-             console.log("prototype library not loaded");
-           }
-     
+             }
+           );
+           return promiseRet;
          };
      
      
@@ -5001,9 +5019,9 @@
       *             onReady(aElementID)
       * aFlags - JSON
       *          deleteRows  (true by default)
-      *          paintRows   (true by default) 
+      *          paintRows   (false by default) 
       *          insertAtTop (applies to TR. false by default)
-      *          unlearn      (false by default)
+      *          unlearn      (undefined by default)
       */
      ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
          if ((aLineSpec === undefined) || (aLineSpec === null))
@@ -5018,10 +5036,8 @@
              aFlags.deleteRows = true;
          if (typeof aFlags.paintRows == 'undefined')
              aFlags.paintRows = true;
-         if (typeof aFlags.unlearn == 'undefined')
-             aFlags.unlearn = false;
          if (typeof aFlags.insertAtTop == 'undefined')
-             aFlags.insertAtTop = true;
+             aFlags.insertAtTop = false;
      
          var idFieldName, colName, newRow, canCreateRow,
              aElement = y$(aElementID),

@@ -1,10 +1,13 @@
 <?php
 /*
     includes/xForms.php
-    YeAPF 0.8.59-41 built on 2017-08-28 20:59 (-3 DST)
+    YeAPF 0.8.59-68 built on 2017-10-11 11:23 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-08-28 19:44:55 (-3 DST)
+    2017-10-09 19:39:39 (-3 DST)
 */
+
+  global $cfgMainFolder;
+
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
   /*
     sintaxis minima
@@ -1508,8 +1511,7 @@
     }
   }
 
-  function cleanFieldName($f, $fieldPrefix, $fieldPostfix)
-  {
+  function cleanFieldName($f, $fieldPrefix, $fieldPostfix) {
     if ($fieldPrefix>'') {
       if (substr($f,0,strlen($fieldPrefix))==$fieldPrefix)
         $f=substr($f,strlen($fieldPrefix),strlen($f));
@@ -1521,8 +1523,7 @@
     return $f;
   }
 
-  function fixFieldName($f, $fieldPrefix, $fieldPostfix)
-  {
+  function fixFieldName($f, $fieldPrefix, $fieldPostfix) {
     if ($fieldPrefix>'') {
       $f=$fieldPrefix.$f;
     };
@@ -1539,8 +1540,7 @@
                          $CreateUniqueID=true, $verb='*',
                          $fieldFixMask=1, $fieldPrefix='',
                          $fieldPostfix='', $quoteFieldValues=true,
-                         $decodeURL=true)
-  {
+                         $decodeURL=true) {
     /* Get the unique seed indicated in config file */
     $auxSeed = getArrayValueIfExists($GLOBALS, 'unique_id_seed', 'rnd'.y_rand(10000,99999));
 
@@ -1685,8 +1685,7 @@
     }
 
     $verb=strtolower($verb);
-    switch ($verb)
-    {
+    switch ($verb) {
       case 'insert':
         $aux01='';
         $aux02='';
@@ -1805,8 +1804,7 @@
     return $sql;
   }
 
-  function cleanFormVars($vars)
-  {
+  function cleanFormVars($vars) {
     if (is_array($vars)) {
       foreach($vars as $vName) {
         $vName=trim($vName);
@@ -1818,8 +1816,7 @@
       cleanFormVars(explode(',',$vars));
   }
 
-  function stretchDate($date)
-  {
+  function stretchDate($date) {
     if ($date>'') {
       $date=dataSQL($date);
       while (($date>'') and (substr($date,strlen($date)-1,1)=='0'))
@@ -1828,7 +1825,72 @@
     return $date;
   }
 
-  global $cfgMainFolder;
+  function suggestFormFromTable($tableName) {
+    $retFields=array();
+    $fields = db_fieldList($tableName);
+
+    for($c=0; $c<count($fields); $c++) {
+      $length=explode(',', $fields[$c][2]);
+      $fieldDefinition=array(
+        'type'=> $fields[$c][1],
+        'width'=> $length[0],
+        'decimal'=> $length[1],
+        'nullable'=> $fields[$c][4]
+      );
+      if (mb_strtoupper($fields[$c][0])=='ID') {
+        $fieldDefinition['hidden']='yes';
+      }
+      $len = intval($length[0])+intval($length[1]);
+      if ($len<13) {
+        $fieldDefinition['class']='col-md-2';
+      } else if ($len<=34) {
+        $fieldDefinition['class']='col-md-6';
+      } else {
+        $fieldDefinition['class']='col-md-12';
+      }
+      $fieldDefinition['label']=ucfirst(mb_strtolower($fields[$c][0]));
+      $fieldDefinition['order']=$c;
+
+      $retFields[$fields[$c][0]]=$fieldDefinition;
+    }
+
+    $ret=array(
+      "mainRow"=>array(
+        'type'=>'row', 
+        'fields'=> array(
+          'mainColumn'=>array(
+            'type'=>'column',
+            'class'=>'col-md-12',
+            'label'=>"Fields for $tableName",
+            'fields'=>$retFields
+          ))),
+      "footerRow"=>array(
+        'type'=>'row',
+        'fields'=>array(
+          'footerColumn'=>array(
+            'type'=>'column',
+            'class'=>'col-md-12 text-right',
+            'fields'=>array(
+              "btnSave_$tableName" => array(
+                "type"=> "button",
+                "class"=>"btn btn-primary btn-save-form",
+                "label"=>"Save"
+              ),
+              "btnCancel_$tableName" => array(
+                "type"=> "button",
+                "class"=>"btn btn-default btn-cancel-form",
+                "label"=>"Cancel"
+              )
+            )
+          )
+        )
+      )
+    );
+
+    $ret=json_encode($ret, JSON_PRETTY_PRINT);
+    return $ret;
+  }
+
 
   if (file_exists("$cfgMainFolder/flags/flag.dbgloader")) error_log(basename(__FILE__)." 0.8.59 ".date("i:s").": xForms.php ready\n",3,"$cfgCurrentFolder/logs/yeapf.loader.log");
 

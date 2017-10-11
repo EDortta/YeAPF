@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)
+ * YeAPF 0.8.59-68 built on 2017-10-11 11:23 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-10-04 15:54:37 (-3 DST)
+ * 2017-10-06 21:15:44 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -443,6 +443,13 @@ function isEmpty(obj) {
             return false;
     }
     return true;
+}
+
+if (!String.prototype.asPhone) {
+  String.prototype.asPhone = function() {
+    var aux=this.replace(/\D+/g, ''), i;
+    return aux.replace(/(\d{2,3})(\d{3})(\d{3})/, '$1-$2-$3');
+  }
 }
 
 if (!String.prototype.abbreviate) {
@@ -1240,13 +1247,13 @@ function UDate2Date(aUDate, aFormat) {
     aFormat="d/m/y";
   var ret='';
   var aDate=extractDateValues(aUDate,'yyyymmddHHMMSS');
-  if (aDate)
-    ret='';
+  if (!(aDate === null)) { 
     for(var i=0; i<aFormat.length; i++)
       if (/^[d,m,y]+$/.test(aFormat[i]))
         ret+=aDate[aFormat[i]];
       else
         ret+=aFormat[i];
+  }
   return ret;
 }
 

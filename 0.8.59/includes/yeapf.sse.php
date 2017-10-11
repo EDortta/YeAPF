@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.59-41 built on 2017-08-28 20:59 (-3 DST)
+    YeAPF 0.8.59-68 built on 2017-10-11 11:23 (-3 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-08-28 19:44:55 (-3 DST)
+    2017-10-04 21:18:54 (-3 DST)
    */
 
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -252,7 +252,7 @@
       if ($u=='')
         $u=$GLOBALS['u'];
       
-      _dumpY(8,1,"SSE::detachUser('$u', '$w')");
+      _dumpY(8,1,"SSE::userAttached('$u', '$w')");
       $ndxFile="$cfgMainFolder/.sse/$u.ndx";
       if (file_exists($ndxFile)) {
         $ndx = file($ndxFile);

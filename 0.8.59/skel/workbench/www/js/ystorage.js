@@ -1,8 +1,8 @@
 /*********************************************
  * skel/workbench/www/js/ystorage.js
- * YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)
+ * YeAPF 0.8.59-68 built on 2017-10-11 11:23 (-3 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-10-04 15:54:58 (-3 DST)
+ * 2017-10-11 11:23:38 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
