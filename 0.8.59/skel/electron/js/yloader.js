@@ -1,8 +1,8 @@
 /*********************************************
   * skel/electron/js/yloader.js
-  * YeAPF 0.8.59-68 built on 2017-10-11 11:23 (-3 DST)
+  * YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
   * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-10-11 11:23:38 (-3 DST)
+  * 2017-12-22 07:10:12 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.59-68 built on 2017-10-11 11:23 (-3 DST)");
+ console.log("YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -430,11 +430,39 @@
        return (window.location.href.indexOf("https://")===0);
      }
      
+     function urlValue(paramName) {
+       var params = document.location.search.split('&'), ret=null, i, p;
+       if (params.length>0)
+         params[0]=params[0].split('?')[1];
+       for(i=0; i<params.length; i++) {
+         p=params[i].split('=');
+         if (p[0]==paramName) {
+           ret=p[1];
+           break;
+         }
+       }
+       return ret;
+     }
+     
      function produceWaitMsg(msg) {
        var feedbackCSS='<style type="text/css"><!--.yWarnBanner {  font-family: Georgia, "Times New Roman", Times, serif;  font-size: 16px;  font-style: normal; font-variant: normal; font-weight: normal;  text-transform: none; margin: 16px; padding: 8px; background-color: #DFEEF2;  border: 1px dotted #387589; line-height: 24px;}--></style>';
        var feedbackText = '<div class=yWarnBanner><img src="images/waitIcon.gif" height=18px>&nbsp;{0}&nbsp;</div>';
        var aux=feedbackCSS + feedbackText.format(msg);
        return aux;
+     }
+     
+     function countCheckedElements(aClassOrElementName) {
+       var elems = y$(aClassOrElementName);
+       var ret = 0;
+       if (elems) {
+         if (!isArray(elems))
+           elems = [ elems ];
+         for(var i=0; i<elems.length; i++) {
+           if (elems[i].checked)
+             ret++;
+         }
+       }
+       return ret;
      }
      
      /*
@@ -496,6 +524,25 @@
        }
      };
      
+     function setStyleRuleValue(className, styleItemName, value) {
+       /* original from http://stackoverflow.com/questions/6338217/get-a-css-value-with-javascript */
+       className=className || '';
+     
+       for (var i = 0; i < document.styleSheets.length; i++) {
+           var mysheet = document.styleSheets[i];
+           var myrules = mysheet.cssRules ? mysheet.cssRules : mysheet.rules;
+           for (var j = 0; j < myrules.length; j++) {
+               if (myrules[j].selectorText && myrules[j].selectorText.toLowerCase() === className) {
+                 if (typeof styleItemName=="string")
+                   myrules[j].style[styleItemName] = value;
+                 else
+                   myrules[j].style = value;
+               }
+           }
+     
+       }
+     };
+     
      var getClientSize = function () {
        var auxDE = (document && document.documentElement)?document.documentElement:{clientWidth:800, clientHeight: 600};
        var auxW = (window)?window:{innerWidth: 800, innerHeight: 600};
@@ -530,6 +577,20 @@
        };
      }
      
+     if (!Element.prototype.matches)
+         Element.prototype.matches = Element.prototype.msMatchesSelector || 
+                                     Element.prototype.webkitMatchesSelector;
+     
+     if (!Element.prototype.closest)
+         Element.prototype.closest = function(s) {
+             var el = this;
+             if (!document.documentElement.contains(el)) return null;
+             do {
+                 if (el.matches(s)) return el;
+                 el = el.parentElement || el.parentNode;
+             } while (el !== null); 
+             return null;
+         };
      
      /*
       * HTMLElement prototype extensions
@@ -701,6 +762,7 @@
              trgObj[i] = srcObj[i];
          }
      };
+     
      
      function isPropertySupported(property)
      {
@@ -1310,7 +1372,7 @@
        var ret;
      
        if (aFormat === undefined)
-         aFormat='yyyy-mm-dd hh:mm:ss';
+         aFormat='yyyy-mm-ddThh:mm:ss';
        if (aStrDate === '') {
          ret=[];
          ret['y']='';
@@ -1354,7 +1416,7 @@
            });
          /* we extract the date elements */
          var auxDateInfo = parseDate();
-         for(i=0; i<sortedInfo.length && i<auxDateInfo.length; i++)
+         for(i=0; i<sortedInfo.length && i<(auxDateInfo||[]).length; i++)
            sortedInfo[i][1] = auxDateInfo[i];
          if (sortedInfo[0][1] * sortedInfo[1][1] * sortedInfo[2][1] > 0 )
            ret = getReturn(sortedInfo);
@@ -1524,6 +1586,8 @@
            else
              ret+=aFormat[i];
        }
+       if (ret=='//')
+         ret='';
        return ret;
      }
      
@@ -1541,6 +1605,8 @@
            else
              ret+=aFormat[i];
        }
+       if (ret=='::')
+         ret='';
        return ret;
      }
      
@@ -1614,9 +1680,9 @@
      };
      
      var isValidDate=function(aFrenchDate) {
-       var ok=true;
+       var ok=true, d;
        if ("string"==typeof aFrenchDate)  {
-         aFrenchDate = dateTransform(aFrenchDate, "dd/mm/yyyy", "yyyy-mm-dd 00:00:00");
+         aFrenchDate = dateTransform(aFrenchDate, "dd/mm/yyyy", "yyyy-mm-ddT12:59:59");
        }
      
        try {
@@ -1627,7 +1693,7 @@
      
        if (ok) {
          if (!isNaN(d.getTime())) {
-           var f=dateTransform(d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate(), "yyyy/mm/dd", "yyyy-mm-dd 00:00:00");
+           var f=dateTransform(d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate(), "yyyy/mm/dd", "yyyy-mm-ddT12:59:59");
            ok=f==aFrenchDate;
          } else
            ok=false;
@@ -1719,10 +1785,11 @@
          while (auxLine.indexOf('!!')>=0)
            auxLine = auxLine.replace('!!', '&');
      
-         auxLine = auxLine.replace(/\&\#91\;/g, '<');
-         auxLine = auxLine.replace(/\&\#93\;/g, '>');
          auxLine = auxLine.replace(/\[/g, '<');
          auxLine = auxLine.replace(/\]/g, '>');
+     
+         auxLine = auxLine.replace(/\&\#91\;/g, '[');
+         auxLine = auxLine.replace(/\&\#93\;/g, ']');
        } else if (typeof auxLine=='number') {
            auxLine = auxLine.toString();
        } else
@@ -1884,7 +1951,10 @@
      
      function decomposeColor(color) {
        if (color.substr(0,4)=='rgb(') {
-         return color.replace(/[^\d,]/g, '').split(',');
+         var aux=color.replace(/[^\d,]/g, '').split(','), ret=[], n;
+         for (n=0; n<aux.length; n++)
+           ret[n]=str2int(aux[n]);
+         return ret;
        } else {
          if (color.substr(0,1)=='#')
            color=color.substr(1);
@@ -1937,11 +2007,23 @@
      function rgb2hex (rgb) {
        var res;
        if (typeof rgb.b ==='undefined') {
-         res=dec2hex(rgb[0])+dec2hex(rgb[1])+dec2hex(rgb[2]);
+         res=pad(dec2hex(rgb[0]),2)+pad(dec2hex(rgb[1]),2)+pad(dec2hex(rgb[2]),2);
        } else {
-         res=dec2hex(rgb.r)+dec2hex(rgb.g)+dec2hex(rgb.b);
+         res=pad(dec2hex(rgb.r),2)+pad(dec2hex(rgb.g),2)+pad(dec2hex(rgb.b),2);
        }
        return res;
+     }
+     
+     function pickColorFromGradient(firstColor, lastColor, weight) {
+         var w1 = Math.max(0,Math.min(weight, 100))/100,
+             w2 = 1 - w1,
+             color1 = decomposeColor(firstColor), 
+             color2 = decomposeColor(lastColor);
+     
+         var rgb = [Math.round(color1[0] * w1 + color2[0] * w2),
+             Math.round(color1[1] * w1 + color2[1] * w2),
+             Math.round(color1[2] * w1 + color2[2] * w2)];
+         return rgb2hex(rgb);
      }
      
      function brighterColor(color, percent){
@@ -2669,95 +2751,103 @@
      **********************************************/
      
      // ==== YeAPF - Javascript implementation
-     function yAnalise(aLine, aStack)
-     {
+     function yAnalise(aLine, aStack, aObject) {
        "use strict";
-       if (aLine!==undefined) {
+       if (aLine !== undefined) {
      
          aLine = unmaskHTML(aLine);
+         if (true === window.__allowInsecureJSCalls__) {
+           aObject = aObject || window;
+         } else {
+           aObject = aObject || {};
+         }
      
          /* var yPattern = /%[+(\w)]|[]\(/gi; */
          var yPattern = /\%(|\w+)\(/gi;
-         var yFunctions = ',int,integer,intz,intn,decimal,ibdate,tsdate,tstime,date,time,lat2deg,lon2deg,words,image,nl2br,quoted,singleQuoted,condLabel';
-         var p,p1,p2,c1,c2,p3;
-         var aValue='';
+         var yFunctions = ',int,integer,intz,intn,decimal,ibdate,tsdate,tstime,date,time,lat2deg,lon2deg,words,image,nl2br,quoted,singleQuoted,condLabel,checked';
+         var p, p1, p2, c1, c2, p3;
+         var aValue = '';
      
-         while ((typeof aLine=='string') && (p = aLine.search(yPattern)) >=0 ) {
+         while ((typeof aLine == 'string') && (p = aLine.search(yPattern)) >= 0) {
            p1 = aLine.slice(p).search(/\(/);
-           if (p1>=0) {
+           if (p1 >= 0) {
              c1 = aLine.slice(p + p1 + 1, p + p1 + 2);
-             if ((c1=='"') || (c1=="'")) {
-               p3 = p + p1 + 1 ;
+             if ((c1 == '"') || (c1 == "'")) {
+               p3 = p + p1 + 1;
                do {
                  p3++;
                  c2 = aLine.slice(p3, p3 + 1);
-               } while ((c2!=c1) && (p3<aLine.length));
+               } while ((c2 != c1) && (p3 < aLine.length));
                p2 = p3 + aLine.slice(p3).search(/\)/) - p;
              } else
                p2 = aLine.slice(p).search(/\)/);
      
-             var funcName = aLine.slice(p+1, p+p1);
+             var funcName = aLine.slice(p + 1, p + p1);
              var funcParams = aLine.slice(p + p1 + 1, p + p2);
-             var parametros = funcParams;
+             var parametros = funcParams, n=null;
              funcParams = funcParams.split(',');
-             for (var n=0; n<funcParams.length; n++)
-               funcParams[n] = yAnalise(funcParams[n], aStack);
+             for (n = 0; n < funcParams.length; n++)
+               funcParams[n] = yAnalise(funcParams[n], aStack, aObject);
      
              aValue = undefined;
              var fParamU = funcParams[0].toUpperCase();
              var fParamN = funcParams[0];
-             if (aStack!==undefined) {
+             if (aStack !== undefined) {
                // can come a stack or a simple unidimensional array
-               if (aStack[0]==undefined) {
+               if (aStack[0] == undefined) {
                  if (aStack[fParamU])
-                   aValue = yAnalise(aStack[fParamU], aStack);
+                   aValue = yAnalise(aStack[fParamU], aStack, aObject);
                  else
-                   aValue = yAnalise(aStack[fParamN], aStack);
+                   aValue = yAnalise(aStack[fParamN], aStack, aObject);
                } else {
-                 for(var sNdx=aStack.length -1 ; (sNdx>=0) && (aValue==undefined); sNdx--)
+                 for (var sNdx = aStack.length - 1;
+                   (sNdx >= 0) && (aValue == undefined); sNdx--)
                    if (aStack[sNdx][fParamU] != undefined)
-                     aValue = yAnalise(aStack[sNdx][fParamU], aStack);
+                     aValue = yAnalise(aStack[sNdx][fParamU], aStack, aObject);
                    else if (aStack[sNdx][fParamN] != undefined)
-                     aValue = yAnalise(aStack[sNdx][fParamN], aStack);
+                   aValue = yAnalise(aStack[sNdx][fParamN], aStack, aObject);
                }
              } else {
-               if (eval('typeof '+fParamN)=='string')
-                 aValue=eval(fParamN);
-               else
-                 aValue=yAnalise(fParamN);
+               if ("" == fParamN) {
+                 aValue = "";
+               } else {
+                 if ((fParamN.substr(0, 1) != '.') && (eval('typeof ' + fParamN) == 'string'))
+                   aValue = eval(fParamN);
+                 else
+                   aValue = yAnalise(fParamN, null, aObject);
+               }
              }
      
-             if (aValue==undefined)
-                 aValue = '';
+             if (aValue == undefined)
+               aValue = '';
              funcParams[0] = aValue;
      
-             switch (funcName)
-             {
+             switch (funcName) {
                case 'integer':
                case 'int':
                case 'intz':
                case 'intn':
                  aValue = str2int(aValue);
-                 if (aValue==0) {
-                   if (funcName=='intz')
-                     aValue='-';
-                   else if (funcName=='intn')
-                     aValue='';
+                 if (aValue == 0) {
+                   if (funcName == 'intz')
+                     aValue = '-';
+                   else if (funcName == 'intn')
+                     aValue = '';
                  }
                  break;
                case 'decimal':
-                 var aDecimals = Math.max(0,parseInt(funcParams[1]));
+                 var aDecimals = Math.max(0, parseInt(funcParams[1]));
                  aValue = str2double(aValue);
                  aValue = aValue.toFixed(aDecimals);
                  break;
                case 'phone':
-                 aValue=(aValue || '').asPhone();
+                 aValue = (aValue || '').asPhone();
                  break;
                case 'lon2deg':
-                 aValue=dec2deg(aValue,false);
+                 aValue = dec2deg(aValue, false);
                  break;
                case 'lat2deg':
-                 aValue=dec2deg(aValue,true);
+                 aValue = dec2deg(aValue, true);
                  break;
                case 'ibdate':
                  aValue = IBDate2Date(aValue);
@@ -2791,32 +2881,40 @@
                case 'words':
                  var auxValue = aValue.split(' ');
      
-                 var aStart = Math.max(0,str2int(funcParams[1]));
-                 var aCount = Math.max(auxValue.length - 1 ,str2int(funcParams[2]));
-                 var aWrap  = Math.max(0,str2int(funcParams[3]));
+                 var aStart = Math.max(0, str2int(funcParams[1]));
+                 var aCount = Math.max(auxValue.length - 1, str2int(funcParams[2]));
+                 var aWrap = Math.max(0, str2int(funcParams[3]));
      
-                 aValue='';
-                 for (var n=aStart; n<aStart+aCount; n++) {
+                 aValue = '';
+                 for (n = aStart; n < aStart + aCount; n++) {
                    var tmpValue = onlyDefinedValue(auxValue[n]);
-                   if (tmpValue>'')
-                     aValue+=' '+tmpValue;
+                   if (tmpValue > '')
+                     aValue += ' ' + tmpValue;
                  }
      
-                 if (aWrap>0)
+                 if (aWrap > 0)
                    aValue = wordwrap(aValue, aWrap, '<br>', true);
      
                  break;
                case 'quoted':
-                 aValue = ('"'+aValue).trim()+'"';
+                 aValue = ('"' + aValue).trim() + '"';
                  break;
                case 'singleQuoted':
-                 aValue = ("'"+aValue).trim()+"'";
+                 aValue = ("'" + aValue).trim() + "'";
                  break;
                case 'condLabel':
      
                  break;
+               case 'checked':
+                 aValue = countCheckedElements(aValue);
+                 break;
+     
                default:
-                 if (funcName>'') {
+                 if (funcName > '') {
+                   if ('function' == typeof aObject[funcName]) {
+                     aValue = aObject[funcName].apply(null, funcParams);
+                   }
+                   /*
                    if (eval('typeof '+funcName) == 'function') {
                      var parametros='';
                      for (var n=0; n<funcParams.length; n++) {
@@ -2828,13 +2926,13 @@
      
                      var chamada = '<script>'+funcName+'('+parametros+');</'+'script>';
                      aValue = chamada.evalScripts();
-                   }
+                   }*/
                  }
                  break;
              }
      
-             aLine = aLine.slice(0,p) + aValue + aLine.slice(p + p2 + 1);
-           } else {        
+             aLine = aLine.slice(0, p) + aValue + aLine.slice(p + p2 + 1);
+           } else {
              console.log("HALTING yAnalise as entering in loop");
              break;
            }
@@ -2849,7 +2947,7 @@
          for(var i=0; i<ops.length; i++) {
            needEval|=(aLine.indexOf(ops[i])>=0);
          }
-         
+        
          if ((needEval) && (false)) {
            try{
              aLine=eval(aLine);
@@ -2857,22 +2955,24 @@
      
            }
          }
-         */ 
+         */
      
        } else
-         aLine='';
+         aLine = '';
      
        return aLine;
      }
      
      /* YeAPF lexical analyser and parser  - Javascript implementation */
-     var yLexObj = function(aString) {
+     var yLexObj = function(aString, toDebug) {
        "use strict";
        var that = {};
      
+       that._debug = (toDebug || false) === true;
+     
        that.optable = {
          '!': 'EXCLAMATION',
-         '"': 'DOUBLE_QUOTE',
+         // '"': 'DOUBLE_QUOTE',
          '#': 'NUMBER_SIGN',
          '$': 'DOLLAR',
          '%': 'MODULUS',
@@ -2908,20 +3008,24 @@
        };
      
        that.opprecedence = {
-         'LIKE': 5,
-         '<':    5,
-         '>':    5,
-         '<=':   5,
-         '>=':   5,
-         '==':   5,
-         '(':    4,
-         '^':    3,
-         '/':    2,
-         '*':    2,
-         'AND':  1,
-         'OR':   1,
-         '+':    1,
-         '-':    1
+         'LIKE': 6,
+         '<': 6,
+         '>': 6,
+         '<=': 6,
+         '>=': 6,
+         '==': 6,
+     
+         '^': 4,
+         '/': 4,
+         '*': 4,
+         'AND': 4,
+     
+         'OR': 3,
+     
+         '+': 2,
+         '-': 2,
+     
+         '(': 1,
        };
      
        that._ALPHA = 1;
@@ -2931,14 +3035,14 @@
        that._QUOTE = 16;
      
        that.voidToken = {
-           type: null,
-           token: null,
-           token_string: null,
-           pos: null
+         type: null,
+         token: null,
+         token_string: null,
+         pos: null
        };
      
        that.error = function() {
-         var ret={};
+         var ret = {};
          mergeObject(that.voidToken, ret);
          ret.type = 'ERROR';
          ret.pos = that.pos;
@@ -2988,7 +3092,7 @@
              token: that.buf.substring(that.pos + 1, lq_pos),
              pos: that.pos
            };
-           ret.token_string=ret.token;
+           ret.token_string = ret.token;
            that.pos = lq_pos + 1;
          }
          return ret;
@@ -3005,7 +3109,7 @@
            token: that.buf.substring(that.pos, that.pos + lq_pos),
            pos: that.pos
          };
-         ret.token_string=ret.token;
+         ret.token_string = ret.token;
          that.pos = that.pos + lq_pos;
          return ret;
        };
@@ -3021,7 +3125,7 @@
            token: that.buf.substring(that.pos, that.pos + lq_pos),
            pos: that.pos
          };
-         ret.token_string=ret.token;
+         ret.token_string = ret.token;
          that.pos = that.pos + lq_pos;
          return ret;
        };
@@ -3043,7 +3147,7 @@
      
          /* if still into string */
          if (that.pos < that.buf.length) {
-           var canProcessOp=true;
+           var canProcessOp = true;
            if (c == '/') {
              if (that.oneChar(1) == '*') {
      
@@ -3058,10 +3162,10 @@
                switch (that._whatis(c)) {
                  case (that._ALPHA):
                    ret = that._process_identifier();
-                   var auxToken=String(ret.token_string).toUpperCase()
-                   if ((auxToken=='AND') || (auxToken=='OR') || (auxToken=='LIKE')) {
-                     ret.token_string=auxToken;
-                     ret.type='OPERATOR';
+                   var auxToken = String(ret.token_string).toUpperCase();
+                   if ((auxToken == 'AND') || (auxToken == 'OR') || (auxToken == 'LIKE')) {
+                     ret.token_string = auxToken;
+                     ret.type = 'OPERATOR';
                    }
                    break;
                  case (that._DIGIT):
@@ -3072,28 +3176,28 @@
                    break;
                }
              } else {
-               var _type='OPERATOR',
-                   _token_string = c,
-                   c1   = that.oneChar(1),
-                   r1   = that.voidToken,
-                   _pos = that.pos;
+               var _type = 'OPERATOR',
+                 _token_string = c,
+                 c1 = that.oneChar(1),
+                 r1 = that.voidToken,
+                 _pos = that.pos;
                if (that.optable[c + c1]) {
                  c = c + c1;
                  op = that.optable[c];
                  _token_string = c;
-               } else if ('-+'.indexOf(c)>=0)  {
-                 var ptt=that.priorToken.type;
-                 if ((ptt===null) || ((ptt=='OPERATOR') && (that.priorToken.token=="L_PAREN"))) {
-                   var c1t=that._whatis(c1);
-                   if (c1t==that._DIGIT) {
+               } else if ('-+'.indexOf(c) >= 0) {
+                 var ptt = that.priorToken.type;
+                 if ((ptt === null) || ((ptt == 'OPERATOR') && (that.priorToken.token == "L_PAREN"))) {
+                   var c1t = that._whatis(c1);
+                   if (c1t == that._DIGIT) {
                      r1 = that._process_number();
-                   } else if (c1t==that._ALPHA)
+                   } else if (c1t == that._ALPHA)
                      r1 = that._process_identifier();
                  }
                }
-               
+     
                ret = {
-                 type: r1.type || _type ,
+                 type: r1.type || _type,
                  token: r1.token || op,
                  pos: _pos,
                  token_string: r1.token_string || _token_string
@@ -3102,159 +3206,162 @@
              }
            }
          } else {
-           ret.type = 'EOF',
-             ret.token = null;
+           ret.type = 'EOF';
+           ret.token = null;
          }
-         that.priorToken=ret;
+         that.priorToken = ret;
          return ret;
        };
      
        that.tokenTypeIs = function(token, expectedTypes) {
-         expectedTypes=','+expectedTypes+',';
-         return  (expectedTypes.indexOf(','+token.type+',')>=0);
+         expectedTypes = ',' + expectedTypes + ',';
+         return (expectedTypes.indexOf(',' + token.type + ',') >= 0);
        };
      
        that.getExpectedToken = function(expectedTypes) {
-         var priorPos=that.pos;
-         var token=that.getToken();
-         if (that.tokenTypeIs(token, expectedTypes))  {
+         var priorPos = that.pos;
+         var token = that.getToken();
+         if (that.tokenTypeIs(token, expectedTypes)) {
            return token;
          } else {
-           that.pos=priorPos;
+           that.pos = priorPos;
            return false;
          }
        };
      
-       that._analiseText = function () {
-         var token, lastSym=that.voidToken, pct, ppt, itemSolved;
+       that._analiseText = function() {
+         var token, lastSym = that.voidToken,
+           pct, ppt, itemSolved;
          do {
-           itemSolved=false;
-           token=that.getToken();
-           if (token && token.type!="EOF") {
-             if (that.symStack.length>0)
-               lastSym=that.symStack[that.symStack.length-1];
-             lastSym=lastSym || that.voidToken;
+           itemSolved = false;
+           token = that.getToken();
+           if (token && token.type != "EOF") {
+             if (that.symStack.length > 0)
+               lastSym = that.symStack[that.symStack.length - 1];
+             lastSym = lastSym || that.voidToken;
      
-             if (token.type=='OPERATOR') {
-               pct=that.opprecedence[token.token_string] || 99;
-               ppt=that.opprecedence[lastSym.token_string] || 10;
-               if (pct<=ppt) {
-                 lastSym=that.symStack.pop();
-                 that.symStack.push(token);
-                 if (lastSym)
-                   if (lastSym.token_string!='(')
-                     that.postFixStack.push(lastSym);
-                 itemSolved=true;
-               
-               } else if (token.token_string==')') {
-                 do {
-                   lastSym=that.symStack.pop();
-                   if (lastSym) {
-                     if (lastSym.token_string!='(')
-                       that.postFixStack.push(lastSym);
-                   }
-                 } while ((lastSym) && (lastSym.token_string!='('));
-                 itemSolved=true;
+             if (token.token_string == '(') {
+               that.symStack.push(token);
+             } else if (token.token_string == ')') {
+               lastSym = that.symStack.pop();
+               while ((lastSym) && (lastSym.token_string != '(')) {
+                 that.postFixStack.push(lastSym);
+                 lastSym = that.symStack.pop();
                }
-             }
-             
-             if (!itemSolved) {
-               if (token) {
-                 if (token.type=='OPERATOR') {
-                   that.symStack.push(token);
-                 } else {
-                   that.postFixStack.push(token);
+             } else if (token.type == 'OPERATOR') {
+               var canTransfer = true;
+               while (canTransfer) {
+                 canTransfer = false;
+                 if (that.symStack.length > 0) {
+                   lastSym = that.symStack[that.symStack.length - 1];
+                   lastSym = lastSym || that.voidToken;
+     
+                   pct = that.opprecedence[token.token_string] || 99;
+                   ppt = that.opprecedence[lastSym.token_string] || 10;
+                   if (ppt > pct) {
+                     canTransfer = true;
+                     lastSym = that.symStack.pop();
+                     that.postFixStack.push(lastSym);
+                   }
                  }
                }
+               that.symStack.push(token);
+     
+             } else {
+               that.postFixStack.push(token);
              }
+     
            }
      
-         } while (!((token.type=='ERROR') || (token.type=='EOF')));
+         } while (!((token.type == 'ERROR') || (token.type == 'EOF')));
      
          do {
-           lastSym=that.symStack.pop();
-           if ((lastSym) && (lastSym.type!='EOF'))
+           lastSym = that.symStack.pop();
+           if ((lastSym) && (lastSym.type != 'EOF'))
              that.postFixStack.push(lastSym);
-         } while ((lastSym) && (lastSym.type!='EOF'));
+         } while ((lastSym) && (lastSym.type != 'EOF'));
      
-         /*
-         if (false) {
+         if (that._debug) {
            console.log("postFixStack:");
            that.showStack(that.postFixStack);
            console.log("symStack:");
            that.showStack(that.symStack);
          }
-         */
        };
      
        that.solve = function(data) {
-         var i, stack=[], token, aux, canPush, op1, op2, ret, noErrors=true;;
-         for (i=0; (i<that.postFixStack.length) && (noErrors); i++) {
-           canPush=false;
+         var i, stack = [],
+           token, aux, canPush, op1, op2, ret, noErrors = true,
+           errorMessage='';
+         data = data || {};
+         data['true'] = true;
+         data['false'] = false;
+         for (i = 0;
+           (i < that.postFixStack.length) && (noErrors); i++) {
+           canPush = false;
      
-           token=that.postFixStack[i];
+           token = that.postFixStack[i];
            if (token) {
-             if ((token.type=='NUMBER') || (token.type=='LITERAL')) {
-               aux=token.token_string;
+             if ((token.type == 'NUMBER') || (token.type == 'LITERAL')) {
+               aux = token.token_string;
                if (!isNumber(aux))
-                 aux=String(aux).toUpperCase();
-               canPush=true;
+                 aux = String(aux).toUpperCase();
+               canPush = true;
              }
-             if (token.type=='IDENTIFIER') {
-               aux=data[token.token_string];
-               if (typeof aux=='undefined') {
-                 var errorMessage="'"+token.token_string + "' is not defined on data";
+             if (token.type == 'IDENTIFIER') {
+               aux = data[token.token_string];
+               if (typeof aux == 'undefined') {
+                 errorMessage = "'" + token.token_string + "' is not defined on data";
                  console.warn(errorMessage);
-                 aux=false;
-                 canPush=true;
-               }
-               else {
-                 if (typeof aux=="string")
-                   aux=String(aux).toUpperCase();
-                 canPush=true;
+                 aux = false;
+                 canPush = true;
+               } else {
+                 if (typeof aux == "string")
+                   aux = String(aux).toUpperCase();
+                 canPush = true;
                }
              }
      
              if (canPush) {
                stack.push(aux);
              } else {
-               op2=stack.pop();
-               op1=stack.pop();
-               ret=null;
-               switch ((""+token.token_string).toUpperCase()) {
+               op2 = stack.pop();
+               op1 = stack.pop();
+               ret = null;
+               switch (("" + token.token_string).toUpperCase()) {
                  case '+':
-                   ret = op1+op2;
+                   ret = str2double(op1) + str2double(op2);
                    break;
                  case '-':
-                   ret = op1-op2;
+                   ret = str2double(op1) - str2double(op2);
                    break;
                  case '*':
-                   ret = op1*op2;
+                   ret = str2double(op1) * str2double(op2);
                    break;
                  case '/':
-                   ret = op1/op2;
+                   ret = str2double(op1) / str2double(op2);
                    break;
                  case '^':
-                   ret = Math.pow(op1, op2);
+                   ret = Math.pow(str2double(op1), str2double(op2));
                    break;
                  case '>':
-                   ret = op1>op2;
+                   ret = op1 > op2;
                    break;
                  case '<':
-                   ret = op1<op2;
+                   ret = op1 < op2;
                    break;
                  case '>=':
-                   ret = op1>=op2;
+                   ret = op1 >= op2;
                    break;
                  case '<=':
-                   ret = op1<=op2;
+                   ret = op1 <= op2;
                    break;
                  case '<>':
                  case '!=':
-                   ret = op1!=op2;
+                   ret = op1 != op2;
                    break;
                  case '==':
-                   ret = op1==op2;
+                   ret = op1 == op2;
                    break;
                  case 'AND':
                  case '&&':
@@ -3266,55 +3373,54 @@
                    break;
      
                  case 'LIKE':
-                   op1=String(op1).toUpperCase();
-                   op2=String(op2).toUpperCase();
-                   var cleanFilter=op2.replace(/\%/g,'');
-                   if (op2.substr(0,1)!='%') {
-                     if (op2.substr(op2.length-1)!='%') {
+                   op1 = String(op1).toUpperCase();
+                   op2 = String(op2).toUpperCase();
+                   var cleanFilter = op2.replace(/\%/g, '');
+                   if (op2.substr(0, 1) != '%') {
+                     if (op2.substr(op2.length - 1) != '%') {
                        /* bla */
-                       ret=op1==op2;
+                       ret = op1 == op2;
                      } else {
                        /* bla% */
-                       ret=op1.substr(0,cleanFilter.length)==cleanFilter;
+                       ret = op1.substr(0, cleanFilter.length) == cleanFilter;
                      }
                    } else {
-                     if (op2.substr(op2.length-1,1)=='%') {
+                     if (op2.substr(op2.length - 1, 1) == '%') {
                        /* %bla% */
-                       ret=op1.indexOf(cleanFilter)>=0;
+                       ret = op1.indexOf(cleanFilter) >= 0;
                      } else {
                        /* %bla */
-                       ret=op1.substr(op1.length-cleanFilter.length)==cleanFilter;
+                       ret = op1.substr(op1.length - cleanFilter.length) == cleanFilter;
                      }
                    }
                    break;
                  default:
-                   var errorMessage="'"+token.token_string + "' is not a recognized operator";
+                   errorMessage = "'" + token.token_string + "' is not a recognized operator";
                    console.error(errorMessage);
                    throw new Error();
-                   break;
                }
      
-               /*
-               if (false) 
-                 console.log("{0} = {1} {2} {3}".format(ret, op1, token.token_string, op2));
-               */
      
-               if (ret!==null)
+               if (that._debug)
+                 console.log("{0} = {1} {2} {3}".format(ret, op1, token.token_string, op2));
+     
+     
+               if (ret !== null)
                  stack.push(ret);
              }
            }
          }
-         ret=stack.pop();
-         /*
-           if (false) console.log(JSON.stringify(ret));
-         */
+         ret = stack.pop();
+     
+         if (that._debug) console.log(JSON.stringify(ret));
+     
          return ret;
        };
      
-       that.showStack = function (s) {
-         var stackString="\t";
-         for(var i=0; i<s.length; i++)
-           stackString+=(s[i].token_string)+' ';
+       that.showStack = function(s) {
+         var stackString = "\t";
+         for (var i = 0; i < s.length; i++)
+           stackString += (s[i].token_string) + ' ';
          console.log(stackString);
        };
      
@@ -3324,11 +3430,11 @@
          return that.stack;
        };
      
-       that.reset = function () {
+       that.reset = function() {
          that.pos = 0;
          that.symStack = [];
          that.postFixStack = [];
-         that.priorToken=that.voidToken;
+         that.priorToken = that.voidToken;
          return that;
        };
      
@@ -3339,8 +3445,7 @@
        };
      
        return that.init(aString);
-     }
-     
+     };
  /* END yanalise.js */
  _dump("yanalise");
  /* START ycfgdb.js */
@@ -3350,7 +3455,7 @@
      
      
      var cfgDBbase = function () {
-       that = {};
+       var that = {};
      
        that.getConnParams = function () {
          var ret = [];
@@ -3933,7 +4038,7 @@
                          i++;
                        }
                        
-                       window.dispatchEvent(that.tabshowEvent);
+                       setTimeout(function(){window.dispatchEvent(that.tabshowEvent);}, 125);
      
                      } else {
                        _dumpy(64,1,"freeze");
@@ -5060,7 +5165,7 @@
                  for (var c = 0; c < aLineSpec.inplaceData.length; c++) {
                      if (typeof xDataItem[aLineSpec.inplaceData[c]] !== "undefined") {
                          var colName = aLineSpec.inplaceData[c];
-                         opt.setAttribute("data-" + colName, xDataItem[colName] || '');
+                         opt.setAttribute("data-" + colName, (xDataItem[colName] || ''));
                      }
                  }
              }
@@ -5097,7 +5202,7 @@
              if (colName != idFieldName) {
                  var newCell = newRow.insertCell(cNdx),
                      xDataItem = getDataFromXData(xData[j]),
-                     aNewCellValue = colName !== null ? unmaskHTML(xDataItem[colName]) : unmaskHTML(xDataItem);
+                     aNewCellValue = colName !== null ? unmaskHTML((xDataItem[colName] || '')) : unmaskHTML(xDataItem);
      
                  if ((aLineSpec.columns) && (aLineSpec.columns[colName])) {
                      if (aLineSpec.columns[colName].align)
@@ -5270,6 +5375,10 @@
                      }
                  }
      
+                 var event = new Event('filled');
+                 aElement.dispatchEvent(event);
+     
+     
              } else if (aElement.nodeName == 'UL') {
                  var oUL = aElement;
      
@@ -5306,7 +5415,7 @@
                                          (colName != idFieldName) &&
                                          (colName != 'rowid') &&
                                          (colName != '_elementid_')) {
-                                         innerText = innerText + xDataItem[colName];
+                                         innerText = innerText + (xDataItem[colName] || '');
                                      }
                                  }
                              }
@@ -5328,6 +5437,10 @@
                              aLineSpec.onNewItem(aElementID, entry, xDataItem);
                      }
                  }
+     
+                 var event = new Event('filled');
+                 aElement.dispatchEvent(event);
+     
      
              } else if (aElement.nodeName == 'LISTBOX') {
                  var oListBox = aElement;
@@ -5358,7 +5471,7 @@
                                          (colName != 'rowid') &&
                                          (colName != '_elementid_')) {
                                          newCell = document.createElement('listcell');
-                                         newCell.innerHTML = xDataItem[colName];
+                                         newCell.innerHTML = (xDataItem[colName] || '');
                                          newCell.id = aElementID + '_' + cNdx + '_' + cRow;
                                          if (typeof aLineSpec.onNewItem == 'function')
                                              aLineSpec.onNewItem(aElementID, newCell, xDataItem);
@@ -5371,7 +5484,7 @@
                              for (colName in aLineSpec.columns) {
                                  if (colName != idFieldName) {
                                      newCell = document.createElement('listcell');
-                                     newCell.innerHTML = xDataItem[colName];
+                                     newCell.innerHTML = (xDataItem[colName] || '');
                                      newCell.id = aElementID + '_' + cNdx + '_' + cRow;
                                      if (typeof aLineSpec.onNewItem == 'function')
                                          aLineSpec.onNewItem(aElementID, newCell, xDataItem);
@@ -5385,6 +5498,10 @@
                          cRow++;
                      }
                  }
+     
+                 var event = new Event('filled');
+                 aElement.dispatchEvent(event);
+     
      
              } else if ((aElement.nodeName == 'SELECT') || (aElement.nodeName == 'DATALIST')) {
      
@@ -5418,7 +5535,7 @@
                                          (colName != idFieldName) &&
                                          (colName != 'rowid') &&
                                          (colName != '_elementid_')) {
-                                         auxHTML = auxHTML + xDataItem[colName];
+                                         auxHTML = auxHTML + (xDataItem[colName] || '');
                                      }
                                  }
                              }
@@ -5428,7 +5545,7 @@
                                  for (c = 0; c < aLineSpec.columns.length; c++) {
                                      if (auxHTML > '')
                                          auxHTML += sep;
-                                     auxHTML = auxHTML + xDataItem[aLineSpec.columns[c]];
+                                     auxHTML = auxHTML + xDataItem[aLineSpec.columns[c]] || '';
                                  }
                              } else {
                                  if (typeof xDataItem == 'string') {
@@ -5436,7 +5553,7 @@
                                  } else {
                                      for (colName in aLineSpec.columns) {
                                          if (colName != idFieldName)
-                                             auxHTML = auxHTML + xDataItem[colName] + sep;
+                                             auxHTML = auxHTML + (xDataItem[colName] || '') + sep;
                                      }
                                  }
                              }
@@ -5460,6 +5577,9 @@
                          cNdx++;
                      }
                  }
+     
+                 var event = new Event('filled');
+                 aElement.dispatchEvent(event);
      
                  if (aElement.onclick)
                      aElement.onclick();
@@ -5487,13 +5607,13 @@
                            aLineSpec.onBeforeNewItem(aElementID, yData);
                          }
      
-                         fieldPrefix = aLineSpec.elementPrefixName || aLineSpec.prefix || '';
-                         fieldPostfix = aLineSpec.elementPostixName || aLineSpec.postfix || '';
+                         fieldPrefix = aLineSpec.elementPrefixName || aLineSpec.prefix || aElement.getAttribute('data-prefix') ||'';
+                         fieldPostfix = aLineSpec.elementPostixName || aLineSpec.postfix || aElement.getAttribute('data-postfix') || '';
                          for (i = 0; i < aElements.length; i++) {
                              /* the less prioritary MASK comes from the html form */
-                             editMask = aElements[i].getAttribute('editMask');
-                             storageMask = aElements[i].getAttribute('storageMask');
-                             valueType = aElements[i].getAttribute('valueType') || 'text';
+                             editMask = aElements[i].getAttribute('data-edit-mask') || aElements[i].getAttribute('editMask');
+                             storageMask = aElements[i].getAttribute('data-storage-mask') || aElements[i].getAttribute('storageMask');
+                             valueType = aElements[i].getAttribute('data-value-type') || aElements[i].getAttribute('valueType') || 'text';
      
                              /* data comming from the server */
                              fieldName = suggestKeyName(yData, aElements[i].name || aElements[i].id, fieldPrefix, fieldPostfix);
@@ -5576,6 +5696,10 @@
                              }
      
                          }
+     
+                         var event = new Event('filled');
+                         aElement.dispatchEvent(event);
+     
                      } else if (xData.length > 1)
                      _dump("There are more than one record returning from the server");
      
@@ -5599,13 +5723,17 @@
                              } else {
                                  for (colName in xDataItem) {
                                      if (xDataItem.hasOwnProperty(colName)) {
-                                         auxHTML += '<div><div class=tnFieldName><b><small>{0}</small></b></div>{1}'.format(colName, xDataItem[colName]);
+                                         auxHTML += '<div><div class=tnFieldName><b><small>{0}</small></b></div>{1}'.format(colName, (xDataItem[colName] || ''));
                                      }
                                  }
                              }
                          }
                      }
                      aElement.innerHTML = auxHTML;
+                     
+                     var event = new Event('filled');
+                     aElement.dispatchEvent(event);
+     
                  }
              }
          }
@@ -5962,8 +6090,6 @@
       */
      ycomm.dom.getFormElements = function(aFormId, aLineSpec, aOnReady) {
          aLineSpec = aLineSpec || {};
-         var fieldPrefix = aLineSpec.elementPrefixName || aLineSpec.prefix || '';
-         var fieldPostfix = aLineSpec.elementPostixName || aLineSpec.postfix || '';
      
          var ret = {},
              aElements = this.selectElements(aFormId),
@@ -5972,117 +6098,121 @@
              storageMask,
              valueType,
              busyCount = 0,
-             canChangeRetValue;
+             canChangeRetValue, form=y$(aFormId);
      
-         for (var i = 0; i < aElements.length; i++) {
-             if (aElements[i].getAttribute) {
-                 editMask    = aElements[i].getAttribute('editMask') || '';
-                 storageMask = aElements[i].getAttribute('storageMask') || '';
-                 valueType   = aElements[i].getAttribute('valueType') || 'text';
-             } else {
-                 editMask    = '';
-                 storageMask = '';
-                 valueType   = 'text';
-             }
-             canChangeRetValue = true;
-     
-             fieldType = aElements[i].type.toLowerCase();
-             fieldName = aElements[i].name || aElements[i].id;
-     
-             if ((fieldName.substr(fieldName.length, -(fieldPostfix.length)) == fieldPostfix) &&
-                 (fieldName.substr(0, fieldPrefix.length) == fieldPrefix)) {
-     
-                 fieldName = fieldName.substr(fieldPrefix.length);
-                 fieldName = fieldName.substr(0, fieldName.length - (fieldPostfix.length));
-     
-                 if (fieldName > '') {
-                     fieldValue = '';
-     
-                     if ((fieldType == 'radio') ||
-                         (fieldType == 'checkbox')) {
-                         canChangeRetValue = false;
-                         if (typeof ret[fieldName] == 'undefined')
-                             ret[fieldName] = '';
-                     }
-     
-                     switch (fieldType) {
-     
-                         case "text":
-                         case "password":
-                         case "textarea":
-                         case "email":
-                         case "hidden":
-                         case "color":
-                         case "date":
-                         case "datetime":
-                         case "datetime-local":
-                         case "month":
-                         case "search":
-                         case "tel":
-                         case "time":
-                         case "url":
-                         case "week":
-                             fieldValue = aElements[i].value + "";
-                             if ((editMask > '') && (storageMask > '')) {
-                                 if (valueType.indexOf('date') >= 0) {
-                                     fieldValue = dateTransform(fieldValue, editMask, storageMask);
-                                     fieldValue = fieldValue ? fieldValue + "" : "";
-                                 }
-                             }
-                             break;
-                         case "number":
-                         case "range":
-                           fieldValue = aElements[i].value;
-                           if (isNumber(fieldValue))
-                             fieldValue = fieldValue.toFloat();
-                             break;
-     
-                         case "radio":
-                         case "checkbox":
-                             fieldValue = aElements[i].checked ? aElements[i].value : '';
-                             canChangeRetValue = (fieldValue !== '');
-                             break;
-     
-                         case "select-one":
-                         case "select-multi":
-                             fieldValue = aElements[i].selectedIndex;
-                             if (aElements[i].options[fieldValue])
-                                 fieldValue = aElements[i].options[fieldValue].value;
-                             break;
-     
-                         case "file":
-                             if (typeof aOnReady == 'function') {
-                                 /*
-                                 http://stackoverflow.com/questions/12090996/waiting-for-a-file-to-load-onload-javascript
-                                 http://stackoverflow.com/questions/6978156/get-base64-encode-file-data-from-input-form
-                                 http://igstan.ro/posts/2009-01-11-ajax-file-upload-with-pure-javascript.html
-                                 https://developer.tizen.org/dev-guide/web/2.3.0/org.tizen.mobile.web.appprogramming/html/tutorials/w3c_tutorial/comm_tutorial/upload_ajax.htm
-                                 */
-                                 var reader = new FileReader();
-                                 busyCount++;
-                                 reader._fieldName = fieldName;
-                                 reader.addEventListener("load", function() {
-                                     ret[this._fieldName] = this.result;
-                                     busyCount--;
-                                     if (busyCount <= 0) {
-                                         aOnReady(ret);
-                                     }
-                                 });
-                                 reader.readAsDataURL(aElements[i].files[0]);
-                                 canChangeRetValue = false;
-                             } else
-                                 fieldValue = "aOnReady() not present in js call to getFormElements()";
-                             break;
-                     }
-                     if (typeof fieldValue == 'string') {
-                         if (fieldValue.indexOf(',') >= 0)
-                             fieldValue = encodeURIComponent(fieldValue);
-                     }
-     
-                     if (canChangeRetValue)
-                         ret[fieldName] = fieldValue;
+         if (form) {
+             var fieldPrefix = aLineSpec.elementPrefixName || aLineSpec.prefix || form.getAttribute('data-prefix') || '';
+             var fieldPostfix = aLineSpec.elementPostixName || aLineSpec.postfix || form.getAttribute('data-postfix') || '';
+             for (var i = 0; i < aElements.length; i++) {
+                 if (aElements[i].getAttribute) {
+                     editMask = aElements[i].getAttribute('data-edit-mask') || aElements[i].getAttribute('editMask');
+                     storageMask = aElements[i].getAttribute('data-storage-mask') || aElements[i].getAttribute('storageMask');
+                     valueType = aElements[i].getAttribute('data-value-type') || aElements[i].getAttribute('valueType') || 'text';
+                 } else {
+                     editMask    = '';
+                     storageMask = '';
+                     valueType   = 'text';
                  }
-             }
+                 canChangeRetValue = true;
+     
+                 fieldType = aElements[i].type.toLowerCase();
+                 fieldName = aElements[i].name || aElements[i].id;
+     
+                 if ((fieldName.substr(fieldName.length, -(fieldPostfix.length)) == fieldPostfix) &&
+                     (fieldName.substr(0, fieldPrefix.length) == fieldPrefix)) {
+     
+                     fieldName = fieldName.substr(fieldPrefix.length);
+                     fieldName = fieldName.substr(0, fieldName.length - (fieldPostfix.length));
+     
+                     if (fieldName > '') {
+                         fieldValue = '';
+     
+                         if ((fieldType == 'radio') ||
+                             (fieldType == 'checkbox')) {
+                             canChangeRetValue = false;
+                             if (typeof ret[fieldName] == 'undefined')
+                                 ret[fieldName] = '';
+                         }
+     
+                         switch (fieldType) {
+     
+                             case "text":
+                             case "password":
+                             case "textarea":
+                             case "email":
+                             case "hidden":
+                             case "color":
+                             case "date":
+                             case "datetime":
+                             case "datetime-local":
+                             case "month":
+                             case "search":
+                             case "tel":
+                             case "time":
+                             case "url":
+                             case "week":
+                                 fieldValue = aElements[i].value + "";
+                                 if ((editMask > '') && (storageMask > '')) {
+                                     if (valueType.indexOf('date') >= 0) {
+                                         fieldValue = dateTransform(fieldValue, editMask, storageMask);
+                                         fieldValue = fieldValue ? fieldValue + "" : "";
+                                     }
+                                 }
+                                 break;
+                             case "number":
+                             case "range":
+                               fieldValue = aElements[i].value;
+                               if (isNumber(fieldValue))
+                                 fieldValue = fieldValue.toFloat();
+                                 break;
+     
+                             case "radio":
+                             case "checkbox":
+                                 fieldValue = aElements[i].checked ? aElements[i].value : '';
+                                 canChangeRetValue = (fieldValue !== '');
+                                 break;
+     
+                             case "select-one":
+                             case "select-multi":
+                                 fieldValue = aElements[i].selectedIndex;
+                                 if (aElements[i].options[fieldValue])
+                                     fieldValue = aElements[i].options[fieldValue].value;
+                                 break;
+     
+                             case "file":
+                                 if (typeof aOnReady == 'function') {
+                                     /*
+                                     http://stackoverflow.com/questions/12090996/waiting-for-a-file-to-load-onload-javascript
+                                     http://stackoverflow.com/questions/6978156/get-base64-encode-file-data-from-input-form
+                                     http://igstan.ro/posts/2009-01-11-ajax-file-upload-with-pure-javascript.html
+                                     https://developer.tizen.org/dev-guide/web/2.3.0/org.tizen.mobile.web.appprogramming/html/tutorials/w3c_tutorial/comm_tutorial/upload_ajax.htm
+                                     */
+                                     var reader = new FileReader();
+                                     busyCount++;
+                                     reader._fieldName = fieldName;
+                                     reader.addEventListener("load", function() {
+                                         ret[this._fieldName] = this.result;
+                                         busyCount--;
+                                         if (busyCount <= 0) {
+                                             aOnReady(ret);
+                                         }
+                                     });
+                                     reader.readAsDataURL(aElements[i].files[0]);
+                                     canChangeRetValue = false;
+                                 } else
+                                     fieldValue = "aOnReady() not present in js call to getFormElements()";
+                                 break;
+                         }
+                         if (typeof fieldValue == 'string') {
+                             if (fieldValue.indexOf(',') >= 0)
+                                 fieldValue = encodeURIComponent(fieldValue);
+                         }
+     
+                         if (canChangeRetValue)
+                             ret[fieldName] = fieldValue;
+                     }
+                 }
+             }        
          }
      
          return ret;

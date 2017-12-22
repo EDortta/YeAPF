@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.59-68 built on 2017-10-11 11:23 (-3 DST)
+ * YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-10-04 21:18:54 (-3 DST)
+ * 2017-12-14 18:31:30 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -121,7 +121,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
             for (var c = 0; c < aLineSpec.inplaceData.length; c++) {
                 if (typeof xDataItem[aLineSpec.inplaceData[c]] !== "undefined") {
                     var colName = aLineSpec.inplaceData[c];
-                    opt.setAttribute("data-" + colName, xDataItem[colName] || '');
+                    opt.setAttribute("data-" + colName, (xDataItem[colName] || ''));
                 }
             }
         }
@@ -158,7 +158,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
         if (colName != idFieldName) {
             var newCell = newRow.insertCell(cNdx),
                 xDataItem = getDataFromXData(xData[j]),
-                aNewCellValue = colName !== null ? unmaskHTML(xDataItem[colName]) : unmaskHTML(xDataItem);
+                aNewCellValue = colName !== null ? unmaskHTML((xDataItem[colName] || '')) : unmaskHTML(xDataItem);
 
             if ((aLineSpec.columns) && (aLineSpec.columns[colName])) {
                 if (aLineSpec.columns[colName].align)
@@ -331,6 +331,10 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                 }
             }
 
+            var event = new Event('filled');
+            aElement.dispatchEvent(event);
+
+
         } else if (aElement.nodeName == 'UL') {
             var oUL = aElement;
 
@@ -367,7 +371,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                                     (colName != idFieldName) &&
                                     (colName != 'rowid') &&
                                     (colName != '_elementid_')) {
-                                    innerText = innerText + xDataItem[colName];
+                                    innerText = innerText + (xDataItem[colName] || '');
                                 }
                             }
                         }
@@ -389,6 +393,10 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                         aLineSpec.onNewItem(aElementID, entry, xDataItem);
                 }
             }
+
+            var event = new Event('filled');
+            aElement.dispatchEvent(event);
+
 
         } else if (aElement.nodeName == 'LISTBOX') {
             var oListBox = aElement;
@@ -419,7 +427,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                                     (colName != 'rowid') &&
                                     (colName != '_elementid_')) {
                                     newCell = document.createElement('listcell');
-                                    newCell.innerHTML = xDataItem[colName];
+                                    newCell.innerHTML = (xDataItem[colName] || '');
                                     newCell.id = aElementID + '_' + cNdx + '_' + cRow;
                                     if (typeof aLineSpec.onNewItem == 'function')
                                         aLineSpec.onNewItem(aElementID, newCell, xDataItem);
@@ -432,7 +440,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                         for (colName in aLineSpec.columns) {
                             if (colName != idFieldName) {
                                 newCell = document.createElement('listcell');
-                                newCell.innerHTML = xDataItem[colName];
+                                newCell.innerHTML = (xDataItem[colName] || '');
                                 newCell.id = aElementID + '_' + cNdx + '_' + cRow;
                                 if (typeof aLineSpec.onNewItem == 'function')
                                     aLineSpec.onNewItem(aElementID, newCell, xDataItem);
@@ -446,6 +454,10 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                     cRow++;
                 }
             }
+
+            var event = new Event('filled');
+            aElement.dispatchEvent(event);
+
 
         } else if ((aElement.nodeName == 'SELECT') || (aElement.nodeName == 'DATALIST')) {
 
@@ -479,7 +491,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                                     (colName != idFieldName) &&
                                     (colName != 'rowid') &&
                                     (colName != '_elementid_')) {
-                                    auxHTML = auxHTML + xDataItem[colName];
+                                    auxHTML = auxHTML + (xDataItem[colName] || '');
                                 }
                             }
                         }
@@ -489,7 +501,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                             for (c = 0; c < aLineSpec.columns.length; c++) {
                                 if (auxHTML > '')
                                     auxHTML += sep;
-                                auxHTML = auxHTML + xDataItem[aLineSpec.columns[c]];
+                                auxHTML = auxHTML + xDataItem[aLineSpec.columns[c]] || '';
                             }
                         } else {
                             if (typeof xDataItem == 'string') {
@@ -497,7 +509,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                             } else {
                                 for (colName in aLineSpec.columns) {
                                     if (colName != idFieldName)
-                                        auxHTML = auxHTML + xDataItem[colName] + sep;
+                                        auxHTML = auxHTML + (xDataItem[colName] || '') + sep;
                                 }
                             }
                         }
@@ -521,6 +533,9 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                     cNdx++;
                 }
             }
+
+            var event = new Event('filled');
+            aElement.dispatchEvent(event);
 
             if (aElement.onclick)
                 aElement.onclick();
@@ -548,13 +563,13 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                       aLineSpec.onBeforeNewItem(aElementID, yData);
                     }
 
-                    fieldPrefix = aLineSpec.elementPrefixName || aLineSpec.prefix || '';
-                    fieldPostfix = aLineSpec.elementPostixName || aLineSpec.postfix || '';
+                    fieldPrefix = aLineSpec.elementPrefixName || aLineSpec.prefix || aElement.getAttribute('data-prefix') ||'';
+                    fieldPostfix = aLineSpec.elementPostixName || aLineSpec.postfix || aElement.getAttribute('data-postfix') || '';
                     for (i = 0; i < aElements.length; i++) {
                         /* the less prioritary MASK comes from the html form */
-                        editMask = aElements[i].getAttribute('editMask');
-                        storageMask = aElements[i].getAttribute('storageMask');
-                        valueType = aElements[i].getAttribute('valueType') || 'text';
+                        editMask = aElements[i].getAttribute('data-edit-mask') || aElements[i].getAttribute('editMask');
+                        storageMask = aElements[i].getAttribute('data-storage-mask') || aElements[i].getAttribute('storageMask');
+                        valueType = aElements[i].getAttribute('data-value-type') || aElements[i].getAttribute('valueType') || 'text';
 
                         /* data comming from the server */
                         fieldName = suggestKeyName(yData, aElements[i].name || aElements[i].id, fieldPrefix, fieldPostfix);
@@ -637,6 +652,10 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                         }
 
                     }
+
+                    var event = new Event('filled');
+                    aElement.dispatchEvent(event);
+
                 } else if (xData.length > 1)
                 _dump("There are more than one record returning from the server");
 
@@ -660,13 +679,17 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                         } else {
                             for (colName in xDataItem) {
                                 if (xDataItem.hasOwnProperty(colName)) {
-                                    auxHTML += '<div><div class=tnFieldName><b><small>{0}</small></b></div>{1}'.format(colName, xDataItem[colName]);
+                                    auxHTML += '<div><div class=tnFieldName><b><small>{0}</small></b></div>{1}'.format(colName, (xDataItem[colName] || ''));
                                 }
                             }
                         }
                     }
                 }
                 aElement.innerHTML = auxHTML;
+                
+                var event = new Event('filled');
+                aElement.dispatchEvent(event);
+
             }
         }
     }
@@ -1023,8 +1046,6 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
  */
 ycomm.dom.getFormElements = function(aFormId, aLineSpec, aOnReady) {
     aLineSpec = aLineSpec || {};
-    var fieldPrefix = aLineSpec.elementPrefixName || aLineSpec.prefix || '';
-    var fieldPostfix = aLineSpec.elementPostixName || aLineSpec.postfix || '';
 
     var ret = {},
         aElements = this.selectElements(aFormId),
@@ -1033,117 +1054,121 @@ ycomm.dom.getFormElements = function(aFormId, aLineSpec, aOnReady) {
         storageMask,
         valueType,
         busyCount = 0,
-        canChangeRetValue;
+        canChangeRetValue, form=y$(aFormId);
 
-    for (var i = 0; i < aElements.length; i++) {
-        if (aElements[i].getAttribute) {
-            editMask    = aElements[i].getAttribute('editMask') || '';
-            storageMask = aElements[i].getAttribute('storageMask') || '';
-            valueType   = aElements[i].getAttribute('valueType') || 'text';
-        } else {
-            editMask    = '';
-            storageMask = '';
-            valueType   = 'text';
-        }
-        canChangeRetValue = true;
-
-        fieldType = aElements[i].type.toLowerCase();
-        fieldName = aElements[i].name || aElements[i].id;
-
-        if ((fieldName.substr(fieldName.length, -(fieldPostfix.length)) == fieldPostfix) &&
-            (fieldName.substr(0, fieldPrefix.length) == fieldPrefix)) {
-
-            fieldName = fieldName.substr(fieldPrefix.length);
-            fieldName = fieldName.substr(0, fieldName.length - (fieldPostfix.length));
-
-            if (fieldName > '') {
-                fieldValue = '';
-
-                if ((fieldType == 'radio') ||
-                    (fieldType == 'checkbox')) {
-                    canChangeRetValue = false;
-                    if (typeof ret[fieldName] == 'undefined')
-                        ret[fieldName] = '';
-                }
-
-                switch (fieldType) {
-
-                    case "text":
-                    case "password":
-                    case "textarea":
-                    case "email":
-                    case "hidden":
-                    case "color":
-                    case "date":
-                    case "datetime":
-                    case "datetime-local":
-                    case "month":
-                    case "search":
-                    case "tel":
-                    case "time":
-                    case "url":
-                    case "week":
-                        fieldValue = aElements[i].value + "";
-                        if ((editMask > '') && (storageMask > '')) {
-                            if (valueType.indexOf('date') >= 0) {
-                                fieldValue = dateTransform(fieldValue, editMask, storageMask);
-                                fieldValue = fieldValue ? fieldValue + "" : "";
-                            }
-                        }
-                        break;
-                    case "number":
-                    case "range":
-                      fieldValue = aElements[i].value;
-                      if (isNumber(fieldValue))
-                        fieldValue = fieldValue.toFloat();
-                        break;
-
-                    case "radio":
-                    case "checkbox":
-                        fieldValue = aElements[i].checked ? aElements[i].value : '';
-                        canChangeRetValue = (fieldValue !== '');
-                        break;
-
-                    case "select-one":
-                    case "select-multi":
-                        fieldValue = aElements[i].selectedIndex;
-                        if (aElements[i].options[fieldValue])
-                            fieldValue = aElements[i].options[fieldValue].value;
-                        break;
-
-                    case "file":
-                        if (typeof aOnReady == 'function') {
-                            /*
-                            http://stackoverflow.com/questions/12090996/waiting-for-a-file-to-load-onload-javascript
-                            http://stackoverflow.com/questions/6978156/get-base64-encode-file-data-from-input-form
-                            http://igstan.ro/posts/2009-01-11-ajax-file-upload-with-pure-javascript.html
-                            https://developer.tizen.org/dev-guide/web/2.3.0/org.tizen.mobile.web.appprogramming/html/tutorials/w3c_tutorial/comm_tutorial/upload_ajax.htm
-                            */
-                            var reader = new FileReader();
-                            busyCount++;
-                            reader._fieldName = fieldName;
-                            reader.addEventListener("load", function() {
-                                ret[this._fieldName] = this.result;
-                                busyCount--;
-                                if (busyCount <= 0) {
-                                    aOnReady(ret);
-                                }
-                            });
-                            reader.readAsDataURL(aElements[i].files[0]);
-                            canChangeRetValue = false;
-                        } else
-                            fieldValue = "aOnReady() not present in js call to getFormElements()";
-                        break;
-                }
-                if (typeof fieldValue == 'string') {
-                    if (fieldValue.indexOf(',') >= 0)
-                        fieldValue = encodeURIComponent(fieldValue);
-                }
-
-                if (canChangeRetValue)
-                    ret[fieldName] = fieldValue;
+    if (form) {
+        var fieldPrefix = aLineSpec.elementPrefixName || aLineSpec.prefix || form.getAttribute('data-prefix') || '';
+        var fieldPostfix = aLineSpec.elementPostixName || aLineSpec.postfix || form.getAttribute('data-postfix') || '';
+        for (var i = 0; i < aElements.length; i++) {
+            if (aElements[i].getAttribute) {
+                editMask = aElements[i].getAttribute('data-edit-mask') || aElements[i].getAttribute('editMask');
+                storageMask = aElements[i].getAttribute('data-storage-mask') || aElements[i].getAttribute('storageMask');
+                valueType = aElements[i].getAttribute('data-value-type') || aElements[i].getAttribute('valueType') || 'text';
+            } else {
+                editMask    = '';
+                storageMask = '';
+                valueType   = 'text';
             }
-        }
+            canChangeRetValue = true;
+
+            fieldType = aElements[i].type.toLowerCase();
+            fieldName = aElements[i].name || aElements[i].id;
+
+            if ((fieldName.substr(fieldName.length, -(fieldPostfix.length)) == fieldPostfix) &&
+                (fieldName.substr(0, fieldPrefix.length) == fieldPrefix)) {
+
+                fieldName = fieldName.substr(fieldPrefix.length);
+                fieldName = fieldName.substr(0, fieldName.length - (fieldPostfix.length));
+
+                if (fieldName > '') {
+                    fieldValue = '';
+
+                    if ((fieldType == 'radio') ||
+                        (fieldType == 'checkbox')) {
+                        canChangeRetValue = false;
+                        if (typeof ret[fieldName] == 'undefined')
+                            ret[fieldName] = '';
+                    }
+
+                    switch (fieldType) {
+
+                        case "text":
+                        case "password":
+                        case "textarea":
+                        case "email":
+                        case "hidden":
+                        case "color":
+                        case "date":
+                        case "datetime":
+                        case "datetime-local":
+                        case "month":
+                        case "search":
+                        case "tel":
+                        case "time":
+                        case "url":
+                        case "week":
+                            fieldValue = aElements[i].value + "";
+                            if ((editMask > '') && (storageMask > '')) {
+                                if (valueType.indexOf('date') >= 0) {
+                                    fieldValue = dateTransform(fieldValue, editMask, storageMask);
+                                    fieldValue = fieldValue ? fieldValue + "" : "";
+                                }
+                            }
+                            break;
+                        case "number":
+                        case "range":
+                          fieldValue = aElements[i].value;
+                          if (isNumber(fieldValue))
+                            fieldValue = fieldValue.toFloat();
+                            break;
+
+                        case "radio":
+                        case "checkbox":
+                            fieldValue = aElements[i].checked ? aElements[i].value : '';
+                            canChangeRetValue = (fieldValue !== '');
+                            break;
+
+                        case "select-one":
+                        case "select-multi":
+                            fieldValue = aElements[i].selectedIndex;
+                            if (aElements[i].options[fieldValue])
+                                fieldValue = aElements[i].options[fieldValue].value;
+                            break;
+
+                        case "file":
+                            if (typeof aOnReady == 'function') {
+                                /*
+                                http://stackoverflow.com/questions/12090996/waiting-for-a-file-to-load-onload-javascript
+                                http://stackoverflow.com/questions/6978156/get-base64-encode-file-data-from-input-form
+                                http://igstan.ro/posts/2009-01-11-ajax-file-upload-with-pure-javascript.html
+                                https://developer.tizen.org/dev-guide/web/2.3.0/org.tizen.mobile.web.appprogramming/html/tutorials/w3c_tutorial/comm_tutorial/upload_ajax.htm
+                                */
+                                var reader = new FileReader();
+                                busyCount++;
+                                reader._fieldName = fieldName;
+                                reader.addEventListener("load", function() {
+                                    ret[this._fieldName] = this.result;
+                                    busyCount--;
+                                    if (busyCount <= 0) {
+                                        aOnReady(ret);
+                                    }
+                                });
+                                reader.readAsDataURL(aElements[i].files[0]);
+                                canChangeRetValue = false;
+                            } else
+                                fieldValue = "aOnReady() not present in js call to getFormElements()";
+                            break;
+                    }
+                    if (typeof fieldValue == 'string') {
+                        if (fieldValue.indexOf(',') >= 0)
+                            fieldValue = encodeURIComponent(fieldValue);
+                    }
+
+                    if (canChangeRetValue)
+                        ret[fieldName] = fieldValue;
+                }
+            }
+        }        
     }
 
     return ret;

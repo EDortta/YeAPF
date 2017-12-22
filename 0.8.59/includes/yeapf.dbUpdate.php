@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)
+    YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-10-04 15:54:37 (-3 DST)
+    2017-12-14 18:31:30 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -762,6 +762,16 @@
               }       
             }
             _db_upd_newVersion(16);
+          } catch(Exception $e) {
+            _db_upd_error($e->getMessage());
+          }
+        }
+
+        if (_db_upd_canReviewVersion(17)) {
+          _recordWastedTime("checking v17");
+          db_sql("ALTER TABLE `is_api_usage` CHANGE COLUMN `wastedTime` `wastedTime` DECIMAL(6,3) NULL DEFAULT NULL");
+          try {
+            _db_upd_newVersion(17);
           } catch(Exception $e) {
             _db_upd_error($e->getMessage());
           }

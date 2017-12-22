@@ -3,9 +3,9 @@
   /*
    * tools
    * tools/ydbcreateform
-   * YeAPF 0.8.59-41 built on 2017-08-28 20:59 (-3 DST)
+   * YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
    * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2017-08-28 19:44:57 (-3 DST)
+   * 2017-10-16 19:16:54 (-2 DST)
    *
    * Purpose: create .form .html .js and .php CRUD files
    */
@@ -24,6 +24,8 @@
     die("\n$errMessage\n");
   }
 
+  echo basename("tools/ydbcreateform")."\nYeAPF 0.8.59 tools\nCopyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+
   $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
   (@include_once "$mydir/yclilib.php") or die("yclilib.php not found\n");
   (@include_once "$mydir/ydblib.php") or die("ydblib.php not found\n");
@@ -31,21 +33,20 @@
   $cwd=getcwd();
   $args = new ArgumentsProcessor();
   if (($args->argValue('h;help')==true) || ($args->optionCount()==0)) {
-    echo "YeAPF 0.8.59 $myself \nCopyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
-    echo "YeAPF dbtools*\nusage:";
+    echo "usage:";
     echo "\n\t[--db <host:database name>]\tdatabase identification";
     echo "\n\t[--user <user name>]\t\tdatabase user name";
     echo "\n\t[--pass <user password>]";
     echo "\n\t[--type <mysql|firebird|postgresql>]";
     echo "\n\t[--sql '<select statement|sql text file>']\tsql command to export data.  Cannot be used with 'table' or 'import' options";
     echo "\n\t[--table <table name>]\t\tname of the table to be dumped/exported/imported";
-    echo "\n\t[--folder <folder name>]\t\tfolder to be used to generate the files";
+    echo "\n\t[--folder <folder name>]\t\tfolder to be used to generate the files (defaults to 'forms')";
     die("\n");
   }
 
   getDBArgs($args);
   
-  $folder=$args->argValue('folder', getcwd());
+  $folder=$args->argValue('folder', getcwd().'/forms/');
 
   $dbConnect=0;
 
@@ -122,6 +123,9 @@
 
         $form=analisarString(join("",file("$__yeapfPath_tools/ydbcreateform_files/table.form")));
         file_put_contents("$folder/$dbTable.form", $form);
+
+        $json=suggestFormFromTable("$dbTable");
+        file_put_contents("$folder/$dbTable.json", $json);
 
       } else
         displayError("Impossible to write to '$folder' directory");

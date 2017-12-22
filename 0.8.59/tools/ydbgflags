@@ -3,9 +3,9 @@
   /*
    * tools
    * tools/ydbgflags
-   * YeAPF 0.8.59-41 built on 2017-08-28 20:59 (-3 DST)
+   * YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
    * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2017-08-28 19:44:57 (-3 DST)
+   * 2017-10-11 11:50:01 (-2 DST)
    */
 
   $myself=$argv[0];
@@ -24,8 +24,8 @@
                        256 => "Developer",
                        512 => "NodeApp Control");
 
-  echo "YeAPF 0.8.59";
-  echo "\n$myself \n(C)2012 dortta@yahoo.com\nYeAPF dbgtools\n";
+  echo basename("tools/ydbgflags")."\nYeAPF 0.8.59 tools\nCopyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+  /* first verision 2012 */
   if (($argc<2) || ($argv[1]=='--help') || ($argv[1]=='-h')) {
     echo "usage:\n";
     echo "ydbgflags --list\t\tlist all debug flags and level for current folder\n";

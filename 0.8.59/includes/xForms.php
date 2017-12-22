@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xForms.php
-    YeAPF 0.8.59-68 built on 2017-10-11 11:23 (-3 DST)
+    YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-10-09 19:39:39 (-3 DST)
+    2017-12-14 18:31:30 (-2 DST)
 */
 
   global $cfgMainFolder;
@@ -1831,9 +1831,11 @@
 
     for($c=0; $c<count($fields); $c++) {
       $length=explode(',', $fields[$c][2]);
+      if (!isset($length[1])) $length[1]=null;
       $fieldDefinition=array(
         'type'=> $fields[$c][1],
         'width'=> $length[0],
+        'domType'=>'input',
         'decimal'=> $length[1],
         'nullable'=> $fields[$c][4]
       );
@@ -1871,12 +1873,12 @@
             'type'=>'column',
             'class'=>'col-md-12 text-right',
             'fields'=>array(
-              "btnSave_$tableName" => array(
+              "btnSave" => array(
                 "type"=> "button",
                 "class"=>"btn btn-primary btn-save-form",
                 "label"=>"Save"
               ),
-              "btnCancel_$tableName" => array(
+              "btnCancel" => array(
                 "type"=> "button",
                 "class"=>"btn btn-default btn-cancel-form",
                 "label"=>"Cancel"

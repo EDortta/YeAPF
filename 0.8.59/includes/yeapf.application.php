@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.59-57 built on 2017-10-04 15:54 (-3 DST)
+    YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-09-19 16:45:26 (-3 DST)
+    2017-12-14 18:31:30 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -52,7 +52,7 @@
       if ($cfgAppLang>'')
         echo "<html lang='$cfgAppLang'>\n";
       echo "<head>\n";
-      echo "<meta http-equiv='X-UA-Compatible' content='IE-edge,chrome=1' />\n";
+      echo "<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1' />\n";
       if ($appCharset>'')
         echo "<meta charset='$appCharset'>\n";
       else {
@@ -61,7 +61,10 @@
           $serverCharset = substr($serverCharset, strpos($serverCharset, '.')+1);
         echo "<meta charset='$serverCharset'>\n";
       }
-      echo "<title>$appTitle</title>\n";
+      $appTitle=trim($appTitle);
+      if ($appTitle>'') {
+        echo "<title>$appTitle</title>\n";
+      }
       echo "<meta http-equiv='X-UA-Compatible' content='IE=EmulateIE8' />\n";
       echo $cssHeaderText;
       /*

@@ -1,8 +1,8 @@
   /********************************************************************
    * app-src/js/ycomm-ajax.js
-   * YeAPF 0.8.59-68 built on 2017-10-11 11:23 (-3 DST)
+   * YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
    * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2017-10-06 21:15:44 (-3 DST)
+   * 2017-10-06 21:15:44 (-2 DST)
    *
    * Com o advento do WebSocket, precisamos de novas formas para
    * provocar o servidor.

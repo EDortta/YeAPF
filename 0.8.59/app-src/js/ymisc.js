@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.59-68 built on 2017-10-11 11:23 (-3 DST)
+ * YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-10-06 21:15:44 (-3 DST)
+ * 2017-12-14 18:31:30 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -160,11 +160,39 @@ function isSSL() {
   return (window.location.href.indexOf("https://")===0);
 }
 
+function urlValue(paramName) {
+  var params = document.location.search.split('&'), ret=null, i, p;
+  if (params.length>0)
+    params[0]=params[0].split('?')[1];
+  for(i=0; i<params.length; i++) {
+    p=params[i].split('=');
+    if (p[0]==paramName) {
+      ret=p[1];
+      break;
+    }
+  }
+  return ret;
+}
+
 function produceWaitMsg(msg) {
   var feedbackCSS='<style type="text/css"><!--.yWarnBanner {  font-family: Georgia, "Times New Roman", Times, serif;  font-size: 16px;  font-style: normal; font-variant: normal; font-weight: normal;  text-transform: none; margin: 16px; padding: 8px; background-color: #DFEEF2;  border: 1px dotted #387589; line-height: 24px;}--></style>';
   var feedbackText = '<div class=yWarnBanner><img src="images/waitIcon.gif" height=18px>&nbsp;{0}&nbsp;</div>';
   var aux=feedbackCSS + feedbackText.format(msg);
   return aux;
+}
+
+function countCheckedElements(aClassOrElementName) {
+  var elems = y$(aClassOrElementName);
+  var ret = 0;
+  if (elems) {
+    if (!isArray(elems))
+      elems = [ elems ];
+    for(var i=0; i<elems.length; i++) {
+      if (elems[i].checked)
+        ret++;
+    }
+  }
+  return ret;
 }
 
 /*
@@ -226,6 +254,25 @@ function getStyleRuleValue(className, styleItemName) {
   }
 };
 
+function setStyleRuleValue(className, styleItemName, value) {
+  /* original from http://stackoverflow.com/questions/6338217/get-a-css-value-with-javascript */
+  className=className || '';
+
+  for (var i = 0; i < document.styleSheets.length; i++) {
+      var mysheet = document.styleSheets[i];
+      var myrules = mysheet.cssRules ? mysheet.cssRules : mysheet.rules;
+      for (var j = 0; j < myrules.length; j++) {
+          if (myrules[j].selectorText && myrules[j].selectorText.toLowerCase() === className) {
+            if (typeof styleItemName=="string")
+              myrules[j].style[styleItemName] = value;
+            else
+              myrules[j].style = value;
+          }
+      }
+
+  }
+};
+
 var getClientSize = function () {
   var auxDE = (document && document.documentElement)?document.documentElement:{clientWidth:800, clientHeight: 600};
   var auxW = (window)?window:{innerWidth: 800, innerHeight: 600};
@@ -260,6 +307,20 @@ if (typeof resizeIframe == 'undefined') {
   };
 }
 
+if (!Element.prototype.matches)
+    Element.prototype.matches = Element.prototype.msMatchesSelector || 
+                                Element.prototype.webkitMatchesSelector;
+
+if (!Element.prototype.closest)
+    Element.prototype.closest = function(s) {
+        var el = this;
+        if (!document.documentElement.contains(el)) return null;
+        do {
+            if (el.matches(s)) return el;
+            el = el.parentElement || el.parentNode;
+        } while (el !== null); 
+        return null;
+    };
 
 /*
  * HTMLElement prototype extensions
@@ -431,6 +492,7 @@ var mergeObject = function (srcObj, trgObj, overwriteIfExists) {
         trgObj[i] = srcObj[i];
     }
 };
+
 
 function isPropertySupported(property)
 {
@@ -1040,7 +1102,7 @@ var extractDateValues = function (aStrDate, aFormat, aDateMap) {
   var ret;
 
   if (aFormat === undefined)
-    aFormat='yyyy-mm-dd hh:mm:ss';
+    aFormat='yyyy-mm-ddThh:mm:ss';
   if (aStrDate === '') {
     ret=[];
     ret['y']='';
@@ -1084,7 +1146,7 @@ var extractDateValues = function (aStrDate, aFormat, aDateMap) {
       });
     /* we extract the date elements */
     var auxDateInfo = parseDate();
-    for(i=0; i<sortedInfo.length && i<auxDateInfo.length; i++)
+    for(i=0; i<sortedInfo.length && i<(auxDateInfo||[]).length; i++)
       sortedInfo[i][1] = auxDateInfo[i];
     if (sortedInfo[0][1] * sortedInfo[1][1] * sortedInfo[2][1] > 0 )
       ret = getReturn(sortedInfo);
@@ -1254,6 +1316,8 @@ function UDate2Date(aUDate, aFormat) {
       else
         ret+=aFormat[i];
   }
+  if (ret=='//')
+    ret='';
   return ret;
 }
 
@@ -1271,6 +1335,8 @@ function UDate2Time(aUDate, aFormat) {
       else
         ret+=aFormat[i];
   }
+  if (ret=='::')
+    ret='';
   return ret;
 }
 
@@ -1344,9 +1410,9 @@ var dateTransform = function (aStrDate, srcFormat, destFormat) {
 };
 
 var isValidDate=function(aFrenchDate) {
-  var ok=true;
+  var ok=true, d;
   if ("string"==typeof aFrenchDate)  {
-    aFrenchDate = dateTransform(aFrenchDate, "dd/mm/yyyy", "yyyy-mm-dd 00:00:00");
+    aFrenchDate = dateTransform(aFrenchDate, "dd/mm/yyyy", "yyyy-mm-ddT12:59:59");
   }
 
   try {
@@ -1357,7 +1423,7 @@ var isValidDate=function(aFrenchDate) {
 
   if (ok) {
     if (!isNaN(d.getTime())) {
-      var f=dateTransform(d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate(), "yyyy/mm/dd", "yyyy-mm-dd 00:00:00");
+      var f=dateTransform(d.getFullYear()+"/"+(d.getMonth()+1)+"/"+d.getDate(), "yyyy/mm/dd", "yyyy-mm-ddT12:59:59");
       ok=f==aFrenchDate;
     } else
       ok=false;
@@ -1449,10 +1515,11 @@ function unmaskHTML(auxLine) {
     while (auxLine.indexOf('!!')>=0)
       auxLine = auxLine.replace('!!', '&');
 
-    auxLine = auxLine.replace(/\&\#91\;/g, '<');
-    auxLine = auxLine.replace(/\&\#93\;/g, '>');
     auxLine = auxLine.replace(/\[/g, '<');
     auxLine = auxLine.replace(/\]/g, '>');
+
+    auxLine = auxLine.replace(/\&\#91\;/g, '[');
+    auxLine = auxLine.replace(/\&\#93\;/g, ']');
   } else if (typeof auxLine=='number') {
       auxLine = auxLine.toString();
   } else
@@ -1614,7 +1681,10 @@ var rowColorSpec = rowColorSpecBase();
 
 function decomposeColor(color) {
   if (color.substr(0,4)=='rgb(') {
-    return color.replace(/[^\d,]/g, '').split(',');
+    var aux=color.replace(/[^\d,]/g, '').split(','), ret=[], n;
+    for (n=0; n<aux.length; n++)
+      ret[n]=str2int(aux[n]);
+    return ret;
   } else {
     if (color.substr(0,1)=='#')
       color=color.substr(1);
@@ -1667,11 +1737,23 @@ function grayColor(color) {
 function rgb2hex (rgb) {
   var res;
   if (typeof rgb.b ==='undefined') {
-    res=dec2hex(rgb[0])+dec2hex(rgb[1])+dec2hex(rgb[2]);
+    res=pad(dec2hex(rgb[0]),2)+pad(dec2hex(rgb[1]),2)+pad(dec2hex(rgb[2]),2);
   } else {
-    res=dec2hex(rgb.r)+dec2hex(rgb.g)+dec2hex(rgb.b);
+    res=pad(dec2hex(rgb.r),2)+pad(dec2hex(rgb.g),2)+pad(dec2hex(rgb.b),2);
   }
   return res;
+}
+
+function pickColorFromGradient(firstColor, lastColor, weight) {
+    var w1 = Math.max(0,Math.min(weight, 100))/100,
+        w2 = 1 - w1,
+        color1 = decomposeColor(firstColor), 
+        color2 = decomposeColor(lastColor);
+
+    var rgb = [Math.round(color1[0] * w1 + color2[0] * w2),
+        Math.round(color1[1] * w1 + color2[1] * w2),
+        Math.round(color1[2] * w1 + color2[2] * w2)];
+    return rgb2hex(rgb);
 }
 
 function brighterColor(color, percent){

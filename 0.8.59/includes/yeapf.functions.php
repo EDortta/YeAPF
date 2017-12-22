@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.59-68 built on 2017-10-11 11:23 (-3 DST)
+    YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
     Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-10-09 19:39:39 (-3 DST)
+    2017-12-14 18:31:30 (-2 DST)
    */
 
   /*
@@ -458,6 +458,7 @@
                       'yeapf.userContext.php',
                       'yeapf.eventHandler.php',
                       'yeapf.application.php',
+                      'yeapf.jforms.php',
                       'yeapf.dbUpdate.php',
 
                       'yeapf.nodes.php',
