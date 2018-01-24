@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
- * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-12-14 18:31:30 (-2 DST)
+ * YeAPF 0.8.59-134 built on 2018-01-24 14:00 (-2 DST)
+ * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+ * 2018-01-24 13:59:56 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -74,6 +74,22 @@
 })();
 
 if (typeof $ =='undefined') $ = y$;
+
+
+window.createDOMEvent = function(eventName) {
+  var ret=null;
+  if (isOnMobile()) {
+    ret = document.createEvent('Event');
+    ret.initEvent(eventName, true, true);
+  } else {
+    ret = new Event(eventName);
+  }
+  return ret;
+}
+
+
+
+
 /*
  * $frame()
  * given a frame name by path it returns dom frame
@@ -1582,26 +1598,30 @@ function nl2br(aString) {
 }
 
 function dec2deg(dec, asLatitude) {
-  asLatitude = asLatitude || true;
-  var positive = Math.sign(dec) > 0,
-      gpsdeg, r, gpsmin,
-      D, M, S, suffix;
+  asLatitude = "undefined" == typeof asLatitude?true:asLatitude;
+  if (sign(dec)!=0) {
+    var positive = sign(dec) > 0,
+        gpsdeg, r, gpsmin,
+        D, M, S, suffix;
 
-  dec=Math.abs(dec);
-  gpsdeg = parseInt(dec),
-  r = dec - (gpsdeg * 1.0);
-  gpsmin = r * 60.0;
-  r = gpsmin - (parseInt(gpsmin)*1.0);
-  D = gpsdeg;
-  M = parseInt(gpsmin);
-  S = parseInt(r*60.0);
+    dec=Math.abs(dec);
+    gpsdeg = parseInt(dec),
+    r = dec - (gpsdeg * 1.0);
+    gpsmin = r * 60.0;
+    r = gpsmin - (parseInt(gpsmin)*1.0);
+    D = gpsdeg;
+    M = parseInt(gpsmin);
+    S = parseInt(r*60.0);
 
-  if (asLatitude) {
-    suffix=positive?'N':'S';
+    if (asLatitude) {
+      suffix=positive?'N':'S';
+    } else {
+      suffix=positive?'E':'W';
+    }
+    return D+"&deg; "+M+"' "+S+"'' "+suffix;    
   } else {
-    suffix=positive?'E':'W';
+    return 'NULL';
   }
-  return D+"&deg; "+M+"' "+S+"'' "+suffix;
 }
 
 function str2double(aStr) {
@@ -1647,6 +1667,16 @@ function str2bool(aStr, aDefaultValue) {
 
 function bool2str(aBool) {
   return aBool ? 'TRUE' : 'FALSE';
+}
+
+function sign(aValue) {
+  aValue = str2int(aValue);
+  if (aValue==0) 
+    return 0;
+  else if (aValue<0)
+    return -1;
+  else
+    return 1;
 }
 
 function dec2hex(d) {
@@ -2399,7 +2429,6 @@ if ((typeof window=='object') && (typeof _onLoadMethods == 'undefined')) {
     var i=_onLoadMethods.length;
     _onLoadMethods[i]=aFunc;
   };
-
 
   document.addEventListener(
       "DOMContentLoaded",

@@ -4,10 +4,20 @@
    *  (C) 2008-2017 Esteban Daniel Dortta
    *  dortta@yahoo.com
    *****************************************************************/
-  if (file_exists('flag.debug')) {
+  if (file_exists('flags/flag.debug')) {
     ini_set('display_errors','1');
     error_reporting (E_ALL);
-  }
+
+    function fatal_error_handler() {
+
+        if (@is_array($e = @error_get_last())) {
+            $code = isset($e['type']) ? $e['type'] : 0;
+            $msg = isset($e['message']) ? $e['message'] : '';
+            $file = isset($e['file']) ? $e['file'] : '';
+            $line = isset($e['line']) ? $e['line'] : '';
+            if ($code>0) error_handler($code,$msg,$file,$line);
+        }
+    }
   
   $isWebservice=true;
   

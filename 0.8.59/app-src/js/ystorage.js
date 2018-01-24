@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ystorage.js
- * YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
- * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-08-28 19:44:54 (-2 DST)
+ * YeAPF 0.8.59-134 built on 2018-01-24 14:00 (-2 DST)
+ * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+ * 2018-01-24 12:49:26 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -949,7 +949,9 @@
           return ret;
         };
 
-        that.sendToServer = function(aoncomplete, aonprogress) {
+        that.sendToServer = function(aoncomplete, aonprogress, aonerror) {
+          aonerror = aonerror || console.warn;
+
           if (!that.busy) {
             that.busy = true;
             that.cfg.onrecordcount = null;
@@ -976,6 +978,8 @@
                           if (typeof that.cfg.onprogress == 'function') {
                             that.cfg.onprogress(that.cfg.dbName, data[0], ++recordCount);
                           }
+                        } else {
+                          aonerror(status+': '+error);
                         }
                       }
                     );
@@ -990,13 +994,13 @@
 
               },
               function(status, error) {
-                console.log("Erro {0} ao tentar acessar o servidor: {1}".format(status, error.message));
+                aonerror("Erro {0} ao tentar acessar o servidor: {1}".format(status, error.message));
               }
             );
 
             return true;
           } else {
-            console.warn("yInfoObj busy");
+            aonerror("yInfoObj busy");
             return false;
           }
         };

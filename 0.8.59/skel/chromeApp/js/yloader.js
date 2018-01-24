@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
-  * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2017-12-22 07:10:12 (-2 DST)
+  * YeAPF 0.8.59-134 built on 2018-01-24 14:00 (-2 DST)
+  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+  * 2018-01-24 14:00:45 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)");
+ console.log("YeAPF 0.8.59-134 built on 2018-01-24 14:00 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -344,6 +344,22 @@
      })();
      
      if (typeof $ =='undefined') $ = y$;
+     
+     
+     window.createDOMEvent = function(eventName) {
+       var ret=null;
+       if (isOnMobile()) {
+         ret = document.createEvent('Event');
+         ret.initEvent(eventName, true, true);
+       } else {
+         ret = new Event(eventName);
+       }
+       return ret;
+     }
+     
+     
+     
+     
      /*
       * $frame()
       * given a frame name by path it returns dom frame
@@ -1852,26 +1868,30 @@
      }
      
      function dec2deg(dec, asLatitude) {
-       asLatitude = asLatitude || true;
-       var positive = Math.sign(dec) > 0,
-           gpsdeg, r, gpsmin,
-           D, M, S, suffix;
+       asLatitude = "undefined" == typeof asLatitude?true:asLatitude;
+       if (sign(dec)!=0) {
+         var positive = sign(dec) > 0,
+             gpsdeg, r, gpsmin,
+             D, M, S, suffix;
      
-       dec=Math.abs(dec);
-       gpsdeg = parseInt(dec),
-       r = dec - (gpsdeg * 1.0);
-       gpsmin = r * 60.0;
-       r = gpsmin - (parseInt(gpsmin)*1.0);
-       D = gpsdeg;
-       M = parseInt(gpsmin);
-       S = parseInt(r*60.0);
+         dec=Math.abs(dec);
+         gpsdeg = parseInt(dec),
+         r = dec - (gpsdeg * 1.0);
+         gpsmin = r * 60.0;
+         r = gpsmin - (parseInt(gpsmin)*1.0);
+         D = gpsdeg;
+         M = parseInt(gpsmin);
+         S = parseInt(r*60.0);
      
-       if (asLatitude) {
-         suffix=positive?'N':'S';
+         if (asLatitude) {
+           suffix=positive?'N':'S';
+         } else {
+           suffix=positive?'E':'W';
+         }
+         return D+"&deg; "+M+"' "+S+"'' "+suffix;    
        } else {
-         suffix=positive?'E':'W';
+         return 'NULL';
        }
-       return D+"&deg; "+M+"' "+S+"'' "+suffix;
      }
      
      function str2double(aStr) {
@@ -1917,6 +1937,16 @@
      
      function bool2str(aBool) {
        return aBool ? 'TRUE' : 'FALSE';
+     }
+     
+     function sign(aValue) {
+       aValue = str2int(aValue);
+       if (aValue==0) 
+         return 0;
+       else if (aValue<0)
+         return -1;
+       else
+         return 1;
      }
      
      function dec2hex(d) {
@@ -2669,7 +2699,6 @@
          var i=_onLoadMethods.length;
          _onLoadMethods[i]=aFunc;
        };
-     
      
        document.addEventListener(
            "DOMContentLoaded",
@@ -3704,6 +3733,13 @@
      var tabNavBase = function () {
        var that = {};
      
+       that.tabchangeEvent = createDOMEvent('tabchange');
+       that.tabblurEvent   = createDOMEvent('tabblur');
+       that.tabfocusEvent  = createDOMEvent('tabfocus');
+       that.tabshowEvent   = createDOMEvent('tabshow');
+     
+       /*
+       OBSOLETE 2018-01-24
        if (isOnMobile()) {
          _dump("Loading mobile tabs");
          that.tabchangeEvent = document.createEvent('Event');
@@ -3727,6 +3763,7 @@
          } else 
            _dump("Tabs are not supported");    
        }
+       */
      
        that.currentTabNdx = -1;
        that.currentContainerNdx = -1;
@@ -5230,6 +5267,11 @@
          var oTable, auxHTML, j, c, cNdx, i, newCell, internalRowId = (new Date()).getTime() - 1447265735470,
              xDataItem;
      
+         /* grants filledEvent exists */
+         if ("undefined" == typeof window._evtFilled) {
+             window._evtFilled = window.createDOMEvent("filled");
+         }
+     
          if (aElement) {
              if (aElement.nodeName == 'TABLE') {
                  if (aElement.getElementsByTagName('tbody').length > 0)
@@ -5375,8 +5417,7 @@
                      }
                  }
      
-                 var event = new Event('filled');
-                 aElement.dispatchEvent(event);
+                 aElement.dispatchEvent(window._evtFilled);
      
      
              } else if (aElement.nodeName == 'UL') {
@@ -5438,9 +5479,7 @@
                      }
                  }
      
-                 var event = new Event('filled');
-                 aElement.dispatchEvent(event);
-     
+                 aElement.dispatchEvent(window._evtFilled);
      
              } else if (aElement.nodeName == 'LISTBOX') {
                  var oListBox = aElement;
@@ -5499,8 +5538,7 @@
                      }
                  }
      
-                 var event = new Event('filled');
-                 aElement.dispatchEvent(event);
+                 aElement.dispatchEvent(window._evtFilled);
      
      
              } else if ((aElement.nodeName == 'SELECT') || (aElement.nodeName == 'DATALIST')) {
@@ -5578,8 +5616,7 @@
                      }
                  }
      
-                 var event = new Event('filled');
-                 aElement.dispatchEvent(event);
+                 aElement.dispatchEvent(window._evtFilled);
      
                  if (aElement.onclick)
                      aElement.onclick();
@@ -5697,8 +5734,7 @@
      
                          }
      
-                         var event = new Event('filled');
-                         aElement.dispatchEvent(event);
+                         aElement.dispatchEvent(window._evtFilled);
      
                      } else if (xData.length > 1)
                      _dump("There are more than one record returning from the server");
@@ -5730,9 +5766,8 @@
                          }
                      }
                      aElement.innerHTML = auxHTML;
-                     
-                     var event = new Event('filled');
-                     aElement.dispatchEvent(event);
+     
+                     aElement.dispatchEvent(window._evtFilled);
      
                  }
              }

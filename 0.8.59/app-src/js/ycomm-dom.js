@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
- * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-12-14 18:31:30 (-2 DST)
+ * YeAPF 0.8.59-134 built on 2018-01-24 14:00 (-2 DST)
+ * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+ * 2018-01-24 13:22:08 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -186,6 +186,11 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
     var oTable, auxHTML, j, c, cNdx, i, newCell, internalRowId = (new Date()).getTime() - 1447265735470,
         xDataItem;
 
+    /* grants filledEvent exists */
+    if ("undefined" == typeof window._evtFilled) {
+        window._evtFilled = window.createDOMEvent("filled");
+    }
+
     if (aElement) {
         if (aElement.nodeName == 'TABLE') {
             if (aElement.getElementsByTagName('tbody').length > 0)
@@ -331,8 +336,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                 }
             }
 
-            var event = new Event('filled');
-            aElement.dispatchEvent(event);
+            aElement.dispatchEvent(window._evtFilled);
 
 
         } else if (aElement.nodeName == 'UL') {
@@ -394,9 +398,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                 }
             }
 
-            var event = new Event('filled');
-            aElement.dispatchEvent(event);
-
+            aElement.dispatchEvent(window._evtFilled);
 
         } else if (aElement.nodeName == 'LISTBOX') {
             var oListBox = aElement;
@@ -455,8 +457,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                 }
             }
 
-            var event = new Event('filled');
-            aElement.dispatchEvent(event);
+            aElement.dispatchEvent(window._evtFilled);
 
 
         } else if ((aElement.nodeName == 'SELECT') || (aElement.nodeName == 'DATALIST')) {
@@ -534,8 +535,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                 }
             }
 
-            var event = new Event('filled');
-            aElement.dispatchEvent(event);
+            aElement.dispatchEvent(window._evtFilled);
 
             if (aElement.onclick)
                 aElement.onclick();
@@ -653,8 +653,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
 
                     }
 
-                    var event = new Event('filled');
-                    aElement.dispatchEvent(event);
+                    aElement.dispatchEvent(window._evtFilled);
 
                 } else if (xData.length > 1)
                 _dump("There are more than one record returning from the server");
@@ -686,9 +685,8 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                     }
                 }
                 aElement.innerHTML = auxHTML;
-                
-                var event = new Event('filled');
-                aElement.dispatchEvent(event);
+
+                aElement.dispatchEvent(window._evtFilled);
 
             }
         }

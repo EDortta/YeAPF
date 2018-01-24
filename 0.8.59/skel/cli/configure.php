@@ -1,9 +1,9 @@
 <?php
 /*
     skel/cli/configure.php
-    YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
-    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-12-22 07:10:12 (-2 DST)
+    YeAPF 0.8.59-134 built on 2018-01-24 14:00 (-2 DST)
+    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+    2018-01-24 14:00:45 (-2 DST)
 */
 
 
@@ -281,8 +281,8 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)\n");
-      fwrite($configFile," * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com\n");
+      fwrite($configFile," * YeAPF 0.8.59-134 built on 2018-01-24 14:00 (-2 DST)\n");
+      fwrite($configFile," * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
       fwrite($configFile," * On $date at $time\n");
@@ -321,9 +321,9 @@
 
 
   echo sayStep("<div class=cpyrght><strong><big><I>skel/cli/configure.php</I></big></strong><br>
-    YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)<br>
-    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    2017-12-22 07:10:12 (-2 DST)</div>");
+    YeAPF 0.8.59-134 built on 2018-01-24 14:00 (-2 DST)<br>
+    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com<br>
+    2018-01-24 14:00:45 (-2 DST)</div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     die(sayStep("<div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
@@ -786,7 +786,7 @@
 
             $lockFolderName=dirname($dbCSVFilename)."/.lock";
 
-            if (substr($lockFolderName,0,3=='//.'))
+            if ((!file_exists($dbCSVFilename)) || (substr($lockFolderName,0,3=='//.')))
               _die("Please, add yeapf.db.ini or db.csv to your main folder");
 
             if (verifyConfigFolder($lockFolderName)) {

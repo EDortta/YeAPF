@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.locks.php
-    YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
-    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-08-28 19:44:55 (-2 DST)
+    YeAPF 0.8.59-134 built on 2018-01-24 14:00 (-2 DST)
+    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+    2017-12-29 10:03:34 (-2 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -31,7 +31,7 @@
     if ((isset($isCLI)) and ($isCLI))
       $CFG_LOCK_DIR=sys_get_temp_dir().'/.lock';
     else {
-      if (isset($cfgMainFolder))
+      if (isset($cfgMainFolder) && ($cfgMainFolder>''))
         $CFG_LOCK_DIR=$cfgMainFolder."/.lock";
       else
         $CFG_LOCK_DIR=getcwd().'/.lock';
@@ -45,7 +45,7 @@
     if (is_writable(dirname($CFG_LOCK_DIR))) {
       mkdir($CFG_LOCK_DIR,0766) or _die("<div>Unsustainable error <b>creating</b> system 'locks' directory '$CFG_LOCK_DIR'</div>");
       chmod($CFG_LOCK_DIR,0766) or _die("<div>Unsustainable error <b>changing</b> system 'locks' directory rights'$CFG_LOCK_DIR'</div>");
-    } else _die("<div>Unsustainable error <b>checking</b> system 'locks' directory parent for '".dirname($CFG_LOCK_DIR)."'. It's not writeable</div>");
+    } else _die("<div>Unsustainable error <b>checking</b> system 'locks' directory parent for '$CFG_LOCK_DIR'. It's not writeable</div>");
   }
 
   // by default, LOCK tries to detect if shared memory semaphores are enabled

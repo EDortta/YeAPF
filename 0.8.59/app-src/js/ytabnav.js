@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ytabnav.js
- * YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
- * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-12-14 18:31:30 (-2 DST)
+ * YeAPF 0.8.59-134 built on 2018-01-24 14:00 (-2 DST)
+ * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+ * 2018-01-24 13:22:02 (-2 DST)
  * First Version (C) 2012 - esteban daniel dortta - dortta@yahoo.com
  * Purpose: to control multiple tabs in a only-one-page application
  *          this is specially useful when building web mobile applications
@@ -11,6 +11,13 @@
 var tabNavBase = function () {
   var that = {};
 
+  that.tabchangeEvent = createDOMEvent('tabchange');
+  that.tabblurEvent   = createDOMEvent('tabblur');
+  that.tabfocusEvent  = createDOMEvent('tabfocus');
+  that.tabshowEvent   = createDOMEvent('tabshow');
+
+  /*
+  OBSOLETE 2018-01-24
   if (isOnMobile()) {
     _dump("Loading mobile tabs");
     that.tabchangeEvent = document.createEvent('Event');
@@ -34,6 +41,7 @@ var tabNavBase = function () {
     } else 
       _dump("Tabs are not supported");    
   }
+  */
 
   that.currentTabNdx = -1;
   that.currentContainerNdx = -1;
