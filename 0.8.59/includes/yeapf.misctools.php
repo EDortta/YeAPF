@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misctools.php
-    YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
-    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-08-28 19:44:55 (-2 DST)
+    YeAPF 0.8.59-136 built on 2018-02-02 15:49 (-2 DST)
+    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+    2018-02-02 15:48:40 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -372,6 +372,32 @@
     $ret = array();
     foreach($srcArray as $k=>$v)
       $ret[]=$v[$transversalKey];
+    return $ret;
+  }
+
+  function valueArray2AssociativeArray($values, $columnNames, $escaping=false) {
+    /*
+      $v = array( array(100, 'john'), array(200, 'ann'));
+      $a = valueArray2AssociativeArray($v, "code;name");
+    */
+    $ret=array();
+    if (!is_array($columnNames)) {
+      if (strpos($columnNames, ",")) 
+        $columnNames = explode(",", $columnNames);
+      else
+        $columnNames = explode(";", $columnNames);
+    }
+
+    for($y=0; $y<count($values); $y++) {
+      $ret[$y] = array();
+      for ($x=0; $x<count($columnNames); $x++) {
+        $value = $values[$x];
+        if ($escaping)
+          $value = escapeString($value);
+        $ret[$y][$columnNames[$x]] = $values;
+      }
+    }
+
     return $ret;
   }
 

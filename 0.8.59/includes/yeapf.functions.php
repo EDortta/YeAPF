@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
-    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-12-14 18:31:30 (-2 DST)
+    YeAPF 0.8.59-136 built on 2018-02-02 15:49 (-2 DST)
+    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+    2018-01-25 13:17:18 (-2 DST)
    */
 
   /*
@@ -500,7 +500,7 @@
           echo "<style> .err {background-color:#FFC0CB; border-style:solid; border-width:2px; border-color:#FF0000;margin:32px;padding:32px;border-radius:4px}</style>";
           if ($reconfigureLinkEnabled)
           $doConfig='<div>Click <b><a href="configure.php">here</a></b> to configure<br></div>';
-          $copyrightNote='<small><em>YeAPF Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com</em></small>';
+          $copyrightNote='<small><em>YeAPF Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com</em></small>';
           echo "<div class=err><div>$msg</div>$doConfig$copyrightNote</div>";
         }
       }
@@ -1190,25 +1190,36 @@
   function rawChars($str)
   {
     global $dbCharset, $appCharset;
-    /*
-     * BEWARE!
-     * This function require to this file be saved in ISO-8859-1
-     */
-    $strCharset=detect_encoding($str);
-    $str=iconv($strCharset, 'ISO-8859-1', $str);
-    $str1="áéíóúàèìòùãõâêîôûäëïöüçñÁÉÍÓÚÀÈÌÒÙÃÕÂÊÎÔÛÄËÏÖÜÇÑ";
-    $str2="aeiouaeiouaoaeiouaeioucnAEIOUAEIOUAOAEIOUAEIOUCN";
 
-    for ($i=0; $i<strlen($str1); $i++){
-      $aux=substr($str1,$i,1);
-      $p=strpos($str,$aux);
-      while ($p!==FALSE) {
-        $str=substr($str,0,$p).substr($str2,$i,1).substr($str,$p+1,strlen($str));
-        $p=strpos($str,substr($str1,$i,1));
-      }
-    }
+    /* https://stackoverflow.com/questions/10054818/convert-accented-characters-to-their-plain-ascii-equivalents */
+
+    $normalizeChars = array(
+        'Š'=>'S', 'š'=>'s', 'Ð'=>'Dj','Ž'=>'Z', 'ž'=>'z',
+        'À'=>'A', 'Á'=>'A', 'Â'=>'A', 'Ã'=>'A', 'Ä'=>'A', 'Å'=>'A', 'Æ'=>'A',
+        'Ç'=>'C',
+        'È'=>'E', 'É'=>'E', 'Ê'=>'E', 'Ë'=>'E',
+        'Ì'=>'I', 'Í'=>'I', 'Î'=>'I', 'Ï'=>'I',
+        'Ñ'=>'N', 'Ń'=>'N',
+        'Ò'=>'O', 'Ó'=>'O', 'Ô'=>'O', 'Õ'=>'O', 'Ö'=>'O', 'Ø'=>'O',
+        'Ù'=>'U', 'Ú'=>'U', 'Û'=>'U', 'Ü'=>'U',
+        'Ý'=>'Y', 'Þ'=>'B', 'ß'=>'Ss',
+        'à'=>'a', 'á'=>'a', 'â'=>'a', 'ã'=>'a', 'ä'=>'a', 'å'=>'a', 'æ'=>'a',
+        'ç'=>'c',
+        'è'=>'e', 'é'=>'e', 'ê'=>'e', 'ë'=>'e',
+        'ì'=>'i', 'í'=>'i', 'î'=>'i', 'ï'=>'i',
+        'ð'=>'o',
+        'ñ'=>'n', 'ń'=>'n',
+        'ò'=>'o', 'ó'=>'o', 'ô'=>'o', 'õ'=>'o', 'ö'=>'o', 'ø'=>'o',
+        'ù'=>'u', 'ú'=>'u', 'û'=>'u', 'ü'=>'u',
+        'ý'=>'y', 'ý'=>'y', 'þ'=>'b', 'ÿ'=>'y', 'ƒ'=>'f',
+        'ă'=>'a', 'î'=>'i', 'â'=>'a', 'ș'=>'s', 'ț'=>'t',
+        'Ă'=>'A', 'Î'=>'I', 'Â'=>'A',
+        'Ș'=>'S', 'Ț'=>'T',
+    );
+    $str = strtr($str, $normalizeChars);
+
     return $str;
-  }
+  }  
 
   function suggestVarName($aStr)
   {
@@ -1258,7 +1269,7 @@
         fputs($f,"<?php\n");
         fputs($f,"/* \n");
         fputs($f," * yeapf.config.files.$user_IP\n");
-        fputs($f," * YEAPF Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com\n");
+        fputs($f," * YEAPF Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n");
         fputs($f," * This config file was auto-updated by YeAPF\n");
         fputs($f," * On $date at $time\n");
         fputs($f," */\n\n");
