@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misctools.php
-    YeAPF 0.8.59-136 built on 2018-02-02 15:49 (-2 DST)
+    YeAPF 0.8.59-156 built on 2018-03-12 07:01 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-02-02 15:48:40 (-2 DST)
+    2018-02-10 10:25:49 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -391,10 +391,12 @@
     for($y=0; $y<count($values); $y++) {
       $ret[$y] = array();
       for ($x=0; $x<count($columnNames); $x++) {
-        $value = $values[$x];
-        if ($escaping)
-          $value = escapeString($value);
-        $ret[$y][$columnNames[$x]] = $values;
+        if (isset($values[$y][$x])) {
+          $value = $values[$y][$x];
+          if ($escaping)
+            $value = escapeString($value);
+          $ret[$y][$columnNames[$x]] = $value;          
+        }
       }
     }
 

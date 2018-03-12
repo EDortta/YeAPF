@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
-    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-12-14 18:31:30 (-2 DST)
+    YeAPF 0.8.59-156 built on 2018-03-12 07:01 (-3 DST)
+    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+    2018-03-12 07:00:48 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -547,7 +547,8 @@
                       explanacao varchar(512)
                     )";
               db_sql($sql);
-              db_commit();
+              if (function_exists("db_commit"))
+                db_commit();
 
               db_sql("INSERT INTO is_perfil_usuarios (bit, etiqueta, explanacao) VALUES(0, 'YeAPF-reserved', NULL)");
               db_sql("INSERT INTO is_perfil_usuarios (bit, etiqueta, explanacao) VALUES(1, 'YeAPF-cms', NULL)");
@@ -579,7 +580,8 @@
                                   j_params VARCHAR(512) ,
                                   PRIMARY KEY (id))";
               db_sql($sql);
-              db_commit();
+              if (function_exists("db_commit"))
+                db_commit();
             }
             _db_upd_newVersion(12);
           } catch(Exception $e) {
@@ -772,6 +774,17 @@
           db_sql("ALTER TABLE `is_api_usage` CHANGE COLUMN `wastedTime` `wastedTime` DECIMAL(6,3) NULL DEFAULT NULL");
           try {
             _db_upd_newVersion(17);
+          } catch(Exception $e) {
+            _db_upd_error($e->getMessage());
+          }
+        }
+
+        if (_db_upd_canReviewVersion(18)) {
+          if (!db_tableExists("is_db_updates")) {
+            db_sql("create table is_db_updates(database_ts char(14), database_sequence integer, source char(45))");
+          }
+          try {
+            _db_upd_newVersion(18);
           } catch(Exception $e) {
             _db_upd_error($e->getMessage());
           }

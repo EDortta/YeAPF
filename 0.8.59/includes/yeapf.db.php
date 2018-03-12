@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
-    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-10-04 15:54:37 (-2 DST)
+    YeAPF 0.8.59-156 built on 2018-03-12 07:01 (-3 DST)
+    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+    2018-03-12 07:00:48 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -962,7 +962,7 @@
     return ($r);
   }
 
-  function db_queryAndFillArray($sql, $keyField='')
+  function db_queryAndFillArray($sql, $keyField='', $withCountField=true)
   {
     $ret=array();
     _dumpY(4,5,"Running [$sql]");
@@ -1001,12 +1001,15 @@
              * $v=preg_replace('/[[:^print:]]/', '', $v);
              */
           }
-          $ret[$id][$k]=$v;
+          if (!in_array($k, $keys))
+            $ret[$id][$k]=$v;
         }
       }
-      if (!isset($ret[$id]['__COUNT__']))
-        $ret[$id]['__COUNT__']=0;
-      $ret[$id]['__COUNT__']++;
+      if ($withCountField) {
+        if (!isset($ret[$id]['__COUNT__']))
+          $ret[$id]['__COUNT__']=0;
+        $ret[$id]['__COUNT__']++;        
+      }
     }
     db_free($qq);
     return $ret;
@@ -1274,8 +1277,6 @@
           } else if (str_is_float($v)) {
             $v=str_replace(',','', $v);
             $v=str_replace('.', ',', $v);
-          } else if (strpos(" $k", "DATA")>0) {
-            $v="******";
           }
           $v = str_replace($order,'\\n',$v);
           $dataLine.=$v;

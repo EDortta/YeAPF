@@ -1,8 +1,8 @@
 /*********************************************
   * skel/workbench/www/js/yloader.js
-  * YeAPF 0.8.59-136 built on 2018-02-02 15:49 (-2 DST)
+  * YeAPF 0.8.59-156 built on 2018-03-12 07:01 (-3 DST)
   * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2018-02-02 15:49:56 (-2 DST)
+  * 2018-03-12 07:01:30 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.59-136 built on 2018-02-02 15:49 (-2 DST)");
+ console.log("YeAPF 0.8.59-156 built on 2018-03-12 07:01 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -1478,7 +1478,7 @@
      
      /* minutes (integer) -> hh:mm (string) */
      function minutes2time(aMinutes) {
-       var h=Math.floor(aMinutes / 60);
+       var h=pad(Math.floor(aMinutes / 60),2);
        var m=pad(aMinutes % 60,2);
        return h+':'+m;
      }
@@ -1808,8 +1808,15 @@
          auxLine = auxLine.replace(/\&\#93\;/g, ']');
        } else if (typeof auxLine=='number') {
            auxLine = auxLine.toString();
-       } else
+       } else if (typeof auxLine == 'object') {
+         for(var aux in auxLine) {
+           if (auxLine.hasOwnProperty(aux)) {
+             auxLine[aux]=unmaskHTML(auxLine[aux]);
+           }
+         }
+       } else {
          auxLine = '';
+       }
        return auxLine;
      }
      
@@ -2161,18 +2168,19 @@
       * object oriented model
       */
      
-     var xml2array = function (xmlDoc) {
+     var xml2array = function (xmlDoc, attribute_inside) {
        var key;
        var that = {};
        that.not_whitespace = new RegExp(/[^\s]/);
        that.parent_count=null;
+       attribute_inside = attribute_inside || 0;
      
        //Process the xml data
-       that.xml2array = function(xmlDoc,parent_count) {
+       that.xml2array = function(xmlDoc,parent_count,attribute_inside) {
          var arr, temp_arr, temp, parent = "";
          parent_count = parent_count || {};
      
-         var attribute_inside = 0; /*:CONFIG: Value - 1 or 0
+         attribute_inside = attribute_inside || 0; /*:CONFIG: Value - 1 or 0
          * If 1, Value and Attribute will be shown inside the tag - like this...
          * For the XML string...
          * <guid isPermaLink="true">http://www.bin-co.com/</guid>
@@ -2203,7 +2211,7 @@
      
          if(xmlDoc.childNodes.length) {
            if(xmlDoc.childNodes.length == 1) { //Just one item in this tag.
-             arr = that.xml2array(xmlDoc.childNodes[0],parent_count); //:RECURSION:
+             arr = that.xml2array(xmlDoc.childNodes[0],parent_count, attribute_inside); //:RECURSION:
            } else { //If there is more than one childNodes, go thru them one by one and get their results.
              if (!arr)
                arr=[];
@@ -2211,7 +2219,7 @@
              var index = 0;
      
              for(var i=0; i<xmlDoc.childNodes.length; i++) {//Go thru all the child nodes.
-               temp = that.xml2array(xmlDoc.childNodes[i],parent_count); //:RECURSION:
+               temp = that.xml2array(xmlDoc.childNodes[i],parent_count, attribute_inside); //:RECURSION:
                if(temp) {
                  var assoc = false;
                  var arr_count = 0;
@@ -2252,8 +2260,9 @@
                              arr[lastKey]['value'] = temp_arr;
                              arr[lastKey]['attribute_'+nname] = xmlDoc.childNodes[i].attributes[j].nodeValue;
                            } else {
-                           /* Value in the tag and Attribute otside the tag(in parent) */
-                             arr['attribute_' + lastKey + '_' + nname] = xmlDoc.childNodes[i].attributes[j].value;
+                             /* Value in the tag and Attribute otside the tag(in parent) */
+                             // 20180305 arr['attribute_' + lastKey + '_' + nname] = xmlDoc.childNodes[i].attributes[j].value;
+                             arr[nname] = xmlDoc.childNodes[i].attributes[j].value;
                            }
                          }
                        } //End of 'for(var j=0; j<xmlDoc. ...'
@@ -5583,7 +5592,7 @@
                                  for (c = 0; c < aLineSpec.columns.length; c++) {
                                      if (auxHTML > '')
                                          auxHTML += sep;
-                                     auxHTML = auxHTML + xDataItem[aLineSpec.columns[c]] || '';
+                                     auxHTML = auxHTML + (xDataItem[aLineSpec.columns[c]] || '');
                                  }
                              } else {
                                  if (typeof xDataItem == 'string') {

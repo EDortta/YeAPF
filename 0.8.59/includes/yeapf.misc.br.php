@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misc.br.php
-    YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
-    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-08-28 19:44:55 (-2 DST)
+    YeAPF 0.8.59-156 built on 2018-03-12 07:01 (-3 DST)
+    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+    2018-03-12 07:00:48 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -131,17 +131,32 @@
     return round($dividendo - (floor($dividendo / $divisor) * $divisor));
   }
 
-  function inventarCPF($compontos=false)
+  function inventarCPF($compontos=false, $base=null)
   {
-    $n1 = y_rand(0, 9);
-    $n2 = y_rand(0, 9);
-    $n3 = y_rand(0, 9);
-    $n4 = y_rand(0, 9);
-    $n5 = y_rand(0, 9);
-    $n6 = y_rand(0, 9);
-    $n7 = y_rand(0, 9);
-    $n8 = y_rand(0, 9);
-    $n9 = y_rand(0, 9);
+    $comBase=false;
+    if ($base!=null) {
+      $base=preg_replace("/[^0-9]+/", "", $base);
+      if (strlen($base)==9) {
+        $comBase=true;
+        for($i=1; $i<10; $i++) {
+          $var="n".$i;
+          $$var=substr($base,$i-1, 1);
+        }
+      }
+    }
+
+    if(!$comBase) {
+      $n1 = y_rand(0, 9);
+      $n2 = y_rand(0, 9);
+      $n3 = y_rand(0, 9);
+      $n4 = y_rand(0, 9);
+      $n5 = y_rand(0, 9);
+      $n6 = y_rand(0, 9);
+      $n7 = y_rand(0, 9);
+      $n8 = y_rand(0, 9);
+      $n9 = y_rand(0, 9);      
+    }
+
     $d1 = $n9 * 2 + $n8 * 3 + $n7 * 4 + $n6 * 5 + $n5 * 6 + $n4 * 7 + $n3 * 8 + $n2 * 9 + $n1 * 10;
     $d1 = 11 - (_mod_($d1, 11));
     if ($d1 >= 10) {

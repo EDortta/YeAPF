@@ -39,6 +39,18 @@
     return $ret;
   }
 
+  function _getProjectInfo($key) {
+    global $cfgAdminBaseFolder;
+    $ret=array();
+    $infoProjectFilename="$cfgAdminBaseFolder/.keys/$key/.info";
+    if (file_exists($infoProjectFilename)) {
+      $ret=json_decode(file_get_contents($infoProjectFilename), true);
+    } else {
+      $ret=array('key'=>$key, 'status'=> 'stop');
+    }
+    return $ret; 
+  }
+
   function clientIP() {
     if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
         $ip = $_SERVER['HTTP_CLIENT_IP'];
@@ -295,6 +307,24 @@
 
     return trim($key);
   }
+
+  function _registerDeviceInfo($projectKey, $deviceId, $JDeviceInfo, $deleteOldInformation=false) {
+    global $cfgAdminBaseFolder;
+    $projectFolder = "$cfgAdminBaseFolder/.keys/$projectKey";
+    if (!is_dir($projectFolder)) {
+      mkdir($projectFolder, 0777, true);
+    }
+
+    if (is_dir($projectFolder)) {
+      $infoFilename = "$projectFolder/$deviceId.json";
+      $currentInfo = array();
+      if (!$deleteOldInformation) {
+        $currentInfo = json_decode(file_get_contents($infoFilename), true);
+      }
+      $newInfo = array_merge($currentInfo, $JDeviceInfo);
+      file_put_contents($infoFilename, json_encode($newInfo));
+    }
+  };
 
   function _deviceId2deviceKey($projectKey, $deviceId) {
     global $cfgAdminBaseFolder;

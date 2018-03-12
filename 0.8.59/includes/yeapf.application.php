@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
-    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-12-14 18:31:30 (-2 DST)
+    YeAPF 0.8.59-156 built on 2018-03-12 07:01 (-3 DST)
+    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+    2018-03-12 07:00:48 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -583,7 +583,8 @@
             $CIKeys[]=$CIK;
 
             $knum = is_numeric($k);
-            if (is_array($v)) {
+            $itemKeyRequired = is_array($v);
+            if ($itemKeyRequired) {
               $v=xq_produceReturnLinesFromInnerArray($v, $colNames, $nonEmptyField, '_'.$k, $xq_prefix, $xq_postfix);
             } else
               $v=maskHTML(trim($v));
@@ -611,7 +612,11 @@
 
 
             if ($canAdd) {
-              $auxRow.="    <$k$fieldAttrib>$v</$k>\n";
+              if ($itemKeyRequired) {
+                $auxRow.="    <rowItem id='$k'$fieldAttrib>$v</rowItem>\n";
+              } else {
+                $auxRow.="    <$k$fieldAttrib>$v</$k>\n";
+              }
               if ($k==$nonEmptyField) {
                 $mandatoryFieldFilled=(trim($v)>'');
               }
@@ -679,7 +684,8 @@
       if ($isArrayOfArray) {
         $xq_return='';
         foreach($returnSet as $k=>$v) {
-          $xq_return.= xq_produceReturnLinesFromArray($v, $xq_regCount, $xq_usingColNames, '', $xq_prefix, $xq_postfix);
+          $auxRet = xq_produceReturnLinesFromArray($v, $xq_regCount, $xq_usingColNames, '', $xq_prefix, $xq_postfix);
+          $xq_return.=$auxRet;
         }
       } else
         $xq_return = xq_produceReturnLinesFromArray($returnSet, $xq_regCount, $xq_usingColNames, '', $xq_prefix, $xq_postfix);

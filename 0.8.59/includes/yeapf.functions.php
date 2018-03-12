@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.59-136 built on 2018-02-02 15:49 (-2 DST)
+    YeAPF 0.8.59-156 built on 2018-03-12 07:01 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-01-25 13:17:18 (-2 DST)
+    2018-03-12 07:00:48 (-3 DST)
    */
 
   /*
@@ -859,13 +859,13 @@
     return ($quote>'');
   }
 
-  function getCharUntil($line, $aPos, $char, $asExpression=true)
+  function getCharUntil($line, $aPos, $quoteChar, $asExpression=true)
   {
     // """(6MMx20CM)GDC MICROMOLA ESPIRAL DESTACAVEL"
     // "HASTE FEMORAL CIMENTADA POLIDA """" CP3 """""
-    if (($char=='"') || ($char=="'") || ($char=="&#34;") || ($char=="&#39;")) {
-      $doubleQuote=$char.$char;
-      $escapedQuote="\\".$char;
+    if (($quoteChar=='"') || ($quoteChar=="'") || ($quoteChar=="&#34;") || ($quoteChar=="&#39;")) {
+      $doubleQuote=$quoteChar.$quoteChar;
+      $escapedQuote="\\".$quoteChar;
     } else {
       $doubleQuote='""';
       $escapedQuote="\\".'"';
@@ -874,9 +874,10 @@
     $inDoubleQuote=false;
     $aPos++;
     while ($aPos<strlen($line)) {
-      if (substr($line,$aPos,2)==$escapedQuote)
+      // echo '|'.substr($line,$aPos,1);
+      if ((substr($line,$aPos,2)==$escapedQuote) || (substr($line, $aPos, 2)=='\\\\'))
         $aPos+=2;
-      if (substr($line,$aPos,1)==$char) {
+      if (substr($line,$aPos,1)==$quoteChar) {
         if (substr($line,$aPos,2)==$doubleQuote) {
           $inDoubleQuote=false;
           $aPos++;
@@ -893,8 +894,9 @@
       $res=unquote($res);
       $res=str_replace($doubleQuote, $escapedQuote, $res);
       $res=$quote.$res.$quote;
-    } else
+    } else {
       $res=str_replace($doubleQuote, $escapedQuote, $res);
+    }
     // echo "[ $res ]\n";
     return $res;
   }
@@ -981,6 +983,7 @@
       }
     }
     $line=trim(substr($line,strlen($res)+1,strlen($line)));
+    $res=stripslashes($res);
     $res=str_replace('\\,', ',', $res);
     return trim(unquote($res));
   }

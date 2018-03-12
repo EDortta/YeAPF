@@ -18,29 +18,30 @@
             if ($code>0) error_handler($code,$msg,$file,$line);
         }
     }
-  
+  }
+
   $isWebservice=true;
-  
+
   (@include_once "yeapf.php") or die("Err loading yeapf.php\n");
   if (file_exists("../lib/nuSOAP/nusoap.php"))
-    $nusoapLib="../lib/nuSOAP/nusoap.php";    
+    $nusoapLib="../lib/nuSOAP/nusoap.php";
   else if (file_exists("lib/nuSOAP/nusoap.php"))
     $nusoapLib="lib/nuSOAP/nusoap.php";
   else if (file_exists("nuSOAP/nusoap.php"))
     $nusoapLib="nuSOAP/nusoap.php";
-  else 
+  else
     $nusoapLib = "../../lib/nuSOAP/nusoap.php";
 
   (@include_once $nusoapLib) or die("Err 1 loading $nusoapLib\n");
-  
+
   $webServiceName="%(webServiceName)";
-  
+
   if ($webServiceName=='%('.'webServiceName)')
     die("Please, change '\$webServiceName' variable value");
-    
-  if (strtolower(basename(__FILE__))=='ywebservice.php') 
+
+  if (strtolower(basename(__FILE__))=='ywebservice.php')
     die("Please, rename this file to something more appropriate");
-    
+
   if (basename(__FILE__)!="$webServiceName.php") {
 	$pathInfo=pathinfo(__FILE__);
     die("Please, change '\$webServiceName' variable to ".$pathInfo['filename']);
@@ -66,7 +67,7 @@
       }
     }
   }
-  
+
   // logAction("{$server['REMOTE_ADDR']} $action");
 
 
