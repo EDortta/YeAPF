@@ -22,12 +22,12 @@
 	    $GLOBALS['dbType']=$args->argValue('type');
 
 	    $GLOBALS['dbDefArray'] = array(
-	    	'dbName'   => $GLOBALS['dbName'],
-	    	'dbHost'   => $GLOBALS['dbHost'],
-	    	'dbServer' => $GLOBALS['dbHost'],
-	    	'dbUser'   => $GLOBALS['dbUser'],
-	    	'dbPass'   => $GLOBALS['dbPass'],
-	    	'dbType'   => $GLOBALS['dbType']
+	    	'dbName'     => $GLOBALS['dbName'],
+	    	'dbHost'     => $GLOBALS['dbHost'],
+	    	'dbServer'   => $GLOBALS['dbHost'],
+	    	'dbUser'     => $GLOBALS['dbUser'],
+	    	'dbPassword' => $GLOBALS['dbPass'],
+	    	'dbType'     => $GLOBALS['dbType']
 	    );
 
 	    $GLOBALS['dbDef']=$GLOBALS['dbHost'].$GLOBALS['dbName'].$GLOBALS['dbUser'].$GLOBALS['dbPass'].$GLOBALS['dbType'];
