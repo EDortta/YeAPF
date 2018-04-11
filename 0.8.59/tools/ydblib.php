@@ -1,6 +1,8 @@
 <?php
   function getDBArgs($args)
-  {    	
+  {
+  	$GLOBALS['dbDef']='';
+  	$GLOBALS['dbDefArray']=array();
 	  if ($args->argValue('db')) {
 	    $db=explode(':',$args->argValue('db'));
 	    if (count($db)==1) {
@@ -18,7 +20,15 @@
 	    if ($GLOBALS['dbUser']=='')$GLOBALS['dbUser']=get_current_user();
 	    $GLOBALS['dbPass']=$args->argValue('pass');
 	    $GLOBALS['dbType']=$args->argValue('type');
-	    
+
+	    $GLOBALS['dbDefArray'] = array(
+	    	'dbName'   => $GLOBALS['dbName'],
+	    	'dbHost'   => $GLOBALS['dbHost'],
+	    	'dbServer' => $GLOBALS['dbHost'],
+	    	'dbUser'   => $GLOBALS['dbUser'],
+	    	'dbPass'   => $GLOBALS['dbPass'],
+	    	'dbType'   => $GLOBALS['dbType']
+	    );
 
 	    $GLOBALS['dbDef']=$GLOBALS['dbHost'].$GLOBALS['dbName'].$GLOBALS['dbUser'].$GLOBALS['dbPass'].$GLOBALS['dbType'];
 
@@ -30,7 +40,6 @@
 	    $GLOBALS['dbSQL']=$args->argValue('sql');
 	    $GLOBALS['dbTable']=$args->argValue('table');
 
-	  } else
-	    $GLOBALS['dbDef']='';
+	  }
   }
 ?>

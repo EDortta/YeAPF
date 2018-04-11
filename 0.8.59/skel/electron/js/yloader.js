@@ -1,8 +1,8 @@
 /*********************************************
   * skel/electron/js/yloader.js
-  * YeAPF 0.8.59-156 built on 2018-03-12 07:01 (-3 DST)
+  * YeAPF 0.8.59-166 built on 2018-04-11 08:50 (-3 DST)
   * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2018-03-12 07:01:30 (-3 DST)
+  * 2018-04-11 08:50:12 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.59-156 built on 2018-03-12 07:01 (-3 DST)");
+ console.log("YeAPF 0.8.59-166 built on 2018-04-11 08:50 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -949,6 +949,44 @@
          });
        };
      }
+     
+     if (!String.prototype.isPIS) {
+       String.prototype.isPIS = function() {
+           var p, n, s, c = this,
+               mult = [3,2,9,8,7,6,5,4,3,2],
+               ret=false;
+           if((c = c.replace(/[^\d]/g,"").split("")).length == 11) {
+             p=c[0];
+             n=1;
+             while ((n<c.length) && (c[n]==p))
+               n++;
+             if (n<c.length) {
+               var total = 0, m1, m2, d;
+               for(n=0; n<10; n++) {
+                 total += (c[n]*mult[n]);
+               }
+               resto = 11 - total % 11;
+               resto = resto == 10 || (resto == 11?0:resto);
+               digito = c[10];
+               ret = resto == digito;
+             }
+           }
+           return ret;
+       }
+     }
+     
+     if (!String.prototype.isCNS) {
+       String.prototype.isCNS = function () {
+         var ret=false, c=this.replace(/[^\d]/g,""), s=0;
+         if ((c.match("[1-2]\\d{10}00[0-1]\\d")) || (c.match("[7-9]\\d{14}"))) {
+           c=c.split('');
+           for(var i=0; i<c.length; i++) {
+             s+=Math.floor(c[i],10) * (15-i);
+           }
+           ret =( s % 11 )==0;
+         }
+         return ret;
+     }}
      
      if (!String.prototype.isCPF) {
        //+ Carlos R. L. Rodrigues
@@ -2824,8 +2862,10 @@
              var funcParams = aLine.slice(p + p1 + 1, p + p2);
              var parametros = funcParams, n=null;
              funcParams = funcParams.split(',');
-             for (n = 0; n < funcParams.length; n++)
+             for (n = 0; n < funcParams.length; n++) {
+               funcParams[n]=(funcParams[n] || '').trim();
                funcParams[n] = yAnalise(funcParams[n], aStack, aObject);
+             }
      
              aValue = undefined;
              var fParamU = funcParams[0].toUpperCase();
@@ -2951,6 +2991,18 @@
                  if (funcName > '') {
                    if ('function' == typeof aObject[funcName]) {
                      aValue = aObject[funcName].apply(null, funcParams);
+                   } else {
+                     if ('object' == typeof aObject[funcName]) {
+                       if ('function' == typeof aObject[funcName][aValue]) {
+                         aValue = aObject[funcName][aValue].apply(null, funcParams);
+                       } else {
+                         aValue = aObject[funcName];
+                       }
+                     } else {
+                       if ('undefined' !== typeof aObject[funcName]) {
+                         aValue = aObject[funcName];
+                       }
+                     }
                    }
                    /*
                    if (eval('typeof '+funcName) == 'function') {

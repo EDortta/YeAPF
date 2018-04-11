@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yanalise.js
- * YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
- * Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
- * 2017-12-22 07:05:55 (-2 DST)
+ * YeAPF 0.8.59-166 built on 2018-04-11 08:50 (-3 DST)
+ * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+ * 2018-03-15 16:21:55 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yLexObj introduced in 2016-08-22 0.8.50-0
 **********************************************/
@@ -43,8 +43,10 @@ function yAnalise(aLine, aStack, aObject) {
         var funcParams = aLine.slice(p + p1 + 1, p + p2);
         var parametros = funcParams, n=null;
         funcParams = funcParams.split(',');
-        for (n = 0; n < funcParams.length; n++)
+        for (n = 0; n < funcParams.length; n++) {
+          funcParams[n]=(funcParams[n] || '').trim();
           funcParams[n] = yAnalise(funcParams[n], aStack, aObject);
+        }
 
         aValue = undefined;
         var fParamU = funcParams[0].toUpperCase();
@@ -170,6 +172,18 @@ function yAnalise(aLine, aStack, aObject) {
             if (funcName > '') {
               if ('function' == typeof aObject[funcName]) {
                 aValue = aObject[funcName].apply(null, funcParams);
+              } else {
+                if ('object' == typeof aObject[funcName]) {
+                  if ('function' == typeof aObject[funcName][aValue]) {
+                    aValue = aObject[funcName][aValue].apply(null, funcParams);
+                  } else {
+                    aValue = aObject[funcName];
+                  }
+                } else {
+                  if ('undefined' !== typeof aObject[funcName]) {
+                    aValue = aObject[funcName];
+                  }
+                }
               }
               /*
               if (eval('typeof '+funcName) == 'function') {

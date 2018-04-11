@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.59-156 built on 2018-03-12 07:01 (-3 DST)
+    YeAPF 0.8.59-166 built on 2018-04-11 08:50 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-03-12 07:00:48 (-3 DST)
+    2018-03-15 16:21:55 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -93,7 +93,7 @@
 
     if (db_status(_DB_CONNECTED_)==_DB_CONNECTED_) {
       if (db_status(_DB_UPDATABLE)==_DB_UPDATABLE) {
-        $currentDBVersion=(intval("$currentDBVersion"));
+        $currentDBVersion=isset($currentDBVersion)?(intval("$currentDBVersion")):0;
         _recordWastedTime("checking structure - currentDBVersion: $currentDBVersion");
 
         if (_db_upd_canReviewVersion(1)) {

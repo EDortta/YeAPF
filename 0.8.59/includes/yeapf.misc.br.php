@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misc.br.php
-    YeAPF 0.8.59-156 built on 2018-03-12 07:01 (-3 DST)
+    YeAPF 0.8.59-166 built on 2018-04-11 08:50 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-03-12 07:00:48 (-3 DST)
+    2018-04-03 10:16:45 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -116,7 +116,7 @@
 
   function formatarCPF($cpf)
   {
-    $cpf = ereg_replace("[^0-9]", "", $cpf);
+    $cpf = preg_replace("/[^0-9]+/", "", $cpf);
     while (strlen($cpf)<11)
       $cpf="0$cpf";
     if ($cpf>'')
@@ -183,19 +183,19 @@
   function formatarRG($rg)
   {
     $rg=strtoupper($rg);
-    $rg=ereg_replace("[^0-9,A-Z]","",$rg);
+    $rg=preg_replace("/[^0-9A-Za-z]/","",$rg);
     $r='';
     // echo "rg=$rg : ";
 
     $letra=substr($rg,strlen($rg)-1,1);
     // eliminar numeros
-    $letra=trim(ereg_replace("[0-9]", "", $letra));
+    $letra=trim(preg_replace("/[0-9]+/", "", $letra));
 
     $primeira=substr($rg,0,1);
-    $primeira=trim(ereg_replace("[0-9]", "", $primeira));
+    $primeira=trim(preg_replace("/[0-9]+/", "", $primeira));
 
     if ($primeira=='')
-      $rg = ereg_replace("[^0-9]", "", $rg);
+      $rg = preg_replace("/[^0-9]+/", "", $rg);
     // echo " ($letra) $rg : ";
 
 
@@ -235,7 +235,7 @@
 
   function mask($value, $mask)
   {
-    $value=ereg_replace("[^0-9]", "",$value);
+    $value=preg_replace("/[^0-9]+/", "",$value);
     $ret='';
     $n=0;
     for($i==0; $i<strlen($mask); $i++)
@@ -248,7 +248,7 @@
 
   function formatarCNPJ($cnpj)
   {
-    $cnpj = ereg_replace("[^0-9]", "", $cnpj);
+    $cnpj = preg_replace("/[^0-9]+/", "", $cnpj);
     $cnpj = str_repeat('0',14).$cnpj;
     $cnpj = substr($cnpj,strlen($cnpj)-14);
     if ($cnpj>'')
@@ -297,7 +297,7 @@
 
   function formatarCEP($cep)
   {
-    $cep = ereg_replace("[^0-9]", "", $cep);
+    $cep = preg_replace("/[^0-9]+/", "", $cep);
     if ($cep>'')
       $cep = substr($cep,strlen($cep)-8,2).'.'.substr($cep,strlen($cep)-6,3).'-'.substr($cep,strlen($cep)-3,3);
     else
@@ -310,7 +310,7 @@
     $nulos = array("12345678909","11111111111","22222222222","33333333333",
                    "44444444444","55555555555","66666666666","77777777777",
                    "88888888888","99999999999","00000000000");
-    $cpf = ereg_replace("[^0-9]", "", $cpf);
+    $cpf = preg_replace("/[^0-9]+/", "", $cpf);
     /*Retorna falso se houver letras no cpf */
     if (!(ereg("[0-9]",$cpf)))
       return false;

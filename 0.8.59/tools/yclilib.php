@@ -1,9 +1,9 @@
 <?php
 /*
     tools/yclilib.php
-    YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
-    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-08-28 19:44:57 (-2 DST)
+    YeAPF 0.8.59-166 built on 2018-04-11 08:50 (-3 DST)
+    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+    2018-04-11 07:58:51 (-3 DST)
 */
 
 
@@ -28,7 +28,7 @@
           if (!is_dir($target)) {
             echo "\nCreating '$target'\n";
             mkdir($target, 0777, true);
-          }          
+          }
           if (file_exists("$target/$bName")) {
             $t1=filemtime("$sourcePath/$bName");
             $t2=filemtime("$target/$bName");
@@ -74,11 +74,15 @@
   }
 
   $GLOBALS['__yeapfPath']='%_YEAPF_PATH_%';
+  /* this allows to use yclilib from YeAPF head source folder */
+  if ($GLOBALS['__yeapfPath']=='%_'.'YEAPF_PATH_%') {
+    $GLOBALS['__yeapfPath']=dirname(dirname(__FILE__));
+  }
 
   function _LOAD_YEAPF_($libraryList='')
   {
     global $__yeapfPath, $cfgAvoidIncludesLst;
-  
+
     /* avoid loading includes.lst in app folders */
     $cfgAvoidIncludesLst = 'yes';
 
@@ -199,6 +203,14 @@
         return $this->src[$srcNdx];
       else
         return null;
+    }
+
+    function getOptionList() {
+      $ret = array();
+      foreach($this->options as $k=>$v) {
+        $ret[$k]=$v;
+      }
+      return $ret;
     }
 
 
