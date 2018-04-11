@@ -1,9 +1,9 @@
 <?php
 /*
     skel/service/configure.php
-    YeAPF 0.8.59-166 built on 2018-04-11 08:50 (-3 DST)
+    YeAPF 0.8.59-167 built on 2018-04-11 09:04 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-04-11 08:50:12 (-3 DST)
+    2018-04-11 09:04:27 (-3 DST)
 */
 
 
@@ -281,7 +281,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.59-166 built on 2018-04-11 08:50 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.59-167 built on 2018-04-11 09:04 (-3 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -321,9 +321,9 @@
 
 
   echo sayStep("<div class=cpyrght><strong><big><I>skel/service/configure.php</I></big></strong><br>
-    YeAPF 0.8.59-166 built on 2018-04-11 08:50 (-3 DST)<br>
+    YeAPF 0.8.59-167 built on 2018-04-11 09:04 (-3 DST)<br>
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    2018-04-11 08:50:12 (-3 DST)</div>");
+    2018-04-11 09:04:27 (-3 DST)</div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     die(sayStep("<div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));

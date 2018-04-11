@@ -9236,14 +9236,14 @@
 <end>40</end>
 </code></__anonymousFunction__3077></functions><filename>sample.js</filename>
 <folder>templates%2Fpure%2Fjs</folder>
-</sample.js><ycreatedbconn.php><functions><displayError><name>displayError</name>
+</sample.js><ysetdbconn.php><functions><displayError><name>displayError</name>
 <parameters><errMessage><dummy>ok</dummy>
 </errMessage></parameters><code><md5>d41d8cd98f00b204e9800998ecf8427e</md5>
 <start>14</start>
 <end>26</end>
-</code></displayError></functions><filename>ycreatedbconn.php</filename>
+</code></displayError></functions><filename>ysetdbconn.php</filename>
 <folder>tools</folder>
-</ycreatedbconn.php><compile-yloader.php><filename>compile-yloader.php</filename>
+</ysetdbconn.php><compile-yloader.php><filename>compile-yloader.php</filename>
 <folder>tools</folder>
 </compile-yloader.php><compile-configure.php><functions><minify_html><name>minify_html</name>
 <parameters><input><dummy>ok</dummy>
