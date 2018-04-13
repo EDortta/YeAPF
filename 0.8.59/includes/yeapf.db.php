@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.59-156 built on 2018-03-12 07:01 (-3 DST)
+    YeAPF 0.8.59-174 built on 2018-04-13 17:55 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-03-12 07:00:48 (-3 DST)
+    2018-04-13 17:54:36 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -1101,13 +1101,13 @@
     $k=false;
     $vn=$v;
     if (strlen($v)==19) {
-      // $k=ereg($universalDate,$v,$regs);
+      // $k=preg_match($universalDate,$v,$regs);
       $k=preg_match("/$universalDate/",$v,$regs);
       if ($k) {
         $vn=$regs[2].$regs[3].$regs[1].$regs[4].$regs[5].$regs[6];
         $ret[$k]=$vn;
       } else {
-        //$k=ereg($usaDate,$v,$regs);
+        //$k=preg_match($usaDate,$v,$regs);
         $k=preg_match("/$usaDate/",$v,$regs);
         if ($k) {
           $vn=$regs[1].$regs[2].$regs[3].$regs[4].$regs[5].$regs[6];
@@ -1115,13 +1115,13 @@
         }
       }
     } else if (strlen($v)==10) {
-      // $k=ereg($universalDateB,$v,$regs);
+      // $k=preg_match($universalDateB,$v,$regs);
       $k=preg_match("/$universalDateB/",$v,$regs);
       if ($k) {
         $vn=$regs[2].$regs[3].$regs[1].'000000';
         $ret[$k]=$vn;
       } else {
-        // $k=ereg($usaDateB,$v,$regs);
+        // $k=preg_match($usaDateB,$v,$regs);
         $k=preg_match("/$usaDateB/",$v,$regs);
         if ($k) {
           $vn=$regs[1].$regs[2].$regs[3].'000000';
@@ -1131,13 +1131,13 @@
     } else if ((strlen($v)==14) || (strlen($v)==12)) {
       if (strlen($v)==12)
         $v=$v.'00';
-      // $k=ereg($universalDateC,$v,$regs);
+      // $k=preg_match($universalDateC,$v,$regs);
       $k=preg_match("/$universalDateC/",$v,$regs);
       if ($k) {
         $vn=$regs[2].$regs[3].$regs[1].$regs[4].$regs[5].$regs[6];
         $ret[$k]=$vn;
       } else {
-        //$k=ereg($usaDateC,$v,$regs);
+        //$k=preg_match($usaDateC,$v,$regs);
         $k=preg_match("/$usaDateC/",$v,$regs);
         if ($k) {
           $vn=$regs[1].$regs[2].$regs[3].$regs[4].$regs[5].$regs[6];

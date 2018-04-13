@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misctools.php
-    YeAPF 0.8.59-156 built on 2018-03-12 07:01 (-3 DST)
+    YeAPF 0.8.59-174 built on 2018-04-13 17:55 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-02-10 10:25:49 (-3 DST)
+    2018-04-13 17:54:36 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -138,7 +138,7 @@
 
   function isint($num)
   {
-    return ereg("([0-9]+)",(string)$num);
+    return preg_match("([0-9]+)",(string)$num);
   }
 
   function str_is_bool($value, $pureBoolean=false)

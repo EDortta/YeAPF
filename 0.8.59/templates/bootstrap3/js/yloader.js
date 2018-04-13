@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.59-168 built on 2018-04-11 10:28 (-3 DST)
+  * YeAPF 0.8.59-174 built on 2018-04-13 17:55 (-3 DST)
   * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2018-04-11 10:28:29 (-3 DST)
+  * 2018-04-13 17:55:33 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.59-168 built on 2018-04-11 10:28 (-3 DST)");
+ console.log("YeAPF 0.8.59-174 built on 2018-04-13 17:55 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -288,7 +288,7 @@
      ( function () {
        y$ = function (aElementId, aTagName, aIndex) {
          var ret=undefined, auxRet;
-         if (aElementId>'') {
+         if (("string" == typeof aElementId) && (aElementId>'')) {
            if (aElementId.substr(0,1)=='#') {
              if (aElementId.indexOf(' ')>0) {
                ret=document.querySelector(aElementId);
@@ -5738,7 +5738,7 @@
                                      if (valueType != 'text') {
                                          if ((editMask > '') && (storageMask > '')) {
                                              if (valueType.indexOf('date') >= 0) {
-                                                 fieldValue = dateTransform(fieldValue, storageMask, editMask);
+                                                 fieldValue = dateTransform(fieldValue, storageMask, editMask) || '';
                                              }
                                          } else
                                              fieldValue = yAnalise("%" + valueType + "(" + fieldValue + ")");

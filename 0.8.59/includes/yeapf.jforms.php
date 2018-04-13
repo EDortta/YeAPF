@@ -1,11 +1,10 @@
 <?php
 /*
     includes/yeapf.jforms.php
-    YeAPF 0.8.59-166 built on 2018-04-11 08:50 (-3 DST)
+    YeAPF 0.8.59-174 built on 2018-04-13 17:55 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-04-11 06:50:28 (-3 DST)
+    2018-04-12 15:45:53 (-3 DST)
 */
-
 
 function jf_getFieldsNames($jsonFilename) {
 
@@ -13,7 +12,7 @@ function jf_getFieldsNames($jsonFilename) {
 
   if (!function_exists("nodeSearch")) {
     function nodeSearch(&$ret, $node) {
-      $reservedWords = array('type','width', 'decimal','nullable','hidden','class','label','order', 
+      $reservedWords = array('type','width', 'decimal','nullable','hidden','class','label','order',
                              'fields', 'domType', 'readOnly', 'value',
                              'mainRow', 'mainColumn', 'footerRow', 'footerColumn',
                              'rows');
@@ -21,8 +20,9 @@ function jf_getFieldsNames($jsonFilename) {
       foreach($node as $k=>$v) {
         if (!is_numeric($k)) {
           if (!in_array($k, $reservedWords)) {
-            if (!in_array($k, $reservedStructures))
-              $ret[$k]=array();
+            if (!in_array($k, $reservedStructures)) {
+              $ret[$k]=$v;
+            }
           }
         }
         if (is_array($v)) {
@@ -38,7 +38,70 @@ function jf_getFieldsNames($jsonFilename) {
   $mainNode = json_decode($jsonFile, true);
   nodeSearch($ret, $mainNode);
 
-  return $ret; 
+  return $ret;
+}
+
+function jf_checkFieldValues($formFields, $values) {
+  $ret = array();
+  foreach($values as $k=>$v) {
+    if (array_key_exists($k, $formFields)) {
+      if (isset($formFields[$k]['type'])) {
+        $fieldType = $formFields[$k]['type'];
+        $fieldSubtype = substr($fieldType, strpos($fieldType .'(', '('));
+        $fieldType = trim(substr($fieldType,0,strlen($fieldType) - strlen($fieldSubtype)));
+        $fieldSubtype = str_replace("(", "", str_replace(")", "", $fieldSubtype));
+        $fieldSubtype = explode(",", $fieldSubtype);
+
+        switch($fieldType) {
+          case 'decimal':
+            $v = decimalSQL($v);
+            $v = number_format($v,$fieldSubtype[1]);
+            break;
+        }
+
+        if (isset($formFields[$k]['options'])) {
+          $valueAccepted = false;
+          foreach($formFields[$k]['options'] as $opk=>$opv) {
+            if ($v==$opv['value'])
+              $valueAccepted==true;
+          }
+          if (!$valueAccepted)
+            $v=null;
+        }
+        if (($v) && (trim($v)>''))
+          $ret[$k]=trim("$v");
+      }
+    }
+  }
+  return $ret;
+}
+
+function jf_getBriefingFields($formFields) {
+  $ret = array();
+  foreach($formFields as $k=>$v) {
+    if (is_array($v)) {
+      if (isset($v['briefingField'])) {
+        if (mb_strtolower(trim($v['briefingField']))=='yes') {
+
+          $fieldType = isset($v['type'])?$v['type']:'char';
+          $fieldSubtype = substr($fieldType, strpos($fieldType .'(', '('));
+          $fieldType = trim(substr($fieldType,0,strlen($fieldType) - strlen($fieldSubtype)));
+          $fieldSubtype = str_replace("(", "", str_replace(")", "", $fieldSubtype));
+
+          $ret[]=array( 'field'=>$k,
+                        'briefingOrder' => $v['briefingOrder'],
+                        'type'          => $fieldType,
+                        'label'         => isset($v['briefingLabel'])?$v['briefingLabel']:$v['label'],
+                        'subType'       => $fieldSubtype,
+                        'rightAddon'    => isset($v['rightAddon'])?$v['rightAddon']:'',
+                        'leftAddon'     => isset($v['leftAddon'])?$v['leftAddon']:'' );
+        }
+      }
+    }
+  }
+  usort($ret, function($a, $b) { return ($a['briefingOrder']-$b['briefingOrder']);});
+
+  return $ret;
 }
 
 ?>

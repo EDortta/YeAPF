@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.59-156 built on 2018-03-12 07:01 (-3 DST)
+ * YeAPF 0.8.59-174 built on 2018-04-13 17:55 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-03-12 07:00:48 (-3 DST)
+ * 2018-04-12 07:58:52 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -596,7 +596,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                                 if (valueType != 'text') {
                                     if ((editMask > '') && (storageMask > '')) {
                                         if (valueType.indexOf('date') >= 0) {
-                                            fieldValue = dateTransform(fieldValue, storageMask, editMask);
+                                            fieldValue = dateTransform(fieldValue, storageMask, editMask) || '';
                                         }
                                     } else
                                         fieldValue = yAnalise("%" + valueType + "(" + fieldValue + ")");

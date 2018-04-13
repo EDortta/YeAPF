@@ -1,8 +1,8 @@
 /*********************************************
  * skel/chromeApp/js/yifc.js
- * YeAPF 0.8.59-168 built on 2018-04-11 10:28 (-3 DST)
+ * YeAPF 0.8.59-174 built on 2018-04-13 17:55 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-04-11 10:28:29 (-3 DST)
+ * 2018-04-13 17:55:33 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * This object allows to communicate with ysandboxifc.js
  * and runs outside the sandbox.

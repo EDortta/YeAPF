@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misc.br.php
-    YeAPF 0.8.59-166 built on 2018-04-11 08:50 (-3 DST)
+    YeAPF 0.8.59-174 built on 2018-04-13 17:55 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-04-03 10:16:45 (-3 DST)
+    2018-04-13 17:54:36 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -312,7 +312,7 @@
                    "88888888888","99999999999","00000000000");
     $cpf = preg_replace("/[^0-9]+/", "", $cpf);
     /*Retorna falso se houver letras no cpf */
-    if (!(ereg("[0-9]",$cpf)))
+    if (!(preg_match("[0-9]",$cpf)))
       return false;
 
     /* Retorna falso se o cpf for nulo */
