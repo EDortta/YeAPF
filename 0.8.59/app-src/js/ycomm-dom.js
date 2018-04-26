@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.59-174 built on 2018-04-13 17:55 (-3 DST)
+ * YeAPF 0.8.59-191 built on 2018-04-26 20:15 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-04-12 07:58:52 (-3 DST)
+ * 2018-04-16 19:11:48 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -342,6 +342,23 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
         } else if (aElement.nodeName == 'UL') {
             var oUL = aElement;
 
+            if (first_time) {
+                if (typeof(aLineSpec.columns || aLineSpec.rows || aLineSpec.html) == "undefined") {
+                    ycomm.dom._elem_templates[aElementID] = {};
+                    if (aElement.children.length > 0) {
+                        ycomm.dom._elem_templates[aElementID].rows = [];
+                        for (i = 0; i < aElement.children.length; i++)
+                            ycomm.dom._elem_templates[aElementID].rows[i] = trim(aElement.children[i].innerHTML + "").replace(/\ \s+/g, '');
+                    }
+                } else {
+                    ycomm.dom._elem_templates[aElementID] = {};
+                    ycomm.dom._elem_templates[aElementID].columns = aLineSpec.columns;
+                    ycomm.dom._elem_templates[aElementID].rows = aLineSpec.rows;
+                    ycomm.dom._elem_templates[aElementID].html = aLineSpec.html;
+                }
+            }
+            mergeObject(ycomm.dom._elem_templates[aElementID], aLineSpec, true);
+
             if (aFlags.deleteRows) {
                 while (oUL.firstChild) {
                     oUL.removeChild(oUL.firstChild);
@@ -659,6 +676,20 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                 _dump("There are more than one record returning from the server");
 
         } else if (aElement.nodeName == 'DIV') {
+            if (first_time) {
+                if (typeof(aLineSpec.columns || aLineSpec.rows || aLineSpec.html) == "undefined") {
+                    ycomm.dom._elem_templates[aElementID] = {};
+                    ycomm.dom._elem_templates[aElementID].html = aElement.innerHTML;
+                } else {
+                    ycomm.dom._elem_templates[aElementID] = {};
+                    ycomm.dom._elem_templates[aElementID].columns = aLineSpec.columns;
+                    ycomm.dom._elem_templates[aElementID].rows = aLineSpec.rows;
+                    ycomm.dom._elem_templates[aElementID].html = aLineSpec.html;
+                }
+            }
+            mergeObject(ycomm.dom._elem_templates[aElementID], aLineSpec, true);
+
+
             if (aFlags.deleteRows)
                 aElement.innerHTML = '';
 

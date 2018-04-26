@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.debug.php
-    YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
-    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-09-01 07:16:40 (-2 DST)
+    YeAPF 0.8.59-191 built on 2018-04-26 20:15 (-3 DST)
+    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+    2018-04-26 17:00:07 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -54,9 +54,9 @@
       $canDoLog=true;
     if ($canDoLog) {
       if ($logOutput<0) {
-        $canDoLog=((!$isCLI) && (is_dir("$cfgCurrentFolder/logs") && 
+        $canDoLog=((!$isCLI) && (is_dir("$cfgCurrentFolder/logs") &&
                                 (is_writable("$cfgCurrentFolder/logs")))) ||
-                   (($isCLI) && (is_dir('/var/log') && 
+                   (($isCLI) && (is_dir('/var/log') &&
                                 (is_writable("/var/log/yeapfApp.log"))));
         if ($canDoLog) {
           if ($isCLI)
@@ -312,7 +312,7 @@
             }
 
             if ($logOutput==2)
-              xq_printXML($auxStackXML, "file", $currentFile);            
+              xq_printXML($auxStackXML, "file", $currentFile);
           }
 
           $lastFile=$currentFile;
@@ -388,10 +388,10 @@
         if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_))) {
           if (db_connectionTypeIs(_MYSQLI_)) {
             $errno = mysqli_errno($ydb_conn);
-            $error = mysqli_error($ydb_conn);            
+            $error = mysqli_error($ydb_conn);
           } else {
             $errno = mysql_errno($ydb_conn);
-            $error = mysql_error($ydb_conn);             
+            $error = mysql_error($ydb_conn);
           }
           if ($logOutput<0)
             $debugOutput.="\nLast MySQL Error: $errno:$error\n";
@@ -531,7 +531,12 @@
       if (!($isCLI || $isWebservice)) {
         if (!headers_sent())
           header("Content-Type: text/html; charset=$appCharset");
-        _die("<h3>Forced exit ($isWebservice)</h3><div style='padding:32px;color:#900;font-weight:800'><big><b>$msg</b></big></div><div><h3>Click Context</h3>".nl2br($debugOutput)."</div>");
+        $debugOutput=trim($debugOutput);
+        if ($debugOutput=='<sys.stack></sys.stack>')
+          $debugOutput="";
+        if ($debugOutput>'')
+          $debugOutput = "<h3>Call context</h3>$debugOutput";
+        _die("<style>pre { white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap; white-space: -o-pre-wrap; word-wrap: break-word; }</style><h3>Forced exit ($isWebservice)</h3><h5>YeAPF 0.8.59-191 built on 2018-04-26 20:15 (-3 DST)</h5><div style='padding:32px;color:#C40002;font-weight:800'><big><b><pre>$msg</pre></b></big></div><div>$debugOutput</div>");
       } else
         _die("\nFORCED EXIT!\n$debugOutput");
     }
@@ -565,14 +570,14 @@
           $funLine=getArrayValueIfExists($myBacktrace[$callerNdx],'line','');
           $funFileName=basename(getArrayValueIfExists($myBacktrace[$callerNdx],'file',''));
           $funPos=strpos($reservedFunctions, ":$funName:");
-          
+
           $inReservedFunctions=($funPos>0) || ($yeapfLogBacktrace&2);
           if ($inReservedFunctions)
             $curCall="$funFileName at $funLine";
         } else
           $inReservedFunctions=false;
       }
-      
+
 
       if (function_exists("decimalMicrotime")) {
         if (!isset($_lastTag))

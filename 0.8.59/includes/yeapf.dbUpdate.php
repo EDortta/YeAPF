@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.59-166 built on 2018-04-11 08:50 (-3 DST)
+    YeAPF 0.8.59-191 built on 2018-04-26 20:15 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-03-15 16:21:55 (-3 DST)
+    2018-04-26 17:00:07 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -12,9 +12,9 @@
 
   function _db_upd_canReviewVersion($aVersion)
   {
-    global $flagCanReviewDBUpdate, $currentDBVersion;
+    global $flagCanReviewDBUpdate, $currentDBVersion, $flagDBStructureCanBeReviewed;
 
-    $ret=($flagCanReviewDBUpdate) && ($currentDBVersion<$aVersion);
+    $ret=($flagDBStructureCanBeReviewed) && ($flagCanReviewDBUpdate) && ($currentDBVersion<$aVersion);
     return $ret;
   }
 
@@ -67,32 +67,72 @@
 
   function _db_upd_newVersion($aVersion)
   {
-    global $setupIni, $dbTEXT_NO_ERROR, $currentDBVersion, $flagDBStructureReviewed, $cfgCurrentAppRegistry;
+    global $setupIni, $dbTEXT_NO_ERROR, $currentDBVersion,
+           $flagDBStructureReviewed,
+           $cfgCurrentAppRegistry, $flagDBStructureCanBeReviewed;
 
     $currentDBVersion=$aVersion;
     _db_grantSetupIni();
 
     $ok=false;
 
-    if ($cfgCurrentAppRegistry>'') {
-      $ok=($setupIni->locate("appRegistry", $cfgCurrentAppRegistry)==$dbTEXT_NO_ERROR);
-    } else {
-      $ok=($setupIni->locate("active",1)==$dbTEXT_NO_ERROR);
+    if ($flagDBStructureCanBeReviewed) {
+      if ($cfgCurrentAppRegistry>'') {
+        $ok=($setupIni->locate("appRegistry", $cfgCurrentAppRegistry)==$dbTEXT_NO_ERROR);
+      } else {
+        $ok=($setupIni->locate("active",1)==$dbTEXT_NO_ERROR);
+      }
+
+      if ($ok) {
+        $setupIni->addField('currentDBVersion');
+        $setupIni->setValue('currentDBVersion',$currentDBVersion);
+        $setupIni->commit();
+      }
+      $flagDBStructureReviewed=true;
     }
 
-    if ($ok) {
-      $setupIni->addField('currentDBVersion');
-      $setupIni->setValue('currentDBVersion',$currentDBVersion);
-      $setupIni->commit();
+  }
+
+  function _db_upd_do($sql) {
+    global $appCharset, $logOutput, $setupIni, $cfgCurrentAppRegistry, $flagDBStructureCanBeReviewed;
+
+    if ($flagDBStructureCanBeReviewed) {
+      $flagDBStructureCanBeReviewed = $flagDBStructureCanBeReviewed && db_sql($sql);
+      if (!$flagDBStructureCanBeReviewed) {
+
+        if ($cfgCurrentAppRegistry>'') {
+          $ok=($setupIni->locate("appRegistry", $cfgCurrentAppRegistry)==$dbTEXT_NO_ERROR);
+        } else {
+          $ok=($setupIni->locate("active",1)==$dbTEXT_NO_ERROR);
+        }
+        $currentDBVersion = $setupIni -> getValue('currentDBVersion');
+        $msg="Error Updating Database on dbVersion #$currentDBVersion.\nTrying to do:\n $sql".db_lasterror();
+
+        if (($logOutput==1) || ($logOutput==0)) {
+          $logOutput=1;
+          $msg="<pre>$msg</pre>";
+        }
+        if ($logOutput==2) {
+          header("Content-Type: text/xml;  charset=UTF-8", true);
+          $msg="<error>$msg</error>";
+        }
+
+        throw new Exception($msg, 1);
+      }
     }
-    $flagDBStructureReviewed=true;
+
+    return $flagDBStructureCanBeReviewed;
   }
 
   function _db_upd_checkStructure() {
-    global $setupIni, $flagDBStructureReviewed;
+    global $setupIni, $flagDBStructureReviewed, $flagDBStructureCanBeReviewed, $SQLdebugLevel;
+
+    $oldSQLDebugLevel = $SQLdebugLevel;
+    $SQLdebugLevel = 3;
 
     if (db_status(_DB_CONNECTED_)==_DB_CONNECTED_) {
       if (db_status(_DB_UPDATABLE)==_DB_UPDATABLE) {
+        $flagDBStructureCanBeReviewed=true;
         $currentDBVersion=isset($currentDBVersion)?(intval("$currentDBVersion")):0;
         _recordWastedTime("checking structure - currentDBVersion: $currentDBVersion");
 
@@ -668,7 +708,7 @@
                 enabled char(1) default 'N',
                 last_verification integer
               )";
-              db_sql("$sql");
+              _db_upd_do("$sql");
             }
 
             if (!db_tableExists("is_node_control")) {
@@ -681,9 +721,9 @@
                 reverse_ip varchar(255),
                 last_verification integer
               )";
-              db_sql("$sql");
+              _db_upd_do("$sql");
               $sql="create index idx_node_control on is_node_control(serverKey, nodePrefix)";
-              db_sql($sql);
+              _db_upd_do($sql);
             }
 
             if (!db_tableExists("is_sequence")) {
@@ -692,9 +732,9 @@
                       segment char(4) NOT NULL,
                       seq_value bigint NOT NULL
                     )";
-              db_sql($sql);
+              _db_upd_do($sql);
               $sql="create index idx_sequence on is_sequence(nodePrefix, segment)";
-              db_sql($sql);
+              _db_upd_do($sql);
             }
 
             if (!db_tableExists("is_segment_control")) {
@@ -702,17 +742,18 @@
               $sql="CREATE TABLE is_segment_control (
                       serverKey char(16) NOT NULL,
                       nodePrefix char(3) NOT NULL,
-                      identity char(32) NULL,
+                      identity char(32) default null,
                       segment char(4) not null,
                       creation char(14) not null,
                       regulation char(14)
                     )";
-              db_sql($sql);
-              db_sql("ALTER TABLE is_segment_control ADD PRIMARY KEY ( serverKey , nodePrefix, segment )");
+              _db_upd_do($sql);
+
+              _db_upd_do("ALTER TABLE is_segment_control ADD PRIMARY KEY ( serverKey , nodePrefix, segment )");
               if (db_connectionTypeIs(_FIREBIRD_) || db_connectionTypeIs(_PGSQL_)) {
-                db_sql("create unique index ndxIdentity on is_segment_control (identity)");
+                _db_upd_do("create unique index ndxIdentity on is_segment_control (identity)");
               } else {
-                db_sql("ALTER TABLE is_segment_control ADD UNIQUE ndxIdentity ( identity )");
+                _db_upd_do("ALTER TABLE is_segment_control ADD UNIQUE ndxIdentity ( identity )");
               }
             }
 
@@ -721,18 +762,18 @@
               $sql="create table is_segment_reservation (
                       serverKey char(16) not null,
                       nodePrefix char(3) not null,
-                      identity char(32) null,
+                      identity char(32) default null,
                       segment char(4) not null,
                       request char(14) not null,
-                      regulation char(14) null,
-                      regulation_message char(48) null
+                      regulation char(14) default null,
+                      regulation_message char(48) default null
                     )";
-              db_sql($sql);
-              db_sql("alter table is_segment_reservation add primary key ( serverKey , nodePrefix, segment )");
+              _db_upd_do($sql);
+              _db_upd_do("alter table is_segment_reservation add primary key ( serverKey , nodePrefix, segment )");
               if (db_connectionTypeIs(_FIREBIRD_) || db_connectionTypeIs(_PGSQL_)) {
-                db_sql("create unique index ndxIdentity on is_segment_reservation (identity)");
+                _db_upd_do("create unique index ndxIdentity on is_segment_reservation (identity)");
               } else {
-                db_sql("alter table is_segment_reservation ADD UNIQUE ndxIdentity ( identity )");
+                _db_upd_do("alter table is_segment_reservation ADD UNIQUE ndxIdentity ( identity )");
               }
             }
 
@@ -752,16 +793,16 @@
                       disabled char(1) default 'N',
                       avgTime numeric(6,3) default NULL,
                       wastedTime integer default NULL,
-                      count integer default NULL
+                      counter integer default NULL
                     )";
-              db_sql("$sql");     
+              _db_upd_do("$sql");
               if (db_connectionTypeIs(_FIREBIRD_) || db_connectionTypeIs(_PGSQL_)) {
-                db_sql("create index ndxA on is_api_usage using btree (a)");
-                db_sql("create index ndxS on is_api_usage using btree (s)");
+                _db_upd_do("create index ndxA on is_api_usage using btree (a)");
+                _db_upd_do("create index ndxS on is_api_usage using btree (s)");
               } else {
-                db_sql("alter table is_api_usage add index ndxA (a asc)");
-                db_sql("alter table is_api_usage add index ndxS (s asc)");
-              }       
+                _db_upd_do("alter table is_api_usage add index ndxA (a asc)");
+                _db_upd_do("alter table is_api_usage add index ndxS (s asc)");
+              }
             }
             _db_upd_newVersion(16);
           } catch(Exception $e) {
@@ -771,7 +812,16 @@
 
         if (_db_upd_canReviewVersion(17)) {
           _recordWastedTime("checking v17");
-          db_sql("ALTER TABLE `is_api_usage` CHANGE COLUMN `wastedTime` `wastedTime` DECIMAL(6,3) NULL DEFAULT NULL");
+          if (db_connectionTypeIs(_FIREBIRD_) || db_connectionTypeIs(_PGSQL_)) {
+            if (db_fieldExists("is_api_usage", "wastedTime")) {
+              _db_upd_do("ALTER TABLE is_api_usage DROP wastedTime");
+              _db_upd_do("COMMIT");
+            }
+            _db_upd_do("ALTER TABLE is_api_usage ADD wastedTime DECIMAL(6,3) DEFAULT NULL");
+          } else {
+            _db_upd_do("ALTER TABLE `is_api_usage` CHANGE COLUMN `wastedTime` `wastedTime` DECIMAL(6,3) DEFAULT NULL");
+          }
+
           try {
             _db_upd_newVersion(17);
           } catch(Exception $e) {
@@ -781,7 +831,7 @@
 
         if (_db_upd_canReviewVersion(18)) {
           if (!db_tableExists("is_db_updates")) {
-            db_sql("create table is_db_updates(database_ts char(14), database_sequence integer, source char(45))");
+            _db_upd_do("create table is_db_updates(database_ts char(14), database_sequence integer, source char(45))");
           }
           try {
             _db_upd_newVersion(18);
@@ -805,7 +855,8 @@
         }
       }
 
-    }    
+    }
+    $SQLdebugLevel = $oldSQLDebugLevel;
   }
 
   function e_dbUpdate(&$s, &$a)

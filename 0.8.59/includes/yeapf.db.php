@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.59-174 built on 2018-04-13 17:55 (-3 DST)
+    YeAPF 0.8.59-191 built on 2018-04-26 20:15 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-04-13 17:54:36 (-3 DST)
+    2018-04-26 17:00:07 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -813,7 +813,7 @@
         $sqlErrNo = mysqli_errno($ydb_conn);
         $sqlError = mysqli_error($ydb_conn);
         if ($sqlErrNo!=0) {
-          showDebugBackTrace("Err '$sqlError' trying to run: $sql .",$SQLDieOnError);
+          showDebugBackTrace("Error:\n\t$sqlError\nwhen run:\n\t$sql",$SQLDieOnError);
         } else {
           $lastCommands.="$sqlCount) $sql;<BR>";
         }
@@ -824,7 +824,7 @@
         $sqlErrNo = mysql_errno();
         $sqlError = mysql_error();
         if ($sqlErrNo!=0) {
-          showDebugBackTrace("Err '$sqlError' trying to run: $sql .",$SQLDieOnError);
+          showDebugBackTrace("Error:\n\t$sqlError\nwhen run:\n\t$sql",$SQLDieOnError);
         } else {
           $lastCommands.="$sqlCount) $sql;<BR>";
         }
@@ -887,7 +887,7 @@
           if ($retryCount==0)
             showDebugBackTrace("Erro '$sqlError'  ao executar comando [$sql] ap&oacute;s $maxRetryCount tentativas em $allWastedTime microsegundos",$SQLDieOnError);
           else
-            showDebugBackTrace("Err '$sqlError' trying to run: $sql .",$SQLDieOnError);
+            showDebugBackTrace("Error:\n\t$sqlError\nwhen run:\n\t$sql",$SQLDieOnError);
         } else
           $lastCommands.="$sqlCount) $sql;<BR>";
 
@@ -904,7 +904,7 @@
         $sqlError = pg_last_error($ydb_conn);
         _dumpY(4,1,"ret: $rs ErrNo: $sqlErrNo ErrMsg: $sqlError ydb_conn: $ydb_conn");
         if (trim($sqlError)>'')
-          showDebugBackTrace("Err '$sqlError' trying to run: $sql .",$SQLDieOnError);
+          showDebugBackTrace("Error:\n\t$sqlError\nwhen run:\n\t$sql",$SQLDieOnError);
         else
           $lastCommands.="$sqlCount) $sql;<BR>";
 

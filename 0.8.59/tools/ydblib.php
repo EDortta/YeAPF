@@ -37,8 +37,8 @@
 	    else if ($GLOBALS['dbType']=='')
 	      displayError("ERROR: You need to set database connection type");
 
-	    $GLOBALS['dbSQL']=$args->argValue('sql');
-	    $GLOBALS['dbTable']=$args->argValue('table');
+	    $GLOBALS['dbSQL']   = $args->argValue('sql');
+	    $GLOBALS['dbTable'] = $args->argValue('table');
 
 	  }
   }

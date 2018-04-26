@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xForms.php
-    YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
-    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-12-14 18:31:30 (-2 DST)
+    YeAPF 0.8.59-191 built on 2018-04-26 20:15 (-3 DST)
+    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+    2018-04-24 09:15:23 (-3 DST)
 */
 
   global $cfgMainFolder;
@@ -451,7 +451,7 @@
     function xForm($aFormName)
     {
       $origFormName=$aFormName;
-      
+
       $r=false;
       $err=0;
       $this->xfFormName=$aFormName;
@@ -1299,7 +1299,7 @@
       return $erros;
     }
 
-    function prepareKeyFields() 
+    function prepareKeyFields()
     {
       $keyValues=$this->keyValues();
       $keyTypes=$this->keyTypes();
@@ -1389,7 +1389,7 @@
 
       if ($erros==0) {
         list($auxKey, $whereSQL) = $this->prepareKeyFields();
-        
+
         if ($auxKey>'') {
           $sql="select count(*) from $this->xfTableName where $whereSQL";
           _dumpY(64,1,$sql);
@@ -1412,7 +1412,7 @@
 
       if ($erros==0) {
         list($auxKey, $whereSQL) = $this->prepareKeyFields();
-        
+
         if ($auxKey>'') {
           $sql="select count(*) from $this->xfTableName where $whereSQL";
           _dumpY(64,1,$sql);
@@ -1825,9 +1825,29 @@
     return $date;
   }
 
-  function suggestFormFromTable($tableName) {
+  function suggestFormFromTable($tableNameOrSQLOrArray) {
     $retFields=array();
-    $fields = db_fieldList($tableName);
+    if (is_array($tableNameOrSQLOrArray)) {
+      $tableName = "mixed table";
+      $fields=$tableNameOrSQLOrArray;
+    }
+    else {
+      if (mb_strtolower(mb_substr($tableNameOrSQLOrArray,0,6))=='select') {
+        preg_match_all("/(from|into|update|join) [\\'\\´]?([a-zA-Z0-9_-]+)[\\'\\´]?/i",
+              $tableNameOrSQLOrArray, $matches);
+        $fields = array();
+        if (isset($matches[2])) {
+          foreach($matches[2] as $k=>$_tableName) {
+            $aux=db_fieldList($_tableName);
+            foreach($aux as $k=>$v)
+              $fields[count($fields)]=$v;
+          }
+        }
+      } else {
+        $tableName = $tableNameOrSQLOrArray;
+        $fields = db_fieldList($tableNameOrSQLOrArray);
+      }
+    }
 
     for($c=0; $c<count($fields); $c++) {
       $length=explode(',', $fields[$c][2]);
@@ -1858,7 +1878,7 @@
 
     $ret=array(
       "mainRow"=>array(
-        'type'=>'row', 
+        'type'=>'row',
         'fields'=> array(
           'mainColumn'=>array(
             'type'=>'column',
