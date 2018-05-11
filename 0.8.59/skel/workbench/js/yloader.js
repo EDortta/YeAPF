@@ -1,8 +1,8 @@
 /*********************************************
   * skel/workbench/js/yloader.js
-  * YeAPF 0.8.59-191 built on 2018-04-26 20:15 (-3 DST)
+  * YeAPF 0.8.59-198 built on 2018-05-11 06:23 (-3 DST)
   * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2018-04-26 20:15:29 (-3 DST)
+  * 2018-05-11 06:23:18 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.59-191 built on 2018-04-26 20:15 (-3 DST)");
+ console.log("YeAPF 0.8.59-198 built on 2018-05-11 06:23 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -2840,7 +2840,7 @@
      
          /* var yPattern = /%[+(\w)]|[]\(/gi; */
          var yPattern = /\%(|\w+)\(/gi;
-         var yFunctions = ',int,integer,intz,intn,decimal,ibdate,tsdate,tstime,date,time,lat2deg,lon2deg,words,image,nl2br,quoted,singleQuoted,condLabel,checked';
+         var yFunctions = ',int,integer,intz,intn,decimal,ibdate,tsdate,tstime,tsdatetime,date,time,lat2deg,lon2deg,words,image,nl2br,quoted,singleQuoted,condLabel,checked';
          var p, p1, p2, c1, c2, p3;
          var aValue = '';
      
@@ -2935,6 +2935,9 @@
                  break;
                case 'tstime':
                  aValue = timestamp2time(aValue);
+                 break;
+               case 'tsdatetime':
+                 aValue = timestamp2date(aValue)+' '+timestamp2time(aValue);
                  break;
                case 'date':
                  if (funcParams[1])

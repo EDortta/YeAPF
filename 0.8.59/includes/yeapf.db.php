@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.59-191 built on 2018-04-26 20:15 (-3 DST)
+    YeAPF 0.8.59-198 built on 2018-05-11 06:23 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-04-26 17:00:07 (-3 DST)
+    2018-05-11 06:21:39 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -247,7 +247,7 @@
         unset($GLOBALS['ydb_conn']);
 
       } else
-        _yLoaderDie(false, "Tipo de Conex&atilde;o desconhecida");
+        _yLoaderDie(false, "Database connection type, unknown");
     }
   }
 
@@ -739,7 +739,8 @@
              * ver https://developer.mozilla.org/en-US/docs/Web/API/console.warn
              * para enviar ao console por grupo
              */
-            db_die("<b>Application out of service</b><br>Try again on: $auxOnlineTime\n<br><b>Aplicativo fora de servi&ccedil;o</b><br>Tente novamente no seguinte horario: $auxOnlineTime");
+            $now=date("Y-m-d H:i:s");
+            db_die("<div><h3>Application out of service</h3>Try again on $auxOnlineTime<br>Server time: $now</div>");
           }
           exit;
         }

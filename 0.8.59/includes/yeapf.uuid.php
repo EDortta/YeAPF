@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.uuid.php
-    YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
-    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-08-28 19:44:55 (-2 DST)
+    YeAPF 0.8.59-198 built on 2018-05-11 06:23 (-3 DST)
+    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+    2018-05-04 20:19:10 (-3 DST)
 */
 
   /*
@@ -84,7 +84,7 @@
     }
 
     public static function v4() {
-      
+
       return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
 
         // 32 bits for "time_low"
@@ -193,7 +193,7 @@
     return $sequence>0;
   }
 
-  function y_sequence($segment='', $nodePrefix='') 
+  function y_sequence($segment='', $nodePrefix='')
   {
     /*
         sssCCCC000000nnnnnnnnnnnnnnnnnnn
@@ -213,7 +213,7 @@
     $segment = substr(str_repeat("_", 4).$segment, -4);
     $nodePrefix   = substr(str_repeat("_", 3).$nodePrefix, -3);
     $flagName="sequencer-$segment-$nodePrefix";
-    
+
     if (lock($flagName)) {
       $sequence=db_sql("select seq_value from is_sequence where nodePrefix='$nodePrefix' and segment='$segment'");
       if ($sequence>0) {

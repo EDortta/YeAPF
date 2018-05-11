@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.59-191 built on 2018-04-26 20:15 (-3 DST)
+    YeAPF 0.8.59-198 built on 2018-05-11 06:23 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-04-26 17:00:07 (-3 DST)
+    2018-05-11 06:21:39 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -814,12 +814,16 @@
           _recordWastedTime("checking v17");
           if (db_connectionTypeIs(_FIREBIRD_) || db_connectionTypeIs(_PGSQL_)) {
             if (db_fieldExists("is_api_usage", "wastedTime")) {
-              _db_upd_do("ALTER TABLE is_api_usage DROP wastedTime");
+              _db_upd_do("alter table is_api_usage drop wastedTime");
               _db_upd_do("COMMIT");
             }
-            _db_upd_do("ALTER TABLE is_api_usage ADD wastedTime DECIMAL(6,3) DEFAULT NULL");
+            _db_upd_do("alter table is_api_usage add wastedTime decimal(6,3) default null");
           } else {
-            _db_upd_do("ALTER TABLE `is_api_usage` CHANGE COLUMN `wastedTime` `wastedTime` DECIMAL(6,3) DEFAULT NULL");
+            if (db_fieldExists("is_api_usage", "wastedTime")) {
+              _db_upd_do("alter table `is_api_usage` change column `wastedTime` `wastedTime` decimal(6,3) default null");
+            } else {
+              _db_upd_do("alter table is_api_usage add wastedTime DECIMAL(6,3) default null");
+            }
           }
 
           try {

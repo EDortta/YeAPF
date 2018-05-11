@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.pre-processor.php
-    YeAPF 0.8.59-128 built on 2017-12-22 07:10 (-2 DST)
-    Copyright (C) 2004-2017 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-08-28 19:44:55 (-2 DST)
+    YeAPF 0.8.59-198 built on 2018-05-11 06:23 (-3 DST)
+    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+    2018-05-04 20:19:10 (-3 DST)
    */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -936,13 +936,7 @@
 
           $sql = 'select '.$campoResultado.' from '.$nomeTabela;
           $sql.= ' where '.$campoChave.'='.$valorCampoChave;
-          if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_))) {
-            $rs = mysql_query($sql, $ydb_conn) or _die ('Impossível fazer <strong>'.$sql.'</strong>');
-            $dados = mysql_fetch_row($rs);
-          } else if (db_connectionTypeIs(_FIREBIRD_)) {
-            $rs = ibase_query($sql);
-            $dados = ibase_fetch_row($rs);
-          }
+          $dados = db_sql($sql, false);
           db_free($rs);
           $s=substr($s,0,$i).$dados[0].substr($s,$n+1,strlen($s));
 
@@ -1405,14 +1399,10 @@
             $whereClause=analisarString($whereClause,$pegarDadosDaTabela, $nomeTabela, $campoChave, $valorChave, $valores);
             $sql="select $keyName, $fieldName from $tableName $otherTables where $whereClause group by $keyName, $fieldName order by $fieldName";
           }
-          if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
-            $rs=mysql_query($sql, $ydb_conn);
-          else
-            $rs=ibase_query($sql);
+          $rs=db_query($sql);
           $noneSelected=true;
-          $fetch_func=db_fetch('array');
 
-          while ($dados=$fetch_func($rs)) {
+          while ($dados=db_fetch_array($rs)) {
             $value=$dados[$keyName];
             $label=$dados[$fieldName];
             if (($defaultValue>'') and ($defaultValue==$value)) {
