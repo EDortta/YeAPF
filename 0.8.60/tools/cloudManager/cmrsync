@@ -1,0 +1,26 @@
+#!/usr/bin/php
+<?php
+  /*
+   * cloudManager
+   * tools/cloudManager/cmrsync
+   * YeAPF 0.8.60-24 built on 2018-05-15 18:13 (-3 DST)
+   * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+   * 2017-08-28 19:44:55 (-3 DST)
+   *
+   * purpouse: to copy file over the network.
+   */
+
+  (@include_once "yclilib.php") or die("yclilib.php not found\n");
+  if ($argc>2) {
+
+    doOnCloud('rsync');
+
+  } else {
+    $myself=$argv[0];
+    echo "$myself src dest\n";
+    echo "src or dest can be node referenced as in these samples:\n";
+    echo "  $myself *.html A:/var/www/html    (sync all html files to the 'A' node)\n";
+    echo "  $myself *.php *:/var/www/html   (sync all php files to all nodes)\n";
+    echo "\n\nWARNING: Disable bash wildcard expansion with 'set -f' statement before use this command";
+  }
+?>
