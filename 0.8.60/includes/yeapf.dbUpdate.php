@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.60-24 built on 2018-05-15 18:13 (-3 DST)
+    YeAPF 0.8.60-43 built on 2018-05-16 06:19 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-15 17:03:09 (-3 DST)
+    2018-05-16 06:18:51 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -125,7 +125,9 @@
   }
 
   function _db_upd_checkStructure() {
-    global $setupIni, $flagDBStructureReviewed, $flagDBStructureCanBeReviewed, $SQLdebugLevel;
+    global $currentDBVersion, $setupIni, 
+           $flagDBStructureReviewed, $flagDBStructureCanBeReviewed, 
+           $SQLdebugLevel;
 
     $oldSQLDebugLevel = $SQLdebugLevel;
     $SQLdebugLevel = 3;
@@ -857,9 +859,12 @@
         }
 
         if (_db_upd_canReviewVersion(19)) {
+          _recordWastedTime("checking v19");
           try {
             if (db_tableExists("is_api_usage")) {
+              _recordWastedTime("dropping is_api_usage");
               _db_upd_do("drop table is_api_usage");
+              _db_upd_do("commit");
             }
 
             $sql="create table is_api_usage (
@@ -870,6 +875,7 @@
                     wastedTime decimal(6,3) default NULL,
                     counter integer default NULL
                   )";
+            _recordWastedTime("creating is_api_usage");
             _db_upd_do("$sql");
             if (db_connectionTypeIs(_FIREBIRD_) || db_connectionTypeIs(_PGSQL_)) {
               _db_upd_do("create index ndxA on is_api_usage (a)");
@@ -905,7 +911,7 @@
 
   function e_dbUpdate(&$s, &$a)
   {
-    if ($s=='cadastros') {
+    if ($s=='yeapf') {
       switch($a)
       {
         case 'afterDBConnect':
@@ -916,8 +922,6 @@
   }
 
   addEventHandler('e_dbUpdate');
-
-
   _db_upd_checkStructure();
 
 ?>

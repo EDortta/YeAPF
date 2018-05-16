@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webSocket/configure.php
-    YeAPF 0.8.60-25 built on 2018-05-15 18:24 (-3 DST)
+    YeAPF 0.8.60-43 built on 2018-05-16 06:19 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-15 18:24:39 (-3 DST)
+    2018-05-16 06:19:43 (-3 DST)
 */
 
 
@@ -287,7 +287,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.60-25 built on 2018-05-15 18:24 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.60-43 built on 2018-05-16 06:19 (-3 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -335,9 +335,9 @@
   }
 
   echo sayStep("<div style='border-left: solid 4px black; padding: 12px'><h2><big><I>skel/webSocket/configure.php</I></big></h2>
-    <h3>YeAPF 0.8.60-25 built on 2018-05-15 18:24 (-3 DST)<br>
+    <h3>YeAPF 0.8.60-43 built on 2018-05-16 06:19 (-3 DST)<br>
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    Last modification: 2018-05-15 18:24:39 (-3 DST)</h3></div>");
+    Last modification: 2018-05-16 06:19:43 (-3 DST)</h3></div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     die(sayStep("<div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
@@ -434,8 +434,9 @@
       $tmpfname=$folderName.'/'.basename(tempnam($folderName,"cfgTest"));
       echo echoStep("Testing write rights using '$tmpfname' temporary file");
       if (!is_dir($folderName))
-        mkdir($folderName, 0755, true);
-      if (touch($tmpfname)) {
+        if (!mkdir($folderName, 0755, true))
+          die(sayStep("<p><ul class=err>You have not enough rights to create '$folderName'</ul></p>"));
+      if (@touch($tmpfname)) {
         unlink($tmpfname);
         $canConfig=true;
       } else {
@@ -1232,7 +1233,7 @@
       }
 
     } else {
-      $errMsg="<span class=err>Was not possible to create support folders</span><span class=err>Your main folder ($homeURL) must to have enough rights to be written by httpd server</span>";
+      $errMsg="<span class=err>Was not possible to create support folders<br>Your main folder ($homeURL) must to have enough rights to be written by httpd server</span>";
       echo sayStep($errMsg);
       if ($silent) echo $errMsg;
       echo sayStep("<span class=err>(You can debug configuration process clicking <a href='configure.php?debugSteps=1'>here</a>)</span>");

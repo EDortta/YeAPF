@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.60-24 built on 2018-05-15 18:13 (-3 DST)
+    YeAPF 0.8.60-43 built on 2018-05-16 06:19 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-11 06:21:39 (-3 DST)
+    2018-05-16 06:18:51 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -205,7 +205,7 @@
   {
     global $_ydb_ready;
     db_setstatus((isset($_ydb_ready)?intval($_ydb_ready):0) & (!$flag));
-    
+
     /*
     $info=debug_backtrace();
     echo explainDBError($flag, $info)."\n";
@@ -305,7 +305,7 @@
     $servidor = "LOCAL [$server_IP]";
 
     // echo "[ $dbType | $dbServer | $dbName | $dbUser | $dbPassword ]";
-     
+
     _dump("set connection type to '$dbType'");
     db_setConnectionType($dbType);
 
@@ -328,9 +328,9 @@
       if (function_exists("mysql_pconnect")) {
         $mysqlConn="mysql_pconnect";
       } else {
-        if (function_exists("mysql_connect")) 
+        if (function_exists("mysql_connect"))
           $mysqlConn="mysql_connect";
-        else 
+        else
           _yLoaderDie(false, "mysql_connect() not present");
       }
 
@@ -1009,7 +1009,7 @@
       if ($withCountField) {
         if (!isset($ret[$id]['__COUNT__']))
           $ret[$id]['__COUNT__']=0;
-        $ret[$id]['__COUNT__']++;        
+        $ret[$id]['__COUNT__']++;
       }
     }
     db_free($qq);
@@ -1065,6 +1065,8 @@
 
           } else
             $ret = (substr(strtoupper($sql),0,6)=='UPDATE');
+        } else {
+          $ret=$_rs;
         }
       } else {
         _dumpY(4,0,"\t\tEsta retornando zero");

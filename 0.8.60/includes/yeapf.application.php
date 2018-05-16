@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.60-24 built on 2018-05-15 18:13 (-3 DST)
+    YeAPF 0.8.60-43 built on 2018-05-16 06:19 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-03-12 07:00:48 (-3 DST)
+    2018-05-16 06:18:51 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -81,32 +81,38 @@
 
   function registerAPIUsageStart() {
     global $s, $a, $__API_START_TS;
-    if (_db_upd_canReviewVersion(17)) {
-      if (lock("api-usage-$s-$a", true)) {    
+    if (lock("api-usage-$s-$a", true)) {
 
-        $__API_START_TS=date('U');
+      _dump("API-USAGE ($s.$a) start");
 
-        unlock("api-usage-$s-$a");
-      }      
+      $__API_START_TS=date('U');
+
+      unlock("api-usage-$s-$a");
     }
-  }
+}
 
   function registerAPIUsageFinish() {
-    global $s, $a, $__API_START_TS;
-    if ($__API_START_TS>0) {
-      if (lock("api-usage-$s-$a")) {    
-        $info=db_sql("select count, wastedTime, avgTime from is_api_usage where s='$s' and a='$a'", false);
-        extract($info);
-        if (!isset($count)) {
-          db_sql("insert into is_api_usage(s,a, disabled, wastedTime, avgTime, count) values ('$s', '$a', 'N', 0, 0, 0)");
+    global $s, $a, $__API_START_TS, $currentDBVersion;
+    if ($currentDBVersion>=19) {
+      if ($__API_START_TS>0) {
+        if (lock("api-usage-$s-$a")) {
+          $info=db_sql("select counter, wastedTime, avgTime from is_api_usage where s='$s' and a='$a'", false);
+          extract($info);
+          if (!isset($counter)) {
+            $counter=0;
+            db_sql("insert into is_api_usage(s,a, disabled, wastedTime, avgTime, counter) values ('$s', '$a', 'N', 0, 0, 0)");
+          }
+          $counter++;
+          $__API_WASTED_TIME = date('U') - $__API_START_TS;
+          $wastedTime+=$__API_WASTED_TIME;
+          $avgTime = $wastedTime / $counter;
+          db_sql("update is_api_usage set counter=$counter, wastedTime=$wastedTime, avgTime=$avgTime where s='$s' and a='$a'");
+          _dump("API-USAGE ($s.$a) finish");
+          unlock("api-usage-$s-$a");
         }
-        $count++;
-        $__API_WASTED_TIME = date('U') - $__API_START_TS; 
-        $wastedTime+=$__API_WASTED_TIME;
-        $avgTime = $wastedTime / $count;
-        db_sql("update is_api_usage set count=$count, wastedTime=$wastedTime, avgTime=$avgTime where s='$s' and a='$a'"); 
-        unlock("api-usage-$s-$a");
       }
+    } else {
+      _dump("currentDBVersion need to be 19 at least. You're on '$currentDBVersion'");
     }
   }
 
@@ -577,7 +583,7 @@
         if ("$k"!="__COUNT__") {
           $CIK=strtolower($k);
           if (( db_status(_DB_CONNECTED_)==0 ) ||
-                 (db_connectionTypeIs(_MYSQL_)) || 
+                 (db_connectionTypeIs(_MYSQL_)) ||
                  (db_connectionTypeIs(_MYSQLI_)) ||
               (!in_array($CIK, $CIKeys))) {
             $CIKeys[]=$CIK;
