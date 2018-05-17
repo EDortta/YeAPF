@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.jforms.php
-    YeAPF 0.8.60-24 built on 2018-05-15 18:13 (-3 DST)
+    YeAPF 0.8.60-51 built on 2018-05-17 19:31 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-04-12 15:45:53 (-3 DST)
+    2018-05-17 19:30:49 (-3 DST)
 */
 
 function jf_getFieldsNames($jsonFilename) {
@@ -63,7 +63,7 @@ function jf_checkFieldValues($formFields, $values) {
           $valueAccepted = false;
           foreach($formFields[$k]['options'] as $opk=>$opv) {
             if ($v==$opv['value'])
-              $valueAccepted==true;
+              $valueAccepted=true;
           }
           if (!$valueAccepted)
             $v=null;

@@ -1,9 +1,9 @@
 <?php
 /*
     skel/workbench/configure.php
-    YeAPF 0.8.60-43 built on 2018-05-16 06:19 (-3 DST)
+    YeAPF 0.8.60-51 built on 2018-05-17 19:31 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-16 06:19:43 (-3 DST)
+    2018-05-17 19:31:22 (-3 DST)
 */
 
 
@@ -198,7 +198,7 @@
       if ($ret>'') {
           echo echoStep("$aFileName = &#32;<span style='font-weight:800; color: #147; font-size: 11px'>$ret</span>");
       } else
-        echo echoStep("<span class=err>$aFileName <b>NOT FOUND</b></span>");
+        echo echoStep("<span class=redDot></span><span class=err>$aFileName <b>NOT FOUND</b></span>");
     }
     str_replace('//', '/', $ret);
     return $ret;
@@ -287,7 +287,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.60-43 built on 2018-05-16 06:19 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.60-51 built on 2018-05-17 19:31 (-3 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -325,7 +325,8 @@
     .err { border: dotted 1px #f00; background-color: #FF6666 }
     .warn { border: dotted 1px #FF8000; background-color: #FFCC66 }
     .severeWarn { border: dotted 1px #FF6666; background-color: #FFCC66; color: #333333 }
-    </style>\n";
+    .greenDot { margin-left: 16px; margin-right: 16px; height: 16px; width: 16px; background-color: #408000; border-radius: 50%; display: inline-block; }
+    .redDot { margin-left: 16px; margin-right: 16px; height: 16px; width: 16px; background-color: #FF3300; border-radius: 50%; display: inline-block; } </style>\n";
 
   if (!$isCLI) {
     echo "<!doctype html>\n\n<html><head><meta name='viewport' content='width=device-width' /><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />";
@@ -335,12 +336,12 @@
   }
 
   echo sayStep("<div style='border-left: solid 4px black; padding: 12px'><h2><big><I>skel/workbench/configure.php</I></big></h2>
-    <h3>YeAPF 0.8.60-43 built on 2018-05-16 06:19 (-3 DST)<br>
+    <h3>YeAPF 0.8.60-51 built on 2018-05-17 19:31 (-3 DST)<br>
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    Last modification: 2018-05-16 06:19:43 (-3 DST)</h3></div>");
+    Last modification: 2018-05-17 19:31:22 (-3 DST)</h3></div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
-    die(sayStep("<div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
+    die(sayStep("<span class=redDot></span><div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
   }
 
   echo echoStep("<b>homeFolder</b>: '$homeFolder' is equivalent to homeURL: '$homeURL'\n");
@@ -435,19 +436,19 @@
       echo echoStep("Testing write rights using '$tmpfname' temporary file");
       if (!is_dir($folderName))
         if (!mkdir($folderName, 0755, true))
-          die(sayStep("<p><ul class=err>You have not enough rights to create '$folderName'</ul></p>"));
+          die(sayStep("<p><span class=redDot></span><ul class=err>You have not enough rights to create '$folderName'</ul></p>"));
       if (@touch($tmpfname)) {
         unlink($tmpfname);
         $canConfig=true;
       } else {
         echo sayStep("'$tmpfname' cannot be created");
         if (is_file($folderName))
-          die(sayStep("<ul class=err>$folderName is a file and we need to create a folder with that name</ul>"));
+          die(sayStep("<span class=redDot></span><ul class=err>$folderName is a file and we need to create a folder with that name</ul>"));
         if (!is_dir($folderName)) {
           echo echoStep("<b>$folderName</b> is not a folder");
           $canConfig = is_writable(".");
           if ($canConfig)
-            $canConfig = mkdir($folderName, 0766) or die(sayStep("<p><ul class=err>Not enough rights to create '<b>$folderName</b>' folder</ul></p>"));
+            $canConfig = mkdir($folderName, 0766) or die(sayStep("<p><span class=redDot></span><ul class=err>Not enough rights to create '<b>$folderName</b>' folder</ul></p>"));
         } else
           $canConfig = is_writable($folderName);
       }
@@ -458,20 +459,20 @@
 
     if ($canConfig) {
       echo sayStep("Loading <em>$__PL__/yeapf.debug.php</em>");
-      (@include_once ($__PL__."/yeapf.debug.php")) || die(sayStep("<ul class=err>Err loading $__PL__/yeapf.debug.php</ul>"));
+      (@include_once ($__PL__."/yeapf.debug.php")) || die(sayStep("<span class=redDot></span><ul class=err>Err loading $__PL__/yeapf.debug.php</ul>"));
 
       if (function_exists("yeapfVersion")) {
         if (("%"."YEAPF_VERSION%")==yeapfVersion())
           echo sayStep("<div class=warn>Warning: You're using a developer version.<br>Please, use a production version instead.</div>");
         else
           if (("0.8.60") != yeapfVersion())
-            die(sayStep("<ul class=err>Your configure version is '0.8.60' while your installed version is '".yeapfVersion()." at ".yeapfBaseDir()."'<br><small>You can use 'yeapf.path' file to indicate where is your YeAPF distribution</small></ul>"));
+            die(sayStep("<span class=redDot></span><ul class=err>Your configure version is '0.8.60' while your installed version is '".yeapfVersion()." at ".yeapfBaseDir()."'<br><small>You can use 'yeapf.path' file to indicate where is your YeAPF distribution</small></ul>"));
       }
 
       $CFG_LOCK_DIR=".config/lock";
 
       echo echoStep("canConfig=".intval($canConfig)."<br>Loading <em>$__PL__/yeapf.locks.php</em>");
-      (@include_once ($__PL__."/yeapf.locks.php")) || die(sayStep("Err loading $__PL__/yeapf.locks.php"));
+      (@include_once ($__PL__."/yeapf.locks.php")) || die(sayStep("<span class=err>Err loading $__PL__/yeapf.locks.php</span>"));
 
 
       /*
@@ -535,7 +536,7 @@
               $myMD5.=join('', file($aFileName));
           $myMD5=md5($myMD5);
           if ((file_exists('configure.md5')) && (!is_writable('configure.md5')))
-            die(sayStep("<div class=err>Impossible to write on 'configure.md5'</div>"));
+            die(sayStep("<span class=redDot></span><div class=err>Impossible to write on 'configure.md5'</div>"));
           else
             file_put_contents('configure.md5',$myMD5);
 
@@ -635,7 +636,7 @@
                 $canConfig=false;
               }
               if (!$canConfig)
-                die(sayStep("<div class=err>Impossible to rename sgug.ini to db.csv</div>"));
+                die(sayStep("<span class=redDot></span><div class=err>Impossible to rename sgug.ini to db.csv</div>"));
             }
           }
 
@@ -657,7 +658,7 @@
             }
 
             echo sayStep("Loading <em>$__PL__/yeapf.dbText.php</em>");
-            (@include_once $__PL__."/yeapf.dbText.php") || die(sayStep("Error loading $__PL__/yeapf.dbText.php"));
+            (@include_once $__PL__."/yeapf.dbText.php") || die(sayStep("<span class=redDot></span>Error loading $__PL__/yeapf.dbText.php"));
             $setupIni=createDBText($dbCSVFilename, true);
 
             $yeapfDB_configured = false;
@@ -762,7 +763,7 @@
                         unlink($dbCSVFilename);
                     }
                     if ($tempDBConnect!='no')
-                      die(sayStep("<div class=err><b>yeapf.db.ini</b> malformed<br>**** $k1 needs to be defined</div>"));
+                      die(sayStep("<span class=redDot></span><div class=err><b>yeapf.db.ini</b> malformed<br>**** $k1 needs to be defined</div>"));
                   }
                 }
 
@@ -817,7 +818,7 @@
                         }
                     }
                   } else
-                    die(sayStep("Folder '$folder' is not writable"));
+                    die(sayStep("<span class=redDot></span><span class=err>Folder '$folder' is not writable</span>"));
                 }
               }
 
@@ -903,7 +904,7 @@
                   $nusoapPath=whereis($searchPath,'nusoap.php',file_exists('flag.dbgphp.configure'));
                   if ($nusoapPath=='') {
                     unlock('configure');
-                    die(sayStep("<div class=err>** nusoap.php not found</div>"));
+                    die(sayStep("<span class=redDot></span><div class=err>** nusoap.php not found</div>"));
                   }
                 }
 
@@ -955,7 +956,7 @@
                 echo sayStep("Ready to write stubloader");
 
                 if ((file_exists('yeapf.php')) && (!is_writable('yeapf.php')))
-                  die(sayStep("<div class=err>Impossible to write to 'yeapf.php'</div>"));
+                  die(sayStep("<span class=redDot></span><div class=err>Impossible to write to 'yeapf.php'</div>"));
                 $f=fopen("yeapf.php", "w");
 
                 $yeapfStub = '
@@ -1189,7 +1190,7 @@
                   $developLink='';
 
                 if ($silent) {
-                  echo "<br>\n<u>YeAPF 0.8.60 well configured!</u>";
+                  echo "<br>\n<u>YeAPF 0.8.60 well configured!<span class=greenDot></span></u>";
                   echo "<br>\nYeAPF Folder: <b>$__PL__</b>";
                   echo "<br>\nDB config: <b>$dbCSVFilename</b>";
                   echo "<br>\nDebug IP: <b>".(isset($cfgDebugIP)?$cfgDebugIP:'none')."</b>";
@@ -1203,7 +1204,7 @@
 
               } else {
                 writeConfigFile("cfgMainFolder",getcwd());
-                $errMsg="<BR>The dbConnection could not be written.<br>Check your access rights to '".getcwd()."' folder ";
+                $errMsg="<BR><span class=redDot></span>The dbConnection could not be written.<br>Check your access rights to '".getcwd()."' folder ";
                 echo sayStep($errMsg);
                 if ($silent) echo $errMsg;
                 echo sayStep("<span class=err>(You can debug configuration process clicking <a href='configure.php?debugSteps=1'>here</a>)</span>");
@@ -1217,7 +1218,7 @@
           echo sayStep($errMsg);
           if ($silent)
             echo $errMsg;
-          echo sayStep("<span class=err>(You can debug configuration process clicking <a href='configure.php?debugSteps=1'>here</a>)</span>");
+          echo sayStep("<span class=redDot></span><span class=err>(You can debug configuration process clicking <a href='configure.php?debugSteps=1'>here</a>)</span>");
 
         }
       }
@@ -1228,7 +1229,7 @@
           $errMsg.="<div class=errItem>You have not enough rights to write to the filesystem on <b>".getcwd()."</b><br>Please give write, read and execution rights to this folder and try again</div>";
         $errMsg.="</div>";
         echo sayStep($errMsg);
-        echo sayStep("<span class=err>(You can debug configuration process clicking <a href='configure.php?debugSteps=1'>here</a>)</span>");
+        echo sayStep("<span class=redDot></span><span class=err>(You can debug configuration process clicking <a href='configure.php?debugSteps=1'>here</a>)</span>");
         if ($silent) echo $errMsg;
       }
 
@@ -1236,11 +1237,11 @@
       $errMsg="<span class=err>Was not possible to create support folders<br>Your main folder ($homeURL) must to have enough rights to be written by httpd server</span>";
       echo sayStep($errMsg);
       if ($silent) echo $errMsg;
-      echo sayStep("<span class=err>(You can debug configuration process clicking <a href='configure.php?debugSteps=1'>here</a>)</span>");
+      echo sayStep("<span class=redDot></span><span class=err>(You can debug configuration process clicking <a href='configure.php?debugSteps=1'>here</a>)</span>");
     }
 
   } else {
-    $errMsg="<span class=err>Define PHP timeZone before configure</span><span class=err>UTC is not accepted as default timeZone</span>";
+    $errMsg="<span class=redDot></span><span class=err>Define PHP timeZone before configure</span><span class=err>UTC is not accepted as default timeZone</span>";
     echo sayStep($errMsg);
       if ($silent) echo $errMsg;
   }
