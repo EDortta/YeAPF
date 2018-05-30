@@ -4,9 +4,9 @@
  *      slotEmptyImplementation.php
  *      This file is part of YeAPF
  *      (Yet Another PHP Framework)
- *      YeAPF 0.8.60-51 built on 2018-05-17 19:31 (-3 DST)
+ *      YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)
  *      Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- *      2018-05-17 19:31:22 (-3 DST)
+ *      2018-05-30 11:21:28 (-3 DST)
  *
  *
  *      The MIT License (MIT)
@@ -38,7 +38,7 @@
            $userMsg, $xq_start, $xq_requestedRows,
            $devSession;
 
-    xq_context('YeAPF',       '%YEAPF_VERSION_LABEL');
+    xq_context('YeAPF',       'YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)');
     xq_context('devSession',  $devSession);
     xq_context('ts1',         date('U'));
 
@@ -46,7 +46,7 @@
        By Default 20 
        proposed interface.js (in future yinterface.js) use this
        in order to generare pages */
-    $xq_requestedRows=20;
+    $xq_requestedRows=max(1,isset($xq_requestedRows)?intval($xq_requestedRows):20);
     /* return set.
        Could be an array or an SQL statement */
     $ret='';
@@ -147,6 +147,8 @@
            $fieldValue, $fieldName,
            $userMsg, $xq_start, $xq_requestedRows;
     */
+
+    global $xq_requestedRows;
 
     $useColNames=true;
 

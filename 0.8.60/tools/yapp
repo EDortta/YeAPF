@@ -2,9 +2,9 @@
 <?php
 /*
     tools/yapp
-    YeAPF 0.8.60-24 built on 2018-05-15 18:13 (-3 DST)
+    YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-15 17:03:09 (-3 DST)
+    2018-05-30 11:21:05 (-3 DST)
 */
 
   $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
@@ -33,11 +33,13 @@
       die("You have not enough rights to create '$__yeapfPath/.projects'\n");
   }
 
-  if (($appFolder=='') && (is_dir(".config")))
+  if (trim($appFolder)=='')
     $appFolder="./";
 
-  if (!is_writable("$appFolder"))
-    die("You have not enough rights to write in '$appFolder'\n");
+  if (!is_writable(dirname("$appFolder"))) {
+    $appHolder = dirname($appFolder);
+    die("You have not enough rights to write in '$appHolder'\n");
+  }
 
   if (is_dir("$appFolder/.config"))
     if (!is_writable("$appFolder/.config"))

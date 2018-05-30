@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.debug.php
-    YeAPF 0.8.60-24 built on 2018-05-15 18:13 (-3 DST)
+    YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-15 18:10:09 (-3 DST)
+    2018-05-30 11:21:05 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -537,7 +537,7 @@
           $debugOutput="";
         if ($debugOutput>'')
           $debugOutput = "<h3>Call context</h3>$debugOutput";
-        _die("<style>pre { white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap; white-space: -o-pre-wrap; word-wrap: break-word; }</style><h3>Forced exit ($isWebservice)</h3><h5>YeAPF 0.8.60-24 built on 2018-05-15 18:13 (-3 DST)</h5><div style='padding:32px;color:#C40002;font-weight:800'><big><b><pre>$msg</pre></b></big></div><div>$debugOutput</div>");
+        _die("<style>pre { white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap; white-space: -o-pre-wrap; word-wrap: break-word; }</style><h3>Forced exit ($isWebservice)</h3><h5>YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)</h5><div style='padding:32px;color:#C40002;font-weight:800'><big><b><pre>$msg</pre></b></big></div><div>$debugOutput</div>");
       } else
         _die("\nFORCED EXIT!\n$debugOutput");
     }

@@ -58,8 +58,14 @@
           $ret=array();
           foreach($devices as $d) {
             if (substr($d,0,1)!='.') {
+              $deviceInfo=__getDeviceInfo($projectKey, $d);
               $key=file_get_contents($d);
-              $ret[]=array("deviceId" =>$d, "deviceKey"=>$key);
+              $ret[]=array( "deviceId" =>$d,
+                            "deviceKey"=>$deviceInfo['key'],
+                            "enabled"=>$deviceInfo['enabled'],
+                            "status"=>$deviceInfo['status'],
+                            "statusDescription"=>$deviceInfo['statusDescription']
+                          );
             }
           }
           break;
@@ -139,6 +145,14 @@
           }
           break;
 
+        case 'toggleDevice':
+          $projectKey=trim(strtoupper($projectKey));
+          $deviceId=trim($deviceId);
+          $deviceInfo = __getDeviceInfo($projectKey, $deviceId);
+          $deviceInfo['enabled'] = ($deviceInfo['enabled']==1)?0:1;
+          __setDeviceInfo($projectKey, $deviceId, $deviceInfo);
+          break;
+
         case 'getLastModifiedData':
 
           break;
@@ -153,11 +167,25 @@
 
     if ($a=='canWork') {
       // cfgIdServerURL
-      $validServerURL = (isset($cfgIdServerURL)) && (!filter_var($cfgIdServerURL, FILTER_VALIDATE_URL) === false);
-      $ret['canWork']=(!$validServerURL && isset($keyCfgDeviceIdLen) && $cfgHtPasswdRequired=='yes')?'yes':'no';
+      $validServerURL = (isset($cfgIdServerURL)) &&
+                        ($cfgIdServerURL>'') &&
+                        (filter_var($cfgIdServerURL, FILTER_VALIDATE_URL) === true);
+
+      $ret['canWork']=((!$validServerURL) &&
+                       (isset($keyCfgDeviceIdLen)) &&
+                       (($cfgHtPasswdRequired=='yes')))?'yes':'no';
       $ret['user']=$_SERVER['REMOTE_USER'];
       if ($ret['canWork']=='no') {
-        $ret['reason']=("$cfgHtPasswdRequired"!='yes')?'.htacces unconfigured':(!isset($keyCfgDeviceIdLen))?'keys.config.php unconfigured at '.dirname(__FILE__):$validServerURL?"'cfgIdServerURL' is a valid URL. Need to be undefined":"Unknown";
+        if ($validServerURL) {
+          $ret['reason'].="'cfgIdServerURL' is a valid URL ($cfgIdServerURL) and need to be undefined\n";
+        }
+
+        if (!isset($keyCfgDeviceIdLen))
+          $ret['reason'].='keys.config.php unconfigured at '.dirname(__FILE__)."\n";
+
+        if (($cfgHtPasswdRequired!='yes'))
+          $ret['reason'].="'cfgHtPasswdRequired' need to be defined as  'yes'\n";
+
       }
     }
     return jr_produceReturnLines($ret);

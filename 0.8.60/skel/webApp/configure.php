@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/configure.php
-    YeAPF 0.8.60-51 built on 2018-05-17 19:31 (-3 DST)
+    YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-17 19:30:49 (-3 DST)
+    2018-05-30 11:21:05 (-3 DST)
 */
 
 
@@ -25,6 +25,16 @@
     $silent=true;
   else
     $silent=false;
+
+  function verifyActiveApp()
+  {
+    global $curAppName, $activeCount, $activeAppName;
+
+    if ($activeCount==1)
+      $activeAppName=$curAppName;
+    else if ($activeCount>1)
+      die(sayStep("Tem mais de uma entrada de banco de dados ativa\n$curAppName, $activeAppName"));
+  }
 
   function getSgugPath($base)
   {
@@ -287,7 +297,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.60-51 built on 2018-05-17 19:31 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -325,6 +335,7 @@
     .err { border: dotted 1px #f00; background-color: #FF6666 }
     .warn { border: dotted 1px #FF8000; background-color: #FFCC66 }
     .severeWarn { border: dotted 1px #FF6666; background-color: #FFCC66; color: #333333 }
+    .goodStep { border: dotted 1px #00FF00; background-color: #408000; color: #E6E6E6 }
     .greenDot { margin-left: 16px; margin-right: 16px; height: 16px; width: 16px; background-color: #408000; border-radius: 50%; display: inline-block; }
     .redDot { margin-left: 16px; margin-right: 16px; height: 16px; width: 16px; background-color: #FF3300; border-radius: 50%; display: inline-block; } </style>\n";
 
@@ -336,9 +347,9 @@
   }
 
   echo sayStep("<div style='border-left: solid 4px black; padding: 12px'><h2><big><I>skel/webApp/configure.php</I></big></h2>
-    <h3>YeAPF 0.8.60-51 built on 2018-05-17 19:31 (-3 DST)<br>
+    <h3>YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)<br>
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    Last modification: 2018-05-17 19:30:49 (-3 DST)</h3></div>");
+    Last modification: 2018-05-30 11:21:05 (-3 DST)</h3></div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     die(sayStep("<span class=redDot></span><div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
@@ -641,49 +652,52 @@
           }
 
           if ($canConfig) {
+            $newSgug = false;
             $dbCSVFilename=whereis($yeapfDB, 'db.csv', true);
             if ((isset($destroydb)) && ($destroydb=='yes')) {
-              if (file_exists("$dbCSVFilename/db.csv"))
+              if (file_exists("$dbCSVFilename/db.csv")) {
+                echo sayStep("<div class=warn>Deleting '$dbCSVFilename/db.csv'</div>");
                 unlink("$dbCSVFilename/db.csv");
-              $dbCSVFilename='';
+              }
+              $newSgug=true;
               echo sayStep("<div class=warn>Destroying DB connection (no database itself, just connection config)</div>");
             }
 
-            if ($dbCSVFilename>'') {
+            if (($dbCSVFilename=='') || ($newSgug)) {
+              $yeapfDB_ini=whereis($yeapfDB, 'yeapf.db.ini');
+              if ($dbCSVFilename=='')
+                $dbCSVFilename="$yeapfDB_ini/db.csv";
+              else
+                $dbCSVFilename="$dbCSVFilename/db.csv";
+            } else {
               $dbCSVFilename="$dbCSVFilename/db.csv";
               $yeapfDB_ini='';
-            } else {
-              $yeapfDB_ini=whereis($yeapfDB, 'yeapf.db.ini');
-              $dbCSVFilename="$yeapfDB_ini/db.csv";
             }
 
             echo sayStep("Loading <em>$__PL__/yeapf.dbText.php</em>");
             (@include_once $__PL__."/yeapf.dbText.php") || die(sayStep("<span class=redDot></span>Error loading $__PL__/yeapf.dbText.php"));
+
+            echo sayStep("<div class>Opening/Creating connection definition $dbCSVFilename</div>");
+
             $setupIni=createDBText($dbCSVFilename, true);
 
             $yeapfDB_configured = false;
             /* flags/flag.nodb */
-            if ($yeapfDB_ini>'') {
+            if (($yeapfDB_ini>'') || ($newSgug)) {
 
-              $newSgug=($dbCSVFilename=='');
+              $newSgug=($newSgug) || ($dbCSVFilename=='');
 
-              if ($newSgug)
+              if ($dbCSVFilename=='') {
                 $dbCSVFilename="$yeapfDB_ini/db.csv";
+                echo sayStep("<div>Connection definition filename: '$dbCSVFilename'</div>");
+              } else {
+                echo sayStep("<div>Overwriting connection definition '$dbCSVFilename'</div>");
+              }
 
               $yeapfINI=parse_ini_file("$yeapfDB_ini/yeapf.db.ini",true);
 
               $activeCount=0;
               $activeAppName='';
-
-              function verifyActiveApp()
-              {
-                global $curAppName, $activeCount, $activeAppName;
-
-                if ($activeCount==1)
-                  $activeAppName=$curAppName;
-                else if ($activeCount>1)
-                  die(sayStep("Tem mais de uma entrada de banco de dados ativa\n$curAppName, $activeAppName"));
-              }
 
               if (($setupIni->locate("active",1))==$dbTEXT_NO_ERROR)
                 $curAppRegistry=$setupIni->getValue('appRegistry');
@@ -700,6 +714,7 @@
               }
 
               $appRegistryList=array();
+
 
               foreach($yeapfINI as $key => $val)  {
 
@@ -723,6 +738,7 @@
                 $thisIsActive=false;
 
                 foreach($val as $k1 => $v1) {
+
                   if ($v1>'') {
                     $setupIni->addField($k1);
 
@@ -759,11 +775,14 @@
 
                   } else if (($k1=='dbType') || ($k1=='dbServer') || ($k1=='dbName')) {
                     if ($newSgug) {
-                      if (file_exists($dbCSVFilename))
+                      if (file_exists($dbCSVFilename)) {
+                        echo sayStep("<div class='goodStep'>Deleting '$dbCSVFilename'</div>");
                         unlink($dbCSVFilename);
+                      }
                     }
-                    if ($tempDBConnect!='no')
+                    if ($tempDBConnect!='no') {
                       die(sayStep("<span class=redDot></span><div class=err><b>yeapf.db.ini</b> malformed<br>**** $k1 needs to be defined</div>"));
+                    }
                   }
                 }
 
@@ -775,6 +794,8 @@
                 $setupIni->addField($xyzField);
                 $setupIni->setValue($xyzField,'5356565058626263613536433536');
               }
+
+              echo sayStep("<div>...</div>");
 
               $setupIni->addField('yUserCount');
               $auxYUserCount=$setupIni->getValue('yUserCount');
@@ -790,12 +811,15 @@
 
               $yeapfDB_configured = ($setupIni->commit() || ($tempDBConnect=='no'));
 
-            } else
+            } else {
               $yeapfDB_configured = true;
+            }
 
 
             if ($setupIni->locate("active",1)==$dbTEXT_NO_ERROR)
               $cfgDebugIP=$setupIni->getValue('cfgDebugIP');
+
+            echo sayStep("<div class=goodStep>cfgDebugIP = $cfgDebugIP</div>");
 
             // @AQUI! verifyConfigFolder(dirname($dbCSVFilename)."/lock")
 
@@ -803,7 +827,7 @@
             $lockFolderName=dirname($dbCSVFilename)."/.lock";
 
             if ((!file_exists($dbCSVFilename)) || (substr($lockFolderName,0,3=='//.')))
-              _die("Please, add yeapf.db.ini or db.csv to your main folder");
+              die("<div class='err'><span class=redDot></span>Please, add yeapf.db.ini or db.csv to your main folder. <div>'$dbCSVFilename' not found</div><div><strong>OR</strong></div>Not regular lockFolderName '$lockFolderName' ($yeapfDB_configured)</div>");
 
             if (verifyConfigFolder($lockFolderName)) {
               function cleanupfolder($folder) {
@@ -1185,7 +1209,7 @@
                   $referer_uri='./';
 
                 if (file_exists('develop.php'))
-                  $developLink="Click <a href='develop.php'>here</a> to start developing your app.<br>";
+                  $developLink="<a href='develop.php'>Develop this app</a>";
                 else
                   $developLink='';
 
@@ -1195,7 +1219,7 @@
                   echo "<br>\nDB config: <b>$dbCSVFilename</b>";
                   echo "<br>\nDebug IP: <b>".(isset($cfgDebugIP)?$cfgDebugIP:'none')."</b>";
                 } else {
-                  echo sayStep("<div style='box-shadow: 5px 5px 2px #888888; background: #90EE90; border-style: solid; border-width: 2px; border-color: #00BD00; padding: 32px'><big><u>YeAPF 0.8.60 well configured!</u></big><div style='padding-left: 16px'>Location: <b>$__PL__</b><br>DB config: <b>$dbCSVFilename</b><br>Debug IP: <b>".(isset($cfgDebugIP)?$cfgDebugIP:'none')."</b></div><br>Click <a href='$referer_uri'>here</a> to go back.<br>Click <a href='configure.php?debugSteps=1'>here</a> to debug configure process.<br> Click <a href='index.php'>here</a> to start your app.<br>$developLink<div style='margin: 16px'>If you wish to destroy database connection an recreate it, click <a href='configure.php?destroydb=yes'>here</a><br><i>It will preserve your database data but will remove all other definitions except the one contained in<em>yeapf.db.ini</em></i></div></div>");
+                  echo sayStep("<style>.basicLink {width: 240px; float: left; height: 24px}</style><div style='box-shadow: 5px 5px 2px #888888; background: #90EE90; border-style: solid; border-width: 2px; border-color: #00BD00; padding: 32px'><big><u>YeAPF 0.8.60 well configured!</u></big><div style='padding-left: 16px'>Location: <b>$__PL__</b><br>DB config: <b>$dbCSVFilename</b><br>Debug IP: <b>".(isset($cfgDebugIP)?$cfgDebugIP:'none')."</b></div><div style='width:100%; height: 24px'><div class='basicLink'><a href='$referer_uri'>Go Back</a></div><div class='basicLink'><a href='configure.php?debugSteps=1'>Debug configure process</a></div><div class='basicLink'><a href='index.php'>Start this app</a></div><div class='basicLink'>$developLink</div></div><div style='margin: 16px'>If you wish to destroy database connection an recreate it, click <a href='configure.php?destroydb=yes'>here</a><br><i>It will preserve your database data but will remove all other definitions except the one contained in<em>yeapf.db.ini</em></i></div></div>");
                 }
                 $aux=join(file('.config/yeapf.config'),'<br>');
                 // echo echoStep("<div class=code>$aux</div>");

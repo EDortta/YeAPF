@@ -19,15 +19,15 @@ var gestaoProjetosObj = function () {
         btn=y$(buttons[btnName[aBtnNdx]]);
         if (btn)
           btn.style.display=btnEnabled?'inline-block':'none';
-      }        
+      }
     };
-            
+
     switch (info.status) {
-      case 'stop':      
+      case 'stop':
         _btnEnabled("download upload erase play", true);
         _btnEnabled("pause stop", false);
         break;
-        
+
       case 'pause':
         _btnEnabled("upload download play stop", true);
         _btnEnabled("pause erase", false);
@@ -43,7 +43,7 @@ var gestaoProjetosObj = function () {
         _btnEnabled("download upload pause stop play", false);
     }
   };
-  
+
   /* muda o estado do projeto */
   that.setProjectStatus = function(projectKey, projectStatus) {
     ycomm.crave(
@@ -104,12 +104,12 @@ var gestaoProjetosObj = function () {
         var t=y$('tbl_projects'), i;
         var _addProjectButton = function (cell, btnClass, actionClass, actionTag, actionName) {
           cell.innerHTML+="<button type='button' class='btn {0} {4}' id='{4}_{3}' data-projectKey='{3}' style='display:none'><a><i class='fa {1}' data-projectKey='{3}'></i><div>{2}</div></a></button>".format(btnClass, actionClass, actionTag, data[i].key, actionName);
-          
+
         };
         while (t.tBodies[0].rows.length>0)
           t.tBodies[0].deleteRow(0);
 
-        for(var i=0; i<data.length; i++) {          
+        for(var i=0; i<data.length; i++) {
           var tr=t.tBodies[0].insertRow(-1);
           var td1=tr.insertCell(0),
               td2=tr.insertCell(1),
@@ -121,7 +121,7 @@ var gestaoProjetosObj = function () {
           td3.innerHTML="<big>"+data[i].name+"</big>";
           td4.innerHTML="";
           td5.innerHTML="";
-          
+
           /* botoes para gestao de dados */
           if (window.lblDownloadProjectData>'')
             _addProjectButton(td4, 'btn-default btn-project','fa-download', window.lblDownloadProjectData, 'btnDownloadProjectData');
@@ -148,9 +148,9 @@ var gestaoProjetosObj = function () {
 
           /* estado atual do projeto */
           that.updateProjectStatus(data[i].key);
-          
+
         }
-        
+
         addEvent(".btnDownloadProjectData", "click", that.downloadProjectData);
         addEvent(".btnUploadProjectData",   "click", that.uploadProjectData);
         addEvent(".btnEraseProjectData",    "click", that.eraseProjectData);
@@ -208,8 +208,29 @@ var gestaoProjetosObj = function () {
     );
   };
 
+  that.toggleDevice = function(e) {
+    if (e.target.tagName=="I")
+      e=e.target.parentNode;
+      else
+        e=e.target;
+    var deviceId=e.getAttribute("data-deviceId"),
+        deviceKey=e.getAttribute("data-deviceKey");
+    ycomm.crave(
+      "management",
+      "toggleDevice",
+      {
+        projectKey: that.projectKey,
+        deviceId: deviceId,
+        deviceKey: deviceKey
+      },
+      function(status,error,data) {
+        that._puxarChavesProjeto();
+      }
+    );
+  };
+
   that.mostrarDispositivos = function () {
-    
+
   };
 
   that._puxarChavesProjeto = function() {
@@ -226,12 +247,26 @@ var gestaoProjetosObj = function () {
         for(var i in data) {
           if (data.hasOwnProperty(i)) {
             var tr=t.tBodies[0].insertRow(-1);
-            var td1=tr.insertCell(0),
-                td2=tr.insertCell(1),
-                td3=tr.insertCell(2);
+            var cols=0,
+                td1=tr.insertCell(cols++),
+                td2=tr.insertCell(cols++),
+                td3=tr.insertCell(cols++),
+                td4=tr.insertCell(cols++),
+                tdControl=tr.insertCell(cols++);
             td1.innerHTML=data[i].deviceId;
             td2.innerHTML=data[i].deviceKey;
-            td3.innerHTML="<button type=button class='btn btn-default' id='btnRenewKey{0}'><i class='fa fa-exchange'></i></button><button type=button class='btn btn-warning' id='btnRevokeKey{0}'><i class='fa fa-close'></i></button>".format(data[i].deviceKey);
+            td3.innerHTML="<i class='fa {0}'></i>".format((data[i].enabled==1)?'fa-check-square-o':'fa-square-o');
+            td3.setAttribute('align','center');
+            td4.innerHTML="<div><b class='device-status-{0}'>{0}</b> {1}</div>".format(data[i].status || '', data[i].statusDescription || '');
+            td4.setAttribute('align','center');
+
+            tdControl.setAttribute('align', 'right');
+            tdControl.innerHTML="<button type=button class='btn btn-default' id='btnRenewKey{0}'><i class='fa fa-exchange'></i></button><button type=button class='btn btn-warning' id='btnRevokeKey{0}'><i class='fa fa-close'></i></button>".format(data[i].deviceKey);
+            if (data[i].enabled==1) {
+              tdControl.innerHTML+="<button type=button class='btn btn-primary' id='btnToggleDevice{0}'><i class='fa fa-pause'></i></button>".format(data[i].deviceKey);
+            } else {
+              tdControl.innerHTML+="<button type=button class='btn btn-primary' id='btnToggleDevice{0}'><i class='fa fa-play'></i></button>".format(data[i].deviceKey);
+            }
 
             tr.setAttribute("data-projectKey", that.projectKey);
             tr.setAttribute("data-deviceId",   data[i].deviceId);
@@ -239,7 +274,8 @@ var gestaoProjetosObj = function () {
 
             var buttons = [
                   "btnRenewKey{0}".format(data[i].deviceKey),
-                  "btnRevokeKey{0}".format(data[i].deviceKey)
+                  "btnRevokeKey{0}".format(data[i].deviceKey),
+                  "btnToggleDevice{0}".format(data[i].deviceKey)
                 ];
             for(var n=0;n<buttons.length; n++) {
               y$(buttons[n]).setAttribute("data-projectKey", that.projectKey);
@@ -248,9 +284,10 @@ var gestaoProjetosObj = function () {
             }
 
 
-            addEvent(td1,  "click", that.escolheDispositivo);
+            addEvent(td1,        "click", that.escolheDispositivo);
             addEvent(buttons[0], "click", that.recreateDeviceKey);
             addEvent(buttons[1], "click", that.removeDeviceKey);
+            addEvent(buttons[2], "click", that.toggleDevice);
           }
         }
 
@@ -264,7 +301,7 @@ var gestaoProjetosObj = function () {
   that.escolheProjeto = function (e) {
     if (e.target.tagName=='TD')
       e=e.target.parentNode;
-    else 
+    else
       e=e.target.parentNode.parentNode;
     that.projectKey=e.getAttribute("data-projectKey");
     that._puxarChavesProjeto();
@@ -282,7 +319,7 @@ var gestaoProjetosObj = function () {
             y$('newProjectName').value='';
             that.getProjects();
           }
-        );    
+        );
     }
   };
 
@@ -300,7 +337,7 @@ var gestaoProjetosObj = function () {
             y$('newDeviceName').value='';
             that._puxarChavesProjeto();
           }
-        );    
+        );
     }
   };
 
@@ -394,7 +431,7 @@ var gestaoProjetosObj = function () {
         configurable: true,
         get: function () {
           return that._projectKey_;
-        }, 
+        },
         set: function (newProjectKey) {
           that._projectKey_=newProjectKey;
           y$('lblProjectKey').innerHTML=newProjectKey;
@@ -403,7 +440,7 @@ var gestaoProjetosObj = function () {
     );
 
     ycomm.setDataLocation(document.location.href.split('?')[0].split('#')[0]+"/rest.php");
-       
+
     addEvent("btnProjetos",          "click", that.getProjects);
     addEvent("btnDispositivos",      "click", that._puxarChavesProjeto);
     addEvent("btnRefreshDeviceList", "click", that._puxarChavesProjeto);
@@ -412,7 +449,7 @@ var gestaoProjetosObj = function () {
     addEvent("btnNewProject",        "click", that.newProject);
     addEvent("btnNewDevice",         "click", that.newDevice);
     addEvent("btnCloseMap",          "click", that.fecharMapa);
-    
+
     ycomm.dom.fillElement("tbl_project_data", {});
     ycomm.dom.fillElement("tbl_project_stats", {});
 

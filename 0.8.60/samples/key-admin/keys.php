@@ -133,6 +133,50 @@
     return $ret;
   }
 
+  function __getDeviceInfo($projectKey, $deviceId) {
+    global $cfgAdminBaseFolder;
+
+    $ret=false;
+    if ($projectKey>'') {
+      if (is_dir("$cfgAdminBaseFolder/.keys")) {
+        if (is_dir("$cfgAdminBaseFolder/.keys/$projectKey")) {
+          if (file_exists("$cfgAdminBaseFolder/.keys/$projectKey/$deviceId")) {
+            $deviceKeyInfo=file_get_contents("$cfgAdminBaseFolder/.keys/$projectKey/$deviceId");
+            if (substr($deviceKeyInfo,0,1)!='{') {
+              /* convert to JSON if required */
+              $ret = array('key'=>$deviceKeyInfo, 'enabled'=>'1');
+              $JDeviceKeyInfo = json_encode($ret);
+              file_put_contents("$cfgAdminBaseFolder/.keys/$projectKey/$deviceId", $JDeviceKeyInfo);
+            } else {
+              $ret = json_decode($deviceKeyInfo, true);
+            }
+          }
+        }
+      }
+    }
+
+    if (!$ret) {
+      $ret = array();
+    }
+
+    return $ret;
+  }
+
+  function __setDeviceInfo($projectKey, $deviceId, $deviceInfo) {
+    global $cfgAdminBaseFolder;
+
+    $ret=false;
+    if ($projectKey>'') {
+      if (is_dir("$cfgAdminBaseFolder/.keys")) {
+        if (is_dir("$cfgAdminBaseFolder/.keys/$projectKey")) {
+          $JDeviceInfo = json_encode($deviceInfo);
+          $ret=file_put_contents("$cfgAdminBaseFolder/.keys/$projectKey/$deviceId", $JDeviceInfo);
+        }
+      }
+    }
+    return $ret;
+  }
+
   function _verifyDeviceBond($projectKey, $deviceId, $deviceKey) {
     global $cfgAdminBaseFolder;
 
@@ -140,6 +184,12 @@
     $projectKey=trim(strtoupper($projectKey));
     $deviceId=trim(strtoupper($deviceId));
     $deviceKey=trim(strtoupper($deviceKey));
+
+    $key=__getDeviceKey($projectKey, $deviceId)['key'];
+    if ($key==$deviceKey)
+      $validKey="Y";
+
+    /* 20180524
     if ($projectKey>'') {
       if (is_dir("$cfgAdminBaseFolder/.keys")) {
         if (is_dir("$cfgAdminBaseFolder/.keys/$projectKey")) {
@@ -151,6 +201,7 @@
         }
       }
     }
+    */
     return $validKey;
   }
 
@@ -205,8 +256,15 @@
     $deviceId=trim(strtoupper($deviceId));
     if (is_dir("$cfgAdminBaseFolder/.keys")) {
       if (is_dir("$cfgAdminBaseFolder/.keys/$projectKey")) {
+        $deviceInfo = __getDeviceInfo($projectKey, $deviceId);
         $key=generateKey($GLOBALS['keyCfgDeviceKeyLen']);
-        file_put_contents("$cfgAdminBaseFolder/.keys/$projectKey/$deviceId", $key);
+        $deviceInfo['key'] = $key;
+
+        __setDeviceInfo($projectKey, $deviceId, $deviceInfo);
+        /* 20180524
+        $JDeviceInfo = json_encode($deviceInfo);
+        file_put_contents("$cfgAdminBaseFolder/.keys/$projectKey/$deviceId", $JDeviceInfo);
+        */
 
         if (!is_dir("$cfgAdminBaseFolder/.keys/.sequence"))
           mkdir("$cfgAdminBaseFolder/.keys/.sequence");
@@ -298,8 +356,12 @@
       }
 
     } else {
+      $deviceInfo = __getDeviceInfo($projectKey, $deviceId);
+      $key = $deviceInfo['key'];
+      /* 20180524
       $deviceIdFile="$cfgAdminBaseFolder/.keys/$projectKey/$deviceId";
       $key=file_get_contents($deviceIdFile);
+      */
     }
     if (!is_dir("$cfgAdminBaseFolder/.ips"))
       mkdir("$cfgAdminBaseFolder/.ips");
@@ -331,8 +393,13 @@
     $ret="UNK";
     if (_projectExists($projectKey)) {
       $deviceIdFile="$cfgAdminBaseFolder/.keys/$projectKey/$deviceId";
-      if (file_exists($deviceIdFile))
+      if (file_exists($deviceIdFile)) {
+        $deviceInfo=__getDeviceInfo($projectKey, $deviceId);
+        $ret = $deviceInfo['key'];
+        /* 20180524
         $ret=file_get_contents($deviceIdFile);
+        */
+      }
     }
     return $ret;
   }

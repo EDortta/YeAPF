@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbText.php
-    YeAPF 0.8.60-24 built on 2018-05-15 18:13 (-3 DST)
+    YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2017-08-28 19:44:55 (-3 DST)
+    2018-05-30 11:21:05 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -134,18 +134,22 @@
                   while ($s>'') {
                     $v=$this->getNextField($s,';');
                     $v=$this->unquote($v);
-                    $fld=$this->fieldsName[$fldSeq++];
+                    if (isset($this->fieldsName[$fldSeq])) {
+                      $fld=$this->fieldsName[$fldSeq++];
+                    }
                     $this->data[$rec][$fld]=$v;
                   }
                   $localAppCharset=strtolower(isset($this->data[$rec]['appCharset'])?$this->data[$this->recCount()]['appCharset']:'ISO-88'.'59-1');
                   for ($i=0; $i<$fldSeq; $i++) {
-                    $fld=$this->fieldsName[$i];
-                    $v=$this->data[$rec][$fld];
-                    if (function_exists("detect_encoding")) {
-                      $strCharset=detect_encoding($v);
-                      if (strtolower($strCharset)!=$localAppCharset) {
-                        $v=iconv($strCharset, $localAppCharset, $v);
-                        $this->data[$rec][$fld]=$v;
+                    if (isset($this->fieldsName[$i])) {
+                      $fld=$this->fieldsName[$i];
+                      $v=$this->data[$rec][$fld];
+                      if (function_exists("detect_encoding")) {
+                        $strCharset=detect_encoding($v);
+                        if (strtolower($strCharset)!=$localAppCharset) {
+                          $v=iconv($strCharset, $localAppCharset, $v);
+                          $this->data[$rec][$fld]=$v;
+                        }
                       }
                     }
                   }
@@ -443,7 +447,7 @@
       {
         $ret = false;
         if (lock(basename($this->fileName))) {
-          if (is_writable($this->fileName)) {
+          if ((touch ($this->fileName)) && (is_writable($this->fileName))) {
             if (!$fake)
               $f=fopen($this->fileName,"w");
 

@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.60-43 built on 2018-05-16 06:19 (-3 DST)
+    YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-16 06:18:51 (-3 DST)
+    2018-05-30 11:21:05 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -878,8 +878,8 @@
             _recordWastedTime("creating is_api_usage");
             _db_upd_do("$sql");
             if (db_connectionTypeIs(_FIREBIRD_) || db_connectionTypeIs(_PGSQL_)) {
-              _db_upd_do("create index ndxA on is_api_usage (a)");
-              _db_upd_do("create index ndxS on is_api_usage (s)");
+              _db_upd_do("create index IDX_IS_API_USAGE1 on is_api_usage (a)");
+              _db_upd_do("create index IDX_IS_API_USAGE2 on is_api_usage (s)");
             } else {
               _db_upd_do("alter table is_api_usage add index ndxA (a asc)");
               _db_upd_do("alter table is_api_usage add index ndxS (s asc)");
