@@ -1,8 +1,8 @@
 /*********************************************
  * skel/electron/js/ysandboxifc.js
- * YeAPF 0.8.60-69 built on 2018-05-30 12:46 (-3 DST)
+ * YeAPF 0.8.60-72 built on 2018-05-30 19:50 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-05-30 12:46:40 (-3 DST)
+ * 2018-05-30 19:50:50 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * By security reasons, sometimes you cannot acces
  * your restful interface from your webapp, so you need a bridge.
