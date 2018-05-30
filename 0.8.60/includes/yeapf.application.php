@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)
+    YeAPF 0.8.60-69 built on 2018-05-30 12:46 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-05-30 12:45:38 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -80,20 +80,22 @@
   $__API_START_TS=0;
 
   function registerAPIUsageStart() {
-    global $s, $a, $__API_START_TS;
-    if (lock("api-usage-$s-$a", true)) {
+    global $s, $a, $__API_START_TS, $cfgApiProfilerEnabled;
+    if ($cfgApiProfilerEnabled == 'yes') {
+      if (lock("api-usage-$s-$a", true)) {
 
-      _dump("API-USAGE ($s.$a) start");
+        _dump("API-USAGE ($s.$a) start");
 
-      $__API_START_TS=date('U');
+        $__API_START_TS=date('U');
 
-      unlock("api-usage-$s-$a");
+        unlock("api-usage-$s-$a");
+      }
     }
 }
 
   function registerAPIUsageFinish() {
-    global $s, $a, $__API_START_TS, $currentDBVersion;
-    if ($currentDBVersion>=19) {
+    global $s, $a, $__API_START_TS, $currentDBVersion, $cfgApiProfilerEnabled;
+    if (($currentDBVersion>=19) && ($cfgApiProfilerEnabled=='yes')) {
       if ($__API_START_TS>0) {
         if (lock("api-usage-$s-$a")) {
           $info=db_sql("select counter, wastedTime, avgTime from is_api_usage where s='$s' and a='$a'", false);

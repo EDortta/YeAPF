@@ -4,9 +4,9 @@
  *      slotEmptyImplementation.php
  *      This file is part of YeAPF
  *      (Yet Another PHP Framework)
- *      YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)
+ *      YeAPF 0.8.60-69 built on 2018-05-30 12:46 (-3 DST)
  *      Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- *      2018-05-30 11:21:28 (-3 DST)
+ *      2018-05-30 12:46:40 (-3 DST)
  *
  *
  *      The MIT License (MIT)
@@ -38,7 +38,7 @@
            $userMsg, $xq_start, $xq_requestedRows,
            $devSession;
 
-    xq_context('YeAPF',       'YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)');
+    xq_context('YeAPF',       'YeAPF 0.8.60-69 built on 2018-05-30 12:46 (-3 DST)');
     xq_context('devSession',  $devSession);
     xq_context('ts1',         date('U'));
 
