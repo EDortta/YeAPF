@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.60-69 built on 2018-05-30 12:46 (-3 DST)
+    YeAPF 0.8.60-83 built on 2018-06-01 09:33 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 12:45:38 (-3 DST)
+    2018-06-01 09:31:47 (-3 DST)
    */
 
   /*
@@ -107,7 +107,7 @@
     return $ret;
   }
 
-  function unescapeString($value) 
+  function unescapeString($value)
   {
     $search = array("\\\\","\\0","\\n", "\\r", "\'", '\"', "\\Z");
     $replace = array("\\",  "\x00", "\n",  "\r",  "'",  '"', "\x1a");
@@ -117,7 +117,7 @@
     if (db_connectionTypeIs(_FIREBIRD_))
       $ret=str_replace("''", "\\'", $ret);
 
-    return $ret;    
+    return $ret;
   }
 
   $_debugTag=decimalMicrotime();
@@ -148,6 +148,7 @@
   function outIsXML()
   {
     $ret = false;
+    $script=basename($_SERVER["PHP_SELF"]);
     $headers = headers_list();
     foreach($headers as $k=>$v) {
       $v=strtoupper($v);
@@ -155,19 +156,20 @@
         $ret=$ret || (strpos($v, 'XML')>0);
       }
     }
-    return $ret;
+    return $ret || (strpos("query.php",$script)!==false);
   }
 
   function outIsJSON()
   {
     $ret = false;
+    $script=basename($_SERVER["PHP_SELF"]);
     $headers = headers_list();
     foreach($headers as $k=>$v) {
       if (strtoupper(substr($v,0,12))=='CONTENT-TYPE') {
         $ret=$ret || strpos($v, 'javascript')>0;
       }
     }
-    return $ret;
+    return $ret || (strpos("rest.php",$script)!==false);
   }
 
   function outIsText()
@@ -198,19 +200,22 @@
 
 
   $isCLI=outIsText();
+  $isXML=outIsXML();
+  $isJSON=outIsJSON();
+
   $isWebservice = !isset($isWebservice)?false:intval($isWebservice);
 
   $isCYGWIN=strtolower(getenv('OSTYPE'))=='cygwin' ||
             strtolower(getenv('TERM'))=='cygwin' ||
             strpos(strtolower(getenv('TEMP')),'cygwin')!==FALSE;
   $isHTTPS= (!$isCLI) && ((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || $_SERVER['SERVER_PORT'] == 443);
-  
+
   $cfgSOAPInstalled=function_exists("is_soap_fault");
 
   $cfgDBCureFields=true;
 
-  // These values will be initializated in two stages: 
-  //   cfgNodePrefix in db_startup() and 
+  // These values will be initializated in two stages:
+  //   cfgNodePrefix in db_startup() and
   //   cfgSegmentPrefix in afterDBCOnnect event
   $cfgNodePrefix="UNK";
   $cfgSegmentPrefix="UNDF";
@@ -224,7 +229,7 @@
     $_MYSELF_=$arrStr[0];
   }
 
-  function isSSL() 
+  function isSSL()
   {
     return $GLOBALS['isHTTPS'];
   }
@@ -383,7 +388,7 @@
 
   function yeapfStage($functionName = '')
   {
-    global $s, $a, $currentYeapfStage, 
+    global $s, $a, $currentYeapfStage,
            /* @OBSOLETE 20170111
            $devMsgQueue,
            */
@@ -477,35 +482,117 @@
                       'yeapf.pre-processor.php'
                         );
   function DEFINE_yLoaderDie() {
+    /* This is a copy of the one created by configure.php
+       The idea is to allow the programmer to build an application
+       without using 'yeapf.php' stubloader.
+       (Ah?  Yes, you can do that just loading yeapf.functions.php)
+     */
     function _yLoaderDie($reconfigureLinkEnabled)
     {
+      global $callback, $user_IP, $callBackFunction;
       $script=basename($_SERVER["PHP_SELF"]);
-      $isXML=(strpos("query.php",$script)!==false);
-      $isJSON=(strpos("rest.php",$script)!==false);
-      $isCLI=(php_sapi_name() == "cli");
+      $isXML=intval(strpos("query.php",$script)!==false);
+      $isJSON=intval(strpos("rest.php",$script)!==false);
+      $isHTML=intval( (strpos("index.php",$script)!==false) || (strpos("body.php",$script)!==false) );
+      $isCLI=intval(php_sapi_name() == "cli");
+      $outputType = $isHTML *1000 +
+                    $isXML  * 100 +
+                    $isJSON *  10 +
+                    $isCLI  *   1;
 
       $args=func_get_args();
       array_shift($args);
-      if ((!$isXML) && (!$isCLI))
-        $msg=join("<br>",$args);
-      else
-        $msg=join("\n",$args);
-      $lineMsg=join(". ", $args);
-      syslog(LOG_INFO,$script." (running at ".getcwd().")"." - ".$lineMsg);
-      if (!$isXML) {
-        if ($isCLI) {
-          echo "\n$msg\n";
-        } else if ($isJSON) {
-        } else {
-          header("Content-Type: text/html; charset=$appCharset");
-          echo "<style> .err {background-color:#FFC0CB; border-style:solid; border-width:2px; border-color:#FF0000;margin:32px;padding:32px;border-radius:4px}</style>";
-          if ($reconfigureLinkEnabled)
-          $doConfig='<div>Click <b><a href="configure.php">here</a></b> to configure<br></div>';
-          $copyrightNote='<small><em>YeAPF Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com</em></small>';
-          echo "<div class=err><div>$msg</div>$doConfig$copyrightNote</div>";
-        }
+      $noHTMLArgs = array();
+      $deathLogMessage = "";
+      foreach($args as $k=>$v) {
+        $noHTMLArgs[$k]  = str_replace("\n", ". ", strip_tags($v));
+        $deathLogMessage.=$noHTMLArgs[$k]." ";
       }
-      die("");
+      $timestamp=date("U");
+      $now=date("Y-m-d H:i:s");
+      $reconfigureLinkEnabled = intval($reconfigureLinkEnabled);
+      $ret = array("reconfigureLinkEnabled" => $reconfigureLinkEnabled,
+                   "outputType" => $outputType,
+                   "isHTML" => $isHTML,
+                   "isJSON" => $isJSON,
+                   "isCLI" => $isCLI,
+                   "isXML" => $isXML);
+      if ($isHTML)
+        $ret["userMsg"] = $args;
+      else
+        $ret["userMsg"] = $noHTMLArgs;
+
+      if (!file_exists("deathLogs"))
+        mkdir("deathLogs",0777);
+      $f=fopen("deathLogs/c.$user_IP.log","a");
+      if ($f) {
+        fwrite($f, "/---DEATH----------\n");
+        foreach($noHTMLArgs as $arg) {
+          fwrite($f, "| $now $arg\n");
+        }
+        fwrite($f, "\---DEATH----------\n");
+        fclose($f);
+      }
+
+      $deathLogMessage="$now Fatal Error: $deathLogMessage OutputType: $outputType";
+      if (function_exists("_recordWastedTime"))
+        _recordWastedTime($deathLogMessage);
+      if (function_exists("_dump"))
+        _dump($deathLogMessage);
+
+      switch ($outputType) {
+        case 10:
+          /* JSON */
+          if ((is_string($callback)) && (trim($callback)>"")) {
+            echo "if (typeof $callback == 'function') $callback(500, 'error', {}, ".json_encode($ret).");";
+          } else {
+            echo json_encode($ret);
+          }
+          break;
+
+        case 100:
+          /* XML */
+          $xmlData="";
+
+          if (!isset($callBackFunction))
+            $callBackFunction="alert";
+
+          foreach($ret as $k=>$v) {
+            if (is_array($v)) {
+              $v=implode(",", $v);
+              $v="[$v]";
+            }
+            $xmlData.="<$k>$v</$k>";
+          }
+          $xmlData="<callBackFunction>$callBackFunction</callBackFunction><dataContext>$xmlData</dataContext>";
+          $xmlOutput="<?xml version='1.0' encoding='UTF-8'?>\n<root>$xmlData<sgug><timestamp>$timestamp</timestamp></sgug></root>";
+          echo $xmlOutput;
+          break;
+
+        case 1000:
+          /* HTML */
+          if (function_exists("_minimalCSS"))
+            _minimalCSS();
+
+          echo "<div style='padding: 16px; margin: 16px; border: dotted 1px #66CCFF; border-radius: 6px; background-color: #fff'>";
+          echo "<div><a href='http://www.yeapf.com' target=x$timestamp><img src='http://www.yeapf.com/images/yeapf-logo-120.png'></a></div><table>";
+          foreach($ret as $k=>$v) {
+            if (is_array($v)) {
+              foreach($v as $kx=>$vx) {
+                echo "<tr><td width=150px>$k.$kx</td><td>$vx</td></tr>\n";
+              }
+            } else {
+              echo "<tr><td width=150px>$k</td><td>$v</td></tr>\n";
+            }
+          }
+          echo "</table></div>";
+          break;
+
+        default:
+          /* TEXT (cli) */
+          print_r($ret);
+      }
+      die();
     }
   }
 
@@ -754,7 +841,7 @@
       _recordSuspiciousIP($user_IP);
       unset($GLOBALS['s']);
       unset($GLOBALS['u']);
-      unset($GLOBALS['a']);      
+      unset($GLOBALS['a']);
       if (!outIsXML()) {
         http_response_code(404);
         exit();
@@ -778,7 +865,7 @@
       $url=$request_uri.'?'.$queryString;
       /*
       https://wadl.java.net
-      https://en.wikipedia.org/wiki/Web_Application_Description_Language 
+      https://en.wikipedia.org/wiki/Web_Application_Description_Language
       */
       error_log(date("YmdHis ").$GLOBALS['_debugTag']." "."$url\n", 3, "$cfgCurrentFolder/logs/access.$safe_user_IP.log");
     }
@@ -1223,7 +1310,7 @@
     $str = strtr($str, $normalizeChars);
 
     return $str;
-  }  
+  }
 
   function suggestVarName($aStr)
   {
@@ -1697,7 +1784,7 @@
     /* this functions try to find the most apropriate implementation
        of the required event.
        1) determine the `page`
-           If it is yet connected to the database, it will try to use 
+           If it is yet connected to the database, it will try to use
            `implementation` field from is_menu table.
            If not connected or not defined, it defaults to `s` parameter.
        2) Once it has the page, it try to load `page`.php
@@ -3336,7 +3423,7 @@
 
   function detect_encoding($string)
   {
-    global $dbCharset, $appCharset;           
+    global $dbCharset, $appCharset;
     return mb_detect_encoding($string, "$dbCharset, $appCharset, ISO-8859-1, ISO-8859-15, UTF-8", true);
     /*
     static $list = array('utf-8', 'iso-8859-1', 'windows-1252', 'windows-1251', 'windows-1250');
@@ -3444,7 +3531,7 @@
                 $title="";
                 $newString='';
                 preg_match_all('/([a-zA-Z0-9_]*)=(("[^"]*")|(\'[^\']*\'))/i', $auxString, $matches);
-                if (is_array($matches)) { 
+                if (is_array($matches)) {
                   foreach($matches[0] as $k=>$v) {
                     $_attrName=getNextValue($v,'=');
                     $_attrValue=unquote($v);
@@ -3452,7 +3539,7 @@
                     if (in_array(strtolower($_attrName), array('id','name'))) {
                       $title.="$_attrName:$_attrValue ";
                     }
-                    if ($_attrName!='title') 
+                    if ($_attrName!='title')
                       $newString.="$_attrName='$_attrValue' ";
                   }
                 }
@@ -3467,7 +3554,7 @@
             } while ($position!==false);
 
             // if ($newString>'') die();
-            
+
             $s=str_replace('type="hidden"', 'type="text" class="dbg-show-id" read-only="yes"', $s);
             $s=str_replace("type='hidden'", 'type="text" class="dbg-show-id" read-only="yes"', $s);
           }
@@ -3532,7 +3619,7 @@
 
       $_CurrentFileName=$auxFileName;
 
-      if (strpos($auxFileName,".xml")>0) {        
+      if (strpos($auxFileName,".xml")>0) {
         header("Content-Type: text/xml;  charset=UTF-8", true);
       }
 

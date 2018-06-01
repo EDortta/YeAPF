@@ -1,4 +1,10 @@
 <?php
+/*
+    tools/compile-configure.php
+    YeAPF 0.8.60-83 built on 2018-06-01 09:33 (-3 DST)
+    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+    2018-06-01 09:31:47 (-3 DST)
+*/
 
 function minify_html($input)
 {

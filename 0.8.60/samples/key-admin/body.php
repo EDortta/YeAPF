@@ -1,9 +1,9 @@
 <?php
 /*
     samples/key-admin/body.php
-    YeAPF 0.8.60-72 built on 2018-05-30 19:50 (-3 DST)
+    YeAPF 0.8.60-83 built on 2018-06-01 09:33 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 19:50:50 (-3 DST)
+    2018-06-01 09:33:31 (-3 DST)
 
     skel/webApp / body.php
     This file cannot be modified within skel/webApp
@@ -123,12 +123,16 @@
           _dumpY(1,1,"CACHED VERSION: $aBody");
         }
         */
+        echo "\n<!-- container for aBody: $aBody e_body.html start -->\n";
         processFile("e_body.html");
+        echo "\n<!-- container for aBody: $aBody e_body.html finish -->\n";
       } else if ($withoutBody)
         echo $aBody;
       else {
         processFile("frame_header.html");
-        processFile($aBody);
+        echo "\n<!-- aBody: $aBody start -->\n";
+        processFile("$aBody");
+        echo "\n<!-- aBody: $aBody finish -->\n";
         processFile("frame_footer.html");
       }
       /* @OBSOLETE 20170111
@@ -177,7 +181,7 @@
   if ($devMsgQueue)
     $devMsgQueue->sendStagedMessage('idle');
   */
-    
+
   _recordWastedTime("Good bye");
 ?>
 

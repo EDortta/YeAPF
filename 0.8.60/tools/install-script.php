@@ -1,9 +1,9 @@
 <?php
 /*
     tools/install-script.php
-    YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)
+    YeAPF 0.8.60-83 built on 2018-06-01 09:33 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-06-01 09:31:47 (-3 DST)
 */
 
   function installFile($entry)
@@ -51,7 +51,7 @@
     $targetPath=$onWinOS?"C:\Windows":$onDarwinOS?"/usr/local/bin":"/usr/bin";
   }
 
-  $yeapfPath=dirname(getcwd());  
+  $yeapfPath=dirname(getcwd());
 
   echo "YeAPF base folder = '$yeapfPath'\n";
   if (file_exists("$targetTemp/chmod-YeAPF-tools.sh"))
@@ -59,7 +59,7 @@
 
   $d=dir(getcwd());
   while ($entry=$d->read()) {
-    if (substr($entry,0,1)=='y') {
+    if ((substr($entry,0,1)=='y') || (substr($entry,0,4)=='adb-')) {
       installFile($entry);
     }
   }

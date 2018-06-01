@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/configure.php
-    YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)
+    YeAPF 0.8.60-83 built on 2018-06-01 09:33 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-06-01 09:31:47 (-3 DST)
 */
 
 
@@ -297,7 +297,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.60-83 built on 2018-06-01 09:33 (-3 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -346,10 +346,13 @@
     echo "</head>\n<body style='padding: 16px'>\n";
   }
 
-  echo sayStep("<div style='border-left: solid 4px black; padding: 12px'><h2><big><I>skel/webApp/configure.php</I></big></h2>
-    <h3>YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)<br>
+  $timestamp=date('U');
+  echo sayStep("<div style='border-left: solid 4px black; padding: 12px; background-color: #fff'>
+    <div><a href='http://www.yeapf.com' target='x$timestamp'><img src='http://www.yeapf.com/logo.php'></a></div>
+    <h2><big><I>skel/webApp/configure.php</I></big></h2>
+    <h3>YeAPF 0.8.60-83 built on 2018-06-01 09:33 (-3 DST)<br>
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    Last modification: 2018-05-30 11:21:05 (-3 DST)</h3></div>");
+    Last modification: 2018-06-01 09:31:47 (-3 DST)</h3></div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     die(sayStep("<span class=redDot></span><div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
@@ -986,55 +989,122 @@
                 $yeapfStub = '
                 /*
                 * yeapf.php
-                * (C) 2004-2014 Esteban Daniel Dortta (dortta@yahoo.com)
+                * (C) 2004-2018 Esteban Daniel Dortta (dortta@yahoo.com)
                 */
 
                 function _yLoaderDie($reconfigureLinkEnabled)
                 {
-                  global $callback;
+                  global $callback, $user_IP, $callBackFunction;
                   $script=basename($_SERVER["PHP_SELF"]);
-                  $isXML=(strpos("query.php",$script)!==false);
-                  $isJSON=(strpos("rest.php",$script)!==false);
-                  $isCLI=(php_sapi_name() == "cli");
-
-                  if (file_exists("flags/flag.dbgloader")) error_log(basename(__FILE__)." ".date("i:s").": app dying\n",3,"logs/yeapf.loader.log");
+                  $isXML=intval(strpos("query.php",$script)!==false);
+                  $isJSON=intval(strpos("rest.php",$script)!==false);
+                  $isHTML=intval( (strpos("index.php",$script)!==false) || (strpos("body.php",$script)!==false) );
+                  $isCLI=intval(php_sapi_name() == "cli");
+                  $outputType = $isHTML *1000 +
+                                $isXML  * 100 +
+                                $isJSON *  10 +
+                                $isCLI  *   1;
 
                   $args=func_get_args();
-                  if (func_num_args()>1)
-                    array_shift($args);
-                  if ((!$isXML) && (!$isCLI))
-                    $msg=join("<br>",$args);
-                  else
-                    $msg=join("\n",$args);
-                  $lineMsg=$args;
-                  $lineMsg = str_replace("<br>",";\t",$lineMsg);
-                  $lineMsg = str_replace("\n",". ",$lineMsg);
-                  syslog(LOG_INFO,$script." (running at ".getcwd().")"." - ".$lineMsg);
-
-                  if (function_exists("_die")) {
-                    if ($isCLI)
-                      _die(htmlentities($lineMsg));
-                    else
-                      _die($lineMsg);
-                  } else {
-                    if (!$isXML) {
-                      if ($isCLI) {
-                        echo "\n$msg\n";
-                      } else if ($isJSON) {
-                        echo "_dump(\'$lineMsg\');\n";
-                        if ((is_string($callback)) && (trim($callback)>""))
-                          echo "if (typeof $callback == \'function\') $callback(null);";
-                      } else {
-                        header("Content-Type: text/html; charset=UTF-8");
-                        echo "<style> .err {background-color:#FFC0CB; border-style:solid; border-width:2px; border-color:#FF0000;margin:32px;padding:32px;border-radius:4px}</style>";
-                        if ($reconfigureLinkEnabled)
-                        $doConfig="<div>Click <b><a href=\"configure.php\">here</a></b> to configure<br></div>";
-                        $copyrightNote="<small><em>YeAPF (C) 2004-2014 Esteban Dortta</em></small>";
-                        echo "<div class=err><div>$msg</div>$doConfig$copyrightNote</div>";
-                      }
-                    }
+                  array_shift($args);
+                  $noHTMLArgs = array();
+                  $deathLogMessage = "";
+                  foreach($args as $k=>$v) {
+                    $noHTMLArgs[$k]  = str_replace("\n", ". ", strip_tags($v));
+                    $deathLogMessage.=$noHTMLArgs[$k]." ";
                   }
-                  die("");
+                  $timestamp=date("U");
+                  $now=date("Y-m-d H:i:s");
+                  $reconfigureLinkEnabled = intval($reconfigureLinkEnabled);
+                  $ret = array("reconfigureLinkEnabled" => $reconfigureLinkEnabled,
+                               "outputType" => $outputType,
+                               "isHTML" => $isHTML,
+                               "isJSON" => $isJSON,
+                               "isCLI" => $isCLI,
+                               "isXML" => $isXML);
+                  if ($isHTML)
+                    $ret["userMsg"] = $args;
+                  else
+                    $ret["userMsg"] = $noHTMLArgs;
+
+                  if (function_exists("get_backtrace"))
+                    $ret["stack"]=get_backtrace();
+
+                  if (!file_exists("deathLogs"))
+                    mkdir("deathLogs",0777);
+                  $f=fopen("deathLogs/c.$user_IP.log","a");
+                  if ($f) {
+                    fwrite($f, "/---DEATH----------\n");
+                    foreach($noHTMLArgs as $arg) {
+                      fwrite($f, "| $now $arg\n");
+                    }
+                    fwrite($f, "\---DEATH----------\n");
+                    fclose($f);
+                  }
+
+                  $deathLogMessage="$now Fatal Error: $deathLogMessage OutputType: $outputType";
+                  if (function_exists("_recordWastedTime"))
+                    _recordWastedTime($deathLogMessage);
+                  if (function_exists("_dump"))
+                    _dump($deathLogMessage);
+
+                  switch ($outputType) {
+                    case 10:
+                      /* JSON */
+                      if ((is_string($callback)) && (trim($callback)>"")) {
+                        echo "if (typeof $callback == \'function\') $callback(500, \'error\', {}, ".json_encode($ret).");";
+                      } else {
+                        echo json_encode($ret);
+                      }
+                      break;
+
+                    case 100:
+                      /* XML */
+                      $xmlData="";
+
+                      if (!isset($callBackFunction))
+                        $callBackFunction="alert";
+
+                      foreach($ret as $k=>$v) {
+                        if (is_array($v)) {
+                          $v=implode(",", $v);
+                          $v="[$v]";
+                        }
+                        $xmlData.="<$k>$v</$k>";
+                      }
+                      $xmlData="<callBackFunction>$callBackFunction</callBackFunction><dataContext>$xmlData</dataContext>";
+                      $xmlOutput="<?xml version=\'1.0\' encoding=\'UTF-8\'?>\n<root>$xmlData<sgug><timestamp>$timestamp</timestamp></sgug></root>";
+                      echo $xmlOutput;
+                      break;
+
+                    case 1000:
+                      /* HTML */
+                      if (function_exists("_minimalCSS")) {
+                        _minimalCSS();
+                      } else {
+                        echo "<style>body {background-color: #f6f6f6;font-family: sans-serif;-webkit-font-smoothing: antialiased;font-size: 14px;line-height: 1.4;margin: 0;padding: 0;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;}</style>";
+                      }
+                      echo "<style>.userMsg { color: #800000} .userMsg .explain { font-size: 120%; font-weight: 800} .stack { color: #666666; font-family: \'Courier New\', Courier, monospace }</style>";
+
+                      echo "<div style=\'padding: 16px; margin: 16px; border: dotted 1px #66CCFF; border-radius: 6px; background-color: #fff\'>";
+                      echo "<div><a href=\'http://www.yeapf.com\' target=x$timestamp><img src=\'http://www.yeapf.com/logo.php\'></a></div><table>";
+                      foreach($ret as $k=>$v) {
+                        if (is_array($v)) {
+                          foreach($v as $kx=>$vx) {
+                            echo "<tr><td width=150px><span class=$k><span class=number>$k.$kx</span></span></td><td><span class=$k><span class=explain>$vx</span></span></td></tr>\n";
+                          }
+                        } else {
+                          echo "<tr><td width=150px>$k</td><td>$v</td></tr>\n";
+                        }
+                      }
+                      echo "</table></div>";
+                      break;
+
+                    default:
+                      /* TEXT (cli) */
+                      print_r($ret);
+                  }
+                  die();
                 }
 
                 function _yeapf_getFileValue($fileName)
@@ -1090,6 +1160,8 @@
                 $__yeapfCWD = str_replace("\\\\","/",$__yeapfCWD);
                 if ($__yeapfContext != $__yeapfCWD) _yLoaderDie(true,"YeAPF running out of original context or is missconfigured\n * $__yeapfCWD differs from $__yeapfContext");
 
+
+
                 $auxAppFolderName="";
                 if (file_exists("appFolderName.def"))
                   $auxAppFolderName="appFolderName.def";
@@ -1115,8 +1187,38 @@
                 }
                 unset($auxAppFolderName);
                 if (file_exists("flags/flag.dbgloader")) error_log(basename(__FILE__)." ".date("i:s").": loading $__yeapfPath/yeapf.functions.php\n",3,"logs/yeapf.loader.log");
+                ';
+
+                fwrite($f,"<?php\n$yeapfStub");
+                $now=date('U')+3;
+
+                // appFolder
+                $appFolderLoader = '
+                $md5Files=array("body.php", "index.php", "configure.php", "search.path");
+                $configMD5="";
+                foreach($md5Files as $aFileName) {
+                  if (file_exists($aFileName)) {
+                    $configMD5.=join("", file($aFileName));
+                  }
+                }
+                $configMD5=md5($configMD5);
+                $yeapfStubMTime = filemtime("yeapf.php");
+                if ($yeapfStubMTime>'.$now.')
+                  $savedConfigMD5=md5('.$now.');
+                else
+                  $savedConfigMD5 = join("",file("configure.md5"));
+
+                if ((file_exists("configure.php")) && ($configMD5 != $savedConfigMD5)) {
+                  _yLoaderDie(true, "YeAPF not configured\nRun <a href=\"configure.php\">configure.php</a> again.");
+                }
+                ';
+
+                fwrite($f,$appFolderLoader);
+
+                $yeapfStub2='
                 (@include_once $__yeapfPath."/yeapf.functions.php") || (_yLoaderDie("$__yeapfPath/yeapf.functions.php not found"));
 
+                _recordWastedTime("StubLoader ready");
                 if (!function_exists("decimalMicrotime")) die("decimalMicrotime() required");
 
                 $t0=decimalMicrotime();
@@ -1137,26 +1239,7 @@
                 $yeapfConfig["searchPath"]=$appName.";".$yeapfConfig["searchPath"];
                 set_include_path(get_include_path().":".str_replace(";",":",$yeapfConfig["searchPath"]));
                 ';
-
-                fwrite($f,"<?php\n$yeapfStub");
-
-                // appFolder
-                $appFolderLoader = '
-                _recordWastedTime("Checking distribution");
-                $md5Files=array("body.php", "index.php", "configure.php", "search.path");
-                $configMD5="";
-                foreach($md5Files as $aFileName)
-                  if (file_exists($aFileName))
-                    $configMD5.=join("", file($aFileName));
-                $configMD5=md5($configMD5);
-
-                $savedConfigMD5 = join("",file("configure.md5"));
-                if ((file_exists("configure.php")) && ($configMD5 != $savedConfigMD5)) {
-                  _yLoaderDie(true, "YeAPF not configured\nRun <a href=\"configure.php\">configure.php</a> again.");
-                }
-                ';
-
-                fwrite($f,$appFolderLoader);
+                fwrite($f,$yeapfStub2);
 
                 // appScript and appFolderScript
                 $appScriptLoader = '

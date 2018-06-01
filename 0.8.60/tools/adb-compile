@@ -1,0 +1,25 @@
+#!/bin/bash
+# (C) 2016 Esteban D.Dortta
+#
+# tools/adb-compile
+# YeAPF 0.8.60-83 built on 2018-06-01 09:33 (-3 DST)
+# Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+# 2018-06-01 09:31:47 (-3 DST)
+
+if [ -f www/js/version.js ]; then
+	my_dir="$(dirname "$0")"
+	source "$my_dir/adb-lib.inc.sh"
+
+	newVersion=$(increaseVersion)
+
+	echo "Compiling $newVersion"
+	jshint www/js/index.js && \
+	echo "-----------" && \
+	date && \
+	cordova build android && \
+	date && \
+	echo "" && \
+	tput bel
+else
+	echo "www/js/version.js file not found"
+fi

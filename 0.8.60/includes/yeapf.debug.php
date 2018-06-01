@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.debug.php
-    YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)
+    YeAPF 0.8.60-83 built on 2018-06-01 09:33 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-06-01 09:31:47 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -131,93 +131,23 @@
     $flgMinimalCss = 1;
   }
 
+  function _defaultExceptionHandler($exception) {
+    global $_defaultExceptionHandler_done;
+    if (!isset($_defaultExceptionHandler_done)) {
+      $_defaultExceptionHandler_done=true;
+      _die($exception->getMessage());
+      // showDebugBackTrace($exception->getMessage(), true);
+    }
+  }
+  set_exception_handler('_defaultExceptionHandler');
+
 
   function _die()
   {
-    global $user_IP, $sysDate, $isCLI;
 
-    _minimalCSS();
-    $auxArgs='';
+    _yLoaderDie(false, func_get_args());
 
-    $args=func_get_args();
-    $argList='';
-    foreach ($args as $a) {
-      if ($argList>'')
-        $argList.=' ';
-      if (is_array($a)) {
-        foreach($a as $v)
-          $argList.="$v ";
-      } else {
-        $argList.=$a;
-        // echo "****'$a'***\n";
-      }
-    }
-
-    if (!file_exists('deathLogs'))
-      mkdir('deathLogs',0777);
-    $f=fopen("deathLogs/c.$user_IP.log","a");
-    if ($f) {
-      $auxArgs=stripNL($argList);
-      $auxArgs=stripNL($auxArgs);
-      fwrite($f, "$auxArgs\n");
-      fclose($f);
-    }
-
-    $sysDate = date("YmdHis");
-    $outputType=outIsJSON()*100+outIsText()*10+outIsXML()*1;
-    $deathLogMessage=strip_tags(stripNL("APP DIES AT $sysDate<BR>$argList<br>outType: $outputType"));
-    _recordWastedTime($deathLogMessage);
-
-    _dump($deathLogMessage);
-    if (outIsText()) {
-      echo $deathLogMessage."\n\n";
-
-    } else if (outIsXML()) {
-      $argList=strip_tags(  html_entity_decode(htmlspecialchars_decode(br2nl($argList))));
-      foreach(explode("\n",$argList) as $argElement)
-        _recordError($argElement);
-      /*
-      $sysDieNum=0;
-      foreach(explode("\n",$argList) as $argElement) {
-        if (is_array($argElement)) {
-          foreach($argElement as $k=>$v) {
-            xq_context("sys.die.$sysDieNum","$k=$v");
-            $sysDieNum++;
-          }
-        } else
-          xq_context("sys.die.$sysDieNum",$argElement);
-        $sysDieNum++;
-      }
-      */
-
-      if (!isset($callBackFunction))
-        $callBackFunction="alert";
-      if (!isset($xq_return))
-        $xq_return=null;
-      if (!isset($xq_regCount))
-        $xq_regCount=null;
-
-      $GLOBALS['xmlData']=xq_produceContext($callBackFunction,$xq_return,$xq_regCount);
-
-      if (!file_exists("e_body.xml"))
-        _dumpY(0,0,"FATAL ERROR: 'e_body.xml' could not be found");
-      else {
-        $xResult=_file("e_body.xml");
-
-        $xResult=iconv(detect_encoding($xResult),"ISO-8859-1", $xResult);
-        if ($logging>2)
-          _dumpY(1,1,$xResult);
-
-        echo "$xResult";
-      }
-
-    } else if (outIsJSON()) {
-
-    } else {
-
-      echo "<div>$argList</div>";
-    }
-    throw new YException("APP DIES:\n$auxArgs");
+    // throw new YException("Fatal error:\n$auxArgs");
   }
 
   if ((isset($logRequest)) && ($logRequest)) {
@@ -235,312 +165,11 @@
 
   function showDebugBackTrace($msg, $forceExit=false)
   {
-    global $logOutput, $SQLdebugLevel, $includedFiles, $lastCommands,
-           $dbCSVFilename, $dbTEXT_NO_ERROR, $debugNotifierSevice, $appName,
-           $ydb_conn, $isCLI, $isWebservice, $appCharset;
+    $trace = get_backtrace(1);
 
-    $xCores = array("#000000","#009900","#3366CC","#FF6600","#CC66CC","#999999");
-
-    $debugOutput='';
-    if ($forceExit) {
-      if ($SQLdebugLevel<2)
-        $SQLdebugLevel=2;
-    }
-
-    if ($SQLdebugLevel>0) {
-      if (function_exists('debug_backtrace'))
-        $aux=debug_backtrace();
-      if ($logOutput<0) {
-        $debugOutput.="\n\n====================================\n$msg\n CWD=".getcwd()."\n";
-      } else if ($logOutput==1) {
-        $debugOutput.= "<style>";
-        $debugOutput.= ".lblError { color:  #661111; font-family: Verdana, Arial, Sans-Serif; font-size:  8pt; font-weight: bold; } ";
-        $debugOutput.= "</style>";
-        $debugOutput.= "<big><b>$msg</b></big><br>".getcwd();
-      } else if ($logOutput==2) {
-        // xq_printXML($debugOutput,"backtrace.msg",$msg);
-        xq_printXML($debugOutput,"backtrace.cwd",getcwd());
-      }
-
-      $incFileCount=0;
-
-      foreach($includedFiles as $if)
-        if ($logOutput<0)
-          $debugOutput.="\t$if\n";
-        else if ($logOutput==1)
-          $debugOutput.= "&nbsp;&nbsp;&nbsp;&nbsp;$if<br>";
-        else if ($logOutput==2) {
-          $incFileCount++;
-          xq_printXML($debugOutput,"backtrace.includedFiles.$incFileCount", $if);
-        }
-
-      if ($SQLdebugLevel>1) {
-        if ($logOutput<0)
-          $debugOutput.="\nCall stack";
-        else if ($logOutput==1)
-          $debugOutput.= "<table class=lblError>";
-
-        $stackCounter=0;
-        $stackXML='';
-
-        $lastFile='';
-        for($a=1; $a<count($aux); $a++) {
-          $auxStackXML='';
-
-          if ($logOutput<0)
-            $debugOutput.="\n";
-          else if ($logOutput==1)
-            $debugOutput.= "<tr>";
-
-          $ln=$aux[$a];
-
-          if (isset($ln['file'])) {
-            $currentFile=basename($ln['file']);
-            $dbLine='';
-
-            // echo "\n\t$currentFile    \t";
-
-            if ($currentFile!=$lastFile) {
-              if ($logOutput<0)
-                $debugOutput.="\t".alignRight($currentFile,40);
-              else if ($logOutput==1)
-                $debugOutput.= "<td valign=top><b>$currentFile</b></td>";
-            } else {
-              if ($logOutput<0)
-                $debugOutput.="\t".alignRight($currentFile,40);
-              else if ($logOutput==1)
-                $debugOutput.= "<td></td>";
-            }
-
-            if ($logOutput==2)
-              xq_printXML($auxStackXML, "file", $currentFile);
-          }
-
-          $lastFile=$currentFile;
-
-          if ($logOutput<0)
-            $debugOutput.= "\t".$ln['line']."\t".$ln['function'];
-          else if ($logOutput==1)
-            $debugOutput.= "<td valign=top align=right>".$ln['line']."</td><td align=right valign=top><i><b>".$ln['function']."</b></i></td>";
-          else  if ($logOutput==2) {
-            xq_printXML($auxStackXML, "line", $ln['line']);
-            xq_printXML($auxStackXML, "function", $ln['function']);
-          }
-
-          $args='';
-          if ($SQLdebugLevel>2) {
-            if ($ln['args']) {
-              $xc=1;
-              $argCount=0;
-              foreach($ln['args'] as $ak => $av) {
-                if ($args>'')
-                  $args.=', ';
-                $av=strip_tags($av);
-                if (!is_numeric($av))
-                  $av='"'.$av.'"';
-                $cc=$xCores[$xc];
-                $xc=($xc+1) % count($xCores);
-                if ($logOutput<0)
-                  $args.=str_replace("\n",'\n',str_replace("\r",'',$av));
-                else if ($logOutput==1)
-                  $args.="<font color='$cc'>$av</font>";
-                else if ($logOutput==2) {
-                  $argCount++;
-                  xq_printXML($auxStackXML, "arg.$argCount", $av);
-                }
-              }
-            }
-          }
-          if ($logOutput<0)
-            $debugOutput.="($args)";
-          else if ($logOutput==1)
-            $debugOutput.= "<td>($args)</td>";
-
-
-          /*
-          foreach($aux[$a] as $kk=>$vv) {
-            if ($kk=='args') {
-              foreach($vv as $ak=>$av) {
-                $av=strip_tags($av);
-                $debugOutput.= "$ak $av<br>";
-              }
-            } else
-              $debugOutput.= "$kk = $vv<br>";
-          }
-          */
-          if ($logOutput<0)
-            $debugOutput.=";\n";
-          else if ($logOutput==1)
-            $debugOutput.= "</tr>";
-          else if ($logOutput==2) {
-            $stackCounter++;
-            xq_printXML($stackXML,"stack.$stackCounter",$auxStackXML);
-          }
-        }
-        xq_printXML($debugOutput, "sys.stack", $stackXML);
-
-        if ($logOutput<0)
-          $debugOutput.="\nSQL Usage\n\t".str_replace("<BR>","\n\t",$lastCommands);
-        else if ($logOutput==1)
-          $debugOutput.= "<tr><td colspan=4>$lastCommands</td></tr>";
-        else if ($logOutput==2)
-          xq_printXML($debugOutput,"sys.sqlTrace",br2nl($lastCommands));
-
-        if ((db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_))) {
-          if (db_connectionTypeIs(_MYSQLI_)) {
-            $errno = mysqli_errno($ydb_conn);
-            $error = mysqli_error($ydb_conn);
-          } else {
-            $errno = mysql_errno($ydb_conn);
-            $error = mysql_error($ydb_conn);
-          }
-          if ($logOutput<0)
-            $debugOutput.="\nLast MySQL Error: $errno:$error\n";
-          else if ($logOutput==1)
-            $debugOutput.= "<tr><td colspan=4><font size=+3 color=#dd0000>$errno: $error</font></td></tr>";
-
-        } else if (db_connectionTypeIs(_FIREBIRD_)) {
-          $errno = ibase_errcode();
-          $error = ibase_errmsg();
-          if ($logOutput<0)
-            $debugOutput.="Last FIREBIRD Error: $errno:$error";
-          else if ($logOutput==1)
-            $debugOutput.= "<tr><td colspan=4><font size=+3 color=#dd0000>$errno: $error</font></td></tr>";
-        }
-
-        if ($logOutput==2)
-          xq_printXML($debugOutput,"sys.sqlError","$errno:$error");
-
-        $setupIni=createDBText($dbCSVFilename);
-        if (($setupIni->locate("active",1))==$dbTEXT_NO_ERROR) {
-          $dbType=$setupIni->getValue('dbType');
-          $dbServer=$setupIni->getValue('dbServer');
-          $dbName=$setupIni->getValue('dbName');
-          if ($logOutput<0)
-            $debugOutput.="\n\tdbServer: $dbName ($dbType) on $dbServer";
-          else if ($logOutput==1)
-            $debugOutput.= "<tr><td colspan=4 style='border-style: solid; border-width:1px'><i>$dbType</i><br>$dbServer : $dbName</td></tr>";
-        }
-
-        if (!function_exists("_dumpArray_")) {
-
-          function _dumpArray_(&$debugOutput, $aArray, $margin='')
-          {
-            global $logOutput;
-
-            _dumpY(1,7,$margin."INICIO");
-            foreach($aArray as $k=>$v)
-            {
-              if (($k!='GLOBALS') && ($k!='debugOutput') && ($k!='abbreviations') && ($k!='mimeExtensions') && ($k!='colorList') && ($k!='setupIni')) {
-                if ($logOutput<0) {
-                  if (is_array($v)) {
-                    $debugOutput.="$margin$k = ";
-                    _dumpY(1,7,"$margin  $k");
-                    _dumpArray_($debugOutput, $v,"$margin  ");
-                  } else if ((!is_object($v)) && (!is_resource($v))) {
-                    if (trim("$v")>'')
-                      $debugOutput.="$margin$k =  '$v'\n";
-                    _dumpY(1,7,"$margin  $k = '$v'");
-                  }
-                }
-              }
-            }
-
-            _dumpY(1,7,$margin."FIM");
-          }
-        }
-        // die(var_dump($GLOBALS));
-
-        /*
-        if ($logOutput<0) {
-          $debugOutput.="\nGlobal Vars\n";
-          _dumpArray_($debugOutput, $GLOBALS,"  ");
-        }
-        */
-
-        if ($logOutput<0)
-          $debugOutput.="\n";
-        else if ($logOutput==1)
-          $debugOutput.= "</table>";
-      }
-
-      if ($logOutput<0)
-        $debugOutput.="\n$dbCSVFilename\n";
-      else if ($logOutput==1)
-        $debugOutput.= "<div><b>$dbCSVFilename</b></div>";
-
-      if ($SQLdebugLevel>3)
-        $forceExit=true;
-
-      $result=0;
-
-      if ($debugNotifierSevice>'') {
-        $dbgService=getNextValue($debugNotifierService,'&').'?wsdl';
-        $dbgEmail=getNextValue($debugNotifierService,'&');
-        if ($dbgEmail=='')
-          $dbgEmail='dortta@yahoo.com';
-
-        if (class_exists("nusoap_client")) {
-          $dbgNotifier=new nusoap_client($dbgService, true);
-          $result = $dbgNotifier->call('getStatus', array('uid' => ''));
-          if ($result==512) {
-            $result = $dbgNotifier->call('sendNotification',
-                                  array('uid' => '',
-                                        'to' => $dest,
-                                        'cc' => "$dbgEmail",
-                                        'bcc' => '',
-                                        'subject' => "SGUG.DEBUGGER: $appName",
-                                        'body' => $debugOutput));
-
-          } else
-            $result=0;
-        }
-        if ($logOutput<0)
-          $debugOutput.="\nNotificação online - ";
-        else if ($logOutput==1)
-          $debugOutput.='<br><font size=-1>';
-
-        if ($result==0) {
-          if ($logOutput<0)
-            $debugOutput.="NÃO enviada";
-          else if ($logOutput==1)
-            $debugOutput.="<font color=#dd0000>Notificação online NÃO enviada</font>";
-        } else {
-          if ($logOutput<0)
-            $debugOutput.="$dbgEmail";
-          else if ($logOutput==1)
-            $debugOutput.="Notificação online enviada para <b>$dbgEmail</b>";
-        }
-        if ($logOutput<0)
-          $debugOutput.="\n";
-        else if ($logOutput==1)
-          $debugOutput.='</font><br>';
-      }
-    }
-
-    if ($logOutput==2) {
-      xq_printXML($auxOutput,'errMsg', $msg);
-      xq_printXML($auxOutput,'errDetail', $debugOutput);
-      xq_context('error', $auxOutput);
-    } else
-      _echo("$debugOutput");
-
-    // testar  com view-source:http://localhost/SGH/query.php?s=lancamentosUTI&u=0&a=carregarListaLeitos&fieldName=&fieldValue=&ts=1332500612805&callBackFunction=listaLeitos
-
-
-    if ($forceExit) {
-      if (!($isCLI || $isWebservice)) {
-        if (!headers_sent())
-          header("Content-Type: text/html; charset=$appCharset");
-        $debugOutput=trim($debugOutput);
-        if ($debugOutput=='<sys.stack></sys.stack>')
-          $debugOutput="";
-        if ($debugOutput>'')
-          $debugOutput = "<h3>Call context</h3>$debugOutput";
-        _die("<style>pre { white-space: pre-wrap; white-space: -moz-pre-wrap; white-space: -pre-wrap; white-space: -o-pre-wrap; word-wrap: break-word; }</style><h3>Forced exit ($isWebservice)</h3><h5>YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)</h5><div style='padding:32px;color:#C40002;font-weight:800'><big><b><pre>$msg</pre></b></big></div><div>$debugOutput</div>");
-      } else
-        _die("\nFORCED EXIT!\n$debugOutput");
-    }
+    echo "\n----------------------------\n";
+    print_r($trace);
+    echo "\n----------------------------\n";
   }
 
   // testar com http://10.0.2.1/~esteban/webApps/metaForms/body.php??u=14&s=formGenerator&a=grantTable&id=cadastroDeFuncionarios&=&=
@@ -730,8 +359,12 @@
 
   function get_backtrace($traces_to_ignore = 1)
   {
+    $ret = array();
+    if (function_exists("debug_backtrace")) {
+      $specFunctions = array('db_connect', 'connect', 'password', 'pwd');
+
       $traces = debug_backtrace();
-      $ret = array();
+      // die(print_r($traces));
       foreach($traces as $i => $call){
           if ($i < $traces_to_ignore ) {
               continue;
@@ -747,12 +380,41 @@
               }
           }
 
+          $retLine = count($ret);
+          $ret[$retLine]  = ""; // str_pad($i - $traces_to_ignore, 3, ' ').': ';
+          $ret[$retLine] .= $object;
+          if (isset($call['function'])) {
+            $ret[$retLine].= $call['function'].'(';
+            if (isset($call['args'])) {
+              $cArgs=0;
+              foreach($call['args'] as $ak => $av) {
+                if ($cArgs++>0)
+                  $ret[$retLine].=', ';
+                if (is_string($av)) {
+                  if (in_array($call['function'], $specFunctions))
+                    $av=str_repeat("*", mt_rand(3,5));
+                  $av="'".$av."'";
+                }
+                $ret[$retLine].=$av;
+              }
+              $ret[$retLine].=')';
+            }
+          }
+
+          if (isset($call['file'])) {
+            $fileName = $call['file'];
+            if (substr($fileName,0,strlen($_SERVER["DOCUMENT_ROOT"])) == $_SERVER["DOCUMENT_ROOT"])
+              $fileName=substr($fileName, strlen($_SERVER["DOCUMENT_ROOT"]));
+            $ret[$retLine].=' '.$fileName.':'.$call['line'];
+          }
+/*
           $ret[] = '#'.str_pad($i - $traces_to_ignore, 3, ' ')
           .$object.$call['function'].'('.implode(', ', $call['args'])
           .') called at ['.$call['file'].':'.$call['line'].']';
+*/
       }
-
-      return implode("\n<br>",$ret);
+    }
+    return $ret;
   }
 
   function get_arg(&$arg) {

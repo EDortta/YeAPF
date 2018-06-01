@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)
+    YeAPF 0.8.60-83 built on 2018-06-01 09:33 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-06-01 09:31:47 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -297,9 +297,23 @@
     return $ret;
   }
 
+  function __dbProtectErrorMsg($errorMessage) {
+    global $dbServer, $dbUser, $dbCSVFilename;
+    $diffuseDbServer      = substr($dbServer,0,3).str_repeat('*', strlen($dbServer)-3);
+    $diffuseUser          = substr($dbUser,0,3).str_repeat('*', strlen($dbUser)-3);
+    $diffuseDbCSVFilename = substr($dbCSVFilename,0,3).str_repeat('*', strlen($dbCSVFilename)-3);
+    $ret = str_replace($dbUser,        $diffuseUser,          $errorMessage);
+    $ret = str_replace($dbServer,      $diffuseDbServer,      $ret);
+    $ret = str_replace($dbCSVFilename, $diffuseDbCSVFilename, $ret);
+    return $ret;
+  }
+
   function db_connect($dbType, $dbServer, $dbName, $dbUser, $dbPassword)
   {
     global $ydb_conn, $dbCSVFilename, $server_IP, $_ydb_connection_info, $dbCharset;
+
+    $max_time = ini_get("max_execution_time");
+    set_time_limit(2);
 
     $computerName=getenv("COMPUTERNAME");
     $servidor = "LOCAL [$server_IP]";
@@ -314,7 +328,7 @@
         $mysqlConn="mysqli_connect";
 
         $ydb_conn = $mysqlConn("$dbServer", "$dbUser", "$dbPassword", "$dbName") or
-             _yLoaderDie(false, "N&atilde;o foi possivel conectar-se como '$dbUser' ao servidor de dados.","Servidor: $dbServer","db.csv: $dbCSVFilename");
+             _yLoaderDie(false, __dbProtectErrorMsg("Was not possible to connect as '$dbUser' to db server.","Server: $dbServer","db.csv: $dbCSVFilename"));
 
         db_setstatus(_DB_ANALYZED_ + _DB_CONNECTED_);
 
@@ -338,11 +352,11 @@
       _recordWastedTime("......ready to '$mysqlConn' on $dbServer as $dbUser");
 
       $ydb_conn = $mysqlConn("$dbServer", "$dbUser", "$dbPassword") or
-           _yLoaderDie(false, "Was not possible to connect as '$dbUser' to db server.","Servidor: $dbServer","db.csv: $dbCSVFilename");
+           _yLoaderDie(false, __dbProtectErrorMsg("Was not possible to connect as '$dbUser' to db server.","Server: $dbServer","db.csv: $dbCSVFilename"));
 
       _recordWastedTime("......ready to mysql_select_db $dbName");
       mysql_select_db("$dbName", $ydb_conn) or
-          _yLoaderDie(false, "O banco de dados principal '$dbName' n&atilde;o foi achado em '$dbServer:$computerName'");
+          _yLoaderDie(false, __dbProtectErrorMsg("O banco de dados principal '$dbName' n&atilde;o foi achado em '$dbServer:$computerName'"));
 
       db_setstatus(_DB_ANALYZED_ + _DB_CONNECTED_);
 
@@ -370,7 +384,7 @@
       }
 
       $ydb_conn = ibase_connect("$dbDef", "$dbUser", "$dbPassword", "$connDBCharset") or
-                  _yLoaderDie(false, "N&atilde;o foi possivel conectar-se como '$dbUser' ao servidor de dados.","Servidor: $dbDef","db.csv: $dbCSVFilename<br>\n".db_errormsg());
+                  _yLoaderDie(false, __dbProtectErrorMsg("Was not possible to connect as '$dbUser' to db server.","Server: $dbServer","db.csv: $dbCSVFilename\n".db_errormsg()));
       db_setstatus(_DB_ANALYZED_ + _DB_CONNECTED_);
       yeapfStage("afterDBConnect");
 
@@ -394,9 +408,11 @@
           PDO::ATTR_EMULATE_PREPARES   => false,
       );
       $ydb_conn = new PDO($dsn, $dbUser, $dbPassword, $opt);
-    } else
-      _yLoaderDie(false, "Database type '$dbType' is not recognized by the system",
-                  "Check your database connection<br><small>$dbCSVFilename</small>");
+    } else {
+      _yLoaderDie(false, 
+                  __dbProtectErrorMsg("Database type '$dbType' is not recognized by the system"),
+                  __dbProtectErrorMsg("Check your database connection<br><small>$dbCSVFilename</small>"));
+    }
 
     if (db_status(_DB_CONNECTED_)==_DB_CONNECTED_) {
       $_ydb_connection_info['dbType']=$dbType;
@@ -410,6 +426,8 @@
     if (!is_resource($ydb_conn))
       if (!is_object($ydb_conn))
         _dump("ydb_conn is not a resource neither an object!");
+
+    set_time_limit($max_time);
 
     return $ydb_conn;
   }
@@ -516,10 +534,13 @@
     if ((!isset($yeapfConfig['yeapfDB'])) || ($yeapfConfig['yeapfDB']==''))
       $dbConnect='no!';
 
+    /*
     $dbg=debug_backtrace();
     $dbg=$dbg[0];
     $msg=basename($dbg['file']).'.'.$dbg['line'].': ';
-    // echo "$msg $dbConnect\n";
+    echo "$msg $dbConnect\n";
+    */
+
     _recordWastedTime("Connecting to db: $dbConnect");
     if ((strtolower($dbConnect)=='yes') || ($dbConnect=='')) {
       $original=filemtime($dbCSVFilename);
