@@ -1,9 +1,9 @@
 <?php
 /*
     skel/cli/configure.php
-    YeAPF 0.8.60-83 built on 2018-06-01 09:33 (-3 DST)
+    YeAPF 0.8.60-93 built on 2018-06-01 12:05 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-06-01 09:33:31 (-3 DST)
+    2018-06-01 12:05:17 (-3 DST)
 */
 
 
@@ -72,7 +72,7 @@
 
   function sayStep()
   {
-    global $curStep, $isCLI, $silent;
+    global $curStep, $isCLI, $silent, $debugSteps;
     if ($isCLI)
       $gt=" -> ";
     else
@@ -104,7 +104,7 @@
       $argList=str_ireplace("&nbsp;"," ",$argList);
       $ret="$line1$line: $argList\n";
     } else {
-      if ($curStep>1) {
+      if (($debugSteps) && ($curStep>1)) {
       $ret="<div style='width: 100%'>
               <span><b class=stepInfo>$curStep)</b>$argList&nbsp;<span style='color:#BBB'>$line1$line</span></span>
             </div>";
@@ -297,7 +297,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.60-83 built on 2018-06-01 09:33 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.60-93 built on 2018-06-01 12:05 (-3 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -343,16 +343,16 @@
     echo "<!doctype html>\n\n<html><head><meta name='viewport' content='width=device-width' /><meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />";
     echo "<title>configure</title>";
     echo $__yeapfCSS;
-    echo "</head>\n<body style='padding: 16px'>\n";
+    echo "</head>\n<body style='padding: 16px; margin: 16px;'><div align=center><div style='max-width:800px' align=left>\n";
   }
 
   $timestamp=date('U');
   echo sayStep("<div style='border-left: solid 4px black; padding: 12px; background-color: #fff'>
     <div><a href='http://www.yeapf.com' target='x$timestamp'><img src='http://www.yeapf.com/logo.php'></a></div>
     <h2><big><I>skel/cli/configure.php</I></big></h2>
-    <h3>YeAPF 0.8.60-83 built on 2018-06-01 09:33 (-3 DST)<br>
+    <h3>YeAPF 0.8.60-93 built on 2018-06-01 12:05 (-3 DST)<br>
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    Last modification: 2018-06-01 09:33:31 (-3 DST)</h3></div>");
+    Last modification: 2018-06-01 12:05:17 (-3 DST)</h3></div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     die(sayStep("<span class=redDot></span><div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
@@ -1302,7 +1302,7 @@
                   echo "<br>\nDB config: <b>$dbCSVFilename</b>";
                   echo "<br>\nDebug IP: <b>".(isset($cfgDebugIP)?$cfgDebugIP:'none')."</b>";
                 } else {
-                  echo sayStep("<style>.basicLink {width: 240px; float: left; height: 24px}</style><div style='box-shadow: 5px 5px 2px #888888; background: #90EE90; border-style: solid; border-width: 2px; border-color: #00BD00; padding: 32px'><big><u>YeAPF 0.8.60 well configured!</u></big><div style='padding-left: 16px'>Location: <b>$__PL__</b><br>DB config: <b>$dbCSVFilename</b><br>Debug IP: <b>".(isset($cfgDebugIP)?$cfgDebugIP:'none')."</b></div><div style='width:100%; height: 24px'><div class='basicLink'><a href='$referer_uri'>Go Back</a></div><div class='basicLink'><a href='configure.php?debugSteps=1'>Debug configure process</a></div><div class='basicLink'><a href='index.php'>Start this app</a></div><div class='basicLink'>$developLink</div></div><div style='margin: 16px'>If you wish to destroy database connection an recreate it, click <a href='configure.php?destroydb=yes'>here</a><br><i>It will preserve your database data but will remove all other definitions except the one contained in<em>yeapf.db.ini</em></i></div></div>");
+                  echo sayStep("<style>.basicLink {max-width: 240px; float: left; height: 24px; padding-right: 18px} .minButton {   display: inline-block;   margin: 0;   padding: 0.75rem 1rem;   border: 0;   border-radius: 0.317rem;   background-color: #aaa;   color: #fff;   text-decoration: none;   font-weight: 700;   font-size: 1rem;   line-height: 1.5;   font-family: 'Helvetica Neue', Arial, sans-serif;   cursor: pointer;   -webkit-appearance: none;   -webkit-font-smoothing: antialiased; }  .minButton:hover {   opacity: 0.85; }  .minButton:active {   box-shadow: inset 0 3px 4px hsla(0, 0%, 0%, 0.2); }  .minButton:focus {   outline: thin dotted #444;   outline: 5px auto -webkit-focus-ring-color;   outline-offset: -2px; }  .minButton_primary {   background-color: #1fa3ec; }  .minButton_secondary {   background-color: #e98724; }  .minButton-icon {   display: inline-block;   position: relative;   top: -0.1em;   vertical-align: middle;   margin-right: 0.317rem; }</style><div style='box-shadow: 5px 5px 2px #888888; padding: 16px; margin: 16px; border: dotted 1px #66CCFF; border-left: solid 8px #337001; border-radius: 6px; background-color: #fff'><big><u>YeAPF 0.8.60 well configured!</u>&nbsp;<span class=greenDot></span></big><div style='padding-left: 16px'>Location: <b>$__PL__</b><br>DB config: <b>$dbCSVFilename</b><br>Debug IP: <b>".(isset($cfgDebugIP)?$cfgDebugIP:'none')."</b></div><div style='width:100%; height: 24px'><div class='basicLink'><a class='minButton' href='$referer_uri'>Go Back</a></div><div class='basicLink'><a class='minButton' href='configure.php?debugSteps=1'>Debug configure process</a></div><div class='basicLink'><a class='minButton minButton_primary' href='index.php'>Start this app</a></div><div class='basicLink'>$developLink</div><div class='basicLink'><a class='minButton minButton_secondary' href='configure.php?destroydb=yes'>Recreate DB conn</a></div></div><br></div>");
                 }
                 $aux=join(file('.config/yeapf.config'),'<br>');
                 // echo echoStep("<div class=code>$aux</div>");
@@ -1354,6 +1354,6 @@
   }
 
   if (!$isCLI) {
-    echo "</body>\n</html>\n";
+    echo "</div></div></body>\n</html>\n";
   }
 ?>

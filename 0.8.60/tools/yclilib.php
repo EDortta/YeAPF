@@ -1,22 +1,22 @@
 <?php
 /*
     tools/yclilib.php
-    YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)
+    YeAPF 0.8.60-93 built on 2018-06-01 12:05 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-06-01 11:02:14 (-3 DST)
 */
 
 
   function updateFiles($sourcePath, $pattern, $target='.',  $toForce=false)
   {
     $specialFiles = array('yeapf.db.ini', 'search.path', 'e_index.html', 'e_main_menu.html');
-    echo "\rFrom $sourcePath/$pattern\n";
+    echo "\r  --+$sourcePath/$pattern\n";
     $files = glob("$sourcePath/$pattern");
     foreach($files as $fileName) {
       $bName = basename($fileName);
-      echo str_replace("//", "/", "   $target/$bName                                  \r");
+      echo str_replace("//", "/", "    +--$target/$bName                                  \r");
       if (in_array($bName, $specialFiles)) {
-        echo "-";
+        echo "X\n";
       } else {
         if (is_dir("$sourcePath/$bName")) {
           if (!(($bName=='.') || ($bName=='..'))) {
@@ -37,7 +37,7 @@
               copy("$sourcePath/$bName", "$target/$bName");
               echo "U\n";
             } else
-              echo "-\n";
+              echo "=\n";
           } else {
             copy("$sourcePath/$bName", "$target/$bName");
           }
