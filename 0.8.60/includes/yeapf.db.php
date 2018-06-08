@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)
+    YeAPF 0.8.60-126 built on 2018-06-08 12:02 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-06-07 07:54:28 (-3 DST)
+    2018-06-08 09:29:08 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -835,7 +835,7 @@
         $sqlErrNo = mysqli_errno($ydb_conn);
         $sqlError = mysqli_error($ydb_conn);
         if ($sqlErrNo!=0) {
-          showDebugBackTrace("Error:\n\t$sqlError\nwhen run:\n\t$sql",$SQLDieOnError);
+          _yLoaderDie(false,"Error:\n\t$sqlError\nwhen run:\n\t$sql");
         } else {
           $lastCommands.="$sqlCount) $sql;<BR>";
         }
@@ -846,7 +846,7 @@
         $sqlErrNo = mysql_errno();
         $sqlError = mysql_error();
         if ($sqlErrNo!=0) {
-          showDebugBackTrace("Error:\n\t$sqlError\nwhen run:\n\t$sql",$SQLDieOnError);
+          _yLoaderDie(false,"Error:\n\t$sqlError\nwhen run:\n\t$sql");
         } else {
           $lastCommands.="$sqlCount) $sql;<BR>";
         }
@@ -906,10 +906,11 @@
             ibase_rollback($transaction);
             $lastCommands.="$sqlCount) (TRANSACTION ROLLEDBACK)<BR>";
           }
+
           if ($retryCount==0)
-            showDebugBackTrace("Erro '$sqlError'  ao executar comando [$sql] ap&oacute;s $maxRetryCount tentativas em $allWastedTime microsegundos",$SQLDieOnError);
+            _yLoaderDie(false,"Erro '$sqlError'  ao executar comando [$sql] ap&oacute;s $maxRetryCount tentativas em $allWastedTime microsegundos",$SQLDieOnError);
           else
-            showDebugBackTrace("Error:\n\t$sqlError\nwhen run:\n\t$sql",$SQLDieOnError);
+            _yLoaderDie(false,"Error:\n\t$sqlError\nwhen run:\n\t$sql",$SQLDieOnError);
         } else
           $lastCommands.="$sqlCount) $sql;<BR>";
 
@@ -926,7 +927,7 @@
         $sqlError = pg_last_error($ydb_conn);
         _dumpY(4,1,"ret: $rs ErrNo: $sqlErrNo ErrMsg: $sqlError ydb_conn: $ydb_conn");
         if (trim($sqlError)>'')
-          showDebugBackTrace("Error:\n\t$sqlError\nwhen run:\n\t$sql",$SQLDieOnError);
+          _yLoaderDie(false,"Error:\n\t$sqlError\nwhen run:\n\t$sql",$SQLDieOnError);
         else
           $lastCommands.="$sqlCount) $sql;<BR>";
 
@@ -948,7 +949,7 @@
       $msgErr="Error when doing [<pre>$sql</pre>].<BR />\n$dbErrMsg<BR />\n:".getCurrentIp();
       _dumpY(4,0,$msgErr);
       $SQLdebugLevel=4;
-      showDebugBackTrace($msgErr,true);
+      _yLoaderDie(false,$msgErr,true);
     }
 
     $auxSQL=explode('<BR>',$lastCommands);
@@ -1224,7 +1225,7 @@
       try {
         $ret=$fetch_func($res);
       } catch (Exception $_E_) {
-        showDebugBackTrace($_E_->getMessage(), true);
+        _yLoaderDie(false,$_E_->getMessage(), true);
       }
       */
 

@@ -2,9 +2,9 @@
 <?php
 /*
     tools/yapp
-    YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)
+    YeAPF 0.8.60-126 built on 2018-06-08 12:02 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-06-08 09:38:47 (-3 DST)
 */
 
   $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
@@ -192,6 +192,14 @@
     updateFiles("$YFolder/skel/$appType/$folderName", "*", "$appFolder/$folderName", ($toCreate || $toForce));
   }
 
+  if (is_dir("$appFolder/includes")) {
+    updateFiles("$YFolder/includes", "*", "$appFolder/includes", ($toCreate || $toForce));
+  }
+
+  if (is_dir("$appFolder/YeAPF")) {
+    updateFiles("$YFolder", "*", "$appFolder/YeAPF", ($toCreate || $toForce));
+  }
+
   if (!file_exists("$appFolder/search.path"))
     $mySearchPath[]="$YFolder";
   else {
@@ -200,6 +208,8 @@
       if (strpos($path, "YeAPF"))
         $mySearchPath[$i]=$YFolder;
   }
+
+  echo "Updating $appFolder/search.path\n";
   $f=fopen("$appFolder/search.path","w");
   foreach($mySearchPath as $i=>$path)
     fputs($f, $path);

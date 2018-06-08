@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)
+    YeAPF 0.8.60-126 built on 2018-06-08 12:02 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-06-01 09:31:47 (-3 DST)
+    2018-06-08 09:30:31 (-3 DST)
    */
 
   /*
@@ -517,10 +517,26 @@
                    "isJSON" => $isJSON,
                    "isCLI" => $isCLI,
                    "isXML" => $isXML);
+
       if ($isHTML)
         $ret["userMsg"] = $args;
       else
         $ret["userMsg"] = $noHTMLArgs;
+
+      if (is_array($ret["userMsg"])) {
+        $ret["userMsgDetails"] = array_slice($ret["userMsg"], 1);
+        $ret["userMsg"]=$ret["userMsg"][0];
+      }
+
+      if (function_exists("get_backtrace")) {
+        $ret["sys"]=array();
+        $auxStack = get_backtrace();
+        $stackNum = 0;
+        foreach($auxStack as $item) {
+          $ret["stack"]["$stackNum"]="$item";
+          $stackNum++;
+        }
+      }
 
       if (!file_exists("deathLogs"))
         mkdir("deathLogs",0777);
@@ -544,7 +560,7 @@
         case 10:
           /* JSON */
           if ((is_string($callback)) && (trim($callback)>"")) {
-            echo "if (typeof $callback == 'function') $callback(500, 'error', {}, ".json_encode($ret).");";
+            echo "if (typeof $callback == \'function\') $callback(500, \'error\', {}, ".json_encode($ret).");";
           } else {
             echo json_encode($ret);
           }
@@ -559,27 +575,38 @@
 
           foreach($ret as $k=>$v) {
             if (is_array($v)) {
-              $v=implode(",", $v);
-              $v="[$v]";
+              $auxV="";
+              foreach($v as $k1=>$v2) {
+                if (is_numeric($k1))
+                  $k1=$k."_$k1";
+                $auxV.="\t<$k1>$v2</$k1>\n";
+              }
+              $v="$auxV";
             }
+            if (is_numeric($k))
+              $k="_$k_";
             $xmlData.="<$k>$v</$k>";
           }
           $xmlData="<callBackFunction>$callBackFunction</callBackFunction><dataContext>$xmlData</dataContext>";
-          $xmlOutput="<?xml version='1.0' encoding='UTF-8'?>\n<root>$xmlData<sgug><timestamp>$timestamp</timestamp></sgug></root>";
+          $xmlOutput="<?xml version=\'1.0\' encoding=\'UTF-8\'?>\n<root>$xmlData<sgug><timestamp>$timestamp</timestamp></sgug></root>";
           echo $xmlOutput;
           break;
 
         case 1000:
           /* HTML */
-          if (function_exists("_minimalCSS"))
+          if (function_exists("_minimalCSS")) {
             _minimalCSS();
+          } else {
+            echo "<style>body {background-color: #f6f6f6;font-family: sans-serif;-webkit-font-smoothing: antialiased;font-size: 14px;line-height: 1.4;margin: 0;padding: 0;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;}</style>";
+          }
+          echo "<style>.userMsg { color: #800000} .userMsg .explain { font-size: 120%; font-weight: 800} .stack { color: #666666; font-family: \'Courier New\', Courier, monospace }</style>";
 
-          echo "<div style='padding: 16px; margin: 16px; border: dotted 1px #66CCFF; border-radius: 6px; background-color: #fff'>";
-          echo "<div><a href='http://www.yeapf.com' target=x$timestamp><img src='http://www.yeapf.com/images/yeapf-logo-120.png'></a></div><table>";
+          echo "<div style=\'padding: 16px; margin: 16px; border: dotted 1px #66CCFF; border-radius: 6px; background-color: #fff\'>";
+          echo "<div><a href=\'http://www.yeapf.com\' target=x$timestamp><img src=\'http://www.yeapf.com/logo.php\'></a></div><table>";
           foreach($ret as $k=>$v) {
             if (is_array($v)) {
               foreach($v as $kx=>$vx) {
-                echo "<tr><td width=150px>$k.$kx</td><td>$vx</td></tr>\n";
+                echo "<tr><td width=150px><span class=$k><span class=number>$k.$kx</span></span></td><td><span class=$k><span class=explain>$vx</span></span></td></tr>\n";
               }
             } else {
               echo "<tr><td width=150px>$k</td><td>$v</td></tr>\n";
@@ -587,8 +614,8 @@
           }
           echo "</table></div>";
           break;
-
         default:
+
           /* TEXT (cli) */
           print_r($ret);
       }

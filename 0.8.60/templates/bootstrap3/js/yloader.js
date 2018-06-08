@@ -1,8 +1,8 @@
 /*********************************************
   * templates/bootstrap3/js/yloader.js
-  * YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)
+  * YeAPF 0.8.60-126 built on 2018-06-08 12:02 (-3 DST)
   * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2018-06-08 05:44:01 (-3 DST)
+  * 2018-06-08 12:02:04 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)");
+ console.log("YeAPF 0.8.60-126 built on 2018-06-08 12:02 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -4866,6 +4866,18 @@
              xGeometry = null,
              xUserMsg = xDataContext['userMsg'],
              xSysMsg = xDataContext['sysMsg'];
+             xStack = xDataContext['stack'];
+     
+         if (xStack) {
+           var requestedS = xDataContext['s'];
+           var requestedA = xDataContext['a'];
+           var requestedV = xDataContext['v'];
+           console.log("/------- {0}.{1}.v{2} ---".format(requestedS, requestedA, requestedV));
+           for(var i in xStack) {
+             console.log("| STACK: %c"+xStack[i],"color: #FF4D48");
+           }
+           console.log("\------- {0}.{1}.v{2} ---".format(requestedS, requestedA, requestedV));
+         }
      
          /* sysMsg has higher priority, so it is processed prior to user application
           * sysMsg.msg = ( logoff, alert )

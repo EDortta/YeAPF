@@ -1,9 +1,9 @@
 <?php
 /*
     skel/service/configure.php
-    YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)
+    YeAPF 0.8.60-126 built on 2018-06-08 12:02 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-06-08 05:44:01 (-3 DST)
+    2018-06-08 12:02:04 (-3 DST)
 */
 
 
@@ -297,7 +297,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.60-126 built on 2018-06-08 12:02 (-3 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -350,9 +350,9 @@
   echo sayStep("<div style='border-left: solid 4px black; padding: 12px; background-color: #fff'>
     <div><a href='http://www.yeapf.com' target='x$timestamp'><img src='http://www.yeapf.com/logo.php'></a></div>
     <h2><big><I>skel/service/configure.php</I></big></h2>
-    <h3>YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)<br>
+    <h3>YeAPF 0.8.60-126 built on 2018-06-08 12:02 (-3 DST)<br>
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    Last modification: 2018-06-08 05:44:01 (-3 DST)</h3></div>");
+    Last modification: 2018-06-08 12:02:04 (-3 DST)</h3></div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     die(sayStep("<span class=redDot></span><div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
@@ -994,7 +994,7 @@
 
                 function _yLoaderDie($reconfigureLinkEnabled)
                 {
-                  global $callback, $user_IP, $callBackFunction;
+                  global $callback, $user_IP, $callBackFunction, $s, $a, $v;
                   $script=basename($_SERVER["PHP_SELF"]);
                   $isXML=intval(strpos("query.php",$script)!==false);
                   $isJSON=intval(strpos("rest.php",$script)!==false);
@@ -1021,14 +1021,31 @@
                                "isHTML" => $isHTML,
                                "isJSON" => $isJSON,
                                "isCLI" => $isCLI,
-                               "isXML" => $isXML);
+                               "isXML" => $isXML,
+                               "s" => $s,
+                               "v" => $v,
+                               "a" => $a
+                               );
+
                   if ($isHTML)
                     $ret["userMsg"] = $args;
                   else
                     $ret["userMsg"] = $noHTMLArgs;
 
-                  if (function_exists("get_backtrace"))
-                    $ret["stack"]=get_backtrace();
+                  if (is_array($ret["userMsg"])) {
+                    $ret["userMsgDetails"] = array_slice($ret["userMsg"], 1);
+                    $ret["userMsg"]=$ret["userMsg"][0];
+                  }
+
+                  if (function_exists("get_backtrace")) {
+                    $ret["sys"]=array();
+                    $auxStack = get_backtrace();
+                    $stackNum = 0;
+                    foreach($auxStack as $item) {
+                      $ret["stack"]["$stackNum"]="$item";
+                      $stackNum++;
+                    }
+                  }
 
                   if (!file_exists("deathLogs"))
                     mkdir("deathLogs",0777);
@@ -1067,9 +1084,16 @@
 
                       foreach($ret as $k=>$v) {
                         if (is_array($v)) {
-                          $v=implode(",", $v);
-                          $v="[$v]";
+                          $auxV="";
+                          foreach($v as $k1=>$v2) {
+                            if (is_numeric($k1))
+                              $k1=$k."_$k1";
+                            $auxV.="\t<$k1>$v2</$k1>\n";
+                          }
+                          $v="$auxV";
                         }
+                        if (is_numeric($k))
+                          $k="_$k_";
                         $xmlData.="<$k>$v</$k>";
                       }
                       $xmlData="<callBackFunction>$callBackFunction</callBackFunction><dataContext>$xmlData</dataContext>";
@@ -1099,8 +1123,8 @@
                       }
                       echo "</table></div>";
                       break;
-
                     default:
+
                       /* TEXT (cli) */
                       print_r($ret);
                   }
