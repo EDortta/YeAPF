@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.60-69 built on 2018-05-30 12:46 (-3 DST)
+    YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 12:45:38 (-3 DST)
+    2018-06-06 10:29:12 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -114,7 +114,8 @@
         }
       }
     } else {
-      _dump("currentDBVersion need to be 19 at least. You're on '$currentDBVersion'");
+      if ($currentDBVersion<19)
+        _dump("currentDBVersion need to be 19 at least. You're on '$currentDBVersion'");
     }
   }
 
@@ -947,6 +948,29 @@
     }
 
     return $script;
+  }
+
+  function qyeapf($a) {
+    $ret="";
+    if ($a=='ping') {
+      $ret['serverTime'] = date('U');
+      $ret['timezone'] = date('Z');
+      $ret['ip'] = getCurrentIp();
+    } else if ($a=='serverTime') {
+      $ret['serverTime'] = date('Y-m-d H:i:s');
+
+    } else if ($a=='nodeKeepAlive') {
+      $ret=yNode::nodeKeepAlive();
+
+    } else if($a=='nodeCheckSeq') {
+      $r=yNode::requestNodeSequenceVerification();
+      if ($r==-1) {
+        $ret['result']='NotTested';
+      } else {
+        $ret['result']=$r?'true':'false';
+      }
+    }
+    xq_produceReturnLines($ret, true, $countLimit);
   }
 
   function ryeapf($a) {

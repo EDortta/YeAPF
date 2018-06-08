@@ -1,20 +1,20 @@
 <?php
 /*
     tools/yclilib.php
-    YeAPF 0.8.60-93 built on 2018-06-01 12:05 (-3 DST)
+    YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-06-01 11:02:14 (-3 DST)
+    2018-06-05 07:26:26 (-3 DST)
 */
 
 
   function updateFiles($sourcePath, $pattern, $target='.',  $toForce=false)
   {
     $specialFiles = array('yeapf.db.ini', 'search.path', 'e_index.html', 'e_main_menu.html');
-    echo "\r  --+$sourcePath/$pattern\n";
+    echo "\r  --+ $sourcePath/$pattern\n";
     $files = glob("$sourcePath/$pattern");
     foreach($files as $fileName) {
       $bName = basename($fileName);
-      echo str_replace("//", "/", "    +--$target/$bName                                  \r");
+      echo str_replace("//", "/", "    +-- $target/$bName                                  \r");
       if (in_array($bName, $specialFiles)) {
         echo "X\n";
       } else {

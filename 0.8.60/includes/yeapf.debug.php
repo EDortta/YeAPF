@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.debug.php
-    YeAPF 0.8.60-83 built on 2018-06-01 09:33 (-3 DST)
+    YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-06-01 09:31:47 (-3 DST)
+    2018-06-07 08:03:22 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -166,10 +166,13 @@
   function showDebugBackTrace($msg, $forceExit=false)
   {
     $trace = get_backtrace(1);
-
-    echo "\n----------------------------\n";
-    print_r($trace);
-    echo "\n----------------------------\n";
+    if ($forceExit) {
+      foreach($trace as $traceItem) {
+        _recordError("DIE ".$traceItem);
+      }
+      _die($msg, $trace);
+    }
+    return $trace;
   }
 
   // testar com http://10.0.2.1/~esteban/webApps/metaForms/body.php??u=14&s=formGenerator&a=grantTable&id=cadastroDeFuncionarios&=&=
@@ -395,7 +398,8 @@
                     $av=str_repeat("*", mt_rand(3,5));
                   $av="'".$av."'";
                 }
-                $ret[$retLine].=$av;
+                if (is_string($av))
+                  $ret[$retLine].=$av;
               }
               $ret[$retLine].=')';
             }

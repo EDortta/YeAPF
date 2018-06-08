@@ -82,13 +82,26 @@
     global $cfgAdminBaseFolder;
 
     $ret="";
+
+    /* Isto aqui é um paliativo já que está entrando mais de uma vez.
+       Por isso que vou devolver o sessionId que tinha se está dentro do timeout de requisição */
+    if (file_exists("$cfgAdminBaseFolder/.login/$deviceId")) {
+      $jLoginInfo = file_get_contents("$cfgAdminBaseFolder/.login/$deviceId");
+      $loginInfo = json_decode($jLoginInfo, true);
+      $now = date('U');
+      if (isset($loginInfo['timeout']) && ($loginInfo['timeout']>=$now))
+        $ret=$loginInfo['sessionId'];
+    }
+
     /* travo para impedir dois logins concomitantes do mesmo cliente */
-    if (lock($deviceId)) {
+    if (lock($deviceId, true)) {
       /* garanto estrutura de .login */
       if (!is_dir("$cfgAdminBaseFolder/.login"))
         mkdir("$cfgAdminBaseFolder/.login");
+
       /* caso este mesmo usuario esteja conectado, derrubo ele */
-      if (file_exists("$cfgAdminBaseFolder/.login/$deviceId"))
+      /* 20180602 desabilitado */
+      if ((false) && (file_exists("$cfgAdminBaseFolder/.login/$deviceId")))
         _do_logoff($deviceId);
       /* crio o sessionId */
       $sessionId=y_uniqid();
@@ -96,7 +109,8 @@
       /* preparo a info de logon */
       $loginInfo = array(
         "loginTime" => date('U'),
-        "sessionId" => $sessionId
+        "sessionId" => $sessionId,
+        "timeout"   => date("U")+120
       );
       $jLoginInfo=json_encode($loginInfo);
 

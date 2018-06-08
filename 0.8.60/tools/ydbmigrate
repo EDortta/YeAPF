@@ -3,9 +3,9 @@
   /*
    * tools
    * tools/ydbmigrate
-   * YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)
+   * YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)
    * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2018-05-30 11:21:05 (-3 DST)
+   * 2018-06-05 07:26:26 (-3 DST)
    *
    * Purpose: to export/import data to/from a .csv file
    */
@@ -45,25 +45,26 @@
   $doImport=$args->argValue('import');
   $doClean=$args->argValue('clean');
 
-  $imprecision=$args->argValue('imprecision',0);
-  $footerRecognizer=$args->argValue('footerRecognizer','Page');
-  $footerLinesCount=$args->argValue('footerLinesCount',1);
-  $headerRecognizer=$args->argValue('headerRecognizer','----');
-  $headerLinesCount=$args->argValue('headerLinesCount',1);
+  $imprecision           = $args->argValue('imprecision',0);
+  $footerRecognizer      = $args->argValue('footerRecognizer','Page');
+  $footerLinesCount      = $args->argValue('footerLinesCount',1);
+  $headerRecognizer      = $args->argValue('headerRecognizer','----');
+  $headerLinesCount      = $args->argValue('headerLinesCount',1);
+  $columnDefinitionOffset= $args->argValue('columnDefinitionOffset',0);
 
-  $requiredColumns=$args->argValue('requiredColumns','');
+  $requiredColumns       = $args->argValue('requiredColumns','');
 
-  $doExport=$args->argValue('export');
-  $doCreateForm=$args->argValue('create-form');
-  $doCreateBS3Form=$args->argValue('create-bs3-form');
-  $cfgFieldPrefix=$args->argValue('field-prefix','');
-  $doDump=$args->argValue('dump');
-  $doListTables=$args->argValue('list-tables');
-  $doListFields=$args->argValue('list-fields');
-  $doTableStructure=$args->argValue('table-structure');
-  $doTableStructureSQL=$args->argValue('table-structure-sql');
-  $targetCharset=$args->argValue('charset');
-  $keys=explode(',',$args->argValue('keys'));
+  $doExport              = $args->argValue('export');
+  $doCreateForm          = $args->argValue('create-form');
+  $doCreateBS3Form       = $args->argValue('create-bs3-form');
+  $cfgFieldPrefix        = $args->argValue('field-prefix','');
+  $doDump                = $args->argValue('dump');
+  $doListTables          = $args->argValue('list-tables');
+  $doListFields          = $args->argValue('list-fields');
+  $doTableStructure      = $args->argValue('table-structure');
+  $doTableStructureSQL   = $args->argValue('table-structure-sql');
+  $targetCharset         = $args->argValue('charset');
+  $keys                  = explode(',',$args->argValue('keys'));
   foreach($keys as $k=>$v)
     $keys[$k]=strtolower($v);
 
@@ -566,6 +567,11 @@
 
             if (!file_exists("$doImport.csv")) {
               if (file_exists("$doImport.txt")) {
+                $exportableColumns='*';
+                $deslocateAllColumns = 0;
+                $columnDefinitionAppearInAllPages = true;
+                $csvOutput = tempnam(sys_get_temp_dir(), $doImport);
+                echo "Temporary output file: $csvOutput\n";
                 txt2csv(function($errorLevel, $message) {
                           if ($errorLevel<2)
                             echo $message;
@@ -573,11 +579,17 @@
                             displayError($message);
                         },
                         "$doImport.txt",
-                        "$doImport.csv",
+                        "$csvOutput.csv",
                         $imprecision,
                         $headerRecognizer, $headerLinesCount,
                         $footerRecognizer, $footerLinesCount,
-                        $keys, $requiredColumns);
+                        $keys,
+                        $requiredColumns,
+                        $exportableColumns,
+                        $deslocateAllColumns,
+                        $columnDefinitionOffset,
+                        $columnDefinitionAppearInAllPages,
+                        $rowCount);
               } else
                 echo "$doImport.txt does not exists\n";
             } else
@@ -627,6 +639,7 @@
     echo "\n\t[--imprecision <string>]***\t\tNumber of characters +/- to be considered as being part of a field";
     echo "\n\t[--headerRecognizer <string>]***\t\tString used to recognize the header";
     echo "\n\t[--headerLinesCount <number>]***\t\tNumber of lines on header";
+    echo "\n\t[--columnDefinitionOffset <number>]***\t\tOffset of column definition in text/csv file (defaults to 0)";
     echo "\n\t[--footerRecognizer <string>]***\t\tString used to recognize the footer";
     echo "\n\t[--footerLinesCount <number>]***\t\tNumber of lines on footer";
     echo "\n\t[--clean]\t\t\tclean the table before import data (requires --import)";

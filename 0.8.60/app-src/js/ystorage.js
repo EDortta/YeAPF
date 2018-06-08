@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ystorage.js
- * YeAPF 0.8.60-67 built on 2018-05-30 11:21 (-3 DST)
+ * YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-05-30 11:21:04 (-3 DST)
+ * 2018-06-05 13:38:16 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -19,39 +19,52 @@
     window.ystorage = (function() {
 
       var aKeys = [],
-        oStorage = {},
-        that = {};
-      Object.defineProperty(oStorage, "getItem", {
-        value: function(sKey) {
-          return sKey ? that[sKey] : null; },
-        writable: false,
-        configurable: false,
-        enumerable: false
+        that = { oStorage: {} };
+
+      that.getItem = function(sKey, defaultValue) {
+        defaultValue = defaultValue || null;
+        var ret=defaultValue;
+        if (sKey) {
+          ret = (that.oStorage[sKey]) || defaultValue;
+        }
+        return ret;
+      }
+
+      that.setItem = function(sKey, sValue) {
+        if (sKey) {
+          that.oStorage[sKey]=sValue;
+          document.cookie = escape(sKey) + "=" + escape(sValue) + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
+        }
+      };
+
+      that.unsetItem = function(sKey) {
+        if ("undefined" !== typeof that.oStorage[sKey]) {
+          
+        }
+      };
+
+      Object.defineProperty(that, "item", {
+        get: that.getItem,
+        set: that.setItem,
+        writable: true,
+        enumerable: true
       });
-      Object.defineProperty(oStorage, "key", {
+
+      Object.defineProperty(that, "key", {
         value: function(nKeyId) {
           return aKeys[nKeyId]; },
         writable: false,
         configurable: false,
         enumerable: false
       });
-      Object.defineProperty(oStorage, "setItem", {
-        value: function(sKey, sValue) {
-          if (!sKey) {
-            return; }
-          document.cookie = escape(sKey) + "=" + escape(sValue) + "; expires=Tue, 19 Jan 2038 03:14:07 GMT; path=/";
-        },
-        writable: false,
-        configurable: false,
-        enumerable: false
-      });
-      Object.defineProperty(oStorage, "length", {
+
+      Object.defineProperty(that, "length", {
         get: function() {
           return aKeys.length; },
         configurable: false,
         enumerable: false
       });
-      Object.defineProperty(oStorage, "removeItem", {
+      Object.defineProperty(that, "removeItem", {
         value: function(sKey) {
           if (!sKey) {
             return; }
@@ -61,6 +74,7 @@
         configurable: false,
         enumerable: false
       });
+
       that.get = function() {
         var iThisIndx;
         for (var sKey in oStorage) {
