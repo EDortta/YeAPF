@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)
+ * YeAPF 0.8.60-153 built on 2018-06-26 07:22 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-05-30 11:21:04 (-3 DST)
+ * 2018-06-19 23:48:48 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -977,8 +977,12 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
         return ret;
     };
 
-    var genNumber = function(min, max) {
-        return Math.floor((Math.random() * (max - min) + min));
+    var genNumber = function(min, max, leftPaddingLen) {
+        leftPaddingLen = leftPaddingLen || 0;
+        var ret=''+Math.floor((Math.random() * (max - min) + min));
+        while ((''+ret).length<leftPaddingLen)
+          ret='0'+ret;
+        return ret;
     };
 
     var classHasName = function(name) {
@@ -1012,7 +1016,7 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
                     fieldValue = genString(ycomm.dom._scratch.mn, 2, 3) + "@" + genString(ycomm.dom._scratch.d, 1, 1);
                     break;
                 case "date":
-                    fieldValue = genNumber(-2208981600000, 2556064800000);
+                    fieldValue = 1*genNumber(-2208981600000, 2556064800000);
                     fieldValue = new Date(fieldValue);
                     fieldValue = fieldValue.toISOString().substr(0, 10);
                     break;
@@ -1021,17 +1025,21 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
                 case "datetime":
                 case "datetime-local":
                 case "month":
-                    fieldValue = genNumber(1, 12);
+                    fieldValue = 1*genNumber(1, 12);
                     break;
                 case "number":
                 case "range":
-                    fieldValue = genNumber(1, 100);
+                    fieldValue = 1*genNumber(1, 100);
+                    break;
+                case "tel":
+                    fieldValue = 1*genNumber(10, 52);
+                    for(var aux=0; aux<3; aux++)
+                      fieldValue+=' '+genNumber(100,999);
                     break;
                 case "search":
-                case "tel":
                 case "time":
                 case "week":
-                    fieldValue = genNumber(1, 52);
+                    fieldValue = 1*genNumber(1, 52);
                     break;
                 case "url":
                     fieldValue = genString(ycomm.dom._scratch.p, 1, 1) + genString(ycomm.dom._scratch.d, 1, 1) + ".xyz";
@@ -1050,12 +1058,23 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
                     break;
 
                 default:
-                    if (classHasName('cpf')) {
+                    if (classHasName('password')) {
+                        fieldValue = genString(ycomm.dom._scratch.ch, 6, 15);
+                    } else if (classHasName('cpf')) {
                         fieldValue = fieldValue.gerarCPF();
                     } else if (classHasName('cnpj')) {
                         fieldValue = fieldValue.gerarCNPJ();
                     } else if (classHasName('ie')) {
                         fieldValue = genString(ycomm.dom._scratch.n, 6, 12);
+                    } else if (classHasName('cep')) {
+                      /* http://www.mapanet.eu/en/resources/Postal-Format.asp */
+                      fieldValue = genNumber(10, 99);
+                      fieldValue+='.'+genNumber(0,999,3);
+                      fieldValue+='-'+genNumber(0,999,3);
+                    } else if (classHasName('zip')) {
+                      /* http://www.mapanet.eu/en/resources/Postal-Format.asp */
+                      fieldValue = genNumber(0, 99999,5);
+                      fieldValue+='-'+genNumber(0,9999,4);
                     } else {
                         fieldValue = genString(ycomm.dom._scratch.t, 1, maxLength);
                     }

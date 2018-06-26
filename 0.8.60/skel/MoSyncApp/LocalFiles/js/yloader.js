@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.60-126 built on 2018-06-08 12:02 (-3 DST)
+  * YeAPF 0.8.60-153 built on 2018-06-26 07:22 (-3 DST)
   * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2018-06-08 12:02:04 (-3 DST)
+  * 2018-06-26 07:22:38 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.60-126 built on 2018-06-08 12:02 (-3 DST)");
+ console.log("YeAPF 0.8.60-153 built on 2018-06-26 07:22 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -2166,7 +2166,7 @@
       */
      
      var rowColorSpecBase = function () {
-       that = { };
+       var that = { };
        that.cfgColors = [ '#F2F0F0', '#CFCFCF'] ;
      
        that.suggestRowColor=function (curRow) {
@@ -4660,19 +4660,21 @@
              canPing: false,
              pingerWatchdog: null,
              pingCount: 0,
-             pingTimeout: 5 * 1000,
+             pingTimeout: 15 * 1000,
              pingInterleave: 1500,
              onSuccess: null,
              onError: null,
      
              pong : function(aStatus, aError, aData) {
                if (that.pinger.pingerWatchdog) clearTimeout(that.pinger.pingerWatchdog);
-               _dumpy(4,1,"pong answer");
+               _dumpy(4,1,"ping answer loc:{0} rem:{1}".format(that.pinger.pingCount, aData.pingCount || 0));
                if (that.pinger.pingCount<=aData.pingCount) {
                  that.pinger.pingCount=0;
                  // sayStatusBar("Servidor ativo");
                  if (that.pinger.onSuccess !== null)
                    that.pinger.onSuccess();
+               } else {
+                 _dumpy(4,1,"ping Answer Rejected");
                }
                if (that.pinger.canPing)
                  that.pinger.pingerWatchdog = setTimeout(that.pinger.ping, that.pinger.pingInterleave);
@@ -4684,24 +4686,26 @@
               */
              notAnswer: function () {
                if (that.pinger.pingerWatchdog) clearTimeout(that.pinger.pingerWatchdog);
-               _dumpy(4,1,"Not pong answer");
+               _dumpy(4,1,"ping timeout");
                if (that.pinger.onError !== null)
                  that.pinger.onError();
                else
-                 _dumpy(4,1,"Not 'onError' event");
+                 _dumpy(4,1,"ping without 'onError' event");
                // sayStatusBar("Servidor nÃ£o localizado "+that.pinger.pingCount+'...<br>Tentando novamente');
-               if (that.pinger.canPing)
+               if (that.pinger.canPing) {
+                 _dumpy(4,1,"ping Scheduling a new call for {0}ms".format(that.pinger.pingInterleave / 2))
                  that.pinger.pingerWatchdog=setTimeout(that.pinger.ping, that.pinger.pingInterleave / 2);
+               }
              },
      
              /*
               * tenta localizar o servidor.  manda um numero.
               * ele retorna o mesmo numero mais um timestamp
               */
-             ping: function (aOnSuccess, aOnError) {
+             ping: function (aOnSuccess, aOnError, keepPinging) {
                if (that.pinger.pingerWatchdog) clearTimeout(that.pinger.pingerWatchdog);
-               _dumpy(4,1,"Prepare to ping");
-               that.pinger.canPing = true;
+               _dumpy(4,1,"ping being called");
+               that.pinger.canPing = keepPinging || false;
                that.pinger.onSuccess = aOnSuccess  || that.pinger.onSuccess;
                that.pinger.onError = aOnError || that.pinger.onError;
      
@@ -4712,7 +4716,7 @@
      
              stopPing: function () {
                if (that.pinger.pingerWatchdog) clearTimeout(that.pinger.pingerWatchdog);
-               _dumpy(4,1,"stop pinging");
+               _dumpy(4,1, "ping stopping");
                that.pinger.canPing = false;
              }
      
@@ -4731,7 +4735,7 @@
                        newTimeout = parseInt(newTimeout || 0); 
                        /* it only accepts values between 125ms and 5minutes */ 
                        that._comm_timeout = Math.min(5*60*60*1000, Math.max(125, newTimeout));
-                       _dumpy(4,0,"Adjusting call timeout to {0}ms".format(that._comm_timeout));
+                       _dumpy(4,0,"ping Adjusting call timeout to {0}ms".format(that._comm_timeout));
                      }
              }
            );
@@ -4745,7 +4749,7 @@
                      newInterval = parseInt(newInterval || 0);
                      /* only accepts values between 100ms and 3/4 of timeout */
                      that._whatchdog_interleave = Math.min((that.timeout*3/4), Math.max(100, newInterval));
-                     _dumpy(4,0,"Adjusting watchdog interleave to {0}ms".format(that._whatchdog_interleave));
+                     _dumpy(4,0,"ping Adjusting watchdog interleave to {0}ms".format(that._whatchdog_interleave));
                }
              }
            );
@@ -5308,7 +5312,6 @@
              var aURL=ycomm.buildCommonURL(s || '', a || '', limits || {}, localU);
              aURL="{0}?{1}&callback={2}&callbackId={3}&scriptSequence={4}&deviceId={5}".format(ycomm._dataLocation_, aURL, callbackFunctionName, callbackId, ycomm._scriptSequence,ycomm._deviceId_);
              if (ycomm.getLoad()<=ycomm._maxDirectCall) {
-               _dumpy(4,1,aURL);
                ycomm.bring(aURL, displayWaitIcon);
              } else
                setTimeout("ycomm.bring('"+aURL+"');", (0.5 + Math.abs(ycomm.getLoad() - ycomm._maxDirectCall)) * ycomm.wd_interval * 2);
@@ -6303,8 +6306,12 @@
              return ret;
          };
      
-         var genNumber = function(min, max) {
-             return Math.floor((Math.random() * (max - min) + min));
+         var genNumber = function(min, max, leftPaddingLen) {
+             leftPaddingLen = leftPaddingLen || 0;
+             var ret=''+Math.floor((Math.random() * (max - min) + min));
+             while ((''+ret).length<leftPaddingLen)
+               ret='0'+ret;
+             return ret;
          };
      
          var classHasName = function(name) {
@@ -6338,7 +6345,7 @@
                          fieldValue = genString(ycomm.dom._scratch.mn, 2, 3) + "@" + genString(ycomm.dom._scratch.d, 1, 1);
                          break;
                      case "date":
-                         fieldValue = genNumber(-2208981600000, 2556064800000);
+                         fieldValue = 1*genNumber(-2208981600000, 2556064800000);
                          fieldValue = new Date(fieldValue);
                          fieldValue = fieldValue.toISOString().substr(0, 10);
                          break;
@@ -6347,17 +6354,21 @@
                      case "datetime":
                      case "datetime-local":
                      case "month":
-                         fieldValue = genNumber(1, 12);
+                         fieldValue = 1*genNumber(1, 12);
                          break;
                      case "number":
                      case "range":
-                         fieldValue = genNumber(1, 100);
+                         fieldValue = 1*genNumber(1, 100);
+                         break;
+                     case "tel":
+                         fieldValue = 1*genNumber(10, 52);
+                         for(var aux=0; aux<3; aux++)
+                           fieldValue+=' '+genNumber(100,999);
                          break;
                      case "search":
-                     case "tel":
                      case "time":
                      case "week":
-                         fieldValue = genNumber(1, 52);
+                         fieldValue = 1*genNumber(1, 52);
                          break;
                      case "url":
                          fieldValue = genString(ycomm.dom._scratch.p, 1, 1) + genString(ycomm.dom._scratch.d, 1, 1) + ".xyz";
@@ -6376,12 +6387,23 @@
                          break;
      
                      default:
-                         if (classHasName('cpf')) {
+                         if (classHasName('password')) {
+                             fieldValue = genString(ycomm.dom._scratch.ch, 6, 15);
+                         } else if (classHasName('cpf')) {
                              fieldValue = fieldValue.gerarCPF();
                          } else if (classHasName('cnpj')) {
                              fieldValue = fieldValue.gerarCNPJ();
                          } else if (classHasName('ie')) {
                              fieldValue = genString(ycomm.dom._scratch.n, 6, 12);
+                         } else if (classHasName('cep')) {
+                           /* http://www.mapanet.eu/en/resources/Postal-Format.asp */
+                           fieldValue = genNumber(10, 99);
+                           fieldValue+='.'+genNumber(0,999,3);
+                           fieldValue+='-'+genNumber(0,999,3);
+                         } else if (classHasName('zip')) {
+                           /* http://www.mapanet.eu/en/resources/Postal-Format.asp */
+                           fieldValue = genNumber(0, 99999,5);
+                           fieldValue+='-'+genNumber(0,9999,4);
                          } else {
                              fieldValue = genString(ycomm.dom._scratch.t, 1, maxLength);
                          }

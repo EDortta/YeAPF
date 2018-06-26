@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm.js
- * YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)
+ * YeAPF 0.8.60-153 built on 2018-06-26 07:22 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-05-30 11:21:04 (-3 DST)
+ * 2018-06-12 06:07:38 (-3 DST)
  * First Version (C) 2010 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm.js
@@ -171,19 +171,21 @@
         canPing: false,
         pingerWatchdog: null,
         pingCount: 0,
-        pingTimeout: 5 * 1000,
+        pingTimeout: 15 * 1000,
         pingInterleave: 1500,
         onSuccess: null,
         onError: null,
 
         pong : function(aStatus, aError, aData) {
           if (that.pinger.pingerWatchdog) clearTimeout(that.pinger.pingerWatchdog);
-          _dumpy(4,1,"pong answer");
+          _dumpy(4,1,"ping answer loc:{0} rem:{1}".format(that.pinger.pingCount, aData.pingCount || 0));
           if (that.pinger.pingCount<=aData.pingCount) {
             that.pinger.pingCount=0;
             // sayStatusBar("Servidor ativo");
             if (that.pinger.onSuccess !== null)
               that.pinger.onSuccess();
+          } else {
+            _dumpy(4,1,"ping Answer Rejected");
           }
           if (that.pinger.canPing)
             that.pinger.pingerWatchdog = setTimeout(that.pinger.ping, that.pinger.pingInterleave);
@@ -195,24 +197,26 @@
          */
         notAnswer: function () {
           if (that.pinger.pingerWatchdog) clearTimeout(that.pinger.pingerWatchdog);
-          _dumpy(4,1,"Not pong answer");
+          _dumpy(4,1,"ping timeout");
           if (that.pinger.onError !== null)
             that.pinger.onError();
           else
-            _dumpy(4,1,"Not 'onError' event");
+            _dumpy(4,1,"ping without 'onError' event");
           // sayStatusBar("Servidor não localizado "+that.pinger.pingCount+'...<br>Tentando novamente');
-          if (that.pinger.canPing)
+          if (that.pinger.canPing) {
+            _dumpy(4,1,"ping Scheduling a new call for {0}ms".format(that.pinger.pingInterleave / 2))
             that.pinger.pingerWatchdog=setTimeout(that.pinger.ping, that.pinger.pingInterleave / 2);
+          }
         },
 
         /*
          * tenta localizar o servidor.  manda um numero.
          * ele retorna o mesmo numero mais um timestamp
          */
-        ping: function (aOnSuccess, aOnError) {
+        ping: function (aOnSuccess, aOnError, keepPinging) {
           if (that.pinger.pingerWatchdog) clearTimeout(that.pinger.pingerWatchdog);
-          _dumpy(4,1,"Prepare to ping");
-          that.pinger.canPing = true;
+          _dumpy(4,1,"ping being called");
+          that.pinger.canPing = keepPinging || false;
           that.pinger.onSuccess = aOnSuccess  || that.pinger.onSuccess;
           that.pinger.onError = aOnError || that.pinger.onError;
 
@@ -223,7 +227,7 @@
 
         stopPing: function () {
           if (that.pinger.pingerWatchdog) clearTimeout(that.pinger.pingerWatchdog);
-          _dumpy(4,1,"stop pinging");
+          _dumpy(4,1, "ping stopping");
           that.pinger.canPing = false;
         }
 
@@ -242,7 +246,7 @@
                   newTimeout = parseInt(newTimeout || 0); 
                   /* it only accepts values between 125ms and 5minutes */ 
                   that._comm_timeout = Math.min(5*60*60*1000, Math.max(125, newTimeout));
-                  _dumpy(4,0,"Adjusting call timeout to {0}ms".format(that._comm_timeout));
+                  _dumpy(4,0,"ping Adjusting call timeout to {0}ms".format(that._comm_timeout));
                 }
         }
       );
@@ -256,7 +260,7 @@
                 newInterval = parseInt(newInterval || 0);
                 /* only accepts values between 100ms and 3/4 of timeout */
                 that._whatchdog_interleave = Math.min((that.timeout*3/4), Math.max(100, newInterval));
-                _dumpy(4,0,"Adjusting watchdog interleave to {0}ms".format(that._whatchdog_interleave));
+                _dumpy(4,0,"ping Adjusting watchdog interleave to {0}ms".format(that._whatchdog_interleave));
           }
         }
       );

@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)
+ * YeAPF 0.8.60-153 built on 2018-06-26 07:22 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-06-07 12:30:54 (-3 DST)
+ * 2018-06-12 06:07:38 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -1896,7 +1896,7 @@ function hex2dec(h) {
  */
 
 var rowColorSpecBase = function () {
-  that = { };
+  var that = { };
   that.cfgColors = [ '#F2F0F0', '#CFCFCF'] ;
 
   that.suggestRowColor=function (curRow) {

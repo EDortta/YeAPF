@@ -1,9 +1,9 @@
 <?php
 /*
     skel/cli/configure.php
-    YeAPF 0.8.60-126 built on 2018-06-08 12:02 (-3 DST)
+    YeAPF 0.8.60-153 built on 2018-06-26 07:22 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-06-08 12:02:04 (-3 DST)
+    2018-06-26 07:22:38 (-3 DST)
 */
 
 
@@ -297,7 +297,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.60-126 built on 2018-06-08 12:02 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.60-153 built on 2018-06-26 07:22 (-3 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -350,9 +350,9 @@
   echo sayStep("<div style='border-left: solid 4px black; padding: 12px; background-color: #fff'>
     <div><a href='http://www.yeapf.com' target='x$timestamp'><img src='http://www.yeapf.com/logo.php'></a></div>
     <h2><big><I>skel/cli/configure.php</I></big></h2>
-    <h3>YeAPF 0.8.60-126 built on 2018-06-08 12:02 (-3 DST)<br>
+    <h3>YeAPF 0.8.60-153 built on 2018-06-26 07:22 (-3 DST)<br>
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    Last modification: 2018-06-08 12:02:04 (-3 DST)</h3></div>");
+    Last modification: 2018-06-26 07:22:38 (-3 DST)</h3></div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     die(sayStep("<span class=redDot></span><div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
@@ -994,7 +994,7 @@
 
                 function _yLoaderDie($reconfigureLinkEnabled)
                 {
-                  global $callback, $user_IP, $callBackFunction, $s, $a, $v;
+                  global $callback, $user_IP, $callBackFunction, $s, $a, $v, $SQLDieOnError;
                   $script=basename($_SERVER["PHP_SELF"]);
                   $isXML=intval(strpos("query.php",$script)!==false);
                   $isJSON=intval(strpos("rest.php",$script)!==false);
@@ -1009,9 +1009,9 @@
                   array_shift($args);
                   $noHTMLArgs = array();
                   $deathLogMessage = "";
-                  foreach($args as $k=>$v) {
-                    $noHTMLArgs[$k]  = str_replace("\n", ". ", strip_tags($v));
-                    $deathLogMessage.=$noHTMLArgs[$k]." ";
+                  foreach($args as $kAux=>$vAux) {
+                    $noHTMLArgs[$kAux] = preg_replace(\'!\s+!\', " ", str_replace("\n", " ", strip_tags($vAux)));
+                    $deathLogMessage.=$noHTMLArgs[$kAux]." ";
                   }
                   $timestamp=date("U");
                   $now=date("Y-m-d H:i:s");
@@ -1082,19 +1082,19 @@
                       if (!isset($callBackFunction))
                         $callBackFunction="alert";
 
-                      foreach($ret as $k=>$v) {
-                        if (is_array($v)) {
+                      foreach($ret as $kAux=>$vAux) {
+                        if (is_array($vAux)) {
                           $auxV="";
-                          foreach($v as $k1=>$v2) {
+                          foreach($vAux as $k1=>$v2) {
                             if (is_numeric($k1))
-                              $k1=$k."_$k1";
+                              $k1=$kAux."_$k1";
                             $auxV.="\t<$k1>$v2</$k1>\n";
                           }
-                          $v="$auxV";
+                          $vAux="$auxV";
                         }
-                        if (is_numeric($k))
-                          $k="_$k_";
-                        $xmlData.="<$k>$v</$k>";
+                        if (is_numeric($kAux))
+                          $kAux="_$kAux"."_";
+                        $xmlData.="<$kAux>$vAux</$kAux>";
                       }
                       $xmlData="<callBackFunction>$callBackFunction</callBackFunction><dataContext>$xmlData</dataContext>";
                       $xmlOutput="<?xml version=\'1.0\' encoding=\'UTF-8\'?>\n<root>$xmlData<sgug><timestamp>$timestamp</timestamp></sgug></root>";
@@ -1112,13 +1112,13 @@
 
                       echo "<div style=\'padding: 16px; margin: 16px; border: dotted 1px #66CCFF; border-radius: 6px; background-color: #fff\'>";
                       echo "<div><a href=\'http://www.yeapf.com\' target=x$timestamp><img src=\'http://www.yeapf.com/logo.php\'></a></div><table>";
-                      foreach($ret as $k=>$v) {
-                        if (is_array($v)) {
-                          foreach($v as $kx=>$vx) {
+                      foreach($ret as $k=>$vAux) {
+                        if (is_array($vAux)) {
+                          foreach($vAux as $kx=>$vx) {
                             echo "<tr><td width=150px><span class=$k><span class=number>$k.$kx</span></span></td><td><span class=$k><span class=explain>$vx</span></span></td></tr>\n";
                           }
                         } else {
-                          echo "<tr><td width=150px>$k</td><td>$v</td></tr>\n";
+                          echo "<tr><td width=150px>$k</td><td>$vAux</td></tr>\n";
                         }
                       }
                       echo "</table></div>";
@@ -1128,7 +1128,17 @@
                       /* TEXT (cli) */
                       print_r($ret);
                   }
-                  die();
+
+                  if (function_exists("db_set_flag")) {
+                    db_set_flag(_DB_DIRTY_);
+                  }
+                  if ($SQLDieOnError) {
+                    if ($SQLDieOnError==1)
+                      die();
+                    else {
+                      exit($SQLDieOnError);
+                    }
+                  }
                 }
 
                 function _yeapf_getFileValue($fileName)

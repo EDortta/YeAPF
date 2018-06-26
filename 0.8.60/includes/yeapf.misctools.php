@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misctools.php
-    YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)
+    YeAPF 0.8.60-153 built on 2018-06-26 07:22 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-06-12 06:07:38 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -302,7 +302,7 @@
     // echo "$qs<br>";
   }
 
-  function soCaracteresVisiveis($valor) 
+  function soCaracteresVisiveis($valor)
   {
     return preg_replace( '/[^[:print:]]/', '', $valor);
   }
@@ -382,7 +382,7 @@
     */
     $ret=array();
     if (!is_array($columnNames)) {
-      if (strpos($columnNames, ",")) 
+      if (strpos($columnNames, ","))
         $columnNames = explode(",", $columnNames);
       else
         $columnNames = explode(";", $columnNames);
@@ -395,7 +395,7 @@
           $value = $values[$y][$x];
           if ($escaping)
             $value = escapeString($value);
-          $ret[$y][$columnNames[$x]] = $value;          
+          $ret[$y][$columnNames[$x]] = $value;
         }
       }
     }
@@ -761,7 +761,7 @@
     if(!function_exists('curl_init')) {
       die ("Curl PHP package not installed\n");
     }
-    
+
     set_time_limit(0);
     $curlHandle = curl_init();
     curl_setopt($curlHandle, CURLOPT_URL, $googleURL);
@@ -798,7 +798,7 @@
     return $shortUrl;
   }
 
-  function getRemoteIp() 
+  function getRemoteIp()
   {
     if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
         $ip = $_SERVER['HTTP_CLIENT_IP'];
@@ -810,14 +810,14 @@
     return $ip;
   }
 
-  function getCurrentIp() 
+  function getCurrentIp()
   {
     global $cfgMainFolder;
 
     $services = array("http://icanhazip.com/", "http://ipecho.net/plain", "http://checkip.dyndns.org");
 
     $secondsPerDay = 24 * 60 * 60;
-    
+
     $cfgName = "$cfgMainFolder/.config/ifconfig.me";
     $cfgSeqName = "$cfgMainFolder/.config/ifconfig.seq";
     $d = date('U');
@@ -828,12 +828,12 @@
     $seq=($seq+1)%count($services);
 
     $currentIP=@file_get_contents($cfgName)||'';
-  
+
     if (($dif > $secondsPerDay / 6) || ($currentIP=='')) {
       set_time_limit(0);
       @file_put_contents($cfgSeqName, $seq);
       $ch=curl_init();
-      curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2); 
+      curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
       curl_setopt($ch, CURLOPT_TIMEOUT, 4);
       curl_setopt($ch, CURLOPT_URL, $services[$seq]);
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -849,7 +849,7 @@
     return $currentIP;
   }
 
-  function getGEOip($currentIP) 
+  function getGEOip($currentIP)
   {
     set_time_limit(0);
     $ch=curl_init();
@@ -858,7 +858,7 @@
     $geoInfo=curl_exec($ch);
     curl_close($ch);
 
-    $g=json_decode($geoInfo, true);    
+    $g=json_decode($geoInfo, true);
     return $g;
   }
 

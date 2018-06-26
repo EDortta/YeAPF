@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/index.php
-    YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)
+    YeAPF 0.8.60-153 built on 2018-06-26 07:22 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-06-01 09:31:47 (-3 DST)
+    2018-06-15 19:37:01 (-3 DST)
 
     skel/webApp / index.php
     This file cannot be modified within skel/webApp
@@ -61,7 +61,7 @@
     die("<div  style='border-color: #CB0000; background: #FFC0CB; width: 520px; margin: 8px; padding: 32px; border-style: solid; border-width: 2px; padding: 16px; border-radius:4px; font-family: arial; font-size: 12px'>
              <b>yeapf.php cannot be found<br>
              <a href='configure.php?devSession=$devSession'>Click here to configure</a></b><br><br>
-             YeAPF 0.8.60-119 built on 2018-06-08 05:44 (-3 DST)<br>
+             YeAPF 0.8.60-153 built on 2018-06-26 07:22 (-3 DST)<br>
              Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
         </div>");
   }
@@ -136,12 +136,14 @@
       case '':
         if (_getErrorCount()==0) {
           if ((!isset($yUserCount)) || ($yUserCount==0)) {
-            $yUserCount=db_sql("select count(*) from $usrTableName");
-            if ($yUserCount>0) {
-              $setupIni=createDBText($sgugIni);
-              if ($setupIni->locate("active",1)==$dbTEXT_NO_ERROR) {
-                $setupIni->setValue('yUserCount',$yUserCount);
-                $setupIni->commit();
+            if (db_tableExists($usrTableName)) {
+              $yUserCount=db_sql("select count(*) from $usrTableName");
+              if ($yUserCount>0) {
+                $setupIni=createDBText($sgugIni);
+                if ($setupIni->locate("active",1)==$dbTEXT_NO_ERROR) {
+                  $setupIni->setValue('yUserCount',$yUserCount);
+                  $setupIni->commit();
+                }
               }
             }
           }
