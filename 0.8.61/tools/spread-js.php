@@ -1,9 +1,9 @@
 <?php
   /*
     tools/spread-js.php
-    YeAPF 0.8.61-5 built on 2018-07-09 15:53 (-3 DST)
+    YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-07-09 15:52:40 (-3 DST)
+    2018-07-09 16:18:11 (-3 DST)
 
     This script will distribute monolite version of yloader.js
     among different application skeletons
@@ -36,7 +36,7 @@
       grantDirectory($tgtFolder);
       $auxFile = _file($srcFileName);
       if ($addHeader) {
-        $auxFile = "/* YeAPF 0.8.61-5 built on 2018-07-09 15:53 (-3 DST) Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
+        $auxFile = "/* YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST) Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
       }
       $tgtFileName=basename($srcFileName);
       if (file_put_contents("$tgtFolder/$tgtFileName", $auxFile))
@@ -96,7 +96,7 @@
   if (file_exists($minJS)) {
     echo "Minified version source: $minJS\n";
     $yeapf_minJS = join("", file($minJS));
-    $yeapf_minJS = "/* YeAPF 0.8.61-5 built on 2018-07-09 15:53 (-3 DST) Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
+    $yeapf_minJS = "/* YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST) Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
   }
 
   grantDirectory("skel/chromeApp/js");
@@ -112,16 +112,18 @@
   grantDirectory("skel/workbench/www");
 
   /* CONFIGURE.PHP and SSE.PHP */
+  echo "Copying configure.php and sse.php\n";
   $phpSpreadList=array('configure.php', 'sse.php');
   foreach($phpSpreadList as $script) {
     copy("skel/webApp/$script", "skel/webSocket/$script");
     copy("skel/webApp/$script", "skel/workbench/$script");
     copy("skel/webApp/$script", "skel/workbench/www/$script");
-    copy("skel/webApp/$script", "skel/templates/bs3/$script");
-    copy("skel/webApp/$script", "skel/templates/bs4/$script");
+    copy("skel/webApp/$script", "templates/bs3/$script");
+    copy("skel/webApp/$script", "templates/bs4/$script");
   }
 
   /* CLI skeleton */
+  echo "CLI skeleton\n";
   copy("skel/webApp/configure.php", "skel/cli/configure.php");
   copy("skel/webApp/yeapf.db.ini", "skel/cli/yeapf.db.ini");
 
@@ -129,13 +131,16 @@
      YEAPF.DB.INI REST.PHP, QUERY.PHP, E_BODY.XML, TASKS.PHP, YEAPF_TICKER.PHP, CONFIGURE.PHP and SSE.PHP */
   $phpServiceSkeleton=array('yeapf.db.ini', 'rest.php', 'query.php', 'e_body.xml',
                             'tasks.php', 'yeapf_ticker.php', 'configure.php', 'sse.php');
+  echo "Service skeleton\n";
   foreach($phpServiceSkeleton as $script) {
+    echo "\t$script\n";
     copy("skel/webApp/$script", "skel/service/$script");
   }
 
+  echo "Template skeletons\n";
   foreach($phpServiceSkeleton as $script) {
-    copy("skel/webApp/$script", "skel/templates/bs3/$script");
-    copy("skel/webApp/$script", "skel/templates/bs4/$script");
+    copy("skel/webApp/$script", "templates/bs3/$script");
+    copy("skel/webApp/$script", "templates/bs4/$script");
   }
 
   /* webapp skeleton (service skeleton + index.php and body.php ) */
