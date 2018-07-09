@@ -1,9 +1,9 @@
 <?php
   /*
     tools/spread-js.php
-    YeAPF 0.8.61-3 built on 2018-07-09 15:12 (-3 DST)
+    YeAPF 0.8.61-5 built on 2018-07-09 15:53 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-07-09 13:24:31 (-3 DST)
+    2018-07-09 15:52:40 (-3 DST)
 
     This script will distribute monolite version of yloader.js
     among different application skeletons
@@ -36,7 +36,7 @@
       grantDirectory($tgtFolder);
       $auxFile = _file($srcFileName);
       if ($addHeader) {
-        $auxFile = "/* YeAPF 0.8.61-3 built on 2018-07-09 15:12 (-3 DST) Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
+        $auxFile = "/* YeAPF 0.8.61-5 built on 2018-07-09 15:53 (-3 DST) Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
       }
       $tgtFileName=basename($srcFileName);
       if (file_put_contents("$tgtFolder/$tgtFileName", $auxFile))
@@ -96,7 +96,7 @@
   if (file_exists($minJS)) {
     echo "Minified version source: $minJS\n";
     $yeapf_minJS = join("", file($minJS));
-    $yeapf_minJS = "/* YeAPF 0.8.61-3 built on 2018-07-09 15:12 (-3 DST) Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
+    $yeapf_minJS = "/* YeAPF 0.8.61-5 built on 2018-07-09 15:53 (-3 DST) Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
   }
 
   grantDirectory("skel/chromeApp/js");
@@ -117,6 +117,8 @@
     copy("skel/webApp/$script", "skel/webSocket/$script");
     copy("skel/webApp/$script", "skel/workbench/$script");
     copy("skel/webApp/$script", "skel/workbench/www/$script");
+    copy("skel/webApp/$script", "skel/templates/bs3/$script");
+    copy("skel/webApp/$script", "skel/templates/bs4/$script");
   }
 
   /* CLI skeleton */
@@ -129,6 +131,11 @@
                             'tasks.php', 'yeapf_ticker.php', 'configure.php', 'sse.php');
   foreach($phpServiceSkeleton as $script) {
     copy("skel/webApp/$script", "skel/service/$script");
+  }
+
+  foreach($phpServiceSkeleton as $script) {
+    copy("skel/webApp/$script", "skel/templates/bs3/$script");
+    copy("skel/webApp/$script", "skel/templates/bs4/$script");
   }
 
   /* webapp skeleton (service skeleton + index.php and body.php ) */
