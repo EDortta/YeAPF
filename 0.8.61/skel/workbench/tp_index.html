@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <script charset="utf-8" src="js/jquery.min.js"></script>
+    <script charset="utf-8" src="js/bootstrap.min.js"></script>
+    <script charset="utf-8" src="js/bootbox.min.js"></script>
+    <script charset="utf-8" src="js/bootstrap-switch.js"></script>
+    <script charset="utf-8" src="js/bootbox.min.js"></script>
+    <script charset="utf-8" src="js/bootstrap-dialog.min.js"></script>
+    <script charset="utf-8" src="js/yloader.js"></script>
+
+    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="css/bootstrap-dialog.css" rel="stylesheet" type="text/css">
+    <link href="css/bootstrap-theme.css" rel="stylesheet" type="text/css">
+    <title>#(wbTitle)</title>
+  </head>
+
+  <style>
+    .page-btn {
+      width: 15vw;
+      overflow: hidden;
+    }
+
+    .file-tag, .file-tag-essential, .file-tag-basement {
+      font-size: 80%;
+      color: rgb(88, 88, 88);
+      /* text-shadow: 1px 1px 2px #000; */
+      padding-right: 16px;
+      padding-left: 4px;
+      border-left: dotted 1px #A6A6A6;
+    }
+
+    .file-tag-essential, .file-tag-basement {
+      font-weight: 800;
+      color: #2C699E;
+    }
+
+    .file-tag-basement {
+      color: #AE1B72;
+      text-shadow: 2px 0 #888888;
+      letter-spacing:2px;
+      font-weight:bold;
+    }
+
+    .highlight-blue {
+      border: solid 2px #337ab7;
+    }
+
+    .highlight-purple {
+      box-shadow: 4px 5px 5px 2px;
+    }
+
+    .highlight-red {
+      border: solid 2px #FF1D00;
+    }
+
+    .centered {
+       margin-left: auto;
+       margin-right: auto;
+       display: block;
+       text-align: center;
+    }
+  </style>
+
+<body>
+  <div id="waitIcon" style="display: none; position: absolute; width: 100vw; height: 100vh; background-color: #fafafa; z-index: 1001; opacity: 0.8">
+    <div style="padding-top: 20%">
+      <img src="wait.gif" class='centered'>
+      <div class="centered">
+      Wait...
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade" id="tp_modal_container_confirm_deletion" role="dialog" aria-labelledby="tp_confirm_deletion" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+            <i class='fa fa-close'></i>
+          </button>
+          <h4 class="modal-title" id="tp_confirm_deletion">
+            Eliminar a p&aacute;gina
+          </h4>
+        </div>
+        <div class="modal-body">
+          Tem certeza que deseja eliminar esta p&aacute;gina?
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">
+            N&atilde;o
+          </button>
+          <button type="button" class="btn btn-danger" id="tp_btnDeletePageConfirmation">
+            Sim, desejo eliminar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="navbar navbar-default navbar-static-top main-menu">
+    <div class="container">
+      <form class="navbar-form navbar-left" role="search" method="get">
+        <div class="form-group">
+          i_<input type="text" class="form-control" placeholder="New page" name="newPageName" id="newPageName">
+        </div>
+        <button type="submit" class="btn btn-default"><i class='fa fa-plus'></i></button>
+        <button type="button" class="btn btn-warning" onclick="javascript:document.location=document.location.href.split('?')[0]"><i class='fa fa-refresh'></i></button>
+        #if(#fileExists('production/e_index_sample.html')>0,{
+        <a type="button" class="btn btn-primary" target="viewer" href="production/e_index_sample.html"><i class='fa fa-folder-open'></i></a>
+        })
+      </form>
+    </div>
+  </div>
+  <div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <h3>Pages</h3>
+
+          <div class="container">
+            <div class="row">
+              #(menu)
+            </div>
+          </div>
+
+          <div><small>YeAPF 0.8.61-3 built on 2018-07-09 15:12 (-3 DST)</small></div>
+
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    var lastError="#nl2br(lastError)";
+
+    var showWaitIcon = function() {
+      var waitIcon = document.getElementById('waitIcon');
+      if (waitIcon)
+        waitIcon.style.display='';
+    }
+    var pageToBeDeleted=null;
+    var getItemAttribute = function(e, attribute) {
+      attribute=attribute || 'data-page';
+      if (e.target)
+        e=e.target;
+      if (e.nodeName=='I')
+        e=e.parentNode;
+      return e.getAttribute(attribute);
+    }
+
+    var _tp_createDist = function(e) {
+      if (e.target) {
+        var pageToBeDist = getItemAttribute(e);
+        showWaitIcon();
+        window.location = "index.php?xMinified=0&xBody="+pageToBeDist;
+      }
+    }
+
+    var _tp_createZipDist = function(e) {
+      if (e.target) {
+        var pageToBeDist = getItemAttribute(e);
+        showWaitIcon();
+        window.location = "index.php?xMinified=1&xBody="+pageToBeDist;
+      }
+    }
+
+    var _tp_deleteZipDist = function(e) {
+      if (e.target) {
+        var distToBeDeleted = getItemAttribute(e);
+        showWaitIcon();
+        window.location = "index.php?xMinified=0&xErase=1&xBody="+distToBeDeleted;
+      }
+    }
+
+    var _tp_deletePageOpenDialog = function(e) {
+      if (e.target) {
+        pageToBeDeleted = getItemAttribute(e);
+        $("#tp_modal_container_confirm_deletion").modal();
+      } else
+        console.error("Que navegador vc esta usando, meu chapa?");
+    };
+
+    var _tp_deletePageAction = function() {
+      showWaitIcon();
+      window.location = "index.php?dBody="+pageToBeDeleted;
+    };
+
+    var _tp_toggleEssentialFilename = function(e) {
+      showWaitIcon();
+      var essentialFilename = getItemAttribute(e),
+          essentialFilepath = getItemAttribute(e, 'data-path');
+      window.location = "index.php?essentialFilename="+essentialFilename+"&essentialFilepath="+essentialFilepath;
+    };
+
+    var _tp_setFirstPage = function(e) {
+      var setFirstPage = getItemAttribute(e);
+      showWaitIcon();
+      window.location = "index.php?setFirstPage="+setFirstPage;
+    };
+
+    addOnLoadManager(
+
+      function() {
+        document.getElementById('newPageName').focus();
+
+        addEvent(".btnDeletePage",               "click", _tp_deletePageOpenDialog);
+        addEvent(".btnCreateDist",               "click", _tp_createDist);
+        addEvent(".btnCreateZipDist",            "click", _tp_createZipDist);
+        addEvent(".btnDeleteDist",               "click", _tp_deleteZipDist);
+
+        addEvent(".btnToggleEssentialFile",      "click", _tp_toggleEssentialFilename);
+        addEvent(".btnFirstPage",                "click", _tp_setFirstPage);
+
+        addEvent("tp_btnDeletePageConfirmation", "click", _tp_deletePageAction);
+
+        if (lastError>'') {
+          BootstrapDialog.show({
+            title: 'Warnings and Errors',
+            message: lastError
+          });
+        }
+      }
+    );
+  </script>
+</html>

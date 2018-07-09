@@ -1,0 +1,18 @@
+ystorage
+
+O propósito deste objeto é guardar poucos dados do lado do cliente.
+Este cliente pode ser um navegador, um aplicativo cordova, um aplicativo electron ou outos que venham a usar javascript.
+
+Os dados sao guardados no ambiente dos cookies, então é um local limitado e pensado apenas para isso.
+
+Todavia, como ele faz parte do conjunto de contenedores de dados, as funções básicas são as mesmas. Então tudo o que é aprendido para ele, serve para os outros.
+
+
+Propriedades:
+key
+length
+
+Métodos
+getItem
+setItem
+removeItem

@@ -1,0 +1,207 @@
+#!/usr/bin/php
+<?php
+  /*
+   * tools
+   * tools/yconvertcharset
+   * YeAPF 0.8.61-3 built on 2018-07-09 15:12 (-3 DST)
+   * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+   * 2018-05-30 11:21:05 (-3 DST)
+   */
+
+  /*
+   * O propósito deste script é converter um projeto inteiro
+   * codificado em ISO-8859-1 para UTF-8 com conversão de entidades
+   * html como as acentuações
+   * Originalmente estava no colegio-1.2
+   *
+   * para descartar pastas, utilize o arquivo yconvertcharset.exclude
+   */
+
+  $acentuados=array(
+    "ç" => "&ccedil;",
+    "á" => "&aacute;",
+    "é" => "&eacute;",
+    "í" => "&iacute;",
+    "ó" => "&oacute;",
+    "ú" => "&uacute;",
+    "à" => "&agrave;",
+    "è" => "&egrave;",
+    "ì" => "&igrave;",
+    "ò" => "&ograve;",
+    "ù" => "&ugrave;",
+    "â" => "&acirc;",
+    "ê" => "&ecirc;",
+    "î" => "&icirc;",
+    "ô" => "&ocirc;",
+    "û" => "&ucirc;",
+    "ã" => "&atilde;",
+    "õ" => "&otilde;",
+    "Ç" => "&CCEDIL;",
+    "Á" => "&AACUTE;",
+    "É" => "&EACUTE;",
+    "Í" => "&IACUTE;",
+    "Ó" => "&OACUTE;",
+    "Ú" => "&UACUTE;",
+    "À" => "&AGRAVE;",
+    "È" => "&EGRAVE;",
+    "Ì" => "&IGRAVE;",
+    "Ò" => "&OGRAVE;",
+    "Ù" => "&UGRAVE;",
+    "Â" => "&ACIRC;",
+    "Ê" => "&ECIRC;",
+    "Î" => "&ICIRC;",
+    "Ô" => "&OCIRC;",
+    "Û" => "&UCIRC;",
+    "Ã" => "&ATILDE;",
+    "Õ" => "&OTILDE;"
+    );
+
+  $mistakes='';
+  function sayMistake($aMistake, $stop=false) {
+    global $mistakes, $argv;
+
+    if ($aMistake>'') {
+      if ($mistakes>'')
+        $mistakes.="\n";
+      $mistakes.="\t$aMistake";
+    }
+
+    if ($stop) {
+      $myself=basename($argv[0]);
+      echo "YeAPF 0.8.61 $myself \nCopyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+      echo "YeAPF tools*\nusage:";
+      echo "\n\t$myself <source> [target]\n\nsource and target are folders, not files.\ntarget defauls to current working directory.";
+      echo "\n".wordwrap("The file 'yconvertcharset.exclude' in the sorce folder contain a list of files and folders to be excluded. Each line represents a file/folder and '*' wilcard are allowed")."\n\n";
+      echo "$mistakes\n\n";
+    }
+  }
+
+  function processFolder($sourcePath, $targetPath) {
+    global $firstPath, $acentuados;
+
+    if (file_exists("yconvertcharset.exclude"))
+      $descartar=file("yconvertcharset.exclude");
+    else
+      $descartar=array();
+
+    $sourcePath=str_replace("//","/",$sourcePath);
+
+    $localPath=substr($sourcePath,strlen($firstPath)-substr($firstPath,0,-1)=='/'?1:0);
+    /*
+    if (!is_dir($localPath))
+      mkdir($localPath);
+    */
+    echo "$localPath\n";
+    $d=glob("$sourcePath/*");
+    foreach($d as $fName) {
+      $fName=str_replace("//","/",$fName);
+
+      if (is_dir("$fName")) {
+        $processar=true;
+        foreach($descartar as $d) {
+          $auxDest=str_replace("\n","","$firstPath/$d");
+          $auxDest=str_replace("//","/",$auxDest);
+          // echo ("\n-------------\n[".substr($fName,0,strlen($auxDest))."] : [".$auxDest."]\n------\n");
+          // if (substr($fName,strlen($fName)-strlen($d))==$d)
+          if (substr($fName,0,strlen($auxDest))==$auxDest) {
+            $processar=false;
+          }
+        }
+        if ($processar) {
+          processFolder($fName, $targetPath);
+        }
+      } else {
+        echo "\t$fName\n";
+        $fInfo=pathinfo($fName);
+        if (isset($fInfo['extension'])) {
+          $newFileName='';
+          if (($fInfo['extension']=='php') ||
+              ($fInfo['extension']=='php3')) {
+            $fText=join('',file($fName));
+            try {
+              $fText=htmlentities($fText, null, "ISO-8859-1", false);
+              $fText=str_replace("&lt;?php","<?php",$fText);
+              $fText=str_replace("?&gt;","?>",$fText);
+              $fText=str_replace("&gt;",">",$fText);
+              $fText=str_replace("&lt;","<",$fText);
+              $fText=str_replace("&amp;","&",$fText);
+
+              $fText=trim($fText);
+
+              $newFileName=substr($fName,strlen($firstPath)-1);
+            } catch(Exception $e) {
+              sayMistake("$fName\n".$e->getMessage());
+            }
+          } else if ( ($fInfo['extension']=='html') ||
+                      ($fInfo['extension']=='htm') ||
+                      ($fInfo['extension']=='js')  ||
+                      ($fInfo['extension']=='css') ) {
+            $fText=join('',file($fName));
+            $fText = htmlentities($fText, null, "ISO-8859-1", false);
+            $fText = htmlspecialchars_decode($fText);
+            /*
+            foreach($acentuados as $c=>$htmlC) {
+              $fText=str_replace($c, $htmlC, $fText);
+            }
+            */
+            $newFileName=substr($fName,strlen($firstPath)-1);
+          }
+          if ($newFileName>'') {
+            $targetFolder="$targetPath/".substr($localPath,strlen($firstPath)-1);
+            $targetFolder=str_replace("//","/",$targetFolder);
+            $canGo=is_dir($targetFolder);
+            if (!$canGo) {
+              echo "creating '$targetFolder'\n";
+              $canGo=mkdir($targetFolder, 0777, true);
+            }
+
+            if ($canGo) {
+              $newFileName="$targetPath/$newFileName";
+              $newFileName=str_replace("//","/",$newFileName);
+
+              $fText=str_replace("charset=iso-8859-1", "charset=UTF-8", $fText);
+              $fText=str_replace("charset=ISO-8859-1", "charset=UTF-8", $fText);
+              $fText=str_replace("&nbsp;","&#32;",$fText);
+
+
+              $fText=@iconv("UTF-8", "ISO-8859-1", $fText) or $fText;
+              echo "\t\t --> $newFileName\n";
+              if ($f=fopen($newFileName,"w")) {
+                fwrite($f,$fText);
+                fclose($f);
+              } else
+                sayMistake("Not enough rights to create '$newFileName' file", true);
+            } else
+              sayMistake("Not enough rights to create '$targetPath/$localPath' folder", true);
+          }
+
+        }
+      }
+    }
+  }
+
+  echo basename("tools/yconvertcharset")."\nYeAPF 0.8.61 tools\nCopyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+
+  $showHelp=true;
+  if (count($argv)>1) {
+    if (is_dir($argv[1])) {
+      $firstPath=$argv[1].'/';
+      if (count($argv)>2)
+        $targetPath=$argv[2];
+      else
+        $targetPath='.';
+
+      if (realpath($targetPath)!=realpath($firstPath)) {
+        processFolder($firstPath, $targetPath);
+        $showHelp=false;
+      } else
+        sayMistake("Chose different folders");
+    } else {
+      sayMistake($argv[1]." is not a folder");
+    }
+  }
+
+  if ($showHelp) {
+    sayMistake('',true);
+  }
+?>

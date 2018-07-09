@@ -1,0 +1,153 @@
+<!doctype html>
+
+<html lang="pt-br">
+  <head>
+    <meta charset="utf-8">
+
+    <title>YeAPF Developer aid</title>
+    <meta name="description" content="0.8.61 Develop">
+    <meta name="author" content="Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com">
+
+    <link rel="stylesheet" href="#(sessionCWD)/yDevelop.css?v=1.0">
+    <link rel="stylesheet" href="#(sessionCWD)/skin-foundation/foundation-icons.css?v=1.0">
+
+    <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <script src="#(sessionCWD)/../../lib/json_sans_eval.js"></script>
+    <script src="#(sessionCWD)/../yeapf.js"></script>
+    <script src="#(sessionCWD)/../yloader.js"></script>
+    <script src="#(sessionCWD)/yDevelop.js"></script>
+
+  </head>
+
+  <body>
+    <div style='width:100%; height: auto'>
+      <!--
+      LEFT MENU
+      -->
+      <div id='leftMenu' class='inlineList'>
+        <div style='width: 100%'>
+          <select onchange="javascript:yDevelopMenu(this)" id='yds_options'>
+            <option value='dbConnection'>Banco de dados</option>
+            <option value='dbTables'>Tabelas</option>
+            <option value='dbMenu'>Menu / Eventos</option>
+          </select>
+          <span id=yds_returnToApp style='display: none; float: right; padding-right: 14px'>
+          <a href="javascript:yDevelopReturn(this)"><i class="step fi-eject" style='font-size: 18px; color: #FFFF00'></i></a></span>
+        </div>
+
+        <!--
+          Submenu de registro de conexões ao banco de dados
+        -->
+        <div class=yDevelopSubMenu id=yds_dbConnection>
+          <div>
+            <a href="javascript:myDevelop.invoke(this, 'dbConn:getList')"><i class="step fi-refresh"></i></a>
+            <a href="javascript:myDevelop.invoke(this, 'dbConn:new')"><i class="step fi-page-add"></i></a>
+            <a href="javascript:myDevelop.invoke(this, 'dbConn:edit')"><i class="step fi-page-edit"></i></a>
+            <a href="javascript:myDevelop.invoke(this, 'dbConn:delete')"><i class="step fi-page-remove"></i></a>
+          </div>
+          <ul id=dbConnList>
+          </ul>
+        </div>
+
+        <!--
+          Submenu de tabelas existentes no banco de dados ATIVO
+        -->
+
+        <div class=yDevelopSubMenu id=yds_dbTables>
+          <div>
+            <a href="javascript:myDevelop.invoke(this, 'dbTables:getList')"><i class="step fi-refresh"></i></a>
+            <a href="javascript:myDevelop.invoke(this, 'dbTables:new')"><i class="step fi-page-add"></i></a>
+            <a href="javascript:myDevelop.invoke(this, 'dbTables:edit')"><i class="step fi-page-edit"></i></a>
+            <a href="javascript:myDevelop.invoke(this, 'dbTables:delete')"><i class="step fi-page-remove"></i></a>
+            <a href="javascript:myDevelop.invoke(this, 'dbTables:openMetaDataRightsEditor')"><i class="step fi-shield"></i></a>
+            <a href="javascript:myDevelop.invoke(this, 'dbTables:openMetaDataEditor')"><i class="step fi-sheriff-badge"></i></a>
+          </div>
+          <ul id=dbTablesList></ul>
+        </div>
+
+        <!--
+          Submenu com os eventos (IS_MENU) existentes no banco de dados ATIVO!
+        -->
+        <div class=yDevelopSubMenu id=yds_dbMenu>
+          <div>
+            <span id=yds_dbMenuBack style='display:none; float: left'><a href="javascript:myDevelop.backMenuHistory()"><i class="step fi-arrow-left"></i></a></span>
+            <span id=yds_dbMenuRefresh style='display:block; float: left'><a href="javascript:myDevelop.backMenuHistory()"><i class="step fi-refresh"></i></a></span>
+            <a href="javascript:myDevelop.invoke(this, 'dbMenu:newItem')"><i class="step fi-page-add"></i></a>
+            <!--
+            <a href="javascript:myDevelop.invoke(this, 'dbMenu:editItem')"><i class="step fi-page-edit"></i></a>
+            <a href="javascript:myDevelop.invoke(this, 'dbMenu:delItem')"><i class="step fi-page-remove"></i></a>
+            -->
+          </div>
+          <ul id=dbMenuList></ul>
+        </div>
+
+      </div>
+      <div id=adminContainer>
+
+        <!--
+          ATALHOS DE DESENVOLVIMENTO
+        -->
+
+        <div id='adminHeader' class='inlineList'>
+          <div class='devFrameLine'>
+            <ul>
+              <li><a href="javascript:myDevelop.toggleLeftMenu()"><i class="step fi-thumbnails"></i></a></li>
+              <li><a href="javascript:myDevelop.home()"><i class="step fi-home"></i>Home</a></li>
+              <li><a href="javascript:myDevelop.reload()"><i class="step fi-loop"></i>Reload</a></li>
+              <li><a href="javascript:myDevelop.invoke(this, 'todo:open')"><i class="step fi-clipboard-notes"></i>A fazer</a></li>
+              <li><a href="javascript:myDevelop.invoke(this,'scheduler:open')"><i class="step fi-calendar"></i>Planejamento</a></li>
+              <li><a href="javascript:myDevelop.invoke(this,'layoutEditor:open')"><i class="step fi-eye"></i>Modelagem</a></li>
+              <li id=yah_returnToApp style='display: none'><a href="javascript:yDevelopReturn(this)"><i class="step fi-eject" style='font-size: 18px; color: #FFFF00'></i>Voltar</a></li>
+            </ul>  <span id=msgSpace></span>
+          </div>
+
+          <div class=devFrameLine>
+
+            <span id=currentEvent>
+              <span id=currentSatus></span>&nbsp;<span id=currentStage></span>&nbsp;[ <span id=currentS style="color:#0082FF;"></span>.<span id=currentA style="color:#FF9100"></span>&nbsp;=&gt;&nbsp;<span id=currentABody></span> ]
+              <span id=notWorkingIcon style='padding-left: 8px; color: #990000; font-weight: 800; display: none'>Halted!</span>
+
+
+              <input type=text name='parentEvent' class=input title="Event's parent" size=13> / <input type=text name='newLabel' class=input title='Label for user interface' size=13>:<input type=text name='newS' class=input title='Subject' size=13>&nbsp;<button class=button id=eventDsgnButton>Save</button>
+
+              </span>
+          </div>
+
+        </div>
+
+        <div id='guestArea'>
+          <div id='guestBody' class=bodyTab style='display:block'>
+            <iframe src='index.php?devSession=#(devSession)' name='applicatioMainFrame_' id='applicatioMainFrame_' scrolling=auto marginwidth=0 frameborder=0 height=100% width=100% onload='javascript:resizeIframe(this);'></iframe>
+          </div>
+          <div id='dbConn_Body' class=bodyTab></div>
+          <div id='dbTables_Body' class=bodyTab></div>
+          <div id='dbMenu_Body' class=bodyTab></div>
+          <div id='todo_Body' class=bodyTab>
+
+            <!-- Formulário a ser preenchido -->
+            <div>
+              <form onsubmit='{return false;}' name='todo_Form' id='todo_Form'>
+                <div class=fieldName>A fazer:</div>
+                <div class=fieldValue>
+                <input type=text id='todoItem' size=60>&nbsp;<input type=button onclick='javascript:ytodoSaveForm(this)' value='Salvar'>
+                <input type='hidden' id='id'>
+                </div>
+              </form>
+            </div>
+
+            <!-- Lista com os afazeres -->
+            <ul id=todoList></ul>
+
+          </div>
+
+          <div id='scheduler_Body' class=bodyTab></div>
+          <div id='layoutEditor_Body' class=bodyTab></div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+</html>
