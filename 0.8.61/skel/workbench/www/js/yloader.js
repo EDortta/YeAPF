@@ -1,8 +1,8 @@
 /*********************************************
   * skel/workbench/www/js/yloader.js
-  * YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+  * YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST)
   * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2018-07-09 16:23:41 (-3 DST)
+  * 2018-07-30 19:34:44 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)");
+ console.log("YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -1724,6 +1724,14 @@
        aux.setTime(aTimestamp*1000);
        return aux.getDay();
      }
+     
+     Date.prototype.getWeekNumber = function(){
+       var d = new Date(Date.UTC(this.getFullYear(), this.getMonth(), this.getDate()));
+       var dayNum = d.getUTCDay() || 7;
+       d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+       var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+       return Math.ceil((((d - yearStart) / 86400000) + 1)/7)
+     };
      
      /* http://stackoverflow.com/questions/11887934/how-to-check-if-the-dst-daylight-saving-time-is-in-effect-and-if-it-is-whats */
      Date.prototype.stdTimezoneOffset = function() {
@@ -4336,6 +4344,7 @@
        that.displayTab = function (aTab, aContainer) {
          if (!that.changingView) {
            that.changingView=true;
+           var styleDisplay='';
            try {
              if (!that.locked()) {
                if (aTab) {
@@ -4373,10 +4382,10 @@
                        if (that.ontabfocus != undefined)
                          that.ontabfocus(aTab);
                        */
-                       aTab.style.display = 'block';
+                       aTab.style.display = styleDisplay;
                        var auxNode=aTab;
                        while ((auxNode) && (auxNode!=document.body)) {
-                         auxNode.style.display = 'block';
+                         auxNode.style.display = styleDisplay;
                          auxNode=auxNode.parentNode;
                        }
                        var elems=aTab.getElementsByTagName('*');;
@@ -4410,16 +4419,16 @@
            if (isPropertySupported('opacity')) {
              y$('waitIcon').style.opacity='.99';
            }
-           y$('waitIcon').style.display='block';
+           y$('waitIcon').style.display='';
          }
        };
      
        that.hideWaitIcon = function () {
          if (y$('waitIcon')) {
-           if (isPropertySupported('opacity'))
+           if (isPropertySupported('opacity')) {
              y$('waitIcon').style.opacity=0;
-           else
-             y$('waitIcon').style.display='none';
+           }
+           y$('waitIcon').style.display='none';
          }
        };
      

@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+    YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-06-08 09:30:31 (-3 DST)
+    2018-07-24 06:51:00 (-3 DST)
    */
 
   /*
@@ -2571,7 +2571,8 @@
 
   function timeStamp($datahora)
   {
-    $datahora=ereg_replace("[^0-9]", "",$datahora);
+    //$datahora=ereg_replace("[^0-9]", "",$datahora);
+    $datahora=preg_replace("/[^0-9]/", "",$datahora);
     while (strlen($datahora)<14)
       $datahora.='0';
     $year = substr($datahora,0,4);
@@ -2585,7 +2586,8 @@
 
   function date2timestamp($valorCampo, $forceInternalFormat=false)
   {
-    $valorCampo=ereg_replace("[^0-9]", "", $valorCampo);
+    //$valorCampo=ereg_replace("[^0-9]", "", $valorCampo);
+    $valorCampo=preg_replace("/[^0-9]/", "", $valorCampo);
     if ((!$forceInternalFormat) && (db_connectionTypeIs(_FIREBIRD_)))
       $valorCampo=dateTransform($valorCampo, 'mmddyyyyHHMMSS','yyyymmddHHMMSS');
     $valorCampo=timeStamp($valorCampo);

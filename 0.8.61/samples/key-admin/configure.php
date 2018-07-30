@@ -1,9 +1,9 @@
 <?php
 /*
     samples/key-admin/configure.php
-    YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+    YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-07-09 16:23:41 (-3 DST)
+    2018-07-30 19:34:44 (-3 DST)
 */
 
 
@@ -33,7 +33,7 @@
     if ($activeCount==1)
       $activeAppName=$curAppName;
     else if ($activeCount>1)
-      die(sayStep("Tem mais de uma entrada de banco de dados ativa\n$curAppName, $activeAppName"));
+      dieConfig(sayStep("Tem mais de uma entrada de banco de dados ativa\n$curAppName, $activeAppName"));
   }
 
   function getSgugPath($base)
@@ -70,6 +70,19 @@
   $curStep=0;
   clearstatcache(true);
 
+  function dieConfig() {
+    $argList='';
+    $args=func_get_args();
+    foreach ($args as $a) {
+      if ($argList>'')
+        $argList.=' ';
+      $argList.=$a;
+    }
+    $ret=sayStep($argList);
+    unlock('configure');
+    die($ret);
+  }
+
   function sayStep()
   {
     global $curStep, $isCLI, $silent, $debugSteps;
@@ -91,6 +104,7 @@
         $argList.=' ';
       $argList.=$a;
     }
+
     $curStep++;
     if ($isCLI) {
       $argList=strip_tags($argList, "<BR><p><div>");
@@ -297,7 +311,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -350,12 +364,12 @@
   echo sayStep("<div style='border-left: solid 4px black; padding: 12px; background-color: #fff'>
     <div><a href='http://www.yeapf.com' target='x$timestamp'><img src='http://www.yeapf.com/logo.php'></a></div>
     <h2><big><I>samples/key-admin/configure.php</I></big></h2>
-    <h3>YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)<br>
+    <h3>YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST)<br>
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    Last modification: 2018-07-09 16:23:41 (-3 DST)</h3></div>");
+    Last modification: 2018-07-30 19:34:44 (-3 DST)</h3></div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
-    die(sayStep("<span class=redDot></span><div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
+    dieConfig(sayStep("<span class=redDot></span><div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
   }
 
   echo echoStep("<b>homeFolder</b>: '$homeFolder' is equivalent to homeURL: '$homeURL'\n");
@@ -450,19 +464,19 @@
       echo echoStep("Testing write rights using '$tmpfname' temporary file");
       if (!is_dir($folderName))
         if (!mkdir($folderName, 0755, true))
-          die(sayStep("<p><span class=redDot></span><ul class=err>You have not enough rights to create '$folderName'</ul></p>"));
+          dieConfig(sayStep("<p><span class=redDot></span><ul class=err>You have not enough rights to create '$folderName'</ul></p>"));
       if (@touch($tmpfname)) {
         unlink($tmpfname);
         $canConfig=true;
       } else {
         echo sayStep("'$tmpfname' cannot be created");
         if (is_file($folderName))
-          die(sayStep("<span class=redDot></span><ul class=err>$folderName is a file and we need to create a folder with that name</ul>"));
+          dieConfig(sayStep("<span class=redDot></span><ul class=err>$folderName is a file and we need to create a folder with that name</ul>"));
         if (!is_dir($folderName)) {
           echo echoStep("<b>$folderName</b> is not a folder");
           $canConfig = is_writable(".");
           if ($canConfig)
-            $canConfig = mkdir($folderName, 0766) or die(sayStep("<p><span class=redDot></span><ul class=err>Not enough rights to create '<b>$folderName</b>' folder</ul></p>"));
+            $canConfig = mkdir($folderName, 0766) or dieConfig(sayStep("<p><span class=redDot></span><ul class=err>Not enough rights to create '<b>$folderName</b>' folder</ul></p>"));
         } else
           $canConfig = is_writable($folderName);
       }
@@ -473,20 +487,20 @@
 
     if ($canConfig) {
       echo sayStep("Loading <em>$__PL__/yeapf.debug.php</em>");
-      (@include_once ($__PL__."/yeapf.debug.php")) || die(sayStep("<span class=redDot></span><ul class=err>Err loading $__PL__/yeapf.debug.php</ul>"));
+      (@include_once ($__PL__."/yeapf.debug.php")) || dieConfig(sayStep("<span class=redDot></span><ul class=err>Err loading $__PL__/yeapf.debug.php</ul>"));
 
       if (function_exists("yeapfVersion")) {
         if (("%"."YEAPF_VERSION%")==yeapfVersion())
           echo sayStep("<div class=warn>Warning: You're using a developer version.<br>Please, use a production version instead.</div>");
         else
           if (("0.8.61") != yeapfVersion())
-            die(sayStep("<span class=redDot></span><ul class=err>Your configure version is '0.8.61' while your installed version is '".yeapfVersion()." at ".yeapfBaseDir()."'<br><small>You can use 'yeapf.path' file to indicate where is your YeAPF distribution</small></ul>"));
+            dieConfig(sayStep("<span class=redDot></span><ul class=err>Your configure version is '0.8.61' while your installed version is '".yeapfVersion()." at ".yeapfBaseDir()."'<br><small>You can use 'yeapf.path' file to indicate where is your YeAPF distribution</small></ul>"));
       }
 
       $CFG_LOCK_DIR=".config/lock";
 
       echo echoStep("canConfig=".intval($canConfig)."<br>Loading <em>$__PL__/yeapf.locks.php</em>");
-      (@include_once ($__PL__."/yeapf.locks.php")) || die(sayStep("<span class=err>Err loading $__PL__/yeapf.locks.php</span>"));
+      (@include_once ($__PL__."/yeapf.locks.php")) || dieConfig(sayStep("<span class=err>Err loading $__PL__/yeapf.locks.php</span>"));
 
 
       /*
@@ -550,7 +564,7 @@
               $myMD5.=join('', file($aFileName));
           $myMD5=md5($myMD5);
           if ((file_exists('configure.md5')) && (!is_writable('configure.md5')))
-            die(sayStep("<span class=redDot></span><div class=err>Impossible to write on 'configure.md5'</div>"));
+            dieConfig(sayStep("<span class=redDot></span><div class=err>Impossible to write on 'configure.md5'</div>"));
           else
             file_put_contents('configure.md5',$myMD5);
 
@@ -635,50 +649,59 @@
           if (file_exists(".config/db.ini"))
             unlink(".config/db.ini");
 
-          $dbCSVFilename=whereis($yeapfDB, 'sgug.ini', true);
-          $dbCSV=whereis($yeapfDB, 'db.csv', true);
+          $SGUG_INI_PATH = whereis($yeapfDB, 'sgug.ini', true);
+          $DB_CSV_PATH   = whereis($yeapfDB, 'db.csv',   true);
+          $YEAPF_INI_PATH=whereis($yeapfDB, 'yeapf.db.ini', true);
           /* introduced in 0.8.44
            * 'sgug.ini' renamed to 'db.csv'
            * 0.8.47 db.csv has higher priority in mixed environments */
-          if (!file_exists($dbCSV)) {
-            if (file_exists("$dbCSVFilename/sgug.ini")) {
-              if (!file_exists("$dbCSVFilename/db.csv")) {
+          if (!is_dir($DB_CSV_PATH)) {
+            if (file_exists("$SGUG_INI_PATH/sgug.ini")) {
+              if (!file_exists("$SGUG_INI_PATH/db.csv")) {
                 echo sayStep("Renaming 'sgug.ini' to 'db.csv'");
-                $canConfig=rename("$dbCSVFilename/sgug.ini", "$dbCSVFilename/db.csv");
+                $canConfig=rename("$SGUG_INI_PATH/sgug.ini", "$SGUG_INI_PATH/db.csv");
               } else {
                 echo sayStep("Cannot continue. db.csv already exists!");
                 $canConfig=false;
               }
               if (!$canConfig)
-                die(sayStep("<span class=redDot></span><div class=err>Impossible to rename sgug.ini to db.csv</div>"));
+                dieConfig(sayStep("<span class=redDot></span><div class=err>Impossible to rename sgug.ini to db.csv</div>"));
             }
           }
 
           if ($canConfig) {
-            $newSgug = false;
-            $dbCSVFilename=whereis($yeapfDB, 'db.csv', true);
-            if ((isset($destroydb)) && ($destroydb=='yes')) {
-              if (file_exists("$dbCSVFilename/db.csv")) {
-                echo sayStep("<div class=warn>Deleting '$dbCSVFilename/db.csv'</div>");
-                unlink("$dbCSVFilename/db.csv");
+            $destroydb=isset($destroydb)?mb_strtolower($destroydb):'no';
+
+            $recreateCSVFile = false;
+
+            if ( ($YEAPF_INI_PATH>'')   && (is_dir($YEAPF_INI_PATH)) &&
+                 ($DB_CSV_PATH>'') && (is_dir($DB_CSV_PATH)) ) {
+              $yeapfDB_ini_M=filemtime("$YEAPF_INI_PATH/yeapf.db.ini");
+              $dbCSVFilename_M=filemtime("$DB_CSV_PATH/db.csv");
+              echo sayStep("<div class=info>'yeapf.db.ini' modified at: $yeapfDB_ini_M | db.csv modified at $dbCSVFilename_M</div>");
+              $recreateCSVFile = $yeapfDB_ini_M > $dbCSVFilename_M;
+            }
+            if (($destroydb=='yes') || ($recreateCSVFile)) {
+              if (file_exists("$DB_CSV_PATH/db.csv")) {
+                echo sayStep("<div class=warn>Deleting '$DB_CSV_PATH/db.csv'</div>");
+                unlink("$DB_CSV_PATH/db.csv");
               }
-              $newSgug=true;
+              $recreateCSVFile=true;
               echo sayStep("<div class=warn>Destroying DB connection (no database itself, just connection config)</div>");
             }
 
-            if (($dbCSVFilename=='') || ($newSgug)) {
-              $yeapfDB_ini=whereis($yeapfDB, 'yeapf.db.ini');
-              if ($dbCSVFilename=='')
-                $dbCSVFilename="$yeapfDB_ini/db.csv";
+            if (($DB_CSV_PATH=='') || ($recreateCSVFile)) {
+              if ($DB_CSV_PATH=='')
+                $dbCSVFilename="$YEAPF_INI_PATH/db.csv";
               else
-                $dbCSVFilename="$dbCSVFilename/db.csv";
+                $dbCSVFilename="$DB_CSV_PATH/db.csv";
             } else {
-              $dbCSVFilename="$dbCSVFilename/db.csv";
-              $yeapfDB_ini='';
+              $dbCSVFilename="$DB_CSV_PATH/db.csv";
+              $YEAPF_INI_PATH='';
             }
 
             echo sayStep("Loading <em>$__PL__/yeapf.dbText.php</em>");
-            (@include_once $__PL__."/yeapf.dbText.php") || die(sayStep("<span class=redDot></span>Error loading $__PL__/yeapf.dbText.php"));
+            (@include_once $__PL__."/yeapf.dbText.php") || dieConfig(sayStep("<span class=redDot></span>Error loading $__PL__/yeapf.dbText.php"));
 
             echo sayStep("<div class>Opening/Creating connection definition $dbCSVFilename</div>");
 
@@ -686,19 +709,21 @@
 
             $yeapfDB_configured = false;
             /* flags/flag.nodb */
-            if (($yeapfDB_ini>'') || ($newSgug)) {
+            if (($YEAPF_INI_PATH>'') || ($recreateCSVFile)) {
 
-              $newSgug=($newSgug) || ($dbCSVFilename=='');
+              $recreateCSVFile=($recreateCSVFile) || ($dbCSVFilename=='');
 
               if ($dbCSVFilename=='') {
-                $dbCSVFilename="$yeapfDB_ini/db.csv";
-                echo sayStep("<div>Connection definition filename: '$dbCSVFilename'</div>");
+                $dbCSVFilename="$YEAPF_INI_PATH/db.csv";
+                echo sayStep("<div class=info>Connection definition filename: '$dbCSVFilename'</div>");
               } else {
-                echo sayStep("<div>Overwriting connection definition '$dbCSVFilename'</div>");
+                echo sayStep("<div class=warn>Overwriting connection definition '$dbCSVFilename'</div>");
               }
 
-              $yeapfINI=parse_ini_file("$yeapfDB_ini/yeapf.db.ini",true);
-
+              $yeapfINI=@parse_ini_file("$YEAPF_INI_PATH/yeapf.db.ini",true);
+              if ($yeapfINI==false) {
+                dieConfig(sayStep("<span class=redDot></span><span class=err>File '$YEAPF_INI_PATH/yeapf.db.ini' is not parseable</span>"));
+              }
               $activeCount=0;
               $activeAppName='';
 
@@ -740,13 +765,35 @@
                 $auxCfgDebugIp='';
                 $thisIsActive=false;
 
+                /* added in 0.8.61
+                   some values need to be explicity defined
+                   when ini file is parsed 'no' is changed by an empty string
+                 */
+                $requiredBooleanValues = array ('dbConnect'           => 'no',
+                                                'cfgHtPasswdRequired' => 'no',
+                                                'cfgHttpsRequired'    => 'no');
                 foreach($val as $k1 => $v1) {
-
+                  if (isset($requiredBooleanValues[$k1])) {
+                    $v1=mb_strtolower($v1);
+                    /* only accept 'yes', '1' or 'true' for indicate 'enable' status */
+                    if (!(($v1=='yes') || ($v1=='1') || ($v1=='true')))
+                      $v1='';
+                    if ($v1=='') {
+                      $v1=$requiredBooleanValues[$k1];
+                      echo sayStep("<div class=info>Required value $k1 defaults to $v1</div>");
+                    }
+                  }
                   if ($v1>'') {
                     $setupIni->addField($k1);
 
-                    if ($k1 == 'dbConnect')
+                    if ($k1 == 'dbConnect') {
                       $v1 = $v1>0?'yes':'no';
+                      if ($v1=='no') {
+                        /* probably you will not want to check the user count */
+                        $setupIni->setValue("yUserCount",1);
+                        echo sayStep("<div class=warn>Value <b>yUserCount</b> changed to <b>'1'</b> as you will not be connected to a database</div>");
+                      }
+                    }
 
                     $setupIni->setValue($k1,$v1);
 
@@ -777,14 +824,14 @@
                     }
 
                   } else if (($k1=='dbType') || ($k1=='dbServer') || ($k1=='dbName')) {
-                    if ($newSgug) {
+                    if ($recreateCSVFile) {
                       if (file_exists($dbCSVFilename)) {
-                        echo sayStep("<div class='goodStep'>Deleting '$dbCSVFilename'</div>");
+                        echo sayStep("<div class='warn'>Deleting '$dbCSVFilename' because <b>$k1</b> is empty</div>");
                         unlink($dbCSVFilename);
                       }
                     }
                     if ($tempDBConnect!='no') {
-                      die(sayStep("<span class=redDot></span><div class=err><b>yeapf.db.ini</b> malformed<br>**** $k1 needs to be defined</div>"));
+                      dieConfig(sayStep("<span class=redDot></span><div class=err><b>yeapf.db.ini</b> malformed<br>**** $k1 needs to be defined</div>"));
                     }
                   }
                 }
@@ -830,7 +877,7 @@
             $lockFolderName=dirname($dbCSVFilename)."/.lock";
 
             if ((!file_exists($dbCSVFilename)) || (substr($lockFolderName,0,3=='//.')))
-              die("<div class='err'><span class=redDot></span>Please, add yeapf.db.ini or db.csv to your main folder. <div>'$dbCSVFilename' not found</div><div><strong>OR</strong></div>Not regular lockFolderName '$lockFolderName' ($yeapfDB_configured)</div>");
+              dieConfig("<div class='err'><span class=redDot></span>Please, add yeapf.db.ini or db.csv to your main folder. <div>'$dbCSVFilename' not found</div><div><strong>OR</strong></div>Not regular lockFolderName '$lockFolderName' ($yeapfDB_configured)</div>");
 
             if (verifyConfigFolder($lockFolderName)) {
               function cleanupfolder($folder) {
@@ -845,7 +892,7 @@
                         }
                     }
                   } else
-                    die(sayStep("<span class=redDot></span><span class=err>Folder '$folder' is not writable</span>"));
+                    dieConfig(sayStep("<span class=redDot></span><span class=err>Folder '$folder' is not writable</span>"));
                 }
               }
 
@@ -858,7 +905,7 @@
                 @rmdir("lock");
 
               if (!openConfigFile()) {
-                die(sayStep("IMPOSSIVEL CRIAR ARQUIVO DE CONFIGURA&Ccedil;&Atilde;O"));
+                dieConfig(sayStep("IMPOSSIVEL CRIAR ARQUIVO DE CONFIGURA&Ccedil;&Atilde;O"));
               }
               writeConfigFile('cfgCurrentFolder', $_MY_CONTEXT_);
               writeConfigFile('myself',$_MYSELF_);
@@ -931,7 +978,7 @@
                   $nusoapPath=whereis($searchPath,'nusoap.php',file_exists('flag.dbgphp.configure'));
                   if ($nusoapPath=='') {
                     unlock('configure');
-                    die(sayStep("<span class=redDot></span><div class=err>** nusoap.php not found</div>"));
+                    dieConfig(sayStep("<span class=redDot></span><div class=err>** nusoap.php not found</div>"));
                   }
                 }
 
@@ -983,7 +1030,7 @@
                 echo sayStep("Ready to write stubloader");
 
                 if ((file_exists('yeapf.php')) && (!is_writable('yeapf.php')))
-                  die(sayStep("<span class=redDot></span><div class=err>Impossible to write to 'yeapf.php'</div>"));
+                  dieConfig(sayStep("<span class=redDot></span><div class=err>Impossible to write to 'yeapf.php'</div>"));
                 $f=fopen("yeapf.php", "w");
 
                 $yeapfStub = '
@@ -1134,7 +1181,7 @@
                   }
                   if ($SQLDieOnError) {
                     if ($SQLDieOnError==1)
-                      die();
+                      dieConfig();
                     else {
                       exit($SQLDieOnError);
                     }
@@ -1253,7 +1300,7 @@
                 (@include_once $__yeapfPath."/yeapf.functions.php") || (_yLoaderDie("$__yeapfPath/yeapf.functions.php not found"));
 
                 _recordWastedTime("StubLoader ready");
-                if (!function_exists("decimalMicrotime")) die("decimalMicrotime() required");
+                if (!function_exists("decimalMicrotime")) dieConfig("decimalMicrotime() required");
 
                 $t0=decimalMicrotime();
 

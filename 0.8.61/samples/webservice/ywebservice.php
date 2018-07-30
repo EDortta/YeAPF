@@ -1,9 +1,29 @@
 <?php
-  /*****************************************************************
-   * webservice sample
-   *  (C) 2008-2017 Esteban Daniel Dortta
-   *  dortta@yahoo.com
-   *****************************************************************/
+/*
+    samples/webservice/ywebservice.php
+    YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST)
+    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
+    2018-07-30 19:33:47 (-3 DST)
+
+    YeAPF/samples
+    webservice sample
+    (C) 2008-2018 Esteban Daniel Dortta
+*/
+
+  function logAction($action)
+  {
+    global $logEnabled, $appName;
+    if (isset($appName) && ($appName>'')) {
+      if ($logEnabled) {
+        $f=fopen("logs/$appName.log","a");
+        if ($f) {
+          fwrite($f, "$action\n");
+          fclose($f);
+        }
+      }
+    }
+  }
+
   if (file_exists('flags/flag.debug')) {
     ini_set('display_errors','1');
     error_reporting (E_ALL);
@@ -34,21 +54,22 @@
 
   (@include_once $nusoapLib) or die("Err 1 loading $nusoapLib\n");
 
-  $webServiceName="%(webServiceName)";
+  $appName="%(appName)";
 
-  if ($webServiceName=='%('.'webServiceName)')
-    die("Please, change '\$webServiceName' variable value");
+  if ($appName=='%('.'appName)')
+    die("Please, change '\$appName' variable value");
 
-  if (strtolower(basename(__FILE__))=='ywebservice.php')
+  if (strtolower(basename(__FILE__))=='y'.'webservice.php') {
     die("Please, rename this file to something more appropriate");
+  }
 
-  if (basename(__FILE__)!="$webServiceName.php") {
-	$pathInfo=pathinfo(__FILE__);
-    die("Please, change '\$webServiceName' variable to ".$pathInfo['filename']);
+  if (basename(__FILE__)!="$appName.php") {
+    $pathInfo=pathinfo(__FILE__);
+    die("Please, change '\$appName' variable to ".$pathInfo['filename']);
   }
 
   $yWebService = new nusoap_server;
-  (@include_once "ywebservice_def.php") or die('');
+  (@include_once "%(appName)_def.php") or die('');
 
   $logRequest=false;
   $dbConnect='no';
@@ -56,17 +77,6 @@
   $logEnabled=true;
   $logOutput=-1;
 
-  function logAction($action)
-  {
-    global $logEnabled, $webServiceName;
-    if ($logEnabled) {
-      $f=fopen("logs/webServiceName.log","a");
-      if ($f) {
-        fwrite($f, "$action\n");
-        fclose($f);
-      }
-    }
-  }
 
   // logAction("{$server['REMOTE_ADDR']} $action");
 
@@ -75,7 +85,7 @@
 
   logAction("Carregando");
 
-  (@include_once("ywebservice_imp.php")) or die("Err loading ywebservice_imp.php");
+  (@include_once("%(appName)_imp.php")) or die("Err loading %(appName)_imp.php");
 
   $HTTP_RAW_POST_DATA = isset($HTTP_RAW_POST_DATA) ? $HTTP_RAW_POST_DATA : '';
   if ((!$HTTP_RAW_POST_DATA) || ($HTTP_RAW_POST_DATA==''))

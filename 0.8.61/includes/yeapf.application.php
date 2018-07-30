@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+    YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-06-12 06:07:38 (-3 DST)
+    2018-07-30 19:33:47 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -290,22 +290,24 @@
         $aFieldValue=null;
       $aFieldValue = str_replace("\!\!", '&', $aFieldValue);
       $canUse=!$xq_only_composed_names;
+      $canUse1=$canUse;
+      $canUse2=$canUse;
 
       /* discard prefix */
       if ($xq_prefix>'') {
         if (substr($aFieldName,0,strlen($xq_prefix))==$xq_prefix) {
-          $canUse=true;
+          $canUse1=true;
           $aFieldName=substr($aFieldName,strlen($xq_prefix));
         }
       }
       /* discard postfix */
       if ($xq_postfix>'') {
         if (substr($aFieldName, -strlen($xq_postfix))==$xq_postfix) {
-          $canUse=true;
+          $canUse2=true;
           $aFieldName=substr($aFieldName, 0, strlen($aFieldName)-strlen($xq_postfix));
         }
       }
-      if (($canUse) && ($aFieldName>'')) {
+      if (($canUse1) && ($canUse2) && ($aFieldName>'')) {
         if ($aFieldName!='fieldValue')
           $aFieldValue=rawurldecode($aFieldValue);
 
@@ -316,6 +318,7 @@
       }
     }
   }
+
 
   function xq_varValue($arrayOfValues, $varName)
   {

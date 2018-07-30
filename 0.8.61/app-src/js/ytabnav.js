@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ytabnav.js
- * YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+ * YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-05-30 11:21:04 (-3 DST)
+ * 2018-07-30 19:33:47 (-3 DST)
  * First Version (C) 2012 - esteban daniel dortta - dortta@yahoo.com
  * Purpose: to control multiple tabs in a only-one-page application
  *          this is specially useful when building web mobile applications
@@ -308,6 +308,7 @@ var tabNavBase = function () {
   that.displayTab = function (aTab, aContainer) {
     if (!that.changingView) {
       that.changingView=true;
+      var styleDisplay='';
       try {
         if (!that.locked()) {
           if (aTab) {
@@ -345,10 +346,10 @@ var tabNavBase = function () {
                   if (that.ontabfocus != undefined)
                     that.ontabfocus(aTab);
                   */
-                  aTab.style.display = 'block';
+                  aTab.style.display = styleDisplay;
                   var auxNode=aTab;
                   while ((auxNode) && (auxNode!=document.body)) {
-                    auxNode.style.display = 'block';
+                    auxNode.style.display = styleDisplay;
                     auxNode=auxNode.parentNode;
                   }
                   var elems=aTab.getElementsByTagName('*');;
@@ -382,16 +383,16 @@ var tabNavBase = function () {
       if (isPropertySupported('opacity')) {
         y$('waitIcon').style.opacity='.99';
       }
-      y$('waitIcon').style.display='block';
+      y$('waitIcon').style.display='';
     }
   };
 
   that.hideWaitIcon = function () {
     if (y$('waitIcon')) {
-      if (isPropertySupported('opacity'))
+      if (isPropertySupported('opacity')) {
         y$('waitIcon').style.opacity=0;
-      else
-        y$('waitIcon').style.display='none';
+      }
+      y$('waitIcon').style.display='none';
     }
   };
 

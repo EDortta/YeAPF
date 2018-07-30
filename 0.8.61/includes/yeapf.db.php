@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+    YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-06-19 23:48:48 (-3 DST)
+    2018-07-30 19:33:47 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -522,14 +522,18 @@
            $cfgNodePrefix, $cfgSegmentPrefix,
            $cfgHtPasswdRequired;
 
+    $appRegistry=trim("$appRegistry");
+
+    _recordWastedTime("appRegistry='$appRegistry' dbConnect='$dbConnect'");
     $ret = false;
     // echo "dbConnect=$dbConnect\n";
     if (isset($dontConnect))
       db_die("'dontConnect=$dontConnect' OBSOLETE!  change for 'dbConnect=no/yes'");
 
     // if the flag is undefined, then let's connect to the DB
-    if ((!isset($dbConnect)) || ($appRegistry>''))
+    if ((!isset($dbConnect)) || ($appRegistry>'')) {
       $dbConnect='yes';
+    }
 
     // if there is no 'yeapfDB' definition, let's don't connect
     if ((!isset($yeapfConfig['yeapfDB'])) || ($yeapfConfig['yeapfDB']==''))

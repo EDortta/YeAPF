@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misctools.php
-    YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+    YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-06-12 06:07:38 (-3 DST)
+    2018-07-24 06:51:00 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -38,6 +38,7 @@
 
   function acentosHTML($buffer)
   {
+  /*
     $buffer = ereg_replace(chr(233), '&eacute;', $buffer);
     $buffer = ereg_replace(chr(201), '&Eacute;', $buffer);
 
@@ -67,6 +68,37 @@
 
     $buffer = ereg_replace(chr(39),   "\'", $buffer);
     $buffer = ereg_replace(chr(34),   '\"', $buffer);
+*/
+    $buffer = preg_replace(chr(233), '&eacute;', $buffer);
+    $buffer = preg_replace(chr(201), '&Eacute;', $buffer);
+
+    $buffer = preg_replace(chr(224), '&agrave;', $buffer);
+    $buffer = preg_replace(chr(232), '&egrave;', $buffer);
+    $buffer = preg_replace(chr(249), '&ugrave;', $buffer);
+    $buffer = preg_replace(chr(192), '&Agrave;', $buffer);
+    $buffer = preg_replace(chr(200), '&Egrave;', $buffer);
+    $buffer = preg_replace(chr(217), '&Ugrave;', $buffer);
+
+    $buffer = preg_replace(chr(226), '&acirc;', $buffer);
+    $buffer = preg_replace(chr(234), '&ecirc;', $buffer);
+    $buffer = preg_replace(chr(238), '&icirc;', $buffer);
+    $buffer = preg_replace(chr(244), '&ocirc;', $buffer);
+    $buffer = preg_replace(chr(251), '&ucirc;', $buffer);
+    $buffer = preg_replace(chr(194), '&Acirc;', $buffer);
+    $buffer = preg_replace(chr(202), '&Ecirc;', $buffer);
+    $buffer = preg_replace(chr(206), '&Icirc;', $buffer);
+    $buffer = preg_replace(chr(212), '&Ocirc;', $buffer);
+    $buffer = preg_replace(chr(219), '&Ucirc;', $buffer);
+
+    $buffer = preg_replace(chr(231), '&ccedil;', $buffer);
+    $buffer = preg_replace(chr(199), '&Ccedil;', $buffer);
+
+    $buffer = preg_replace(chr(171), '&laquo;', $buffer);
+    $buffer = preg_replace(chr(187), '&raquo;', $buffer);
+
+    $buffer = preg_replace(chr(39),   "\'", $buffer);
+    $buffer = preg_replace(chr(34),   '\"', $buffer);
+
     return $buffer;
   }
 

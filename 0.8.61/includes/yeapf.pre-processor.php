@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.pre-processor.php
-    YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+    YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-07-24 06:51:00 (-3 DST)
    */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -229,14 +229,16 @@
 
           if ($analisarData) {
             if ((tokenValido($s, '#campoMes(',$i)) || (tokenValido($s, '#month(',$i))) {
-              $valorCampo= ereg_replace("[^0-9]", "", $valorCampo);
+              //$valorCampo= ereg_replace("[^0-9]", "", $valorCampo);
+              $valorCampo= preg_replace("/[^0-9]/", "", $valorCampo);
               if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
                 $valorCampo=substr($valorCampo,4,2);
               else
                 $valorCampo=substr($valorCampo,0,2);
 
             } else if ((tokenValido($s, '#campoAno(',$i)) || (tokenValido($s, '#year(',$i))) {
-              $valorCampo= ereg_replace("[^0-9]", "", $valorCampo);
+              //$valorCampo= ereg_replace("[^0-9]", "", $valorCampo);
+              $valorCampo= preg_replace("/[^0-9]/", "", $valorCampo);
               if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
                 $valorCampo=substr($valorCampo,0,4);
               else
@@ -246,7 +248,8 @@
               $abreviacao=0;
               if (substr($s,$n,1)!=')')
                 $abreviacao=unquote(pegaValor($s, $n, $t));
-              $valorCampo= ereg_replace("[^0-9]", "", $valorCampo);
+              //$valorCampo= ereg_replace("[^0-9]", "", $valorCampo);
+              $valorCampo= preg_replace("/[^0-9]/", "", $valorCampo);
               $meses = array ('Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro');
               $mesesAbreviados = array ('Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez');
               if (strlen($valorCampo)>4) {
@@ -263,12 +266,14 @@
 
             } else if ((tokenValido($s, '#campoNomeDia(',$i)) || (tokenValido($s, '#dayName(',$i))) {
               $dias = array ('Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado');
-              $valorCampo= ereg_replace("[^0-9]", "", $valorCampo);
+              //$valorCampo= ereg_replace("[^0-9]", "", $valorCampo);
+              $valorCampo= preg_replace("/[^0-9]/", "", $valorCampo);
               $dataAux=dateSQL2timestamp($valorCampo);
               $valorCampo = $dias[date('w',$dataAux)];
 
             } else if ((tokenValido($s, '#campoDia(',$i)) || (tokenValido($s, '#day(',$i))) {
-              $valorCampo= ereg_replace("[^0-9]", "", $valorCampo);
+              // $valorCampo= ereg_replace("[^0-9]", "", $valorCampo);
+              $valorCampo= preg_replace("/[^0-9]/", "", $valorCampo);
               if ((db_connectionTypeIs(_PGSQL_)) || (db_connectionTypeIs(_MYSQL_)) || (db_connectionTypeIs(_MYSQLI_)))
                 $valorCampo=substr($valorCampo,6,2);
               else
@@ -1733,12 +1738,14 @@
           $substituicoes++;
           $n=$i+largoToken($s,$i);
           $aDate=pegaValor($s, $n, $tokenType);
-          if ((ereg_replace("[^0-9]", "", $aDate)=='') && (substr($aDate,0,1)!='#'))
+          // if ((ereg_replace("[^0-9]", "", $aDate)=='') && (substr($aDate,0,1)!='#'))
+          if ((preg_replace("/[^0-9]/", "", $aDate)=='') && (substr($aDate,0,1)!='#'))
             $aDate="#($aDate)";
           $aDate=unquote(analisarString($aDate,$pegarDadosDaTabela, $nomeTabela, $campoChave, $valorChave, $valores));
           $aInc=unquote(analisarString(pegaValor($s, $n, $tokenType),$pegarDadosDaTabela, $nomeTabela, $campoChave, $valorChave, $valores));
 
-          $aDate= ereg_replace("[^0-9]", "", $aDate);
+          // $aDate= ereg_replace("[^0-9]", "", $aDate);
+          $aDate= preg_replace("/[^0-9]/", "", $aDate);
           $auxDate=dateSQL2timestamp(substr($aDate,0,8));
 
           $aDay   = date('j',$auxDate);
