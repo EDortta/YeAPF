@@ -4,14 +4,14 @@
  *      slotEmptyImplementation.php
  *      This file is part of YeAPF
  *      (Yet Another PHP Framework)
- *      YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST)
+ *      YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)
  *      Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- *      2018-07-30 19:34:44 (-3 DST)
+ *      2018-08-02 22:38:57 (-3 DST)
  *
  *
  *      The MIT License (MIT)
  *
- *      Copyright (c) 2016 Esteban D.Dortta
+ *      Copyright (c) 2016-2018 Esteban D.Dortta
  *
  *      Permission is hereby granted, free of charge, to any person obtaining a copy
  *      of this software and associated documentation files (the "Software"), to deal
@@ -33,17 +33,13 @@
  */
 
 
-  function em_#(s)($a) {
+  function em_#(s)($a, $values=null) {
     global $userContext, $sysDate, $u,
            $userMsg, $xq_start, $xq_requestedRows,
            $devSession;
 
-    xq_context('YeAPF',       'YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST)');
-    xq_context('devSession',  $devSession);
-    xq_context('ts1',         date('U'));
-
     /* numer of rows to limit queries result
-       By Default 20 
+       By Default 20
        proposed interface.js (in future yinterface.js) use this
        in order to generare pages */
     $xq_requestedRows=max(1,isset($xq_requestedRows)?intval($xq_requestedRows):20);
@@ -53,6 +49,11 @@
 
     /* publish query variables as local variables */
     extract(xq_extractValuesFromQuery());
+
+    /* publish SOAP parameters as local variables */
+    if (($values) && is_array($values)) {
+      extract($values);
+    }
     $xq_start=isset($xq_start)?intval($xq_start):0;
 
     /* process the events */
@@ -128,8 +129,6 @@
         break;
     }
 
-    xq_context('ts2',         date('U'));
-
     return $ret;
   }
 
@@ -169,7 +168,8 @@
     /* samples:
     switch($a) {
       case 'dograph':
-        // create the image and post it in 'cache' folder
+        // create the image and place it in 'cache' folder
+        // after that, you can use it from 'cache' folder
         $ret="<img src='cache/test.svg'>";
         break;
     }
@@ -206,6 +206,11 @@
   {
     $jsonRet=w#(s)($a);
     echo produceRestOutput($jsonRet);
+  }
+
+  function soap_#(s)($a, $values)
+  {
+    return em_#(s)($a, $values);
   }
 
   /* t#(s) is the task event manager

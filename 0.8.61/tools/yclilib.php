@@ -1,9 +1,9 @@
 <?php
 /*
     tools/yclilib.php
-    YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+    YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-06-05 07:26:26 (-3 DST)
+    2018-08-02 22:38:27 (-3 DST)
 */
 
 
@@ -208,7 +208,12 @@
     function getOptionList() {
       $ret = array();
       foreach($this->options as $k=>$v) {
-        $ret[$k]=$v;
+        if (mb_strpos($k, "=")) {
+          $key=explode("=", $k);
+          $ret[$key[0]]=$key[1];
+        } else {
+          $ret[$k]=$v;
+        }
       }
       return $ret;
     }

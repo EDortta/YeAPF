@@ -2,9 +2,9 @@
 <?php
 /*
     tools/ywscreate
-    YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST)
+    YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-07-30 19:33:47 (-3 DST)
+    2018-08-02 22:38:27 (-3 DST)
 */
 
   $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
@@ -19,6 +19,9 @@
 
   if (($wsName=='') || ($toHelp)) {
     echo "WebSocket creator\n";
+    echo "OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE\n ";
+    echo " Please, use yapp instead of this application\n";
+    echo "OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE OBSOLETE\n ";
     echo "simple usage:\n\t".basename("tools/ywscreate")." service-name [options]\n\n";
     echo "options:\n";
     echo "\t--help\n";

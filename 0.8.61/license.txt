@@ -1,16 +1,19 @@
 .
-License Information                      
-YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+License Information
+YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)
 
 YeAPF means 'Yet Another PHP Framework'
-It was written and maintained by Esteban D.Dortta in order to help the 
-programmer to write better and faster software in a comfortable and fancy 
-way and is deployed under the MIT License.
+It is written and maintained by Esteban D.Dortta in order to help the
+programmer to write better and faster software in a comfortable and fancy
+way.
+
+From 2016 it's deployed under the MIT License.
+
 http://yeapf.com
 
 The MIT License (MIT)
 
-Copyright (c) 2016 Esteban D.Dortta
+Copyright (c) 2016-2018 Esteban D.Dortta
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the 'Software'), to deal

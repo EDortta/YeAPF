@@ -1,9 +1,9 @@
 <?php
   /*
     tools/spread-js.php
-    YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST)
+    YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-07-30 19:33:47 (-3 DST)
+    2018-08-02 22:38:27 (-3 DST)
 
     This script will distribute monolite version of yloader.js
     among different application skeletons
@@ -36,7 +36,7 @@
       grantDirectory($tgtFolder);
       $auxFile = _file($srcFileName);
       if ($addHeader) {
-        $auxFile = "/* YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST) Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
+        $auxFile = "/* YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST) Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
       }
       $tgtFileName=basename($srcFileName);
       if (file_put_contents("$tgtFolder/$tgtFileName", $auxFile))
@@ -96,7 +96,7 @@
   if (file_exists($minJS)) {
     echo "Minified version source: $minJS\n";
     $yeapf_minJS = join("", file($minJS));
-    $yeapf_minJS = "/* YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST) Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
+    $yeapf_minJS = "/* YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST) Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
   }
 
   grantDirectory("skel/chromeApp/js");
@@ -112,42 +112,47 @@
   grantDirectory("skel/workbench/www");
 
   /* CONFIGURE.PHP and SSE.PHP */
-  echo "Copying configure.php and sse.php\n";
-  $phpSpreadList=array('configure.php', 'sse.php');
-  foreach($phpSpreadList as $script) {
-    copy("skel/webApp/$script", "skel/webSocket/$script");
-    copy("skel/webApp/$script", "skel/workbench/$script");
-    copy("skel/webApp/$script", "skel/workbench/www/$script");
-    copy("skel/webApp/$script", "skel/webApp/templates/bs3/$script");
-    copy("skel/webApp/$script", "skel/webApp/templates/bs4/$script");
+  echo "Copying yeapf.db.ini, configure.php and sse.php\n";
+  $phpSpreadList=array('configure.php', 'sse.php', 'yeapf.db.ini');
+  $folders = array("skel", "skel/webApp/templates", "samples");
+  foreach($folders as $aFolder) {
+    foreach(glob("$aFolder/*") as $folderName) {
+      if ($folderName!="skel/webApp") {
+        foreach($phpSpreadList as $script) {
+          if (file_exists("$folderName/$script")) {
+            echo "  +-- $folderName/$script\n";
+            copy("skel/webApp/$script", "$folderName/$script");
+          }
+        }
+      }
+    }
   }
 
-  /* CLI skeleton */
+/*
   echo "CLI skeleton\n";
   copy("skel/webApp/configure.php", "skel/cli/configure.php");
   copy("skel/webApp/yeapf.db.ini", "skel/cli/yeapf.db.ini");
+*/
 
   /* service skeleton
      YEAPF.DB.INI REST.PHP, QUERY.PHP, E_BODY.XML, TASKS.PHP, YEAPF_TICKER.PHP, CONFIGURE.PHP and SSE.PHP */
-  $phpServiceSkeleton=array('yeapf.db.ini', 'rest.php', 'query.php', 'e_body.xml',
-                            'tasks.php', 'yeapf_ticker.php', 'configure.php', 'sse.php');
-  echo "Service skeleton\n";
+  $phpServiceSkeleton=array('rest.php', 'query.php', 'e_body.xml',
+                            'tasks.php', 'yeapf_ticker.php');
+  $phpServiceSkeletonTargetFolders = array("skel/service",
+                                           "skel/webApp/templates/bs3",
+                                           "skel/webApp/templates/bs4",
+                                           "samples/key-admin");
+  echo "Service, Templates skeletons and Samples folder\n";
   foreach($phpServiceSkeleton as $script) {
-    echo "\t$script\n";
-    copy("skel/webApp/$script", "skel/service/$script");
-  }
-
-  echo "Template skeletons\n";
-  foreach($phpServiceSkeleton as $script) {
-    copy("skel/webApp/$script", "skel/webApp/templates/bs3/$script");
-    copy("skel/webApp/$script", "skel/webApp/templates/bs4/$script");
+    echo "  $script\n";
+    foreach($phpServiceSkeletonTargetFolders as $scriptTarget) {
+      echo "    +-- $scriptTarget/$script\n";
+      copy("skel/webApp/$script", "$scriptTarget/$script");
+    }
   }
 
   /* webapp skeleton (service skeleton + index.php and body.php ) */
   $phpWebAppSkeleton = array("index.php", "body.php");
-  foreach($phpServiceSkeleton as $script) {
-    copy("skel/webApp/$script", "samples/key-admin/$script");
-  }
   foreach($phpWebAppSkeleton as $script) {
     copy("skel/webApp/$script", "samples/key-admin/$script");
   }
@@ -212,6 +217,7 @@
   /* samples */
   $jsSpreadTargets = array("samples/key-admin", "samples/yIndexedDB", "skel/cordova");
   foreach($jsSpreadTargets as $targetFolder) {
+    echo "ystorage and yloader -> $targetFolder\n";
     copyFile("app-src/js/min/ystorage.min.js",          "$targetFolder/js", false);
     copyFile("skel/webApp/js/yloader.min.js",           "$targetFolder/js", false);
 

@@ -1,9 +1,9 @@
 <?php
 /*
     samples/webservice/ywebservice.php
-    YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST)
+    YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-07-30 19:33:47 (-3 DST)
+    2018-08-02 22:38:27 (-3 DST)
 
     YeAPF/samples
     webservice sample
@@ -12,10 +12,10 @@
 
   function logAction($action)
   {
-    global $logEnabled, $appName;
-    if (isset($appName) && ($appName>'')) {
+    global $logEnabled, $webServiceName;
+    if (isset($webServiceName) && ($webServiceName>'')) {
       if ($logEnabled) {
-        $f=fopen("logs/$appName.log","a");
+        $f=fopen("logs/$webServiceName.log","a");
         if ($f) {
           fwrite($f, "$action\n");
           fclose($f);
@@ -54,18 +54,18 @@
 
   (@include_once $nusoapLib) or die("Err 1 loading $nusoapLib\n");
 
-  $appName="%(appName)";
+  $webServiceName="%(appName)";
 
-  if ($appName=='%('.'appName)')
-    die("Please, change '\$appName' variable value");
+  if ($webServiceName=='%('.'appName)')
+    die("Please, change '\$webServiceName' variable value");
 
   if (strtolower(basename(__FILE__))=='y'.'webservice.php') {
     die("Please, rename this file to something more appropriate");
   }
 
-  if (basename(__FILE__)!="$appName.php") {
+  if (basename(__FILE__)!="$webServiceName.php") {
     $pathInfo=pathinfo(__FILE__);
-    die("Please, change '\$appName' variable to ".$pathInfo['filename']);
+    die("Please, change '\$webServiceName' variable to ".$pathInfo['filename']);
   }
 
   $yWebService = new nusoap_server;

@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.61-26 built on 2018-07-30 19:34 (-3 DST)
+    YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-07-24 06:51:00 (-3 DST)
+    2018-08-02 22:38:27 (-3 DST)
    */
 
   /*
@@ -1806,7 +1806,11 @@
 
   function implementation($s, $a='', $prefix='f', $onlyTest=false)
   {
-    global $lastImplementation, $flgCanContinueWorking;
+    global $lastImplementation, $flgCanContinueWorking, $devSession;
+
+    xq_context('YeAPF',       'YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)');
+    xq_context('devSession',  $devSession);
+    xq_context('ts1',         date('U'));
 
     /* this functions try to find the most apropriate implementation
        of the required event.
@@ -1908,6 +1912,9 @@
     if (($flgCanContinueWorking) || ($s=='yeapf')) {
       doEventHandler($s, $a);
     }
+
+    xq_context('implemented', intval($implemented));
+    xq_context('ts2',         date('U'));
 
     return $implemented;
   }
