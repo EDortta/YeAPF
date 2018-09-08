@@ -1,8 +1,8 @@
 /*********************************************
  * skel/chromeApp/js/ystorage.js
- * YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)
+ * YeAPF 0.8.61-62 built on 2018-09-08 15:12 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-08-02 22:38:57 (-3 DST)
+ * 2018-09-08 15:12:07 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
@@ -15,6 +15,14 @@
  */
 (function () {
   "use strict";
+  /*
+    #   #   ####    #####   ####   #####     ##     ####   ######
+     # #   #          #    #    #  #    #   #  #   #    #  #
+      #     ####      #    #    #  #    #  #    #  #       #####
+      #         #     #    #    #  #####   ######  #  ###  #
+      #    #    #     #    #    #  #   #   #    #  #    #  #
+      #     ####      #     ####   #    #  #    #   ####   ######
+  */
   if (!window.ystorage) {
     window.ystorage = (function() {
 
@@ -98,7 +106,15 @@
       return that;
     })();
   }
-
+/*
+           #####                                          ######
+    #   # #     #     #    #    #   ####   #       ###### #     #  #####
+     # #  #           #    ##   #  #    #  #       #      #     #  #    #
+      #    #####      #    # #  #  #       #       #####  #     #  #####
+      #         #     #    #  # #  #  ###  #       #      #     #  #    #
+      #   #     #     #    #   ##  #    #  #       #      #     #  #    #
+      #    #####      #    #    #   ####   ######  ###### ######   #####
+*/
   if (!window.ySingleDb) {
     console.log("Creating ySingleDb ... ");
     window.ySingleDb = function(dbTag, aKeyName) {
@@ -418,14 +434,24 @@
     console.log("ystorage ready!");
   }
 
+/*
+            ###                                                   ######  ######
+    #   #    #     #    #  #####   ######  #    #  ######  #####  #     # #     #
+     # #     #     ##   #  #    #  #        #  #   #       #    # #     # #     #
+      #      #     # #  #  #    #  #####     ##    #####   #    # #     # ######
+      #      #     #  # #  #    #  #         ##    #       #    # #     # #     #
+      #      #     #   ##  #    #  #        #  #   #       #    # #     # #     #
+      #     ###    #    #  #####   ######  #    #  ######  #####  ######  ######
+*/
   if (!window.yIndexedDB) {
     if (!window.indexedDB)
       window.indexedDB = window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB;
     window.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction;
     window.IDBKeyRange = window.IDBKeyRange || window.webkitIDBKeyRange || window.msIDBKeyRange;
 
-    window.yIndexedDB = function (dbTag, aKeyName, onready_callback) {
+    window.yIndexedDB = function (dbTag, aKeyName, onready_callback, dbVersion) {
       var that={};
+      dbVersion = Math.max(1,  dbVersion || 1 );
 
       that._newTransaction = function(mode, callback, txCallback) {
         mode=mode || "readonly";
@@ -648,30 +674,70 @@
         return ret;
       };
 
+      that.cleanList = function(propagate) {
+        that.filter(
+          function(item) {
+            that.removeItem(item.keyValue);
+          }
+        )
+      };
+
+      /* removes all the items in the list without propagating deletion */
+      that.blankList = function() {
+        that.cleanList(false);
+      };
+
+
       that.onDBRequestError = function(event) {
+        var errorMessage = event.currentTarget.error;
+        console.log("{0} onDBRequestError(): {1}".format(dbTag, errorMessage));
         that.newStatus(-1);
-        console.error("yIndexedDB error trying to open '{0}'".format(dbTag));
       };
 
       that.onDBRequestSuccess = function(event) {
-        that.newStatus(3);
+        console.log("{0} onDBRequestSuccess()".format(dbTag));
         that._db = event.target.result;
+        that.newStatus(3);
         if ("function" == typeof onready_callback)
           onready_callback();
       };
 
       that.onDBUpgradeNeeded = function(event) {
+        console.log("{0} onDBUpgradeNeeded()".format(dbTag));
         that.newStatus(2);
         that._db = event.target.result;
-        that._objectStore = that._db.createObjectStore(that._dbTag_, {keyPath: that._keyName_[0]});
-        for (var n=1; n<that._keyName_.length; n++) {
-          that._objectStore.createIndex(that._keyName_[n]+'_ndx', that._keyName_[n], {unique: false});
+        try {
+          var transaction = event.target.transaction;
+          var objectStore = transaction.db.createObjectStore(that._dbTag_, {keyPath: that._keyName_[0]});
+          var n=1;
+          var __createIndex = function() {
+            if (n<that._keyName_.length) {
+              var request = objectStore.createIndex(
+                that._keyName_[n]+'_ndx',
+                that._keyName_[n],
+                {
+                  unique: false,
+                  keyPath: that._keyName_[n]
+                }
+              );
+              request.onsuccess = function() {
+                n++;
+                setTimeout(__createIndex, 125);
+              }
+            } else {
+              that.newStatus(3);
+            }
+          }
+          __createIndex(n);
+
+        } catch(error) {
+          console.error(error.message);
         }
-        that.newStatus(3);
       };
 
       that.init = function(dbTag, aKeyName) {
         that._dbTag_ = dbTag;
+
         /* prepare index key names */
         aKeyName = aKeyName || '_id';
         if (!isArray(aKeyName)) {
@@ -696,20 +762,27 @@
 
         that.newStatus = function(aNewStatus) {
           if (aNewStatus!=that._status) {
-            console.warn(that._dbTag_+'.status changes from {0} to {1}'.format(that.status, aNewStatus));
+            console.log(that._dbTag_+'.status changes from {0} to {1}'.format(that.status, aNewStatus));
             that._status=aNewStatus;
             if ('function' == typeof that.onStatusChange)
               that.onStatusChange(that);
           }
-        }
+        };
 
         if (window.indexedDB) {
           that.newStatus(1);
+          console.log("Creating {0}".format(dbTag));
           /* request an indexedDB instance */
-          that._DBOpenRequest = window.indexedDB.open(dbTag, 1);
-          that._DBOpenRequest.onerror         = that.onDBRequestError;
-          that._DBOpenRequest.onsuccess       = that.onDBRequestSuccess;
-          that._DBOpenRequest.onupgradeneeded = that.onDBUpgradeNeeded;
+          try {
+            that._DBOpenRequest = window.indexedDB.open(dbTag, dbVersion);
+            that._DBOpenRequest.onerror         = that.onDBRequestError;
+            that._DBOpenRequest.onsuccess       = that.onDBRequestSuccess;
+            that._DBOpenRequest.onupgradeneeded = that.onDBUpgradeNeeded;
+          } catch(error) {
+            console.error(error.message);
+          }
+        } else {
+          console.error("indexedDB not found!");
         }
 
         return that;
@@ -718,6 +791,17 @@
       return that.init(dbTag, aKeyName);
     };
   }
+
+
+/*
+           #####                                          #     #                                                 #######
+    #   # #     #  ######  #####   #    #  ######  #####  #  #  #    ##     #####   ####   #    #  ######  #####  #     #  #####        #
+     # #  #        #       #    #  #    #  #       #    # #  #  #   #  #      #    #    #  #    #  #       #    # #     #  #    #       #
+      #    #####   #####   #    #  #    #  #####   #    # #  #  #  #    #     #    #       ######  #####   #    # #     #  #####        #
+      #         #  #       #####   #    #  #       #####  #  #  #  ######     #    #       #    #  #       #####  #     #  #    #       #
+      #   #     #  #       #   #    #  #   #       #   #  #  #  #  #    #     #    #    #  #    #  #       #   #  #     #  #    #  #    #
+      #    #####   ######  #    #    ##    ######  #    #  ## ##   #    #     #     ####   #    #  ######  #    # #######  #####    ####
+*/
 
   /*
   yStorage -> ySingleDb + ycomm.crave  = infoObj
@@ -765,6 +849,15 @@
     };
   }
 
+/*
+          ###                           #######
+  #   #    #     #    #  ######   ####  #     #  #####        #
+   # #     #     ##   #  #       #    # #     #  #    #       #
+    #      #     # #  #  #####   #    # #     #  #####        #
+    #      #     #  # #  #       #    # #     #  #    #       #
+    #      #     #   ##  #       #    # #     #  #    #  #    #
+    #     ###    #    #  #        ####  #######  #####    ####
+*/
   if (!window.yInfoObj) {
     /* prior to 0.8.55 the parameter sequence was: (restServer, aDBName, aKeyName, aDataTemplate)
        on 0.8.55 it expected (aDBSpec, aServerSpec)
@@ -953,7 +1046,7 @@
             );
             return true;
           } else {
-            console.warn("yInfoObj busy");
+            console.log("yInfoObj busy");
             return false;
           }
         };

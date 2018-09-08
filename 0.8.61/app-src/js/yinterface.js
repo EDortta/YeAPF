@@ -1,8 +1,8 @@
 /*
     app-src/js/yinterface.js
-    YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+    YeAPF 0.8.61-62 built on 2018-09-08 15:12 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-07-09 14:21:20 (-3 DST)
+    2018-09-04 06:32:08 (-3 DST)
 */
 
 var yInterfaceObj = function() {
@@ -1482,8 +1482,10 @@ var yInterfaceObj = function() {
   return that.init();
 };
 
-addOnLoadManager(
-  function() {
-    yInterface = yInterfaceObj();
-  }
-);
+if ("function" == typeof addOnLoadManager) {
+  addOnLoadManager(
+    function() {
+      yInterface = yInterfaceObj();
+    }
+  );
+}

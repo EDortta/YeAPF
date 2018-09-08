@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yloader-src.js
- * YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+ * YeAPF 0.8.61-62 built on 2018-09-08 15:12 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-05-30 11:21:04 (-3 DST)
+ * 2018-09-08 09:44:02 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * Purpose:  Build a monolitic YeAPF script so
  *           it can be loaded at once
@@ -29,7 +29,7 @@ if (typeof console === 'undefined')
   }
 )();
 
-console.log("YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)");
+console.log("YeAPF 0.8.61-62 built on 2018-09-08 15:12 (-3 DST)");
 
 #include('yopcontext.js')
 #include('ydebug.js')
@@ -53,6 +53,19 @@ var yloaderBase = function () {
   that.isMobile = (!that.isWorker) && (typeof window.orientation !== 'undefined');
   that.isChromeExtension = (!that.isWorker) && ((window.chrome && chrome.runtime && chrome.runtime.id) || (that.selfLocation.substr(0,17)=='chrome-extension:'));
   that.isChromeSandbox = (!that.isWorker) && ((that.isChromeExtension) && !(chrome.storage));
+  that.isWebkit = /(safari|chrome)/.test(navigator.userAgent.toLowerCase());
+  that.webKitVersion = (
+    function() {
+      var ret="530.00";
+      var agentIds = navigator.userAgent.match(/([A-Za-z]*)\/([0-9A-Za-z\.]*)/g);
+      for(var i=0; i<agentIds.length; i++) {
+        if (agentIds[i].substr(0,11)=='AppleWebKit') {
+          ret = agentIds[i].substr(12);
+        }
+      }
+      return ret;
+    }
+  )();
 
   that.loadLibrary = function (jsFileName, elementId, onload) {
 

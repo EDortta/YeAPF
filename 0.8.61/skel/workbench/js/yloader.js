@@ -1,8 +1,8 @@
 /*********************************************
   * skel/workbench/js/yloader.js
-  * YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)
+  * YeAPF 0.8.61-62 built on 2018-09-08 15:12 (-3 DST)
   * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2018-08-02 22:38:57 (-3 DST)
+  * 2018-09-08 15:12:07 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)");
+ console.log("YeAPF 0.8.61-62 built on 2018-09-08 15:12 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -199,6 +199,19 @@
    that.isMobile = (!that.isWorker) && (typeof window.orientation !== 'undefined');
    that.isChromeExtension = (!that.isWorker) && ((window.chrome && chrome.runtime && chrome.runtime.id) || (that.selfLocation.substr(0,17)=='chrome-extension:'));
    that.isChromeSandbox = (!that.isWorker) && ((that.isChromeExtension) && !(chrome.storage));
+   that.isWebkit = /(safari|chrome)/.test(navigator.userAgent.toLowerCase());
+   that.webKitVersion = (
+     function() {
+       var ret="530.00";
+       var agentIds = navigator.userAgent.match(/([A-Za-z]*)\/([0-9A-Za-z\.]*)/g);
+       for(var i=0; i<agentIds.length; i++) {
+         if (agentIds[i].substr(0,11)=='AppleWebKit') {
+           ret = agentIds[i].substr(12);
+         }
+       }
+       return ret;
+     }
+   )();
    that.loadLibrary = function (jsFileName, elementId, onload) {
      var libFileName;
      if (jsFileName>'') {
@@ -346,15 +359,17 @@
      if (typeof $ =='undefined') $ = y$;
      
      
-     window.createDOMEvent = function(eventName) {
-       var ret=null;
-       if (isOnMobile()) {
-         ret = document.createEvent('Event');
-         ret.initEvent(eventName, true, true);
-       } else {
-         ret = new Event(eventName);
+     if (typeof window == "object") {
+       window.createDOMEvent = function(eventName) {
+         var ret=null;
+         if (isOnMobile()) {
+           ret = document.createEvent('Event');
+           ret.initEvent(eventName, true, true);
+         } else {
+           ret = new Event(eventName);
+         }
+         return ret;
        }
-       return ret;
      }
      
      
@@ -716,12 +731,12 @@
          var s1, s2, bestSize, onResize;
      
          s1 = screen.height;
-         s2 = obj.contentWindow.document.body.scrollHeight + 40 - objMargin.height;
+         s2 = (obj.contentWindow || obj.contentDocument || obj).document.body.scrollHeight + 40 - objMargin.height;
          bestSize=Math.max(s1, s2);
          obj.style.height = bestSize + 'px';
      
          s1 = screen.width;
-         s2 = obj.contentWindow.document.body.scrollWidth + 40 - objMargin.width;
+         s2 = (obj.contentWindow || obj.contentDocument || obj).document.body.scrollWidth + 40 - objMargin.width;
          bestSize=Math.max(s1, s2);
          obj.style.width = bestSize + 'px';
      
@@ -732,21 +747,24 @@
        };
      }
      
-     if (!Element.prototype.matches)
-         Element.prototype.matches = Element.prototype.msMatchesSelector || 
-                                     Element.prototype.webkitMatchesSelector;
+     if ("undefined" !== typeof Element) {
      
-     if (!Element.prototype.closest)
-         Element.prototype.closest = function(s) {
-             var el = this;
-             if (!document.documentElement.contains(el)) return null;
-             do {
-                 if (el.matches(s)) return el;
-                 el = el.parentElement || el.parentNode;
-             } while (el !== null); 
-             return null;
-         };
+       if (!Element.prototype.matches)
+           Element.prototype.matches = Element.prototype.msMatchesSelector || 
+                                       Element.prototype.webkitMatchesSelector;
      
+       if (!Element.prototype.closest)
+           Element.prototype.closest = function(s) {
+               var el = this;
+               if (!document.documentElement.contains(el)) return null;
+               do {
+                   if (el.matches(s)) return el;
+                   el = el.parentElement || el.parentNode;
+               } while (el !== null); 
+               return null;
+           };
+     
+     }
      /*
       * HTMLElement prototype extensions
       */
@@ -772,29 +790,31 @@
        HTMLElement.prototype.deleteClass = function(aClassName) {
          var aNewClasses='';
          var aClasses=this.className.split(' ');
+         var aParamClasses = (aClassName || '').split(' ');
          for(var i = 0; i<aClasses.length; i++) {
-           if (aClasses[i] != aClassName) {
-             if (aNewClasses>'')
-               aNewClasses = aNewClasses+' ';
-             aNewClasses = aNewClasses + aClasses[i];
+           if (aParamClasses.indexOf(aClasses[i])<0) {
+             aNewClasses = aNewClasses + ' ' + aClasses[i];
            }
          }
-         this.className=aNewClasses;
+         this.className=trim(aNewClasses);
          return this;
        };
      
        HTMLElement.prototype.removeClass = HTMLElement.prototype.deleteClass;
      
        HTMLElement.prototype.addClass = function(aClassName) {
-         var aClassExists=false;
+         var aClassModified = false;
+         var aNewClasses=this.className;
          var aClasses=this.className.split(' ');
-         for(var i = 0; i<aClasses.length; i++) {
-           if (aClasses[i] == aClassName) {
-             aClassExists = true;
+         var aParamClasses = (aClassName || '').split(' ');
+         for(var i = 0; i<aParamClasses.length; i++) {
+           if (aClasses.indexOf(aParamClasses[i])<0) {
+             aNewClasses = aNewClasses + ' ' + aParamClasses[i];
+             aClassModified = true;
            }
          }
-         if (!aClassExists)
-           this.className = aClassName+ ' ' + this.className;
+         if (aClassModified)
+           this.className = trim(aNewClasses);
          return this;
        };
      
@@ -2087,6 +2107,12 @@
          return "";
      }
      
+     if (!String.prototype.trim) {
+       String.prototype.trim = function() {
+         return this.replace(/^\s+|\s+$/g,"");
+       }
+     }
+     
      function unparentesis(v) {
        if (v.length>1) {
          if ((v.substring(0,1)=='(') || (v.substring(0,1)=='[') || (v.substring(0,1)=='{'))
@@ -2686,6 +2712,32 @@
       return out;
      }
      
+     function replaceDiacritics(str){
+     
+       var diacritics = [
+         {char: 'A', base: /[\300-\306]/g},
+         {char: 'a', base: /[\340-\346]/g},
+         {char: 'E', base: /[\310-\313]/g},
+         {char: 'e', base: /[\350-\353]/g},
+         {char: 'I', base: /[\314-\317]/g},
+         {char: 'i', base: /[\354-\357]/g},
+         {char: 'O', base: /[\322-\330]/g},
+         {char: 'o', base: /[\362-\370]/g},
+         {char: 'U', base: /[\331-\334]/g},
+         {char: 'u', base: /[\371-\374]/g},
+         {char: 'N', base: /[\321]/g},
+         {char: 'n', base: /[\361]/g},
+         {char: 'C', base: /[\307]/g},
+         {char: 'c', base: /[\347]/g}
+       ];
+     
+       diacritics.forEach(function(letter){
+         str = str.replace(letter.base, letter.char);
+       });
+     
+       return str;
+     };
+     
      /*=====================================================================
       * http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
       *=====================================================================*/
@@ -2711,6 +2763,27 @@
        return s4() + s4() + '-4' + s4().substr(0,3) + '-' + s4() + '-' +
          s4() + '-' + s4() + s4() + s4();
      }
+     
+     function newIdentifier () {
+       function randomIntFromInterval(min, max) {
+         return Math.floor(Math.random() * (max - min + 1) + min);
+       }
+       nro = (new Date()).getTime();
+     
+       var ret = '';
+       nro = trim(" " + nro);
+       nro = nro + "" + randomIntFromInterval(11, 99);
+       nro = nro + "" + randomIntFromInterval(11, 99);
+       nro = nro + "" + randomIntFromInterval(11, 99);
+       for (var i = 0; i < Math.ceil(nro.length / 2); i++) {
+         var p = parseInt(nro.substr(i * 2, 2));
+         var x = dec2hex(p);
+         ret += pad(x, 2);
+         if ((i + 1) % 3 == 0)
+           ret += '-';
+       }
+       return ret;
+     };
      
      var generateSmallSessionUniqueId = (function() {
        var nextIndex = [0,0,0];
@@ -4047,10 +4120,12 @@
      var tabNavBase = function () {
        var that = {};
      
-       that.tabchangeEvent = createDOMEvent('tabchange');
-       that.tabblurEvent   = createDOMEvent('tabblur');
-       that.tabfocusEvent  = createDOMEvent('tabfocus');
-       that.tabshowEvent   = createDOMEvent('tabshow');
+       if ("undefined" !== typeof createDOMEvent) {
+         that.tabchangeEvent = createDOMEvent('tabchange');
+         that.tabblurEvent   = createDOMEvent('tabblur');
+         that.tabfocusEvent  = createDOMEvent('tabfocus');
+         that.tabshowEvent   = createDOMEvent('tabshow');
+       }
      
        /*
        OBSOLETE 2018-01-24
@@ -5384,7 +5459,9 @@
              /* callback control... for garbage collect */
              ycomm._CBControl[callbackFunctionName]={ready: false};
      
-             window[callbackFunctionName]=function(status, error, data, userMsg, context, geometry) {
+             var rootSystem = window || self;
+     
+             rootSystem[callbackFunctionName]=function(status, error, data, userMsg, context, geometry) {
                callbackFunction(status, error, data, userMsg, context, geometry);
                _dumpy(4,1,callbackFunctionName);
              };
@@ -6965,25 +7042,27 @@
        return that;
      }
      
-     addOnLoadManager(
-       function()
-       {
-         if (typeof messagePeekerInterval=="undefined") {
-           /*
-            *  Si existe la bandera flags/debug.javascript, entonces, el tiempo de latencia es mayor
-            *  para permitir poder depurar los eventos con calma
-            */
-           if (typeof jsDumpEnabled == "undefined")
-             jsDumpEnabled = 0;
+     if ("function" == typeof addOnLoadManager) {
+       addOnLoadManager(
+         function()
+         {
+           if (typeof messagePeekerInterval=="undefined") {
+             /*
+              *  Si existe la bandera flags/debug.javascript, entonces, el tiempo de latencia es mayor
+              *  para permitir poder depurar los eventos con calma
+              */
+             if (typeof jsDumpEnabled == "undefined")
+               jsDumpEnabled = 0;
      
-           if (jsDumpEnabled==1)
-             messagePeekerInterval=15000;
-           else
-             messagePeekerInterval=750;
+             if (jsDumpEnabled==1)
+               messagePeekerInterval=15000;
+             else
+               messagePeekerInterval=750;
+           }
+     
          }
-     
-       }
-     );
+       );
+     }
      
      ycomm.msg = ycommMsgBase();
      

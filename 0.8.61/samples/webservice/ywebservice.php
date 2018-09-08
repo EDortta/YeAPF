@@ -1,14 +1,16 @@
 <?php
 /*
     samples/webservice/ywebservice.php
-    YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)
+    YeAPF 0.8.61-62 built on 2018-09-08 15:12 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-08-02 22:38:27 (-3 DST)
+    2018-08-16 06:40:47 (-3 DST)
 
     YeAPF/samples
     webservice sample
     (C) 2008-2018 Esteban Daniel Dortta
 */
+
+  ini_set("always_populate_raw_post_data", 0);
 
   function logAction($action)
   {
@@ -38,6 +40,9 @@
             if ($code>0) error_handler($code,$msg,$file,$line);
         }
     }
+  } else {
+    ini_set('display_errors','0');
+    error_reporting (E_NONE);
   }
 
   $isWebservice=true;

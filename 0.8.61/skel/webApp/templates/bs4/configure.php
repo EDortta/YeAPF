@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/templates/bs4/configure.php
-    YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)
+    YeAPF 0.8.61-62 built on 2018-09-08 15:12 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-08-02 22:38:57 (-3 DST)
+    2018-09-08 15:12:07 (-3 DST)
 */
 
 
@@ -311,7 +311,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.61-62 built on 2018-09-08 15:12 (-3 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -364,9 +364,9 @@
   echo sayStep("<div style='border-left: solid 4px black; padding: 12px; background-color: #fff'>
     <div><a href='http://www.yeapf.com' target='x$timestamp'><img src='http://www.yeapf.com/logo.php'></a></div>
     <h2><big><I>skel/webApp/templates/bs4/configure.php</I></big></h2>
-    <h3>YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)<br>
+    <h3>YeAPF 0.8.61-62 built on 2018-09-08 15:12 (-3 DST)<br>
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    Last modification: 2018-08-02 22:38:57 (-3 DST)</h3></div>");
+    Last modification: 2018-09-08 15:12:07 (-3 DST)</h3></div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     dieConfig(sayStep("<span class=redDot></span><div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
@@ -1039,151 +1039,156 @@
                 * (C) 2004-2018 Esteban Daniel Dortta (dortta@yahoo.com)
                 */
 
+                global $__yeapfGlobalError;
+                $__yeapfGlobalError = false;
+
                 function _yLoaderDie($reconfigureLinkEnabled)
                 {
-                  global $callback, $user_IP, $callBackFunction, $s, $a, $v, $SQLDieOnError;
-                  $script=basename($_SERVER["PHP_SELF"]);
-                  $isXML=intval(strpos("query.php",$script)!==false);
-                  $isJSON=intval(strpos("rest.php",$script)!==false);
-                  $isHTML=intval( (strpos("index.php",$script)!==false) || (strpos("body.php",$script)!==false) );
-                  $isCLI=intval(php_sapi_name() == "cli");
-                  $outputType = $isHTML *1000 +
-                                $isXML  * 100 +
-                                $isJSON *  10 +
-                                $isCLI  *   1;
+                  global $__yeapfGlobalError, $callback, $user_IP, $callBackFunction, $s, $a, $v, $SQLDieOnError;
+                  if (!$__yeapfGlobalError) {
+                    $script=basename($_SERVER["PHP_SELF"]);
+                    $isXML=intval(strpos("query.php",$script)!==false);
+                    $isJSON=intval(strpos("rest.php",$script)!==false);
+                    $isHTML=intval( (strpos("index.php",$script)!==false) || (strpos("body.php",$script)!==false) );
+                    $isCLI=intval(php_sapi_name() == "cli");
+                    $outputType = $isHTML *1000 +
+                                  $isXML  * 100 +
+                                  $isJSON *  10 +
+                                  $isCLI  *   1;
 
-                  $args=func_get_args();
-                  array_shift($args);
-                  $noHTMLArgs = array();
-                  $deathLogMessage = "";
-                  foreach($args as $kAux=>$vAux) {
-                    $noHTMLArgs[$kAux] = preg_replace(\'!\s+!\', " ", str_replace("\n", " ", strip_tags($vAux)));
-                    $deathLogMessage.=$noHTMLArgs[$kAux]." ";
-                  }
-                  $timestamp=date("U");
-                  $now=date("Y-m-d H:i:s");
-                  $reconfigureLinkEnabled = intval($reconfigureLinkEnabled);
-                  $ret = array("reconfigureLinkEnabled" => $reconfigureLinkEnabled,
-                               "outputType" => $outputType,
-                               "isHTML" => $isHTML,
-                               "isJSON" => $isJSON,
-                               "isCLI" => $isCLI,
-                               "isXML" => $isXML,
-                               "s" => $s,
-                               "v" => $v,
-                               "a" => $a
-                               );
-
-                  if ($isHTML)
-                    $ret["userMsg"] = $args;
-                  else
-                    $ret["userMsg"] = $noHTMLArgs;
-
-                  if (is_array($ret["userMsg"])) {
-                    $ret["userMsgDetails"] = array_slice($ret["userMsg"], 1);
-                    $ret["userMsg"]=$ret["userMsg"][0];
-                  }
-
-                  if (function_exists("get_backtrace")) {
-                    $ret["sys"]=array();
-                    $auxStack = get_backtrace();
-                    $stackNum = 0;
-                    foreach($auxStack as $item) {
-                      $ret["stack"]["$stackNum"]="$item";
-                      $stackNum++;
+                    $args=func_get_args();
+                    array_shift($args);
+                    $noHTMLArgs = array();
+                    $deathLogMessage = "";
+                    foreach($args as $kAux=>$vAux) {
+                      $noHTMLArgs[$kAux] = preg_replace(\'!\s+!\', " ", str_replace("\n", " ", strip_tags($vAux)));
+                      $deathLogMessage.=$noHTMLArgs[$kAux]." ";
                     }
-                  }
+                    $timestamp=date("U");
+                    $now=date("Y-m-d H:i:s");
+                    $reconfigureLinkEnabled = intval($reconfigureLinkEnabled);
+                    $ret = array("reconfigureLinkEnabled" => $reconfigureLinkEnabled,
+                                 "outputType" => $outputType,
+                                 "isHTML" => $isHTML,
+                                 "isJSON" => $isJSON,
+                                 "isCLI" => $isCLI,
+                                 "isXML" => $isXML,
+                                 "s" => $s,
+                                 "v" => $v,
+                                 "a" => $a
+                                 );
 
-                  if (!file_exists("deathLogs"))
-                    mkdir("deathLogs",0777);
-                  $f=fopen("deathLogs/c.$user_IP.log","a");
-                  if ($f) {
-                    fwrite($f, "/---DEATH----------\n");
-                    foreach($noHTMLArgs as $arg) {
-                      fwrite($f, "| $now $arg\n");
+                    if ($isHTML)
+                      $ret["userMsg"] = $args;
+                    else
+                      $ret["userMsg"] = $noHTMLArgs;
+
+                    if (is_array($ret["userMsg"])) {
+                      $ret["userMsgDetails"] = array_slice($ret["userMsg"], 1);
+                      $ret["userMsg"]=$ret["userMsg"][0];
                     }
-                    fwrite($f, "\---DEATH----------\n");
-                    fclose($f);
-                  }
 
-                  $deathLogMessage="$now Fatal Error: $deathLogMessage OutputType: $outputType";
-                  if (function_exists("_recordWastedTime"))
-                    _recordWastedTime($deathLogMessage);
-                  if (function_exists("_dump"))
-                    _dump($deathLogMessage);
-
-                  switch ($outputType) {
-                    case 10:
-                      /* JSON */
-                      if ((is_string($callback)) && (trim($callback)>"")) {
-                        echo "if (typeof $callback == \'function\') $callback(500, \'error\', {}, ".json_encode($ret).");";
-                      } else {
-                        echo json_encode($ret);
+                    if (function_exists("get_backtrace")) {
+                      $ret["sys"]=array();
+                      $auxStack = get_backtrace();
+                      $stackNum = 0;
+                      foreach($auxStack as $item) {
+                        $ret["stack"]["$stackNum"]="$item";
+                        $stackNum++;
                       }
-                      break;
+                    }
 
-                    case 100:
-                      /* XML */
-                      $xmlData="";
-
-                      if (!isset($callBackFunction))
-                        $callBackFunction="alert";
-
-                      foreach($ret as $kAux=>$vAux) {
-                        if (is_array($vAux)) {
-                          $auxV="";
-                          foreach($vAux as $k1=>$v2) {
-                            if (is_numeric($k1))
-                              $k1=$kAux."_$k1";
-                            $auxV.="\t<$k1>$v2</$k1>\n";
-                          }
-                          $vAux="$auxV";
-                        }
-                        if (is_numeric($kAux))
-                          $kAux="_$kAux"."_";
-                        $xmlData.="<$kAux>$vAux</$kAux>";
+                    if (!file_exists("deathLogs"))
+                      mkdir("deathLogs",0777);
+                    $f=fopen("deathLogs/c.$user_IP.log","a");
+                    if ($f) {
+                      fwrite($f, "/---DEATH----------\n");
+                      foreach($noHTMLArgs as $arg) {
+                        fwrite($f, "| $now $arg\n");
                       }
-                      $xmlData="<callBackFunction>$callBackFunction</callBackFunction><dataContext>$xmlData</dataContext>";
-                      $xmlOutput="<?xml version=\'1.0\' encoding=\'UTF-8\'?>\n<root>$xmlData<sgug><timestamp>$timestamp</timestamp></sgug></root>";
-                      echo $xmlOutput;
-                      break;
+                      fwrite($f, "\---DEATH----------\n");
+                      fclose($f);
+                    }
 
-                    case 1000:
-                      /* HTML */
-                      if (function_exists("_minimalCSS")) {
-                        _minimalCSS();
-                      } else {
-                        echo "<style>body {background-color: #f6f6f6;font-family: sans-serif;-webkit-font-smoothing: antialiased;font-size: 14px;line-height: 1.4;margin: 0;padding: 0;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;}</style>";
-                      }
-                      echo "<style>.userMsg { color: #800000} .userMsg .explain { font-size: 120%; font-weight: 800} .stack { color: #666666; font-family: \'Courier New\', Courier, monospace }</style>";
+                    $deathLogMessage="$now Fatal Error: $deathLogMessage OutputType: $outputType";
+                    if (function_exists("_recordWastedTime"))
+                      _recordWastedTime($deathLogMessage);
+                    if (function_exists("_dump"))
+                      _dump($deathLogMessage);
 
-                      echo "<div style=\'padding: 16px; margin: 16px; border: dotted 1px #66CCFF; border-radius: 6px; background-color: #fff\'>";
-                      echo "<div><a href=\'http://www.yeapf.com\' target=x$timestamp><img src=\'http://www.yeapf.com/logo.php\'></a></div><table>";
-                      foreach($ret as $k=>$vAux) {
-                        if (is_array($vAux)) {
-                          foreach($vAux as $kx=>$vx) {
-                            echo "<tr><td width=150px><span class=$k><span class=number>$k.$kx</span></span></td><td><span class=$k><span class=explain>$vx</span></span></td></tr>\n";
-                          }
+                    switch ($outputType) {
+                      case 10:
+                        /* JSON */
+                        if ((is_string($callback)) && (trim($callback)>"")) {
+                          echo "if (typeof $callback == \'function\') $callback(500, \'error\', {}, ".json_encode($ret).");";
                         } else {
-                          echo "<tr><td width=150px>$k</td><td>$vAux</td></tr>\n";
+                          echo json_encode($ret);
                         }
+                        break;
+
+                      case 100:
+                        /* XML */
+                        $xmlData="";
+
+                        if (!isset($callBackFunction))
+                          $callBackFunction="alert";
+
+                        foreach($ret as $kAux=>$vAux) {
+                          if (is_array($vAux)) {
+                            $auxV="";
+                            foreach($vAux as $k1=>$v2) {
+                              if (is_numeric($k1))
+                                $k1=$kAux."_$k1";
+                              $auxV.="\t<$k1>$v2</$k1>\n";
+                            }
+                            $vAux="$auxV";
+                          }
+                          if (is_numeric($kAux))
+                            $kAux="_$kAux"."_";
+                          $xmlData.="<$kAux>$vAux</$kAux>";
+                        }
+                        $xmlData="<callBackFunction>$callBackFunction</callBackFunction><dataContext>$xmlData</dataContext>";
+                        $xmlOutput="<?xml version=\'1.0\' encoding=\'UTF-8\'?>\n<root>$xmlData<sgug><timestamp>$timestamp</timestamp></sgug></root>";
+                        echo $xmlOutput;
+                        break;
+
+                      case 1000:
+                        /* HTML */
+                        if (function_exists("_minimalCSS")) {
+                          _minimalCSS();
+                        } else {
+                          echo "<style>body {background-color: #f6f6f6;font-family: sans-serif;-webkit-font-smoothing: antialiased;font-size: 14px;line-height: 1.4;margin: 0;padding: 0;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;}</style>";
+                        }
+                        echo "<style>.userMsg { color: #800000} .userMsg .explain { font-size: 120%; font-weight: 800} .stack { color: #666666; font-family: \'Courier New\', Courier, monospace }</style>";
+
+                        echo "<div style=\'padding: 16px; margin: 16px; border: dotted 1px #66CCFF; border-radius: 6px; background-color: #fff\'>";
+                        echo "<div><a href=\'http://www.yeapf.com\' target=x$timestamp><img src=\'http://www.yeapf.com/logo.php\'></a></div><table>";
+                        foreach($ret as $k=>$vAux) {
+                          if (is_array($vAux)) {
+                            foreach($vAux as $kx=>$vx) {
+                              echo "<tr><td width=150px><span class=$k><span class=number>$k.$kx</span></span></td><td><span class=$k><span class=explain>$vx</span></span></td></tr>\n";
+                            }
+                          } else {
+                            echo "<tr><td width=150px>$k</td><td>$vAux</td></tr>\n";
+                          }
+                        }
+                        echo "</table></div>";
+                        break;
+                      default:
+
+                        /* TEXT (cli) */
+                        print_r($ret);
+                    }
+
+                    if (function_exists("db_set_flag")) {
+                      db_set_flag(_DB_DIRTY_);
+                    }
+                    if ($SQLDieOnError) {
+                      if ($SQLDieOnError==1)
+                        dieConfig();
+                      else {
+                        exit($SQLDieOnError);
                       }
-                      echo "</table></div>";
-                      break;
-                    default:
-
-                      /* TEXT (cli) */
-                      print_r($ret);
-                  }
-
-                  if (function_exists("db_set_flag")) {
-                    db_set_flag(_DB_DIRTY_);
-                  }
-                  if ($SQLDieOnError) {
-                    if ($SQLDieOnError==1)
-                      dieConfig();
-                    else {
-                      exit($SQLDieOnError);
                     }
                   }
                 }

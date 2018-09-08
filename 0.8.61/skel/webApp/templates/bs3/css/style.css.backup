@@ -1,0 +1,145 @@
+/*
+ * http://fonts.googleapis.com/css?family=Lato:400,700,400italic
+ */
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Lato Regular'), local('Lato-Regular'), url(../fonts/1YwB1sO8YE1Lyjf12WNiUA.woff2) format('woff2'), url(../fonts/9k-RPmcnxYEPm8CNFsH2gg.woff) format('woff');
+}
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Lato Bold'), local('Lato-Bold'), url(../fonts/H2DMvhDLycM56KNuAtbJYA.woff2) format('woff2'), url(../fonts/wkfQbvfT_02e2IWO3yYueQ.woff) format('woff');
+}
+@font-face {
+  font-family: 'Lato';
+  font-style: italic;
+  font-weight: 400;
+  src: local('Lato Italic'), local('Lato-Italic'), url(../fonts/PLygLKRVCQnA5fhu3qk5fQ.woff2) format('woff2'), url(../fonts/oUan5VrEkpzIazlUe5ieaA.woff) format('woff');
+}
+
+.animated025,
+.animated050,
+.animated075,
+.animated100 {
+    -webkit-animation-fill-mode: both;
+    animation-fill-mode: both;
+    -webkit-animation-timing-function: linear;
+    animation-timing-function: linear;
+}
+
+
+.animated025 {
+    -webkit-animation-duration: 0.25s;
+    animation-duration: 0.25s;
+}
+
+.animated050 {
+    -webkit-animation-duration: 0.50s;
+    animation-duration: 0.50s;
+}
+
+.animated075 {
+    -webkit-animation-duration: 0.75s;
+    animation-duration: 0.75s;
+}
+
+.animated100 {
+    -webkit-animation-duration: 1.00s;
+    animation-duration: 1.00s;
+}
+
+@-webkit-keyframes bounceIn {
+    0% {
+        opacity: 0;
+        -webkit-transform: scale(.3);
+    }
+
+    50% {
+        opacity: 1;
+        -webkit-transform: scale(1.05);
+    }
+
+    70% {
+        -webkit-transform: scale(.9);
+    }
+
+    100% {
+         -webkit-transform: scale(1);
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(.3);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+
+    70% {
+        transform: scale(.9);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.bounceIn {
+    -webkit-animation-name: bounceIn;
+    animation-name: bounceIn;
+}
+
+@-webkit-keyframes fadeOut {
+    0% {opacity: 1;}
+    100% {opacity: 0;}
+}
+@keyframes fadeOut {
+    0% {opacity: 1;}
+    100% {opacity: 0;}
+}
+
+.fadeOut {
+    -webkit-animation-name: fadeOut;
+    animation-name: fadeOut;
+}
+
+@-webkit-keyframes fadeIn {
+    0% {opacity: 0;}
+    100% {opacity: 1;}
+}
+@keyframes fadeIn {
+    0% {opacity: 0;}
+    100% {opacity: 1;}
+}
+.fadeIn {
+    -webkit-animation-name: fadeIn;
+    animation-name: fadeIn;
+}
+
+.tnContainer {
+}
+
+.tnTab {}
+
+.debug:before {
+  font-size: 80%;
+  color: #7F7F7F;
+  content: attr(id);
+  border-bottom: dotted 1px #BFBFBF;
+}
+
+.wrongValue {
+  background-color: #FFAEAB;
+}
+
+.appWaitIcon {
+  float:left;
+  display: none;
+}

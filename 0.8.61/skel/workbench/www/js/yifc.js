@@ -1,8 +1,8 @@
 /*********************************************
  * skel/workbench/www/js/yifc.js
- * YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)
+ * YeAPF 0.8.61-62 built on 2018-09-08 15:12 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-08-02 22:38:57 (-3 DST)
+ * 2018-09-08 15:12:08 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * This object allows to communicate with ysandboxifc.js
  * and runs outside the sandbox.
@@ -22,14 +22,14 @@ var IFCObj = function () {
   that.findSandboxFrame = function() {
     if (frames && frames.ifc_frame) {
       _dumpy(1,1,"MAIN: looking for bridge from 'ifc_frame'");
-      that.ySandboxFrame=frames.ifc_frame.contentWindow;
+      that.ySandboxFrame=frames.ifc_frame.contentWindow || frames.ifc_frame.contentDocument || frames.ifc_frame;
     } else {
       _dumpy(1,1,"MAIN: looking for bridge from 'ifc_frame'");
-      that.ySandboxFrame=$frameByName('ifc_frame').contentWindow;
+      that.ySandboxFrame=$frameByName('ifc_frame').contentWindow || $frameByName('ifc_frame').contentDocument || $frameByName('ifc_frame');
       if (typeof that.ySandboxFrame == "undefined") {
         if ((opener) && (opener.ifc_frame)) {
           _dumpy(1,1,"MAIN: looking for bridge from 'opener'");
-          that.ySandboxFrame=opener.ifc_frame.contentWindow;
+          that.ySandboxFrame=opener.ifc_frame.contentWindow || opener.ifc_frame.contentDocument || frames.ifc_frame;
         }
       }
     }
@@ -151,7 +151,9 @@ var IFCObj = function () {
 
 var ifc;
 
-window.addEventListener("load", function() {
-  if (!ifc) ifc = IFCObj();
-  window.addEventListener("message", ifc.receiveMessage, false);
-});
+addOnLoadManager(
+  function() {
+    if (!ifc) ifc = IFCObj();
+    window.addEventListener("message", ifc.receiveMessage, false);
+  }
+);

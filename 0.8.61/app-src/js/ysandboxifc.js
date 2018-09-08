@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ysandboxifc.js
- * YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+ * YeAPF 0.8.61-62 built on 2018-09-08 15:12 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-05-30 11:21:04 (-3 DST)
+ * 2018-09-06 18:50:49 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * By security reasons, sometimes you cannot acces
  * your restful interface from your webapp, so you need a bridge.
@@ -63,6 +63,11 @@ var sandboxIFCObj = function () {
           var toCrave = localData.context;
           ycomm.crave(toCrave.s, toCrave.a, toCrave.limits, 'sandboxIFC.dataPleaded', null, localData.queueId);
           break;
+        case 'yeapf.loadLibrary':
+          _dump("Loading library");
+          var toLoad = localData.context;
+          yloader.loadLibrary(toLoad.libraryName);
+          break;
       }
     } else
       _dump("The event is not an object");
@@ -85,12 +90,14 @@ var sandboxIFCObj = function () {
 console.log("Sandbox stage3");
 var sandboxIFC = {};
 
-window.addEventListener("load", function() {
-  console.log("Sandbox stage4");
-  sandboxIFC = sandboxIFCObj();
-  console.log("Sandbox stage5");
-  ycomm.pinger.pingInterleave = 10000;
-  sandboxIFC.getConnParams();
-  window.addEventListener("message", sandboxIFC.receiveMessage, false);
-  console.log("Sandbox stage6");
-});
+addOnLoadManager(
+  function() {
+    console.log("Sandbox stage4");
+    sandboxIFC = sandboxIFCObj();
+    console.log("Sandbox stage5");
+    ycomm.pinger.pingInterleave = 10000;
+    sandboxIFC.getConnParams();
+    window.addEventListener("message", sandboxIFC.receiveMessage, false);
+    console.log("Sandbox stage6");
+  }
+);
