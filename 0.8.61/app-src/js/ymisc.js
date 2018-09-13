@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.61-62 built on 2018-09-08 15:12 (-3 DST)
+ * YeAPF 0.8.61-70 built on 2018-09-13 19:29 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-09-06 06:46:53 (-3 DST)
+ * 2018-09-13 08:40:05 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -2760,16 +2760,27 @@ if ((typeof window=='object') && (typeof _onLoadMethods == 'undefined')) {
       }
   );
 
-  window.addEventListener("load", function() {
+  __startup = function() {
     for(var i=0; i<_onLoadMethods.length; i++)
       if (_onLoadMethods.hasOwnProperty(i))
         if (_onLoadMethods[i]!==undefined)
           _onLoadMethods[i]();
-    if (!isOnMobile()) {
-      var event = new Event('deviceready');
-      document.dispatchEvent(event);
-    }
-  }, false);
+  }
+
+  if (typeof cordova=='object') {
+    document.addEventListener(
+      'deviceready',
+      __startup
+      , false);
+  } else {
+    window.addEventListener("load", function() {
+      __startup();
+      if (!isOnMobile()) {
+        var event = new Event('deviceready');
+        document.dispatchEvent(event);
+      }
+    }, false);
+  }
 
 
   var addEvent = function(elem, eventName, eventHandler) {

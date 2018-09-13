@@ -1,5 +1,5 @@
 /*********************************************
-  * skel/webApp/templates/bs4/js/yloader.js
+  * samples/yIndexedDB/js/yloader.js
   * YeAPF 0.8.61-70 built on 2018-09-13 19:29 (-3 DST)
   * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
   * 2018-09-13 19:29:13 (-3 DST)
@@ -1982,9 +1982,9 @@
      };
      
      var dateInRange = function (aFrenchDate, aFrenchMinDate, aFrenchMaxDate) {
-       /* determina se uma data em formato frances (dd/mm/yyyy) estÃ¡ no escopo indicado
-          Na ausencia de um dos parÃ¡metros, ele assume hoje para aquele que falta
-          Se faltam os dois, a Ãºnica data vÃ¡lida Ã© hoje */
+       /* determina se uma data em formato frances (dd/mm/yyyy) estÃÂ¡ no escopo indicado
+          Na ausencia de um dos parÃÂ¡metros, ele assume hoje para aquele que falta
+          Se faltam os dois, a ÃÂºnica data vÃÂ¡lida ÃÂ© hoje */
        var ret=false;
        if (isValidDate(aFrenchDate)) {
          aFrenchMinDate = aFrenchMinDate || (new Date()).toFrenchString();
@@ -4854,8 +4854,8 @@
                  that.pinger.pingerWatchdog = setTimeout(that.pinger.ping, that.pinger.pingInterleave);
              },
              /*
-              * apÃ³s um tempo de 60 segundos (pingTimeout)
-              * sem resposta, ele cai nesta funÃ§Ã£o e
+              * apÃÂ³s um tempo de 60 segundos (pingTimeout)
+              * sem resposta, ele cai nesta funÃÂ§ÃÂ£o e
               * volta a tentar em 1/2 pingInterleave
               */
              notAnswer: function () {
@@ -4865,7 +4865,7 @@
                  that.pinger.onError();
                else
                  _dumpy(4,1,"ping without 'onError' event");
-               // sayStatusBar("Servidor nÃ£o localizado "+that.pinger.pingCount+'...<br>Tentando novamente');
+               // sayStatusBar("Servidor nÃÂ£o localizado "+that.pinger.pingCount+'...<br>Tentando novamente');
                if (that.pinger.canPing) {
                  _dumpy(4,1,"ping Scheduling a new call for {0}ms".format(that.pinger.pingInterleave / 2))
                  that.pinger.pingerWatchdog=setTimeout(that.pinger.ping, that.pinger.pingInterleave / 2);
@@ -4948,8 +4948,8 @@
         * Com o advento do WebSocket, precisamos de novas formas para
         * provocar o servidor.
         * Este primeiro passo pretende melhorar o Ajax
-        * Depois, virÃ£o funÃ§Ãµes genericas
-        * Caso esteja usando prototype, ele usarÃ¡ o mesmo, se nÃ£o se virarÃ¡
+        * Depois, virÃÂ£o funÃÂ§ÃÂµes genericas
+        * Caso esteja usando prototype, ele usarÃÂ¡ o mesmo, se nÃÂ£o se virarÃÂ¡
         * para criar uma interface
         *
         * verificar ServerSentEvents
@@ -5420,7 +5420,7 @@
              if (ycomm._load>0)
                ycomm._load--;
              _dumpy(4,1,"Calling {0}(404);".format(callbackFunctionName));
-             /* https://pt.wikipedia.org/wiki/Lista_de_cÃ³digos_de_status_HTTP#404_N.C3.A3o_encontrado */
+             /* https://pt.wikipedia.org/wiki/Lista_de_cÃÂ³digos_de_status_HTTP#404_N.C3.A3o_encontrado */
              setTimeout("{0}(404,{message: 'Server do not respond ({1})'}, {})".format(callbackFunctionName, url), 100);
          };
      
@@ -6894,9 +6894,9 @@
        };
      
        that.grantMsgProc = function(aInterval) {
-         /* caso venha sem parÃ¡mtros, calcular um tempo prudente de no mÃ¡ximo 20 segs
+         /* caso venha sem parÃÂ¡mtros, calcular um tempo prudente de no mÃÂ¡ximo 20 segs
           * Isso acontece quando o servidor devolveu uma resposta errada
-          * e queremos que o sistema de mensagens continue em operaÃ§Ã£o. */
+          * e queremos que o sistema de mensagens continue em operaÃÂ§ÃÂ£o. */
          if ((aInterval === undefined) || (aInterval <= 0))
            aInterval = Math.min(20000, messagePeekerInterval * 2);
      
@@ -8126,7 +8126,7 @@
                  dynSetElementDisplay(allElements[i].id, e.id, e.value);
      
                if ((auxID=='*.') || (!e.checked)) {
-                 // limpar conteÃºdo dos campos dependentes
+                 // limpar conteÃÂºdo dos campos dependentes
                  // caso esteja ocultando
                  if (allElements[i].type=='checkbox')
                    allElements[i].checked=false;
@@ -8716,8 +8716,8 @@
                y$(nextCellName).click();
            }
          } else {
-           console.log("O Valor nÃ£o pode ser lanÃ§ado por nÃ£o cumprir condiÃ§Ãµes de existÃªncia");
-           window.alert("O valor nÃ£o Ã© consistente.\nRevise valores do campo pai e o prÃ³prio valor lanÃ§ado\nTente novamente");
+           console.log("O Valor nÃÂ£o pode ser lanÃÂ§ado por nÃÂ£o cumprir condiÃÂ§ÃÂµes de existÃÂªncia");
+           window.alert("O valor nÃÂ£o ÃÂ© consistente.\nRevise valores do campo pai e o prÃÂ³prio valor lanÃÂ§ado\nTente novamente");
            y$(aCellName).click();
          }
        }
@@ -9049,7 +9049,7 @@
      
      function __cbOnChange__(e, saving)
      {
-       // procurar elemento que chamou esta funÃ§Ã£o
+       // procurar elemento que chamou esta funÃÂ§ÃÂ£o
        if (e==undefined)
          var e = window.event || arguments.callee.caller.arguments[0];
        if (e.target)
@@ -9062,7 +9062,7 @@
      
        if (e.dynOnChange != undefined)
          e.dynOnChange();
-       // salvar informaÃ§Ã£o
+       // salvar informaÃÂ§ÃÂ£o
        if (saving)
          __saveFormInfo(e);
      /*
@@ -9073,7 +9073,7 @@
                ccDependents++;
              }
       */
-       // corrigir visualizaÃ§Ã£o dos elementos dependentes do clicado
+       // corrigir visualizaÃÂ§ÃÂ£o dos elementos dependentes do clicado
        dynCleanChilds(e, document);
      
      }
@@ -9082,7 +9082,7 @@
  _dump("ydyntable");
  /* START yinterface.js */
      /*
-         skel/webApp/templates/bs4/js/yloader.js
+         samples/yIndexedDB/js/yloader.js
          YeAPF 0.8.61-70 built on 2018-09-13 19:29 (-3 DST)
          Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
          2018-09-13 19:29:13 (-3 DST)
@@ -9305,7 +9305,7 @@
            // tableParams.currentPage=pageNo;
      
            pageLen = Math.max(1, pageLen || 20);
-           /* curo os parÃ¡metros e misturo com os params que tenho */
+           /* curo os parÃÂ¡metros e misturo com os params que tenho */
            mergeObject(params || {}, tableParams, true);
      
            table.setAttribute('data-params', JSON.stringify(tableParams));
@@ -9314,7 +9314,7 @@
      
            promiseReturn = new Promise(
              function(resolve, reject) {
-               /* esta funÃ§Ã£o serve para puxar apenas uma pÃ¡gina dos dados do banco para dentro de uma tabela
+               /* esta funÃÂ§ÃÂ£o serve para puxar apenas uma pÃÂ¡gina dos dados do banco para dentro de uma tabela
                   recomendamos seu uso para tabelas com 200 registros ou mais */
                var blockStart = 0,
                  blockSize = pageNo * pageLen,
@@ -9386,7 +9386,7 @@
          if (table)
            tableParams = JSON.parse(table.getAttribute('data-params') || '{}');
      
-         /* curo os parÃ¡metros e misturo com os params que tenho */
+         /* curo os parÃÂ¡metros e misturo com os params que tenho */
          mergeObject(params || {}, tableParams, true);
      
          table.setAttribute('data-params', JSON.stringify(tableParams));
@@ -9394,8 +9394,8 @@
      
          var promiseReturn = new Promise(
            function(resolve, reject) {
-             /* esta funÃ§Ã£o serve para puxar TODOS os dados do banco para dentro de uma tabela
-                entÃ£o use apenas com aquelas tabelas relativamente pequenas */
+             /* esta funÃÂ§ÃÂ£o serve para puxar TODOS os dados do banco para dentro de uma tabela
+                entÃÂ£o use apenas com aquelas tabelas relativamente pequenas */
              var blockStart = 0;
      
              var __loadTable = function() {
@@ -9518,10 +9518,10 @@
              mTabNav.showTab(table_tab);
            if (table_form) {
              ycomm.dom.cleanForm(table_form);
-             /* coloco os valores padrÃ£o que vem do params */
+             /* coloco os valores padrÃÂ£o que vem do params */
              ycomm.dom.fillElement(table_form, [JSON.parse(table_params)]);
      
-             /* enumero os elementos para poder limpar sua condiÃ§Ã£o de erro */
+             /* enumero os elementos para poder limpar sua condiÃÂ§ÃÂ£o de erro */
              var form = ycomm.dom.getFormElements(table_form),
                cd;
              for (i in form) {
@@ -9563,7 +9563,7 @@
                    that._forms_cache[subject + '.' + formId] = d[0];
                    that.buildFormFromJSON(manager, formId, d[0], fieldPrefix, fieldPostfix).then(callback);
                  } else
-                   console.error("'{0}' nÃ£o estÃ¡ devolve resultado ao fazer 'getForm'".format(subject));
+                   console.error("'{0}' nÃÂ£o estÃÂ¡ devolve resultado ao fazer 'getForm'".format(subject));
                }
              }
            );
@@ -9911,7 +9911,7 @@
      
            var classes = e.className.split(' '),
              mySensitivitySpec;
-           /* acrescento o id do prÃ³prio elemento caso exista */
+           /* acrescento o id do prÃÂ³prio elemento caso exista */
            if ((e.id || '') > '')
              classes[classes.length] = e.id;
      
@@ -10242,7 +10242,7 @@
                      (jList[i].readOnly || '').toUpperCase() == 'YES' ? 'disabled=yes' : '');
      
                  } else if ((jList[i].domType || jList[i].type || '').toUpperCase() == "SELECT") {
-                   /* o problema Ã© adiar as opÃ§oes do select */
+                   /* o problema ÃÂ© adiar as opÃÂ§oes do select */
                    if (jList[i].query) {
                      html += selectModelWithQuery.format(elementId, jList[i].class, jList[i].label || '', groupingSpecs, null);
                      for(var auxP in jList[i].query.params) {
@@ -10314,7 +10314,7 @@
                          jList[i].inputMode || 'text',
                          jList[i].label || '',
                          (jList[i].readOnly || '').toUpperCase() == 'YES' ? 'readonly' : '',
-                         groupingClass, /* groupingSpecs nÃ£o pode ir aqui */
+                         groupingClass, /* groupingSpecs nÃÂ£o pode ir aqui */
                          elementId + "_datalist_" + sequence,
                          jList[i].query.subject,
                          jList[i].query.action,
@@ -10330,7 +10330,7 @@
                            jList[i].inputMode || 'text',
                            jList[i].label || '',
                            (jList[i].readOnly || '').toUpperCase() == 'YES' ? 'readonly' : '',
-                           groupingClass, /* groupingSpecs nÃ£o pode ir aqui */
+                           groupingClass, /* groupingSpecs nÃÂ£o pode ir aqui */
                            '',
                            jList[i].rightAddon);
                        } else if ("undefined" != typeof jList[i].leftAddon) {
@@ -10340,7 +10340,7 @@
                            jList[i].inputMode || 'text',
                            jList[i].label || '',
                            (jList[i].readOnly || '').toUpperCase() == 'YES' ? 'readonly' : '',
-                           groupingClass, /* groupingSpecs nÃ£o pode ir aqui */
+                           groupingClass, /* groupingSpecs nÃÂ£o pode ir aqui */
                            '',
                            jList[i].leftAddon);
                        } else {
@@ -10350,7 +10350,7 @@
                            jList[i].inputMode || 'text',
                            jList[i].label || '',
                            (jList[i].readOnly || '').toUpperCase() == 'YES' ? 'readonly' : '',
-                           groupingClass, /* groupingSpecs nÃ£o pode ir aqui */
+                           groupingClass, /* groupingSpecs nÃÂ£o pode ir aqui */
                            '');
                        }
                      }
@@ -10380,7 +10380,7 @@
          }
      
          var controlButtonAction = function(e) {
-           /* cuidado... ele estÃ¡ voltando aqui mas nem tudo estÃ¡ onde deveria, entÃ£o tudo tem que ser montado novamente */
+           /* cuidado... ele estÃÂ¡ voltando aqui mas nem tudo estÃÂ¡ onde deveria, entÃÂ£o tudo tem que ser montado novamente */
            e = e.target;
            sequence = (new Date()).getTime();
            eventList = [];
@@ -10545,7 +10545,7 @@
          addEvent(".btn-atualizar", "click", that.refreshTable);
          addEvent(".btn-adicionar", "click", that.insertData);
      
-         /* apenas para desenvolvimento. Em produÃ§Ã£o tem que estar TRUE */
+         /* apenas para desenvolvimento. Em produÃÂ§ÃÂ£o tem que estar TRUE */
          that.allowCacheForm = false;
          that._repeatableFieldInfo = [];
      
@@ -10555,7 +10555,7 @@
              ycomm.dom.fillElement(table.id, {});
            });
      
-         /* analiso a url para ver se o usuÃ¡rio quer ir para uma ancora */
+         /* analiso a url para ver se o usuÃÂ¡rio quer ir para uma ancora */
          setTimeout(function() {
            that.openTab(window.location.hash);
          }, 512);

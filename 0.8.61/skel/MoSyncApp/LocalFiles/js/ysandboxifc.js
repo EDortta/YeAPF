@@ -1,8 +1,8 @@
 /*********************************************
  * skel/MoSyncApp/LocalFiles/js/ysandboxifc.js
- * YeAPF 0.8.61-62 built on 2018-09-08 15:12 (-3 DST)
+ * YeAPF 0.8.61-70 built on 2018-09-13 19:29 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-09-08 15:12:08 (-3 DST)
+ * 2018-09-13 19:29:13 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * By security reasons, sometimes you cannot acces
  * your restful interface from your webapp, so you need a bridge.

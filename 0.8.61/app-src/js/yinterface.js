@@ -1,8 +1,8 @@
 /*
     app-src/js/yinterface.js
-    YeAPF 0.8.61-62 built on 2018-09-08 15:12 (-3 DST)
+    YeAPF 0.8.61-70 built on 2018-09-13 19:29 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-09-04 06:32:08 (-3 DST)
+    2018-09-10 07:27:59 (-3 DST)
 */
 
 var yInterfaceObj = function() {
@@ -22,8 +22,8 @@ var yInterfaceObj = function() {
         while ((e) && (e.nodeName != 'LI'))
           e = e.parentNode;
         e.addClass('active');
-        var aba = e.getAttribute('data-aba');
-        mTabNav.showTab(aba);
+        var tab = e.getAttribute('data-tab');
+        mTabNav.showTab(tab);
       } else if (typeof e == "string") {
         /* pode ser uma ancora */
         var i, href;
@@ -835,11 +835,11 @@ var yInterfaceObj = function() {
       for (var i = 0; i < classes.length; i++) {
         mySensitivitySpec = undefined;
 
-        if ("undefined" !== typeof interface._sensitiveFields[classes[i]]) {
-          mySensitivitySpec = interface._sensitiveFields[classes[i]];
+        if ("undefined" !== typeof (yInterface._sensitiveFields[classes[i]])) {
+          mySensitivitySpec = yInterface._sensitiveFields[classes[i]];
         }
-        if ("undefined" !== typeof interface._sensitiveFields["." + classes[i]]) {
-          mySensitivitySpec = interface._sensitiveFields["." + classes[i]];
+        if ("undefined" !== typeof (yInterface._sensitiveFields["." + classes[i]])) {
+          mySensitivitySpec = yInterface._sensitiveFields["." + classes[i]];
         }
 
         if (mySensitivitySpec) {

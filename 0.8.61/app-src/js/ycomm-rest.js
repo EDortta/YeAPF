@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-rest.js
- * YeAPF 0.8.61-62 built on 2018-09-08 15:12 (-3 DST)
+ * YeAPF 0.8.61-70 built on 2018-09-13 19:29 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-09-05 19:40:37 (-3 DST)
+ * 2018-09-13 18:46:24 (-3 DST)
  *
  * ycomm-rest.js is a set of prototyped functions
  * build in order to use REST protocol
@@ -56,7 +56,9 @@
   };
 
   ycomm.bring =  function (url, displayWaitIcon) {
-    var head = document.head;
+    var head;
+    //head = document.head;
+    head=document.getElementsByTagName("head")[0];
     if (displayWaitIcon)
       ycomm.waitIconControl(true);
     var script = document.createElement("script");
@@ -81,6 +83,8 @@
     script.maxWaitCount=(ycomm.timeout / ycomm.wd_interval)+2;
     script.callbackFunctionName=callbackFunctionName;
     script.displayWaitIcon = displayWaitIcon;
+    script.type = "text/javascript";
+
     script.onload=function() {
       if (ycomm._load>0)
         ycomm._load--;
@@ -90,6 +94,8 @@
     };
 
     script.abort = function () {
+        if (ycomm._load>0)
+          ycomm._load--;
         _dumpy(4,1,"Calling {0}(404);".format(callbackFunctionName));
         /* https://pt.wikipedia.org/wiki/Lista_de_códigos_de_status_HTTP#404_N.C3.A3o_encontrado */
         setTimeout("{0}(404,{message: 'Server do not respond ({1})'}, {})".format(callbackFunctionName, url), 100);
@@ -106,8 +112,8 @@
       }
     };
 
-    script.setAttribute("src", url);
     script.id='rest_'+scriptSequence;
+    script.setAttribute("src", url);
 
     try {
       _dumpy(4,2,"Creating {0} as {1}".format(script.UUID, script.src));

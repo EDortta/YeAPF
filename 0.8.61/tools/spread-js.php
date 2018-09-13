@@ -1,9 +1,9 @@
 <?php
   /*
     tools/spread-js.php
-    YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)
+    YeAPF 0.8.61-70 built on 2018-09-13 19:29 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-08-02 22:38:27 (-3 DST)
+    2018-09-10 10:25:26 (-3 DST)
 
     This script will distribute monolite version of yloader.js
     among different application skeletons
@@ -36,7 +36,7 @@
       grantDirectory($tgtFolder);
       $auxFile = _file($srcFileName);
       if ($addHeader) {
-        $auxFile = "/* YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST) Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
+        $auxFile = "/* YeAPF 0.8.61-70 built on 2018-09-13 19:29 (-3 DST) Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
       }
       $tgtFileName=basename($srcFileName);
       if (file_put_contents("$tgtFolder/$tgtFileName", $auxFile))
@@ -96,7 +96,7 @@
   if (file_exists($minJS)) {
     echo "Minified version source: $minJS\n";
     $yeapf_minJS = join("", file($minJS));
-    $yeapf_minJS = "/* YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST) Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
+    $yeapf_minJS = "/* YeAPF 0.8.61-70 built on 2018-09-13 19:29 (-3 DST) Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
   }
 
   grantDirectory("skel/chromeApp/js");
@@ -220,6 +220,8 @@
     echo "ystorage and yloader -> $targetFolder\n";
     copyFile("app-src/js/min/ystorage.min.js",          "$targetFolder/js", false);
     copyFile("skel/webApp/js/yloader.min.js",           "$targetFolder/js", false);
+    copyFile("app-src/js/min/ystorage.js",          "$targetFolder/js", false);
+    copyFile("skel/webApp/js/yloader.js",           "$targetFolder/js", false);
 
   }
 
