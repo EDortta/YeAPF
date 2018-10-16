@@ -1,11 +1,15 @@
 <?php
 /*
     includes/yeapf.nodes.php
-    YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-10-03 12:17:23 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
+
+  if (!defined('CURL_SSLVERSION_TLSv1_2')) {
+     define('CURL_SSLVERSION_TLSv1_2', 6);
+  }
 
   global $cfgMaxSegmentReservationChunkCount,
          $cfgMaxUnattachedSegments;
@@ -22,7 +26,7 @@
     else
       $url.="&";
     $url.="r".y_rand(11,99)."z=".y_uniqid();
-    return $url; 
+    return $url;
   }
 
   class yNode {
@@ -105,7 +109,7 @@
           }
         } else {
           self::registerAction( 1,"NODE: fetching already reserved $count segment(s)");
-          $sql="select segment 
+          $sql="select segment
                 from is_segment_control
                 where serverKey='$serverKey'
                   and nodePrefix='$nodePrefix'
@@ -143,7 +147,7 @@
           $now = date("YmdHis");
           if ($cc == 1) {
             db_sql("update is_segment_control
-                    set regulation='$now', 
+                    set regulation='$now',
                         identity='$identity'
                     where serverKey='$serverKey'
                       and nodePrefix='$nodePrefix'
@@ -216,9 +220,9 @@
         $ret['rn']=intval($registeredNode);
 
         if ($registeredNode) {
-          $x=y_uniqid(); 
+          $x=y_uniqid();
           $ax=$bx=$x;
-          $auth=_registerDeviceIntoProject($serverKey, $nodeName);
+          $auth=_registerDeviceIntoProject($serverKey, $nodeName, $ax, $bx);
           _grantSequenceKeys($nodeName, $ax, $bx);
 
           $ret['auth']=md5($auth);
@@ -260,7 +264,6 @@
       if (($ret = curl_exec($ch)) === false) {
         $errorMsg = "Error: #" . curl_errno($ch) . ", " . curl_error($ch);
         self::registerAction( 1,"NODE: $errorMsg");
-        _recordError($errorMsg);
         $canEvaluate = false;
       }
       return $ret;
@@ -299,7 +302,6 @@
             if (($retSegments = curl_exec($ch)) === false) {
               $errorMsg = "Error: #" . curl_errno($ch) . ", " . curl_error($ch);
               self::registerAction( 1,"NODE: $errorMsg");
-              _recordError($errorMsg);
               $canEvaluate = false;
             } else {
               $ret=false;
@@ -343,10 +345,10 @@
       if ($allNodes)
         $sql="select count(*) as cc from is_segment_reservation where identity is null";
       else
-        $sql="select count(*) as cc 
-              from is_segment_reservation 
-              where identity is null 
-                and serverKey='$serverKey' 
+        $sql="select count(*) as cc
+              from is_segment_reservation
+              where identity is null
+                and serverKey='$serverKey'
                 and nodePrefix='$nodePrefix'";
       return db_sql($sql);
     }
@@ -355,6 +357,7 @@
       global $dbgYNode;
       _dumpy(512, $level, $description);
       _record($dbgYNode, $description);
+      _recordError($description);
     }
 
     public function requestSegmentAssociation($identity) {
@@ -387,18 +390,18 @@
             $serverKey = $GLOBALS['cfgDBNode']['server_key'];
             $nodePrefix = $GLOBALS['cfgDBNode']['node_prefix'];
             if (lock("$serverKey-$nodePrefix")) {
-              $segment=db_sql("select segment 
-                               from is_segment_reservation 
-                               where identity is null 
-                                 and serverKey='$serverKey' 
+              $segment=db_sql("select segment
+                               from is_segment_reservation
+                               where identity is null
+                                 and serverKey='$serverKey'
                                  and nodePrefix='$nodePrefix'
                                order by request
                                limit 0,1");
               if ($segment>'') {
                 try {
-                  db_sql("update is_segment_reservation 
-                             set identity='$identity' 
-                           where segment='$segment' 
+                  db_sql("update is_segment_reservation
+                             set identity='$identity'
+                           where segment='$segment'
                              and serverKey='$serverKey'
                              and nodePrefix='$nodePrefix'");
                   $ret = -1;
@@ -418,42 +421,43 @@
                       $ret=false;
                       self::registerAction( 1, "NODE: regulationInfo=$regulationInfo ".gettype($regulationInfo));
 
-                    
                       $regulationInfo=json_decode($regulationInfo, true);
                       $errorMsg=isset($regulationInfo['errorMsg'])?$regulationInfo['errorMsg']:"";
                       if ("$errorMsg"=='') {
                         $regulation=isset($regulationInfo['regulation'])?$regulationInfo['regulation']:"";
                         if ($regulation>'') {
-                          db_sql("update is_segment_reservation 
-                                     set regulation='$regulation' 
-                                   where segment='$segment' 
+                          db_sql("update is_segment_reservation
+                                     set regulation='$regulation'
+                                   where segment='$segment'
                                      and serverKey='$serverKey'
-                                     and nodePrefix='$nodePrefix'");                        
+                                     and nodePrefix='$nodePrefix'");
                         }
                       } else {
-                        db_sql("update is_segment_reservation 
-                                   set regulation_message='$errorMsg' 
-                                 where segment='$segment' 
+                        db_sql("update is_segment_reservation
+                                   set regulation_message='$errorMsg'
+                                 where segment='$segment'
                                   and serverKey='$serverKey'
                                   and nodePrefix='$nodePrefix'");
-                      }                      
+                      }
                     }
                   }
                 } catch(Exception $e) {
                   self::registerAction( 1,"NODE: Error trying to associate a segment with an identity: ".$e->getMessage());
                 }
-              }  
+              }
 
-              unlock("$serverKey-$nodePrefix");                  
+              unlock("$serverKey-$nodePrefix");
             }
           }
-        } 
-        
+        }
+
         $ret=db_queryAndFillArray("$sqlGetRegulation",false);
         if (is_array($ret))
           $ret=isset($ret[0])?$ret[0]:false;
-        else
+        else {
+          _recordError("$sqlGetRegulation");
           $ret=false;
+        }
       } else {
         self::registerAction( 0, "This is not an Application Node");
       }
@@ -523,7 +527,6 @@
               if (($ret = curl_exec($ch)) === false) {
                 $errorMsg = "Error: #" . curl_errno($ch) . ", " . curl_error($ch);
                 self::registerAction( 1,"NODE: $errorMsg");
-                _recordError($errorMsg);
                 $canEvaluate = false;
               }
 
@@ -537,10 +540,15 @@
                   }
                 }
                 if ($check == $ret['c']) {
-                  @file_put_contents("$cfgMainFolder/.config/cloudAppNode.seq", $ret['a'] . ':' . $ret['b']);
-                  $dt = $now + y_rand(15, 60 * 60);
-                  @file_put_contents($tempTimeMark, $dt);
-                  $ok = true;
+                  $writtenBytes = @file_put_contents("$cfgMainFolder/.config/cloudAppNode.seq", $ret['a'] . ':' . $ret['b']);
+                  if (false===$writtenBytes) {
+                    self::registerAction( 1, "NODE: file '$cfgMainFolder/.config/cloudAppNode.seq' cannot be created");
+                    $ok=false;
+                  } else {
+                    $dt = $now + y_rand(15, 60 * 60);
+                    @file_put_contents($tempTimeMark, $dt);
+                    $ok = true;
+                  }
                 } else {
                   self::registerAction( 1,"NODE: Is this a clone node?");
                   if (is_array($ret))
@@ -837,7 +845,7 @@
 
   global $dbgYNode, $cfgNodeRequisitionTimeout;
   $dbgYNode='';
-  if (!isset($cfgNodeRequisitionTimeout)) 
+  if (!isset($cfgNodeRequisitionTimeout))
     $cfgNodeRequisitionTimeout=30;
 
   $cfgNodeRequisitionTimeout=min(360, max(5, $cfgNodeRequisitionTimeout));

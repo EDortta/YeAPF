@@ -1,7 +1,7 @@
 <?php
 /*
     skel/webApp/index.php
-    YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
     2018-06-15 19:37:01 (-3 DST)
 
@@ -61,7 +61,7 @@
     die("<div  style='border-color: #CB0000; background: #FFC0CB; width: 520px; margin: 8px; padding: 32px; border-style: solid; border-width: 2px; padding: 16px; border-radius:4px; font-family: arial; font-size: 12px'>
              <b>yeapf.php cannot be found<br>
              <a href='configure.php?devSession=$devSession'>Click here to configure</a></b><br><br>
-             YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)<br>
+             YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)<br>
              Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
         </div>");
   }

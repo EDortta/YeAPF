@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xParser.php
-    YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-10-16 07:54:20 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -446,7 +446,9 @@
   function exemplo_xParser()
   {
     $qs = getenv("QUERY_STRING").'&';
-    parse_str($qs);
+    $ret= array();
+    parse_str($qs, $ret);
+    extract($ret);
     if (isset($arquivo)) {
       $f=join('',file($arquivo));
       $p=new xParser($f);

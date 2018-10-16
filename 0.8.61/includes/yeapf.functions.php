@@ -1,7 +1,7 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)
+    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
     2018-08-02 22:38:27 (-3 DST)
    */
@@ -1808,7 +1808,7 @@
   {
     global $lastImplementation, $flgCanContinueWorking, $devSession;
 
-    xq_context('YeAPF',       'YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)');
+    xq_context('YeAPF',       'YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)');
     xq_context('devSession',  $devSession);
     xq_context('ts1',         date('U'));
 

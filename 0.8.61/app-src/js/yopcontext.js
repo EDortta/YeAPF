@@ -1,8 +1,8 @@
 /***********************************************************************
  * app-src/js/yopcontext.js
- * YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+ * YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-05-30 11:21:04 (-3 DST)
+ * 2018-10-08 12:43:10 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * This is a set of function that helps to recognize operational context
@@ -41,7 +41,7 @@ function getAndroidVersion(ua) {
     var match = ua.match(/android\s([0-9\.]*)/);
     return match ? match[1] : false;
 };
- 
+
 function isOnMobile() {
   var ret=false;
   if (typeof mosync != 'undefined') {

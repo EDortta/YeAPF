@@ -1,6 +1,6 @@
 .
 License Information
-YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)
+YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
 
 YeAPF means 'Yet Another PHP Framework'
 It is written and maintained by Esteban D.Dortta in order to help the

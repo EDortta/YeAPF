@@ -1,8 +1,8 @@
   /********************************************************************
    * app-src/js/ycomm-ajax.js
-   * YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+   * YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
    * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2018-06-08 11:12:33 (-3 DST)
+   * 2018-09-18 06:22:48 (-3 DST)
    *
    * Com o advento do WebSocket, precisamos de novas formas para
    * provocar o servidor.
@@ -253,7 +253,7 @@
         _ycomm_stat[via][s][a] = {count:0};
 
       _ycomm_stat[via][s][a].count++;
-      _dumpy(8,2,"via: {0} s: {1} a: {2} count: {3}".format(via, s, a, _ycomm_stat[via][s][a].count));
+      _dumpy(4,2,"via: {0} s: {1} a: {2} count: {3}".format(via, s, a, _ycomm_stat[via][s][a].count));
     }
   }
 

@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yanalise.js
- * YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+ * YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-06-28 12:50:52 (-3 DST)
+ * 2018-09-18 06:23:51 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yLexObj introduced in 2016-08-22 0.8.50-0
 **********************************************/
@@ -241,7 +241,7 @@ function yAnalise(aLine, aStack, aObject) {
 
         aLine = aLine.slice(0, p) + aValue + aLine.slice(p + p2 + 1);
       } else {
-        console.log("HALTING yAnalise as entering in loop");
+        console.error("HALTING yAnalise as entering in loop");
         break;
       }
 
@@ -590,9 +590,9 @@ var yLexObj = function(aString, toDebug) {
     } while ((lastSym) && (lastSym.type != 'EOF'));
 
     if (that._debug) {
-      console.log("postFixStack:");
+      _dumpy(32,2,"postFixStack:");
       that.showStack(that.postFixStack);
-      console.log("symStack:");
+      _dumpy(32,2,"symStack:");
       that.showStack(that.symStack);
     }
   };
@@ -620,7 +620,7 @@ var yLexObj = function(aString, toDebug) {
           aux = data[token.token_string];
           if (typeof aux == 'undefined') {
             errorMessage = "'" + token.token_string + "' is not defined on data";
-            console.warn(errorMessage);
+            _dumpy(32,1,errorMessage);
             aux = false;
             canPush = true;
           } else {
@@ -710,7 +710,7 @@ var yLexObj = function(aString, toDebug) {
 
 
           if (that._debug)
-            console.log("{0} = {1} {2} {3}".format(ret, op1, token.token_string, op2));
+            _dumpy(32,2,"{0} = {1} {2} {3}".format(ret, op1, token.token_string, op2));
 
 
           if (ret !== null)
@@ -720,7 +720,7 @@ var yLexObj = function(aString, toDebug) {
     }
     ret = stack.pop();
 
-    if (that._debug) console.log(JSON.stringify(ret));
+    if (that._debug) _dumpy(32,2,JSON.stringify(ret));
 
     return ret;
   };
@@ -729,7 +729,7 @@ var yLexObj = function(aString, toDebug) {
     var stackString = "\t";
     for (var i = 0; i < s.length; i++)
       stackString += (s[i].token_string) + ' ';
-    console.log(stackString);
+    _dumpy(32,2,stackString);
   };
 
   that.parse = function() {

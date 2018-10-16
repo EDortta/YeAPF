@@ -1,8 +1,8 @@
 /*********************************************
   * skel/electron/js/yloader.js
-  * YeAPF 0.8.61-70 built on 2018-09-13 19:29 (-3 DST)
+  * YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
   * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2018-09-13 19:29:13 (-3 DST)
+  * 2018-10-16 08:01:12 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.61-70 built on 2018-09-13 19:29 (-3 DST)");
+ console.log("YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -67,7 +67,7 @@
          var match = ua.match(/android\s([0-9\.]*)/);
          return match ? match[1] : false;
      };
-      
+     
      function isOnMobile() {
        var ret=false;
        if (typeof mosync != 'undefined') {
@@ -210,6 +210,16 @@
          }
        }
        return ret;
+     }
+   )();
+   that.operatingSystem = (
+     function() {
+       var agentIds = navigator.userAgent.match(/(\([A-z\ 0-9\.\;\,\-\/\:]*)\)/g);
+       var OSes=(agentIds[0] || '').replace(/[^a-zA-Z0-9\ \.\;]+/g, "").split(";") || ["Unknown", "Unknown"];
+       for(var i=0; i<OSes.length; i++) {
+         OSes[i]=trim(OSes[i] || "Unknown");
+       }
+       return OSes;
      }
    )();
    that.loadLibrary = function (jsFileName, elementId, onload) {
@@ -3360,7 +3370,7 @@
      
              aLine = aLine.slice(0, p) + aValue + aLine.slice(p + p2 + 1);
            } else {
-             console.log("HALTING yAnalise as entering in loop");
+             console.error("HALTING yAnalise as entering in loop");
              break;
            }
      
@@ -3709,9 +3719,9 @@
          } while ((lastSym) && (lastSym.type != 'EOF'));
      
          if (that._debug) {
-           console.log("postFixStack:");
+           _dumpy(32,2,"postFixStack:");
            that.showStack(that.postFixStack);
-           console.log("symStack:");
+           _dumpy(32,2,"symStack:");
            that.showStack(that.symStack);
          }
        };
@@ -3739,7 +3749,7 @@
                aux = data[token.token_string];
                if (typeof aux == 'undefined') {
                  errorMessage = "'" + token.token_string + "' is not defined on data";
-                 console.warn(errorMessage);
+                 _dumpy(32,1,errorMessage);
                  aux = false;
                  canPush = true;
                } else {
@@ -3829,7 +3839,7 @@
      
      
                if (that._debug)
-                 console.log("{0} = {1} {2} {3}".format(ret, op1, token.token_string, op2));
+                 _dumpy(32,2,"{0} = {1} {2} {3}".format(ret, op1, token.token_string, op2));
      
      
                if (ret !== null)
@@ -3839,7 +3849,7 @@
          }
          ret = stack.pop();
      
-         if (that._debug) console.log(JSON.stringify(ret));
+         if (that._debug) _dumpy(32,2,JSON.stringify(ret));
      
          return ret;
        };
@@ -3848,7 +3858,7 @@
          var stackString = "\t";
          for (var i = 0; i < s.length; i++)
            stackString += (s[i].token_string) + ' ';
-         console.log(stackString);
+         _dumpy(32,2,stackString);
        };
      
        that.parse = function() {
@@ -5194,7 +5204,7 @@
              _ycomm_stat[via][s][a] = {count:0};
      
            _ycomm_stat[via][s][a].count++;
-           _dumpy(8,2,"via: {0} s: {1} a: {2} count: {3}".format(via, s, a, _ycomm_stat[via][s][a].count));
+           _dumpy(4,2,"via: {0} s: {1} a: {2} count: {3}".format(via, s, a, _ycomm_stat[via][s][a].count));
          }
        }
      
@@ -6902,10 +6912,10 @@
      
          if (that.messagePeekerTimer === undefined) {
            if (that.msgCount === 0)
-             _dumpy(4, 1, "Configuring receivers interval to " + aInterval + 'ms');
+             _dumpy(16, 1, "Configuring receivers interval to " + aInterval + 'ms');
            that.messagePeekerTimer = setTimeout(ycomm.msg.peek, aInterval);
          } else
-           _dumpy(4, 1, "Receivers interval already defined");
+           _dumpy(16, 1, "Receivers interval already defined");
        };
      
        that.feedBack = function() {
@@ -6932,7 +6942,7 @@
                while (that.messageStack.length > 0) {
                  var oldLen = that.messageStack.length;
                  for (var i = 0; i < that.msgProcs.length; i++) {
-                   // _dumpy(4,1,"Calling: "+that.msgProcs[i]);
+                   // _dumpy(16,1,"Calling: "+that.msgProcs[i]);
                    var auxCallFunction = '<script>' + that.msgProcs[i] + '();</' + 'script>';
                    auxCallFunction.evalScripts();
                  }
@@ -6962,7 +6972,7 @@
                if (transport.status == 200)
                  _QUERY_RETURN(transport);
                else {
-                 _dumpy(4, 1, "*** XMLHttpRequest call failure");
+                 _dumpy(16, 1, "*** XMLHttpRequest call failure");
                  setTimeout(that.notifyServerOffline, 500);
                }
              }
@@ -7041,7 +7051,7 @@
      
        that.registerMsgProc = function(aFunctionName) {
          var canAdd = true;
-         _dumpy(4, 1, "Registering message receiver: " + aFunctionName);
+         _dumpy(16, 1, "Registering message receiver: " + aFunctionName);
          for (var i = 0; i < that.msgProcs.length; i++)
            if (that.msgProcs[i] == aFunctionName)
              canAdd = false;
@@ -9083,9 +9093,9 @@
  /* START yinterface.js */
      /*
          skel/electron/js/yloader.js
-         YeAPF 0.8.61-70 built on 2018-09-13 19:29 (-3 DST)
+         YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
          Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-         2018-09-13 19:29:13 (-3 DST)
+         2018-10-16 08:01:12 (-3 DST)
      */
      
      var yInterfaceObj = function() {

@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yloader-src.js
- * YeAPF 0.8.61-70 built on 2018-09-13 19:29 (-3 DST)
+ * YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-09-10 07:23:53 (-3 DST)
+ * 2018-10-08 12:43:10 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * Purpose:  Build a monolitic YeAPF script so
  *           it can be loaded at once
@@ -29,7 +29,7 @@ if (typeof console === 'undefined')
   }
 )();
 
-console.log("YeAPF 0.8.61-70 built on 2018-09-13 19:29 (-3 DST)");
+console.log("YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)");
 
 #include('yopcontext.js')
 #include('ydebug.js')
@@ -64,6 +64,17 @@ var yloaderBase = function () {
         }
       }
       return ret;
+    }
+  )();
+
+  that.operatingSystem = (
+    function() {
+      var agentIds = navigator.userAgent.match(/(\([A-z\ 0-9\.\;\,\-\/\:]*)\)/g);
+      var OSes=(agentIds[0] || '').replace(/[^a-zA-Z0-9\ \.\;]+/g, "").split(";") || ["Unknown", "Unknown"];
+      for(var i=0; i<OSes.length; i++) {
+        OSes[i]=trim(OSes[i] || "Unknown");
+      }
+      return OSes;
     }
   )();
 

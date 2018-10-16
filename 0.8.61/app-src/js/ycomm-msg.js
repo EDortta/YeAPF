@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-msg.js
- * YeAPF 0.8.61-62 built on 2018-09-08 15:12 (-3 DST)
+ * YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-09-04 06:33:15 (-3 DST)
+ * 2018-09-18 06:22:46 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * These routines were written in order to help interprocess process messages
  * but as an remote process messages implementation.
@@ -33,10 +33,10 @@ var ycommMsgBase = function() {
 
     if (that.messagePeekerTimer === undefined) {
       if (that.msgCount === 0)
-        _dumpy(4, 1, "Configuring receivers interval to " + aInterval + 'ms');
+        _dumpy(16, 1, "Configuring receivers interval to " + aInterval + 'ms');
       that.messagePeekerTimer = setTimeout(ycomm.msg.peek, aInterval);
     } else
-      _dumpy(4, 1, "Receivers interval already defined");
+      _dumpy(16, 1, "Receivers interval already defined");
   };
 
   that.feedBack = function() {
@@ -63,7 +63,7 @@ var ycommMsgBase = function() {
           while (that.messageStack.length > 0) {
             var oldLen = that.messageStack.length;
             for (var i = 0; i < that.msgProcs.length; i++) {
-              // _dumpy(4,1,"Calling: "+that.msgProcs[i]);
+              // _dumpy(16,1,"Calling: "+that.msgProcs[i]);
               var auxCallFunction = '<script>' + that.msgProcs[i] + '();</' + 'script>';
               auxCallFunction.evalScripts();
             }
@@ -93,7 +93,7 @@ var ycommMsgBase = function() {
           if (transport.status == 200)
             _QUERY_RETURN(transport);
           else {
-            _dumpy(4, 1, "*** XMLHttpRequest call failure");
+            _dumpy(16, 1, "*** XMLHttpRequest call failure");
             setTimeout(that.notifyServerOffline, 500);
           }
         }
@@ -172,7 +172,7 @@ var ycommMsgBase = function() {
 
   that.registerMsgProc = function(aFunctionName) {
     var canAdd = true;
-    _dumpy(4, 1, "Registering message receiver: " + aFunctionName);
+    _dumpy(16, 1, "Registering message receiver: " + aFunctionName);
     for (var i = 0; i < that.msgProcs.length; i++)
       if (that.msgProcs[i] == aFunctionName)
         canAdd = false;

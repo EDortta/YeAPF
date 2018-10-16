@@ -1,7 +1,7 @@
 <?php
 /*
     skel/workbench/www/configure.php
-    YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)
+    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
     2018-08-02 13:30:21 (-3 DST)
 */
@@ -311,7 +311,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -364,7 +364,7 @@
   echo sayStep("<div style='border-left: solid 4px black; padding: 12px; background-color: #fff'>
     <div><a href='http://www.yeapf.com' target='x$timestamp'><img src='http://www.yeapf.com/logo.php'></a></div>
     <h2><big><I>skel/workbench/www/configure.php</I></big></h2>
-    <h3>YeAPF 0.8.61-40 built on 2018-08-02 22:38 (-3 DST)<br>
+    <h3>YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)<br>
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com<br>
     Last modification: 2018-08-02 13:30:21 (-3 DST)</h3></div>");
 

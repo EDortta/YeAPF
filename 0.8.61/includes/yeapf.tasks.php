@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.tasks.php
-    YeAPF 0.8.61-12 built on 2018-07-09 16:23 (-3 DST)
+    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-10-10 17:46:07 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -15,6 +15,7 @@
 
     private function setTaskId($taskId)
     {
+      $taskId = intval($taskId);
       $this->initialized=true;
       $this->task_id=$taskId;
     }
@@ -42,6 +43,8 @@
               $newId=intval(db_sql("select max(id) from is_tasks"));
               $newId++;
 
+              $retTaskId = $newId;
+
               /* all tasks starts with stage=0 (disabled) */
               $sql="insert into is_tasks(id, stage, s, a, j_params,
                                          xq_start, xq_target,
@@ -51,7 +54,6 @@
               db_sql($sql);
               unlock("newTaskId");
             }
-            $retTaskId=db_sql($sqlTask);
           }
           $this->setTaskId($retTaskId);
         } catch (Exception $e) {
@@ -217,6 +219,32 @@
         }
       }
       return $retContext;
+    }
+
+    public function setTaskParam($paramName, $paramValue) {
+      $ret = false;
+      if ($this->initialized) {
+        $taskId=$this->getTaskId();
+        $retContext=db_sql("select j_params from is_tasks where id=$taskId", false);
+        $j_params=json_decode($retContext['j_params']);
+        $j_params[$paramName]=$paramValue;
+        $j_params=json_encode($j_params);
+        $ret=db_sql("update is_tasks set j_params='$j_params' where id='$taskId'");
+      }
+      return $ret;
+    }
+
+    public function unsetTaskParam($paramName) {
+      $ret = false;
+      if ($this->initialized) {
+        $taskId=$this->getTaskId();
+        $retContext=db_sql("select j_params from is_tasks where id=$taskId", false);
+        $j_params=json_decode($retContext['j_params']);
+        unset($j_params[$paramName]);
+        $j_params=json_encode($j_params);
+        $ret=db_sql("update is_tasks set j_params='$j_params' where id='$taskId'");
+      }
+      return $ret;
     }
 
     public function advanceTo($xq_start)
