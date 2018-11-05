@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xPhonetize.php
-    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+    YeAPF 0.8.61-130 built on 2018-11-05 10:50 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-11-05 10:36:50 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -349,8 +349,7 @@
       return $this->aWord;
     }
 
-    function phonetize($phrase, &$encodedWord, $hexFormat=true)
-    {
+    public function __construct($phrase, &$encodedWord, $hexFormat=true) {
       $this->HexaFormat=$hexFormat;
 
       $res='#';
@@ -369,7 +368,12 @@
         }
 
       }
-      $this->result="$res";
+      $this->result="$res";      
+    }
+
+    function phonetize($phrase, &$encodedWord, $hexFormat=true)
+    {
+      self::__construct($phrase, $encodedWord, $hexFormat);
     }
   }
 

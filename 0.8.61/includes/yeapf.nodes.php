@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.nodes.php
-    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+    YeAPF 0.8.61-130 built on 2018-11-05 10:50 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-10-03 12:17:23 (-3 DST)
+    2018-11-05 10:36:50 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -505,8 +505,8 @@
               self::registerAction( 1,"NODE: urlBase '$urlBase'");
               $nodeSeq = @file_get_contents("$cfgMainFolder/.config/cloudAppNode.seq");
               $nodeSeq = explode(":", $nodeSeq);
-              $a = $nodeSeq[0];
-              $b = $nodeSeq[1];
+              $a = intval(@$nodeSeq[0]);
+              $b = intval(@$nodeSeq[1]);
               $r = $a + $b;
               $serverKey = $GLOBALS['cfgDBNode']['server_key'];
               $nodeName = $GLOBALS['cfgDBNode']['node_name'];
@@ -539,20 +539,25 @@
                     $check = md5($ret['a'] . ':' . $ret['b'] . ':1');
                   }
                 }
-                if ($check == $ret['c']) {
-                  $writtenBytes = @file_put_contents("$cfgMainFolder/.config/cloudAppNode.seq", $ret['a'] . ':' . $ret['b']);
-                  if (false===$writtenBytes) {
-                    self::registerAction( 1, "NODE: file '$cfgMainFolder/.config/cloudAppNode.seq' cannot be created");
-                    $ok=false;
+                if (is_writable("$cfgMainFolder/.config")) {
+                  if ($check == $ret['c']) {
+                    $writtenBytes = @file_put_contents("$cfgMainFolder/.config/cloudAppNode.seq", $ret['a'] . ':' . $ret['b']);
+                    if ((false===$writtenBytes) || ($writtenBytes==0)) {
+                      self::registerAction( 1, "NODE: file '$cfgMainFolder/.config/cloudAppNode.seq' cannot be created");
+                      $ok=false;
+                    } else {
+                      $dt = $now + y_rand(15, 60 * 60);
+                      @file_put_contents($tempTimeMark, $dt);
+                      $ok = true;
+                    }
                   } else {
-                    $dt = $now + y_rand(15, 60 * 60);
-                    @file_put_contents($tempTimeMark, $dt);
-                    $ok = true;
-                  }
+                    self::registerAction( 1,"NODE: Is this a clone node?");
+                    if (is_array($ret))
+                      foreach($ret as $k => $v) self::registerAction( 1,"NODE: $k = '$v'");
+                  }                  
                 } else {
-                  self::registerAction( 1,"NODE: Is this a clone node?");
-                  if (is_array($ret))
-                    foreach($ret as $k => $v) self::registerAction( 1,"NODE: $k = '$v'");
+                  self::registerAction( 1, "NODE: folder '$cfgMainFolder/.config' cannot be written");
+                  $ok=false;                  
                 }
               } else {
                 self::registerAction( 1,"NODE: '$cfgIdServerURL' is not a valid url");
@@ -758,7 +763,9 @@
 
     if ($a=='ping') {
       $ret['serverTime'] = date('U');
-      $ret['timezone'] = date('Z');
+      $ret['offset'] = date('Z');
+      $ret['timezone'] = date('e');
+      $ret['daylight'] = date('I')==1?'Y':'N';
       $ret['ip'] = getCurrentIp();
     }
 
@@ -772,6 +779,7 @@
            #    #  #       #      #    ##  #    #  #    #  #
            #    #  #       #      #     #   ####   #####   ######
        */
+      $ret['error']=-2;
       switch($a) {
         case 'nodeKeepAlive':
           $ret=yNode::nodeKeepAlive();
@@ -837,6 +845,8 @@
             break;
         }
       }
+    } else {
+      $ret['error']=-3;
     }
 
     $jsonRet = json_encode($ret);

@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbText.php
-    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+    YeAPF 0.8.61-130 built on 2018-11-05 10:50 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-11-05 10:36:50 (-2 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -85,8 +85,7 @@
         return trim($res);
       }
 
-      function dbTEXT($fileName, $createNewFile=false)
-      {
+      public function __construct($fileName, $createNewFile=false) {
         global $db_creationEnabled_;
         $this->recordCount=0;
         $this->curPos=0;
@@ -98,7 +97,12 @@
         if (!file_exists($fileName))
           if ($createNewFile)
             touch($fileName);
-        $this->loadData();
+        $this->loadData();        
+      } 
+
+      function dbTEXT($fileName, $createNewFile=false)
+      {
+        self::__construct($fileName, $createNewFile);
       }
 
       function loadData()

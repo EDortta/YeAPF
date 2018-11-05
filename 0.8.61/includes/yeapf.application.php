@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+    YeAPF 0.8.61-130 built on 2018-11-05 10:50 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-10-10 17:46:07 (-3 DST)
+    2018-11-05 10:36:50 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -962,11 +962,14 @@
   function qyeapf($a) {
 
     extract(xq_extractValuesFromQuery());
-
+ 
     $ret="";
     if ($a=='ping') {
       $ret['serverTime'] = date('U');
-      $ret['timezone'] = date('Z');
+      $ret['offset'] = date('Z');
+      $ret['timezone'] = date('e');
+      $ret['daylight'] = date('I')==1?'Y':'N';
+      $ret['udate'] = date("Y-m-d")."T".date("H:i:s");
       $ret['ip'] = getCurrentIp();
       $ret['pingCount'] = intval($pingCount)+1;
 
@@ -995,7 +998,10 @@
 
     if ($a=='ping') {
       $ret['serverTime'] = date('U');
-      $ret['timezone'] = date('Z');
+      $ret['offset'] = date('Z');
+      $ret['timezone'] = date('e');
+      $ret['daylight'] = date('I')==1?'Y':'N';
+      $ret['udate'] = date("Y-m-d")."T".date("H:i:s");
       $ret['ip'] = getCurrentIp();
       $ret['pingCount'] = intval($pingCount)+1;
 

@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+    YeAPF 0.8.61-130 built on 2018-11-05 10:50 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-08-02 22:38:27 (-3 DST)
+    2018-11-05 10:50:34 (-2 DST)
    */
 
   /*
@@ -51,8 +51,7 @@
 
   $cfgApiProfilerEnabled=(file_exists("$cfgMainFolder/flags/flag.api-profiler"))?'yes':'no';
 
-  function _recordWastedTime()
-  {
+  function _recordWastedTime() {
     global $_lastTimeMark, $_debugTag, $_debugSequence, $cfgCurrentFolder, $cfgMainFolder;
 
     if (file_exists("$cfgCurrentFolder/logs/wastedTime.log")) {
@@ -84,15 +83,13 @@
     }
   }
 
-  function decimalMicrotime()
-  {
+  function decimalMicrotime() {
     $auxMT=microtime(false);
     $auxMT=substr($auxMT,0,strpos($auxMT,' ')) * 1000;
     return $auxMT;
   }
 
-  function escapeString($value)
-  {
+  function escapeString($value) {
     /*
      * http://stackoverflow.com/questions/1162491/alternative-to-mysql-real-escape-string-without-connecting-to-db
      */
@@ -118,6 +115,20 @@
       $ret=str_replace("''", "\\'", $ret);
 
     return $ret;
+  }
+
+  if (file_exists("$cfgMainFolder/flags/timezone")) {
+    $cfgTimeZone=file_get_contents("$cfgMainFolder/flags/timezone");
+    $cfgTimeZone=preg_replace('/[\x00-\x1F\x7F]/', '',$cfgTimeZone);
+  } else {
+    $cfgTimeZone=@date_default_timezone_get();
+  }
+  if (!@date_default_timezone_set("$cfgTimeZone")) {
+    _yLoaderDie(false, "Choosed timezone '$cfgTimeZone' can not be used.");
+  }
+
+  if ($cfgTimeZone=="UTC") {
+    _yLoaderDie(false, "Timezone cannot be UTC");
   }
 
   $_debugTag=decimalMicrotime();
@@ -1808,7 +1819,7 @@
   {
     global $lastImplementation, $flgCanContinueWorking, $devSession;
 
-    xq_context('YeAPF',       'YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)');
+    xq_context('YeAPF',       'YeAPF 0.8.61-130 built on 2018-11-05 10:50 (-2 DST)');
     xq_context('devSession',  $devSession);
     xq_context('ts1',         date('U'));
 
@@ -2090,6 +2101,14 @@
     $existe = false;
 
     reset($dados);
+    foreach ($dados as $key => $val) {
+      if (strtoupper($key) == strtoupper($nomeCampo)) {
+        $existe = true;
+        $valor=$val;
+        break;
+      }
+    }
+    /* DEPRECATED in PHP7.2
     while (list ($key, $val) = each ($dados)) {
       if (strtoupper($key) == strtoupper($nomeCampo)) {
         $existe = true;
@@ -2097,6 +2116,7 @@
         break;
       }
     }
+    */
 
     return $valor;
   }

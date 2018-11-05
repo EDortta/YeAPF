@@ -1,9 +1,9 @@
 <?php
 /*
     skel/service/yeapf_ticker.php
-    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+    YeAPF 0.8.61-130 built on 2018-11-05 10:50 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-10-16 08:01:12 (-3 DST)
+    2018-11-05 10:50:52 (-2 DST)
 */
 
   require_once "yeapf.php";

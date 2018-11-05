@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xForms.php
-    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+    YeAPF 0.8.61-130 built on 2018-11-05 10:50 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-11-05 10:36:50 (-2 DST)
 */
 
   global $cfgMainFolder;
@@ -448,8 +448,7 @@
       $this->xxSituation('doDebug');
     }
 
-    function xForm($aFormName)
-    {
+    public function __construct($aFormName) {
       $origFormName=$aFormName;
 
       $r=false;
@@ -630,7 +629,12 @@
 
       } else
         showDebugBackTrace("$origFormName não foi localizado", true);
-      return $r;
+      return $r;      
+    }
+
+    function xForm($aFormName)
+    {
+      self::__construct($aFormName);
     }
 
     function writeResult(&$myLine, $token, &$type, $p)

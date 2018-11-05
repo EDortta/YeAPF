@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ydocbuilder
-    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+    YeAPF 0.8.61-130 built on 2018-11-05 10:50 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-10-18 06:29:32 (-2 DST)
 */
 
   function _cleanup(&$inner)
@@ -288,21 +288,29 @@
 
   function processSourceFolder($folderOrFile)
   {
-    global $src;
+    global $src, $avoid;
 
     if (is_dir($folderOrFile))
       $folderOrFile="$folderOrFile/*";
     $folderOrFile=str_replace('//','/',$folderOrFile);
-    $d = glob($folderOrFile);
-    foreach($d as $filename) {
-      if (is_dir($filename)) {
-        if (($filename!='.') && ($filename!='..'))
-          processSourceFolder("$filename");
-      } else {
-        $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
-        if (($ext == 'js') || ($ext == 'php'))
-          processSourceFile("$filename");
+    $position = array_search($folderOrFile, $avoid);
+    if ($position === false) {
+      echo "+ $folderOrFile\n";
+      $d = glob($folderOrFile);
+      foreach($d as $filename) {
+        if (is_dir($filename)) {
+          if (($filename!='.') && ($filename!='..')) {
+            processSourceFolder("$filename");
+          }
+        } else {
+          $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+          if (($ext == 'js') || ($ext == 'php')) {
+            processSourceFile("$filename");
+          }
+        }
       }
+    } else {
+      echo "- $folderOrFile\n";
     }
   }
 
@@ -350,6 +358,7 @@
 
   $files=file("$projectBase/ydistbuilder.files");
   $avoid=file_exists("$projectBase/ydocbuilder.avoid")?file("$projectBase/ydocbuilder.avoid"):array();
+
 
   _LOAD_YEAPF_();
   $files=y_array_diff($files, $avoid);
