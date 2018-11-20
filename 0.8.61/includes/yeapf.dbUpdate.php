@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+    YeAPF 0.8.61-144 built on 2018-11-20 06:55 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-11-17 09:37:50 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -885,6 +885,19 @@
               _db_upd_do("alter table is_api_usage add index ndxS (s asc)");
             }
             _db_upd_newVersion(19);
+          } catch(Exception $e) {
+            _db_upd_error($e->getMessage());
+          }
+        }
+
+        if (_db_upd_canReviewVersion(20)) {
+          _recordWastedTime("checking v20");
+          try {
+            _db_upd_do("delete from is_tasks");
+            _db_upd_do("alter table is_tasks drop column j_params");
+            _db_upd_do("commit");
+            _db_upd_do("alter table is_tasks add j_params VARCHAR(2048)");
+            _db_upd_newVersion(20);
           } catch(Exception $e) {
             _db_upd_error($e->getMessage());
           }

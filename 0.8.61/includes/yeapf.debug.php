@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.debug.php
-    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+    YeAPF 0.8.61-144 built on 2018-11-20 06:55 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-06-07 08:03:22 (-3 DST)
+    2018-11-17 09:37:50 (-2 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -378,7 +378,7 @@
               $object = $call['class'].$call['type'];
               if (is_array($call['args'])) {
                   foreach ($call['args'] as $arg) {
-                      get_argx($arg);
+                      get_arg($arg);
                   }
               }
           }

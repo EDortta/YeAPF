@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.tasks.php
-    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+    YeAPF 0.8.61-144 built on 2018-11-20 06:55 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-10-10 17:46:07 (-3 DST)
+    2018-11-17 09:37:50 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -203,7 +203,7 @@
           $retContext=db_sql("select s, a, j_params, xq_start, xq_target from is_tasks where id=$taskId", false);
         else
           $retContext=db_sql("select j_params, xq_start, xq_target from is_tasks where id=$taskId", false);
-        $j_params=json_decode($retContext['j_params']);
+        $j_params=json_decode($retContext['j_params'],true);
         unset($retContext['j_params']);
         if (isset($j_params)) {
           $reserved=explode(',','s,a,j_params,xq_start,xq_target');
@@ -226,7 +226,7 @@
       if ($this->initialized) {
         $taskId=$this->getTaskId();
         $retContext=db_sql("select j_params from is_tasks where id=$taskId", false);
-        $j_params=json_decode($retContext['j_params']);
+        $j_params=json_decode($retContext['j_params'],true);
         $j_params[$paramName]=$paramValue;
         $j_params=json_encode($j_params);
         $ret=db_sql("update is_tasks set j_params='$j_params' where id='$taskId'");
@@ -239,7 +239,7 @@
       if ($this->initialized) {
         $taskId=$this->getTaskId();
         $retContext=db_sql("select j_params from is_tasks where id=$taskId", false);
-        $j_params=json_decode($retContext['j_params']);
+        $j_params=json_decode($retContext['j_params'],true);
         unset($j_params[$paramName]);
         $j_params=json_encode($j_params);
         $ret=db_sql("update is_tasks set j_params='$j_params' where id='$taskId'");

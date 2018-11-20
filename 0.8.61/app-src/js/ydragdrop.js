@@ -1,8 +1,8 @@
 /********************************************************************
  * app-src/js/ydragdrop.js
- * YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+ * YeAPF 0.8.61-144 built on 2018-11-20 06:55 (-2 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-05-30 11:21:04 (-3 DST)
+ * 2018-11-20 06:47:05 (-2 DST)
  *
  * Drag and Drop functions were modified from luke beuer ideas at
  * http://luke.breuer.com/tutorial/javascript-drag-and-drop-tutorial.aspx
@@ -79,23 +79,22 @@ var ydragdropBase = function() {
       // bring the clicked element to the front while it is being dragged
       that.info.oldZIndex = target.style.zIndex;
 
+      /*
+      OBSOLETE-2018-11-20
       var maxZ = 0;
-      var divList = document.getElementsByTagName('div');
+      var divList = document.querySelectorAll('[draggable="yes"]');
       for (var i = 0; i < divList.length; i++) {
         var aDiv = divList[i];
-        if ((aDiv.getAttribute('draggable') == 'yes') && (aDiv != target)) {
-          if (parseInt(aDiv.style.zIndex) > maxZ)
-            maxZ = parseInt(aDiv.style.zIndex);
-        }
+        if (parseInt(aDiv.style.zIndex) > maxZ)
+          maxZ = parseInt(aDiv.style.zIndex);
       }
 
       for (var i = 0; i < divList.length; i++) {
         var aDiv = divList[i];
-        if (aDiv.getAttribute('draggable') == 'yes')
-          aDiv.style.zIndex = parseInt(aDiv.style.zIndex) - 1;
-
+        aDiv.style.zIndex = Math.max(0, parseInt(aDiv.style.zIndex) - 1);
       }
       target.style.zIndex = maxZ + 2;
+      */
 
       // we need to access the element in OnMouseMove
       that.info.dragElement = target;
@@ -172,7 +171,10 @@ var ydragdropBase = function() {
       var e = window.event;
     if (that.info.dragElement != null) {
       document.body.style.cursor = "default";
-      that.info.dragElement.style.zIndex = parseInt(that.info.dragElement.style.zIndex)-1;
+      /*
+      OBSOLETE-2018-11-20
+      that.info.dragElement.style.zIndex = Math.max(0,parseInt(that.info.dragElement.style.zIndex)-1);
+      */
 
       // we're done with these events until the next OnMouseDown
       document.onselectstart = null;
@@ -183,19 +185,20 @@ var ydragdropBase = function() {
       var aux = that.info.dragElement;
       // this is how we know we're not dragging
       that.info.dragElement = null;
-      _dumpy(2,1,'mouse up over'+that.info.overElement.id);
+      if (that.info.overElement) {
+        _dumpy(2,1,'mouse up over'+that.info.overElement.id);
 
-      var canDo = that.info.overElement.getAttribute('droppable') == 'yes';
-      if (canDo) {
-        if (typeof that.info.overElement.ondragover == 'function') {
-          canDo = that.info.overElement.ondragover(aux);
-        }
-        if (typeof that.info.overElement.ondrop == 'function') {
-          if (canDo)
-            that.info.overElement.ondrop(aux);
-        }
+        var canDo = that.info.overElement.getAttribute('droppable') == 'yes';
+        if (canDo) {
+          if (typeof that.info.overElement.ondragover == 'function') {
+            canDo = that.info.overElement.ondragover(aux);
+          }
+          if (typeof that.info.overElement.ondrop == 'function') {
+            if (canDo)
+              that.info.overElement.ondrop(aux);
+          }
+        }        
       }
-
 
     }
 

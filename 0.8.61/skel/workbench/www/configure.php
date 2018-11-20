@@ -1,9 +1,9 @@
 <?php
 /*
     skel/workbench/www/configure.php
-    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+    YeAPF 0.8.61-144 built on 2018-11-20 06:55 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-08-02 13:30:21 (-3 DST)
+    2018-11-20 06:47:06 (-2 DST)
 */
 
 
@@ -25,6 +25,19 @@
     $silent=true;
   else
     $silent=false;
+
+  function dieConfig() {
+    $argList='';
+    $args=func_get_args();
+    foreach ($args as $a) {
+      if ($argList>'')
+        $argList.=' ';
+      $argList.=$a;
+    }
+    $ret=sayStep($argList);
+    unlock('configure');
+    die($ret);
+  }
 
   function verifyActiveApp()
   {
@@ -69,19 +82,6 @@
   $isCLI=(php_sapi_name() == "cli");
   $curStep=0;
   clearstatcache(true);
-
-  function dieConfig() {
-    $argList='';
-    $args=func_get_args();
-    foreach ($args as $a) {
-      if ($argList>'')
-        $argList.=' ';
-      $argList.=$a;
-    }
-    $ret=sayStep($argList);
-    unlock('configure');
-    die($ret);
-  }
 
   function sayStep()
   {
@@ -311,7 +311,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.61-144 built on 2018-11-20 06:55 (-2 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -364,9 +364,9 @@
   echo sayStep("<div style='border-left: solid 4px black; padding: 12px; background-color: #fff'>
     <div><a href='http://www.yeapf.com' target='x$timestamp'><img src='http://www.yeapf.com/logo.php'></a></div>
     <h2><big><I>skel/workbench/www/configure.php</I></big></h2>
-    <h3>YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)<br>
+    <h3>YeAPF 0.8.61-144 built on 2018-11-20 06:55 (-2 DST)<br>
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    Last modification: 2018-08-02 13:30:21 (-3 DST)</h3></div>");
+    Last modification: 2018-11-20 06:47:06 (-2 DST)</h3></div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     dieConfig(sayStep("<span class=redDot></span><div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
@@ -1181,7 +1181,7 @@
                   }
                   if ($SQLDieOnError) {
                     if ($SQLDieOnError==1)
-                      dieConfig();
+                      die("Fatal Error");
                     else {
                       exit($SQLDieOnError);
                     }
@@ -1300,7 +1300,7 @@
                 (@include_once $__yeapfPath."/yeapf.functions.php") || (_yLoaderDie("$__yeapfPath/yeapf.functions.php not found"));
 
                 _recordWastedTime("StubLoader ready");
-                if (!function_exists("decimalMicrotime")) dieConfig("decimalMicrotime() required");
+                if (!function_exists("decimalMicrotime")) die("decimalMicrotime() required");
 
                 $t0=decimalMicrotime();
 

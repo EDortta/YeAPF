@@ -1,8 +1,8 @@
 /*********************************************
   * skel/cordova/js/yloader.js
-  * YeAPF 0.8.61-130 built on 2018-11-05 10:50 (-2 DST)
+  * YeAPF 0.8.61-144 built on 2018-11-20 06:55 (-2 DST)
   * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2018-11-05 10:50:52 (-2 DST)
+  * 2018-11-20 06:55:43 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.61-130 built on 2018-11-05 10:50 (-2 DST)");
+ console.log("YeAPF 0.8.61-144 built on 2018-11-20 06:55 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -782,10 +782,16 @@
        HTMLElement.prototype.hasClass = function (aClassName) {
          var ret = false;
          if (this.className) {
+           var asterisk = aClassName.indexOf('*');
            var aClasses = this.className.split(' ');
            for(var i = 0; i<aClasses.length; i++) {
-             if (aClasses[i] == aClassName)
-               ret = true;
+             if (asterisk>=0) {
+               if (aClasses[i].substr(0,asterisk)==aClassName.substr(0,asterisk))
+                 ret=true;
+             } else {
+               if (aClasses[i] == aClassName)
+                 ret = true;          
+             }
            }
          }
          return ret;
@@ -3996,23 +4002,22 @@
            // bring the clicked element to the front while it is being dragged
            that.info.oldZIndex = target.style.zIndex;
      
+           /*
+           OBSOLETE-2018-11-20
            var maxZ = 0;
-           var divList = document.getElementsByTagName('div');
+           var divList = document.querySelectorAll('[draggable="yes"]');
            for (var i = 0; i < divList.length; i++) {
              var aDiv = divList[i];
-             if ((aDiv.getAttribute('draggable') == 'yes') && (aDiv != target)) {
-               if (parseInt(aDiv.style.zIndex) > maxZ)
-                 maxZ = parseInt(aDiv.style.zIndex);
-             }
+             if (parseInt(aDiv.style.zIndex) > maxZ)
+               maxZ = parseInt(aDiv.style.zIndex);
            }
      
            for (var i = 0; i < divList.length; i++) {
              var aDiv = divList[i];
-             if (aDiv.getAttribute('draggable') == 'yes')
-               aDiv.style.zIndex = parseInt(aDiv.style.zIndex) - 1;
-     
+             aDiv.style.zIndex = Math.max(0, parseInt(aDiv.style.zIndex) - 1);
            }
            target.style.zIndex = maxZ + 2;
+           */
      
            // we need to access the element in OnMouseMove
            that.info.dragElement = target;
@@ -4089,7 +4094,10 @@
            var e = window.event;
          if (that.info.dragElement != null) {
            document.body.style.cursor = "default";
-           that.info.dragElement.style.zIndex = parseInt(that.info.dragElement.style.zIndex)-1;
+           /*
+           OBSOLETE-2018-11-20
+           that.info.dragElement.style.zIndex = Math.max(0,parseInt(that.info.dragElement.style.zIndex)-1);
+           */
      
            // we're done with these events until the next OnMouseDown
            document.onselectstart = null;
@@ -4100,19 +4108,20 @@
            var aux = that.info.dragElement;
            // this is how we know we're not dragging
            that.info.dragElement = null;
-           _dumpy(2,1,'mouse up over'+that.info.overElement.id);
+           if (that.info.overElement) {
+             _dumpy(2,1,'mouse up over'+that.info.overElement.id);
      
-           var canDo = that.info.overElement.getAttribute('droppable') == 'yes';
-           if (canDo) {
-             if (typeof that.info.overElement.ondragover == 'function') {
-               canDo = that.info.overElement.ondragover(aux);
-             }
-             if (typeof that.info.overElement.ondrop == 'function') {
-               if (canDo)
-                 that.info.overElement.ondrop(aux);
-             }
+             var canDo = that.info.overElement.getAttribute('droppable') == 'yes';
+             if (canDo) {
+               if (typeof that.info.overElement.ondragover == 'function') {
+                 canDo = that.info.overElement.ondragover(aux);
+               }
+               if (typeof that.info.overElement.ondrop == 'function') {
+                 if (canDo)
+                   that.info.overElement.ondrop(aux);
+               }
+             }        
            }
-     
      
          }
      
@@ -9093,9 +9102,9 @@
  /* START yinterface.js */
      /*
          skel/cordova/js/yloader.js
-         YeAPF 0.8.61-130 built on 2018-11-05 10:50 (-2 DST)
+         YeAPF 0.8.61-144 built on 2018-11-20 06:55 (-2 DST)
          Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-         2018-11-05 10:50:52 (-2 DST)
+         2018-11-20 06:55:43 (-2 DST)
      */
      
      var yInterfaceObj = function() {
