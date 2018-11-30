@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.61-144 built on 2018-11-20 06:55 (-2 DST)
+    YeAPF 0.8.61-153 built on 2018-11-30 07:00 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-11-17 09:37:50 (-2 DST)
+    2018-11-22 15:51:19 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -894,8 +894,10 @@
           _recordWastedTime("checking v20");
           try {
             _db_upd_do("delete from is_tasks");
-            _db_upd_do("alter table is_tasks drop column j_params");
-            _db_upd_do("commit");
+            if (db_fieldExists("is_tasks", "j_params")) {
+              _db_upd_do("alter table is_tasks drop j_params");
+              _db_upd_do("commit");
+            }
             _db_upd_do("alter table is_tasks add j_params VARCHAR(2048)");
             _db_upd_newVersion(20);
           } catch(Exception $e) {

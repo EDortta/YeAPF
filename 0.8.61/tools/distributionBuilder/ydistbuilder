@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ydistbuilder
-    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+    YeAPF 0.8.61-153 built on 2018-11-30 07:00 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-11-22 15:51:19 (-2 DST)
 */
 
   function getVerFromPath($aPath)
@@ -129,7 +129,6 @@
 
         if ((trim($ext)=='') || (in_array($ext, $textualExtensions))) {
           $file=join("",file($fileName));
-
 
           $symlist[$fileName] = array();
           $symlist[$fileName]['LAST_FILE_MODIFICATION']=@date('Y-m-d H:i:s',$fileStat['mtime'])." ($utcOffset DST)";

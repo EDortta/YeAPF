@@ -13,7 +13,7 @@ var htmlEditorObject = function() {
       for(c=0; c<columns.length; c++) {
         t+=str2int(columns[c]);
       }
-      if (t<=12) {
+      if ((t>0) && (t<=12)) {
         var row = document.createElement("div");
         this.appendChild(row);
         row.addClass("row");
@@ -28,30 +28,39 @@ var htmlEditorObject = function() {
             col.setAttribute("droppable","yes");
             col.ondrop = that.componentDropped;
             col.ondragover = that.componentDraggedOver;
-            row.appendChild(col);              
+            row.appendChild(col);
           }
-        }          
+        }
       }
     } else {
       var re=/id\=([\"A-Za-z_\-0-9]+)/g;
       var innerHTML = aDraggedElement.innerHTML;
       var result;
-      var shuffle = Math.floor(((new Date()).getTime() - 1542657731593) / 100);
+      var shuffle = dec2hex(Math.floor(((new Date()).getTime() - 1542657731593) / 500));
       var replacements = [];
       while (result = re.exec(innerHTML)) {
         var toSearch = result[0];
         var id = ( result[1] || '').unquote();
         var newId=id+"_"+shuffle;
         replacements[toSearch] = toSearch.replace(id, newId);
+        replacements[id] = newId;
       }
       for(var rep in replacements) {
         if (replacements.hasOwnProperty(rep)) {
-          innerHTML = innerHTML.replace(rep, replacements[rep]);
+          var toReplace=new RegExp(rep, "g");
+          innerHTML = innerHTML.replace(toReplace, replacements[rep]);
         }
       }
       var div = document.createElement("div");
       div.innerHTML=innerHTML;
+      div.id=componentName+"_"+shuffle;
+      div.addClass("editable-component");
       this.appendChild(div);
+      var childs=div.getElementsByTagName("*");
+      for (var i=0; i<childs.length; i++) {
+        if (childs[i].nodeName!="DIV")
+          childs[i].setAttribute("contenteditable","true");
+      }
     }
   };
 
@@ -59,7 +68,7 @@ var htmlEditorObject = function() {
     var componentName = aDraggedElement.getAttribute("data-component");
     var canUseRow = ( ((this.hasClass('row')) || (this.id=='mainTarget')) && (componentName=='rowsplace') );
     var canUseCol =                             ((this.hasClass('col-*')) && (componentName!='rowsplace') );
-    var ret = (this.nodeName == 'DIV') && 
+    var ret = (this.nodeName == 'DIV') &&
               ( canUseRow || canUseCol );
     if (that.status) {
       that.status.innerHTML ="Component: <b>{0}</b> Target: <b>{1}</b>/<b>{2}</b> {3} or {4} = {5}".format( componentName, this.id, this.nodeName, bool2str(canUseRow), bool2str(canUseCol), bool2str(ret) );

@@ -4,9 +4,9 @@
  *      slotEmptyImplementation.php
  *      This file is part of YeAPF
  *      (Yet Another PHP Framework)
- *      YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+ *      YeAPF 0.8.61-153 built on 2018-11-30 07:00 (-2 DST)
  *      Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- *      2018-08-02 22:38:27 (-3 DST)
+ *      2018-11-22 15:51:19 (-2 DST)
  *
  *
  *      The MIT License (MIT)
@@ -45,7 +45,7 @@
     $xq_requestedRows=max(1,isset($xq_requestedRows)?intval($xq_requestedRows):20);
     /* return set.
        Could be an array or an SQL statement */
-    $ret='';
+    $ret=null;
 
     /* publish query variables as local variables */
     extract(xq_extractValuesFromQuery());

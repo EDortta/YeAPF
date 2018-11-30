@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ycheckdistsource
-    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+    YeAPF 0.8.61-153 built on 2018-11-30 07:00 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2018-11-22 15:51:19 (-2 DST)
 */
 
   $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
@@ -36,9 +36,9 @@
             echo "Advice:  '$relSrcFolder/$filename' without timestamp\n";
           } else {
             if ($smt<$dmt) {
-              echo "Error:   '$relSrcFolder/$filename' older than distribution ($sD vs $dD)\n";
+              echo "Error:   '$relSrcFolder/$filename' older than distribution\n\t\t\t\t($sD vs $dD)\n";
             } else if ($smt>$dmt) {
-              echo "Warning: '$relSrcFolder/$filename' modified after distribution ($sD vs $dD)\n";
+              echo "Warning: '$relSrcFolder/$filename' modified after distribution\n\t\t\t\t($sD vs $dD)\n";
             }
           }
 

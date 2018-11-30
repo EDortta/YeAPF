@@ -1,9 +1,9 @@
 <?php
 /*
     tools/yclilib.php
-    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+    YeAPF 0.8.61-153 built on 2018-11-30 07:00 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-08-02 22:38:27 (-3 DST)
+    2018-11-22 15:51:19 (-2 DST)
 */
 
 
@@ -78,6 +78,17 @@
   if ($GLOBALS['__yeapfPath']=='%_'.'YEAPF_PATH_%') {
     $GLOBALS['__yeapfPath']=dirname(dirname(__FILE__));
   }
+
+  if (file_exists("flags/timezone"))
+    $auxDefaultTimeZone=file_get_contents("flags/timezone");
+  else
+    $auxDefaultTimeZone = @date_default_timezone_get();
+
+  if (!date_default_timezone_set($auxDefaultTimeZone)) {
+    die("\nWas not possible to set timezone to '$auxDefaultTimeZone'\n");
+  }
+  unset($auxDefaultTimeZone);
+
 
   function _LOAD_YEAPF_($libraryList='')
   {
@@ -243,6 +254,27 @@
       }
     } else
       $tagList=array($tag);
+  }
+
+  function ping($ip) {
+    $fp = @fSockOpen($ip,80,$errno,$errstr,1);
+    if($fp) { $status=1; fclose($fp); } else { $status=0; }
+    /* returns 1 if ok */
+    return $status;
+  }
+
+  function retrieveJSON($url) {
+    set_time_limit(0);
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 2);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_URL, $url);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $ret = curl_exec($ch);
+    return $ret;
   }
 
   function doOnCloud($cmd)

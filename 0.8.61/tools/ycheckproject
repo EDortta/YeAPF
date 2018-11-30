@@ -3,13 +3,12 @@
   /*
    * tools
    * tools/ycheckproject
-   * YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+   * YeAPF 0.8.61-153 built on 2018-11-30 07:00 (-2 DST)
    * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2018-05-30 11:21:05 (-3 DST)
+   * 2018-11-22 15:51:19 (-2 DST)
    */
 
-  function detect_encoding($string)
-  {
+  function detect_encoding($string) {
     global $php_errormsg;
     static $list = array('UTF-8', 'ISO-8859-1', 'WINDOWS-1251');
 
@@ -36,16 +35,15 @@
     return null;
   }
 
-  function is_target_file($fileName)
-  {
+  function is_target_file($fileName) {
     $textFiles=array('js','php','htm','html','text','txt','inc','css');
     $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
 
     return (in_array($ext, $textFiles));
   }
 
-  function checkFileIntegrity($fileName)
-  {
+  function checkFileIntegrity($fileName) {
+    global $vd;
     $output='';
     $output.="$fileName;\n";
     // check existence
@@ -129,6 +127,11 @@
     echo "\n$myself -R\ttest all files on all folders\n";
   } else {
     echo "Checking...\n";
+    if (file_exists("version.def")) {
+      $vd=unserialize(join(file("version.def")));
+    } else {
+      $vd=array();
+    }
     checkFolderIntegrity(getcwd(), $recursive);
 
     for($a=0; $a<$args->srcCount(); $a++) {
