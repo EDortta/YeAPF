@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.tasks.php
-    YeAPF 0.8.61-144 built on 2018-11-20 06:55 (-2 DST)
+    YeAPF 0.8.61-170 built on 2018-12-12 12:54 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-11-17 09:37:50 (-2 DST)
+    2018-12-06 14:43:19 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -113,9 +113,7 @@
             $flagStat=stat($runFlag);
             $mtime=$flagStat['mtime'];
             $now=date('U');
-            echo "iteraction_ttl: $iteraction_ttl seg. limite: ";
-            echo $mtime+$iteraction_ttl;
-            echo ".. agora:".$now."\n";
+            _dump( "iteraction_ttl: $iteraction_ttl seg. limit: ".($mtime+$iteraction_ttl).".. now: ".$now );
             $ret=($mtime+$iteraction_ttl>$now);
           }
         }

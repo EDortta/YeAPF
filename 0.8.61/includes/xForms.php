@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xForms.php
-    YeAPF 0.8.61-130 built on 2018-11-05 10:50 (-2 DST)
+    YeAPF 0.8.61-170 built on 2018-12-12 12:54 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-11-05 10:36:50 (-2 DST)
+    2018-12-12 12:52:37 (-2 DST)
 */
 
   global $cfgMainFolder;
@@ -1916,6 +1916,263 @@
     $ret=json_encode($ret, JSON_PRETTY_PRINT);
     return $ret;
   }
+
+  function fillFieldsWithJunk ($aElements) {
+      $_scratch = array(
+      "t" => array( 
+                    'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.',
+                    'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.',
+                    'Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.',
+                    'Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.',
+                    'Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis.',
+                    'At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, At accusam aliquyam diam diam dolore dolores duo eirmod eos erat, et nonumy sed tempor et et invidunt justo labore Stet clita ea et gubergren, kasd magna no rebum. sanctus sea sed takimata ut vero voluptua. est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat. ',
+                    'Consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.'
+                  ) ,
+      "d" => array(
+        'yahu.com',
+        'hotmayl.com',
+        'jmail.com',
+        'yahu.com.nh',
+        'hotmayl.com.nh',
+        'jmail.com.nh'
+      ) ,
+      "p" => array(
+        'http://',
+        'https://',
+        'ws://',
+        'wss://',
+        'ftp://'
+      ) ,
+      "mn" => array(
+        'Alexandre',
+        'Charles',
+        'David',
+        'Diego',
+        'Diogo',
+        'James',
+        'John',
+        'Luan ',
+        'Marcelo',
+        'Michael',
+        'Raul',
+        'Ricardo ',
+        'Richard',
+        'Robert',
+        'Vicente',
+        'William'
+      ) ,
+      "fn" => array(
+        'Alexia',
+        'Antonella',
+        'Ayla ',
+        'Barbara',
+        'Caroline',
+        'Clarice',
+        'Elizabeth',
+        'Jennifer',
+        'Joana',
+        'Kamilly',
+        'Linda',
+        'Lis ',
+        'Maria Sophia',
+        'Maria',
+        'Mary',
+        'Patricia',
+        'Susan'
+      ) ,
+      "sn" => array(
+        'Brown',
+        'Davies',
+        'Evans',
+        'Jones',
+        'Smith',
+        'Taylor',
+        'Williams',
+        'Wilson',
+        'Carvalho',
+        'Gomes',
+        'Lopes',
+        'Martins',
+        'Melo',
+        'Mendes',
+        'Nunes',
+        'Rodrigues'
+      ) ,
+      "ch" => 'qwertyuiopasdfghjklzxcvbnmQAZWSXEDCRFVTGBYHNUJMIKOLP0123456789',
+      "n" => '0123456789'
+    );
+
+    if (!is_array($aElements)) {
+      $aElements = array($aElements);
+    }
+    if (isAssoc($aElements)) {
+      $aElements = array($aElements);
+    }
+
+    $ret=array();
+    $i = null;
+    $fieldType = null;
+    $fieldId = null;
+    $fieldValue = null;
+    $maxLength = null;
+    $classes = null;
+
+    $genString = function ($base, $minLen, $maxLen) {
+      $ret = '';
+      $n = null;
+      $j = null;
+      $maxLen = floor(mt_rand(0, $maxLen) + $minLen);
+      $j = 0;
+      $maxLoop=100;
+      while (($j < $maxLen) && ($maxLoop>0)) {
+        $maxLoop--;
+        $n = floor(mt_rand(0, count($base)-1));
+        if (strpos($ret, $base[$n])===false) {
+          $ret.= $base[$n].' ';
+          $j += strlen($base[$n]);        
+        }
+      }
+
+      return trim($ret);
+    };
+
+    $genNumber = function ($min, $max, $leftPaddingLen=0) {
+      $ret = ''.floor(mt_rand($min, $max));
+      while (strlen($ret) < $leftPaddingLen) {
+        $ret = '0'.$ret;
+      }
+
+      return $ret;
+    };
+
+    $classHasName = function ($lClasses, $name) {
+      $ret = false;
+      $name = strtoupper($name);
+      for ($c = 0; $c < count($lClasses); $c++) {
+        $ret = $ret || (strpos($lClasses[$c], "$name"."-") !==false ) || ($lClasses[$c]==$name);
+      }
+      return $ret;
+    };
+
+    foreach($aElements as $elem) {
+      $fieldType = strtolower($elem['type']);
+      $fieldId = $elem['id'];
+      $maxLength = isset($elem["maxlength"])?intval($elem["maxlength"]):100;
+      $lClasses = isset($elem['className'])?explode(" ", $elem['className']):array();
+      for ($n = 0; $n < count($lClasses); $n++) {
+        $lClasses[$n] = strtoupper($lClasses[$n]);
+      }
+
+      $fieldValue = '';
+      if ($fieldId) {
+        switch ($fieldType) {
+        case "password":
+          $fieldValue = $genString($_scratch['ch'], 6, 15);
+          break;
+
+        case "textarea":
+          $fieldValue = $genString($_scratch['t'], 1, 15 * $maxLength);
+          break;
+
+        case "email":
+          $fieldValue = $genString($_scratch['mn'], 2, 3) . "@" . $genString($_scratch['d'], 1, 1);
+          break;
+
+        case "date":
+          $fieldValue = 1 * $genNumber(-2208981600000, 2556064800000);
+          $fieldValue = new Date($fieldValue);
+          $fieldValue = substr($fieldValue->toISOString() , 0, 10);
+          break;
+
+        case "color":
+        case "datetime":
+        case "datetime-local":
+        case "month":
+          $fieldValue = 1 * $genNumber(1, 12);
+          break;
+
+        case "number":
+        case "range":
+          $fieldValue = 1 * $genNumber(1, 100);
+          break;
+
+        case "tel":
+          $fieldValue = 1 * $genNumber(10, 52);
+          for ($aux = 0; $aux < 3; $aux++) {
+            $fieldValue.= ' ' . $genNumber(100, 999);
+          }
+
+          break;
+
+        case "search":
+        case "time":
+        case "week":
+          $fieldValue = 1 * $genNumber(1, 52);
+          break;
+
+        case "url":
+          $fieldValue = $genString($_scratch['p'], 1, 1) . $genString($_scratch['d'], 1, 1) . ".xyz";
+          break;
+
+        case "radio":
+        case "checkbox":
+          break;
+
+        case "select-one":
+        case "select-multi":
+          break;
+
+        case "hidden":
+          $fielValue = "";
+          break;
+
+        default:
+          $canCut=true;
+          if ($classHasName($lClasses, 'password')) {
+            $fieldValue = $genString($_scratch['ch'], 6, 15);
+          } else if ($classHasName($lClasses, 'cpf')) {
+            $fieldValue = inventarCPF(true);
+          } else  if ($classHasName($lClasses, 'cnpj')) {
+            $fieldValue = inventarCNPJ(true);
+          } else if ($classHasName($lClasses, 'ie')) {
+            $fieldValue = $genString($_scratch['n'], 6, 12);
+          } else if ($classHasName($lClasses, 'cep')) {
+            $fieldValue = $genNumber(10, 99, 2);
+            $fieldValue.= '.'.$genNumber(0, 999, 3);
+            $fieldValue.= '-'.$genNumber(0, 999, 3);
+          } else if ($classHasName($lClasses, 'zip')) {
+            $fieldValue = $genNumber(0, 99999, 5);
+            $fieldValue.= '-'.$genNumber(0, 9999, 4);
+          } else {
+            if (($classHasName($lClasses, 'name')) || ($classHasName($lClasses, 'nome'))) {
+              $canCut=false;
+              if (($classHasName($lClasses, 'female')) || ($classHasName($lClasses, 'feminino'))) {
+                $fieldValue = mb_strtolower($genString($_scratch['fn'], 1, $maxLength / 2));
+                $fieldValue.=' '.mb_strtoupper($genString($_scratch['sn'],1, $maxLength - strlen($fieldValue)));
+              } else if (($classHasName($lClasses, 'male')) || ($classHasName($lClasses, 'masculino'))) {
+                $fieldValue = mb_strtolower($genString($_scratch['mn'], 1, $maxLength / 2));
+                $fieldValue.=' '.mb_strtoupper($genString($_scratch['sn'],1, $maxLength - strlen($fieldValue)));
+              } else {
+                $fieldValue = mb_strtolower($genString(array_merge($_scratch['fn'], $_scratch['mn']), 1, $maxLength / 2));
+                $fieldValue.=' '.mb_strtoupper($genString($_scratch['sn'],1, $maxLength - strlen($fieldValue)));
+              }
+            } else {
+              $fieldValue = $genString($_scratch['t'], 1, $maxLength);
+            }
+          }
+
+          if ($canCut) {
+            $fieldValue = substr($fieldValue, 0, $maxLength);
+          }
+          break;
+        }
+
+        $ret[$fieldId]= $fieldValue;
+      }
+
+    }
+    return $ret;
+  };
 
 
   if (file_exists("$cfgMainFolder/flags/flag.dbgloader")) error_log(basename(__FILE__)." 0.8.61 ".date("i:s").": xForms.php ready\n",3,"$cfgCurrentFolder/logs/yeapf.loader.log");

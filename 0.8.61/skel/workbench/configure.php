@@ -1,9 +1,9 @@
 <?php
 /*
     skel/workbench/configure.php
-    YeAPF 0.8.61-153 built on 2018-11-30 07:00 (-2 DST)
+    YeAPF 0.8.61-170 built on 2018-12-12 12:54 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-11-30 07:00:56 (-2 DST)
+    2018-12-12 12:54:23 (-2 DST)
 */
 
 
@@ -33,7 +33,7 @@
     if ($activeCount==1)
       $activeAppName=$curAppName;
     else if ($activeCount>1)
-      dieConfig(sayStep("Tem mais de uma entrada de banco de dados ativa\n$curAppName, $activeAppName"));
+      dieConfig(sayStep("You have more than one active database entry\nCurrent AppName: $curAppName. Active AppName: $activeAppName"));
   }
 
   function getSgugPath($base)
@@ -311,7 +311,7 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.61-153 built on 2018-11-30 07:00 (-2 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.61-170 built on 2018-12-12 12:54 (-2 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
@@ -366,9 +366,9 @@
   echo sayStep("<div style='border-left: solid 4px black; padding: 12px; background-color: #fff'>
     <div><a href='http://www.yeapf.com' target='x$timestamp'><img src='http://www.yeapf.com/logo.php'></a></div>
     <h2><big><I>skel/workbench/configure.php</I></big></h2>
-    <h3>YeAPF 0.8.61-153 built on 2018-11-30 07:00 (-2 DST)<br>
+    <h3>YeAPF 0.8.61-170 built on 2018-12-12 12:54 (-2 DST)<br>
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com<br>
-    Last modification: 2018-11-30 07:00:56 (-2 DST)</h3></div>");
+    Last modification: 2018-12-12 12:54:23 (-2 DST)</h3></div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     dieConfig(sayStep("<span class=redDot></span><div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
@@ -819,10 +819,11 @@
                       }
 
                       if ($k1=='active') {
-                        $activeCount++;
-                        verifyActiveApp();
-                        $thisIsActive;
-                        $cfgDebugIP=$auxCfgDebugIp;
+                        $thisIsActive=intval($v1)==1;
+                        if ($thisIsActive) {
+                          $activeCount++;
+                          verifyActiveApp();                          
+                        }
                       }
 
                       if ($k1=='aDebugIP') {
@@ -1073,6 +1074,8 @@
                       $noHTMLArgs = array();
                       $deathLogMessage = "";
                       foreach($args as $kAux=>$vAux) {
+                        if (is_array($vAux))
+                          $vAux=json_encode($vAux);
                         $noHTMLArgs[$kAux] = preg_replace(\'!\s+!\', " ", str_replace("\n", " ", strip_tags($vAux)));
                         $deathLogMessage.=$noHTMLArgs[$kAux]." ";
                       }
@@ -1197,7 +1200,7 @@
                       }
                       if ($SQLDieOnError) {
                         if ($SQLDieOnError==1)
-                          dieConfig();
+                          die();
                         else {
                           exit($SQLDieOnError);
                         }
@@ -1309,7 +1312,7 @@
                   (@include_once $__yeapfPath."/yeapf.functions.php") || (_yLoaderDie("$__yeapfPath/yeapf.functions.php not found"));
 
                   _recordWastedTime("StubLoader ready");
-                  if (!function_exists("decimalMicrotime")) dieConfig("decimalMicrotime() required");
+                  if (!function_exists("decimalMicrotime")) _die("decimalMicrotime() required");
 
                   $t0=decimalMicrotime();
 

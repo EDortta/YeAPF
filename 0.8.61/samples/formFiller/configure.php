@@ -1,6 +1,6 @@
 <?php
 /*
-    samples/key-admin/configure.php
+    samples/formFiller/configure.php
     YeAPF 0.8.61-170 built on 2018-12-12 12:54 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
     2018-12-12 12:54:23 (-2 DST)
@@ -365,7 +365,7 @@
   $timestamp=date('U');
   echo sayStep("<div style='border-left: solid 4px black; padding: 12px; background-color: #fff'>
     <div><a href='http://www.yeapf.com' target='x$timestamp'><img src='http://www.yeapf.com/logo.php'></a></div>
-    <h2><big><I>samples/key-admin/configure.php</I></big></h2>
+    <h2><big><I>samples/formFiller/configure.php</I></big></h2>
     <h3>YeAPF 0.8.61-170 built on 2018-12-12 12:54 (-2 DST)<br>
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com<br>
     Last modification: 2018-12-12 12:54:23 (-2 DST)</h3></div>");

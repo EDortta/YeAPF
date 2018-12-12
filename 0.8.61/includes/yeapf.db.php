@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+    YeAPF 0.8.61-170 built on 2018-12-12 12:54 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-07-30 19:33:47 (-3 DST)
+    2018-12-11 07:36:36 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -313,6 +313,8 @@
   {
     global $ydb_conn, $dbCSVFilename, $server_IP, $_ydb_connection_info, $dbCharset;
 
+    _recordWastedTime("dbType: $dbType dbServer: $dbServer dbName: $dbName");
+
     $max_time = ini_get("max_execution_time");
     set_time_limit(2);
 
@@ -525,6 +527,10 @@
     $appRegistry=trim("$appRegistry");
 
     _recordWastedTime("appRegistry='$appRegistry' dbConnect='$dbConnect'");
+
+    if ($dbConnect=='')
+      $dbConnect='no';
+
     $ret = false;
     // echo "dbConnect=$dbConnect\n";
     if (isset($dontConnect))
@@ -546,7 +552,9 @@
     echo "$msg $dbConnect\n";
     */
 
-    _recordWastedTime("Connecting to db: $dbConnect");
+    _recordWastedTime("appRegistry='$appRegistry' dbConnect='$dbConnect'");
+
+    _recordWastedTime("Connecting to db?: $dbConnect");
     if ((strtolower($dbConnect)=='yes') || ($dbConnect=='')) {
       $original=filemtime($dbCSVFilename);
       $cfgMainFolderX=dirname($dbCSVFilename);
@@ -586,7 +594,11 @@
         if (isset($dbINI[$cfgCurrentAppRegistry])) {
           //$setupIni->populateValues(false, 'SQLDieOnError', true);
           db_populateDBConfig($dbINI[$cfgCurrentAppRegistry], 'SQLDieOnError');
-          $dbConnect=strtolower(trim((($dbConnect==1) || (strtoupper($dbConnect)=='TRUE')|| (strtoupper($dbConnect)=='YES'))?'yes':'no'));
+          $dbConnect=mb_strtolower( trim( (
+                                    ($dbConnect==1) || 
+                                    (mb_strtoupper($dbConnect)=='ENABLE') || 
+                                    (mb_strtoupper($dbConnect)=='TRUE') || 
+                                    (mb_strtoupper($dbConnect)=='YES') )?'yes':'no') );
           _recordWastedTime("...populating values (dbConnect: $dbConnect)");
           // after this point, dbConnect could be redefined
 
@@ -746,7 +758,9 @@
                   _db_upd_checkStructure();
               }
             }
-          };
+          } else {
+            _recordWastedTime("ydb_conn is already defined");
+          }
         } else {
           if (!$silentQuit) {
             $auxOnlineTime = '';

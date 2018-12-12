@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yloader-src.js
- * YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
+ * YeAPF 0.8.61-170 built on 2018-12-12 12:54 (-2 DST)
  * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-10-08 12:43:10 (-3 DST)
+ * 2018-12-06 14:43:19 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * Purpose:  Build a monolitic YeAPF script so
  *           it can be loaded at once
@@ -29,7 +29,7 @@ if (typeof console === 'undefined')
   }
 )();
 
-console.log("YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)");
+console.log("YeAPF 0.8.61-170 built on 2018-12-12 12:54 (-2 DST)");
 
 #include('yopcontext.js')
 #include('ydebug.js')
@@ -49,16 +49,21 @@ var yloaderBase = function () {
     _dump("Loading from "+mydir);
   })();
 
+  /* in order to work with node */
+  var auxW = "undefined" ==typeof window?{}:window;
+  var auxN = "undefined" ==typeof navigator?{userAgent:'nodejs'}:navigator;
+
+  that.isNode = (typeof module !== 'undefined' && module.exports);
   that.isWorker = (typeof importScripts == 'function');
-  that.isMobile = (!that.isWorker) && (typeof window.orientation !== 'undefined');
-  that.isChromeExtension = (!that.isWorker) && ((window.chrome && chrome.runtime && chrome.runtime.id) || (that.selfLocation.substr(0,17)=='chrome-extension:'));
+  that.isMobile = (!that.isWorker) && (typeof auxW.orientation !== 'undefined');
+  that.isChromeExtension = (!that.isWorker) && ((auxW.chrome && chrome.runtime && chrome.runtime.id) || (that.selfLocation.substr(0,17)=='chrome-extension:'));
   that.isChromeSandbox = (!that.isWorker) && ((that.isChromeExtension) && !(chrome.storage));
-  that.isWebkit = /(safari|chrome)/.test(navigator.userAgent.toLowerCase());
+  that.isWebkit = /(safari|chrome)/.test(auxN.userAgent.toLowerCase());
   that.webKitVersion = (
     function() {
       var ret="530.00";
-      var agentIds = navigator.userAgent.match(/([A-Za-z]*)\/([0-9A-Za-z\.]*)/g);
-      for(var i=0; i<agentIds.length; i++) {
+      var agentIds = auxN.userAgent.match(/([A-Za-z]*)\/([0-9A-Za-z\.]*)/g);
+      for(var i=0; i<(agentIds || []).length; i++) {
         if (agentIds[i].substr(0,11)=='AppleWebKit') {
           ret = agentIds[i].substr(12);
         }
@@ -69,9 +74,9 @@ var yloaderBase = function () {
 
   that.operatingSystem = (
     function() {
-      var agentIds = navigator.userAgent.match(/(\([A-z\ 0-9\.\;\,\-\/\:]*)\)/g);
+      var agentIds = auxN.userAgent.match(/(\([A-z\ 0-9\.\;\,\-\/\:]*)\)/g) || [];
       var OSes=(agentIds[0] || '').replace(/[^a-zA-Z0-9\ \.\;]+/g, "").split(";") || ["Unknown", "Unknown"];
-      for(var i=0; i<OSes.length; i++) {
+      for(var i=0; i<(OSes || []).length; i++) {
         OSes[i]=trim(OSes[i] || "Unknown");
       }
       return OSes;
@@ -142,16 +147,18 @@ var yloaderBase = function () {
   */
 
   if (!that.isWorker) {
-    window.addEventListener("load", function() {
-      var elem = (document.compatMode === "CSS1Compat") ?
-          document.documentElement :
-          document.body;
+    if (!that.isNode) {
+      window.addEventListener("load", function() {
+        var elem = (document.compatMode === "CSS1Compat") ?
+            document.documentElement :
+            document.body;
 
-      var appScreen=document.getElementById('screen');
-      if (appScreen)
-        appScreen.style.width = elem.clientWidth + 'px';
+        var appScreen=document.getElementById('screen');
+        if (appScreen)
+          appScreen.style.width = elem.clientWidth + 'px';
 
-    });
+      });      
+    }
   }
 
   return that;

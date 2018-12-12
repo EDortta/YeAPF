@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.61-130 built on 2018-11-05 10:50 (-2 DST)
+    YeAPF 0.8.61-170 built on 2018-12-12 12:54 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-11-05 10:36:50 (-2 DST)
+    2018-12-06 14:43:19 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -936,14 +936,69 @@
     $context=json_encode($_xq_context_);
 
     $returnAsScript=false;
+    $returnFormat='json';
     /* 0.9.0 */
     if (isset($GLOBALS['_rap_'.$ts])) {
       if ($GLOBALS['_rap_'.$ts]==1)
         $returnAsScript=true;
     }
 
-    if (isset($GLOBALS['fieldName']) && isset($GLOBALS['fieldValue']) && isset($GLOBALS['ts']))
+    if (  isset($GLOBALS['fieldName']) && 
+          isset($GLOBALS['fieldValue']) && 
+          isset($GLOBALS['ts']) ) {
       $returnAsScript=true;
+    }
+
+    if (isset($GLOBALS['xq_output_format'])) {
+      /* 
+          format to be used when returning to caller
+          json  - JSON: the default way 
+          csv*  - comma separated values: 
+                  The first line has the KEYS and from the second line, the VALUES.
+                  Values are escaped separated by ';' and quoted if you have ';' in valuess
+          pair* - key,value pair:
+                  It's more or less as an ini file. 
+                  The first key of the first row is used in each row as the session key and 
+                  each row (including the first) are represented as a key,value pair using '=' to separate them.
+
+          * WARNING - ONLY FIRST LEVEL OF DATA ARE RETURNED.
+                      If you have nested array/objects 'json' is the best choice
+       */
+      $allowedOutputFormat=';json;csv;ini;';
+      $auxReturnFormat=mb_strtolower($GLOBALS['xq_output_format']);
+      if (mb_strpos($allowedOutputFormat, ";$auxReturnFormat;") !== false) {
+
+        $returnFormat=$auxReturnFormat;
+
+        if ($returnFormat!='json') {
+          
+          $data = json_decode($jsonData, true);
+          reset($data);
+
+          $jsonData="";
+
+          switch ($returnFormat) {
+            case 'csv':
+              break;
+
+            case 'pair':
+              $first_key = key($data);
+              if (isInt($first_key)) {
+                reset($data[$first_key]);
+                $first_key = key($data[$first_key]);
+              } else {
+                
+              }
+
+              break;
+
+            default:
+
+              break;
+          }        
+        }
+      }
+    }
 
     if ($returnAsScript) {
       $script=

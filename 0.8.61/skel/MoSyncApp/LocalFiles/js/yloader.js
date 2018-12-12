@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.61-153 built on 2018-11-30 07:00 (-2 DST)
+  * YeAPF 0.8.61-170 built on 2018-12-12 12:54 (-2 DST)
   * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2018-11-30 07:00:56 (-2 DST)
+  * 2018-12-12 12:54:23 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.61-153 built on 2018-11-30 07:00 (-2 DST)");
+ console.log("YeAPF 0.8.61-170 built on 2018-12-12 12:54 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -195,16 +195,20 @@
      that.selfLocation = mydir;
      _dump("Loading from "+mydir);
    })();
+   /* in order to work with node */
+   var auxW = "undefined" ==typeof window?{}:window;
+   var auxN = "undefined" ==typeof navigator?{userAgent:'nodejs'}:navigator;
+   that.isNode = (typeof module !== 'undefined' && module.exports);
    that.isWorker = (typeof importScripts == 'function');
-   that.isMobile = (!that.isWorker) && (typeof window.orientation !== 'undefined');
-   that.isChromeExtension = (!that.isWorker) && ((window.chrome && chrome.runtime && chrome.runtime.id) || (that.selfLocation.substr(0,17)=='chrome-extension:'));
+   that.isMobile = (!that.isWorker) && (typeof auxW.orientation !== 'undefined');
+   that.isChromeExtension = (!that.isWorker) && ((auxW.chrome && chrome.runtime && chrome.runtime.id) || (that.selfLocation.substr(0,17)=='chrome-extension:'));
    that.isChromeSandbox = (!that.isWorker) && ((that.isChromeExtension) && !(chrome.storage));
-   that.isWebkit = /(safari|chrome)/.test(navigator.userAgent.toLowerCase());
+   that.isWebkit = /(safari|chrome)/.test(auxN.userAgent.toLowerCase());
    that.webKitVersion = (
      function() {
        var ret="530.00";
-       var agentIds = navigator.userAgent.match(/([A-Za-z]*)\/([0-9A-Za-z\.]*)/g);
-       for(var i=0; i<agentIds.length; i++) {
+       var agentIds = auxN.userAgent.match(/([A-Za-z]*)\/([0-9A-Za-z\.]*)/g);
+       for(var i=0; i<(agentIds || []).length; i++) {
          if (agentIds[i].substr(0,11)=='AppleWebKit') {
            ret = agentIds[i].substr(12);
          }
@@ -214,9 +218,9 @@
    )();
    that.operatingSystem = (
      function() {
-       var agentIds = navigator.userAgent.match(/(\([A-z\ 0-9\.\;\,\-\/\:]*)\)/g);
+       var agentIds = auxN.userAgent.match(/(\([A-z\ 0-9\.\;\,\-\/\:]*)\)/g) || [];
        var OSes=(agentIds[0] || '').replace(/[^a-zA-Z0-9\ \.\;]+/g, "").split(";") || ["Unknown", "Unknown"];
-       for(var i=0; i<OSes.length; i++) {
+       for(var i=0; i<(OSes || []).length; i++) {
          OSes[i]=trim(OSes[i] || "Unknown");
        }
        return OSes;
@@ -280,14 +284,16 @@
    }
    */
    if (!that.isWorker) {
-     window.addEventListener("load", function() {
-       var elem = (document.compatMode === "CSS1Compat") ?
-           document.documentElement :
-           document.body;
-       var appScreen=document.getElementById('screen');
-       if (appScreen)
-         appScreen.style.width = elem.clientWidth + 'px';
-     });
+     if (!that.isNode) {
+       window.addEventListener("load", function() {
+         var elem = (document.compatMode === "CSS1Compat") ?
+             document.documentElement :
+             document.body;
+         var appScreen=document.getElementById('screen');
+         if (appScreen)
+           appScreen.style.width = elem.clientWidth + 'px';
+       });      
+     }
    }
    return that;
  };
@@ -1133,6 +1139,36 @@
        };
      }
      
+     //+ Carlos R. L. Rodrigues
+     //@ http://jsfromhell.com/string/extenso [rev. #3]
+     String.prototype.extenso = function( c ) {
+       var ex = [
+         [ "zero", "um", "dois", "trÃªs", "quatro", "cinco", "seis", "sete", "oito", "nove", "dez", "onze", "doze", "treze", "quatorze", "quinze", "dezesseis", "dezessete", "dezoito", "dezenove" ],
+         [ "dez", "vinte", "trinta", "quarenta", "cinqÃ¼enta", "sessenta", "setenta", "oitenta", "noventa" ],
+         [ "cem", "cento", "duzentos", "trezentos", "quatrocentos", "quinhentos", "seiscentos", "setecentos", "oitocentos", "novecentos" ],
+         [ "mil", "milhÃ£o", "bilhÃ£o", "trilhÃ£o", "quadrilhÃ£o", "quintilhÃ£o", "sextilhÃ£o", "setilhÃ£o", "octilhÃ£o", "nonilhÃ£o", "decilhÃ£o", "undecilhÃ£o", "dodecilhÃ£o", "tredecilhÃ£o", "quatrodecilhÃ£o", "quindecilhÃ£o", "sedecilhÃ£o", "septendecilhÃ£o", "octencilhÃ£o", "nonencilhÃ£o" ]
+       ];
+       var a, n, v, i, n = this.replace( c ? /[^,\d]/g : /\D/g, "" ).split( "," ),
+         e = " e ",
+         $ = "real",
+         d = "centavo",
+         sl;
+       for ( var f = n.length - 1, l, j = -1, r = [], s = [], t = ""; ++j <= f; s = [] ) {
+         j && ( n[ j ] = ( ( "." + n[ j ] ) * 1 ).toFixed( 2 ).slice( 2 ) );
+         if ( !( a = ( v = n[ j ] ).slice( ( l = v.length ) % 3 ).match( /\d{3}/g ), v = l % 3 ? [ v.slice( 0, l % 3 ) ] : [], v = a ? v.concat( a ) : v ).length ) continue;
+         for ( a = -1, l = v.length; ++a < l; t = "" ) {
+           if ( !( i = v[ a ] * 1 ) ) continue;
+           i % 100 < 20 && ( t += ex[ 0 ][ i % 100 ] ) ||
+             i % 100 + 1 && ( t += ex[ 1 ][ ( i % 100 / 10 >> 0 ) - 1 ] + ( i % 10 ? e + ex[ 0 ][ i % 10 ] : "" ) );
+           s.push( ( i < 100 ? t : !( i % 100 ) ? ex[ 2 ][ i == 100 ? 0 : i / 100 >> 0 ] : ( ex[ 2 ][ i / 100 >> 0 ] + e + t ) ) +
+             ( ( t = l - a - 2 ) > -1 ? " " + ( i > 1 && t > 0 ? ex[ 3 ][ t ].replace( "Ã£o", "Ãµes" ) : ex[ 3 ][ t ] ) : "" ) );
+         }
+         a = ( ( sl = s.length ) > 1 ? ( a = s.pop(), s.join( " " ) + e + a ) : s.join( "" ) || ( ( !j && ( n[ j + 1 ] * 1 > 0 ) || r.length ) ? "" : ex[ 0 ][ 0 ] ) );
+         a && r.push( a + ( c ? ( " " + ( v.join( "" ) * 1 > 1 ? j ? d + "s" : ( /0{6,}$/.test( n[ 0 ] ) ? "de " : "" ) + $.replace( "l", "is" ) : j ? d : $ ) ) : "" ) );
+       }
+       return r.join( e );
+     }
+     
      if (!String.prototype.isPIS) {
        String.prototype.isPIS = function() {
            var p, n, s, c = this,
@@ -1185,7 +1221,6 @@
            if(c[10] != (((n %= 11) < 2) ? 0 : 11 - n)) return false;
            return true;
        };
-     
      
        function _mod_(a,b){return Math.round(a-(Math.floor(a/b)*b));}
        //+ Johny W.Alves
@@ -9102,9 +9137,9 @@
  /* START yinterface.js */
      /*
          skel/MoSyncApp/LocalFiles/js/yloader.js
-         YeAPF 0.8.61-153 built on 2018-11-30 07:00 (-2 DST)
+         YeAPF 0.8.61-170 built on 2018-12-12 12:54 (-2 DST)
          Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-         2018-11-30 07:00:56 (-2 DST)
+         2018-12-12 12:54:23 (-2 DST)
      */
      
      var yInterfaceObj = function() {
