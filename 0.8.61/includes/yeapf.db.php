@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.61-170 built on 2018-12-12 12:54 (-2 DST)
+    YeAPF 0.8.61-173 built on 2018-12-12 17:54 (-2 DST)
     Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-12-11 07:36:36 (-2 DST)
+    2018-12-12 17:53:04 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -527,9 +527,6 @@
     $appRegistry=trim("$appRegistry");
 
     _recordWastedTime("appRegistry='$appRegistry' dbConnect='$dbConnect'");
-
-    if ($dbConnect=='')
-      $dbConnect='no';
 
     $ret = false;
     // echo "dbConnect=$dbConnect\n";
