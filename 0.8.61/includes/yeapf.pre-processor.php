@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.pre-processor.php
-    YeAPF 0.8.61-130 built on 2018-11-05 10:50 (-2 DST)
-    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-11-05 10:50:34 (-2 DST)
+    YeAPF 0.8.61-177 built on 2019-02-18 08:25 (-3 DST)
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+    2018-12-12 23:28:44 (-3 DST)
    */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -31,6 +31,11 @@
            $appCharset, $dbCharset,
            $formNameSeed,
            $intoFormFile;
+
+    if (!isset($searchPath))
+      $searchPath=array();
+    if (!is_array($searchPath))
+      $searchPath=explode(';', $searchPath);
 
     $searchPathLen=count($searchPath);
 

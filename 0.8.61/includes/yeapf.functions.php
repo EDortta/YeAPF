@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.61-130 built on 2018-11-05 10:50 (-2 DST)
-    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-11-05 10:50:34 (-2 DST)
+    YeAPF 0.8.61-177 built on 2019-02-18 08:25 (-3 DST)
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+    2018-12-17 16:33:57 (-3 DST)
    */
 
   /*
@@ -140,6 +140,11 @@
   $yeapfLogBacktrace = 0;
 
   $flgCanContinueWorking=true;
+
+  $PHPVer = phpversion();
+  $PHPVersion = explode('.', $PHPVer);
+  $PHPVersion = $PHPVersion[0]*10000 + $PHPVersion[1]*100+$PHPVersion[2];
+  unset($PHPVer);
 
   if (file_exists("$cfgCurrentFolder/logs/wastedTime.log"))
     error_log("\n\n\n",3,"$cfgCurrentFolder/logs/wastedTime.log");
@@ -1398,7 +1403,7 @@
         fputs($f,"<?php\n");
         fputs($f,"/* \n");
         fputs($f," * yeapf.config.files.$user_IP\n");
-        fputs($f," * YEAPF Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n");
+        fputs($f," * YEAPF Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n");
         fputs($f," * This config file was auto-updated by YeAPF\n");
         fputs($f," * On $date at $time\n");
         fputs($f," */\n\n");
@@ -1819,7 +1824,7 @@
   {
     global $lastImplementation, $flgCanContinueWorking, $devSession;
 
-    xq_context('YeAPF',       'YeAPF 0.8.61-130 built on 2018-11-05 10:50 (-2 DST)');
+    xq_context('YeAPF',       'YeAPF 0.8.61-177 built on 2019-02-18 08:25 (-3 DST)');
     xq_context('devSession',  $devSession);
     xq_context('ts1',         date('U'));
 
