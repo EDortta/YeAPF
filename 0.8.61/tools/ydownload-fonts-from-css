@@ -1,0 +1,28 @@
+#!/bin/bash
+# tools/ydownload-fonts-from-css
+# YeAPF 0.8.61-182 built on 2019-02-25 20:32 (-3 DST)
+# Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+# 2019-02-21 09:28:22 (-3 DST)
+
+if [ -f "$1" ]; then
+  regex='(https?|ftp|file)://[-A-Za-z0-9\+&@#/%?=~_|!:,.;]*[-A-Za-z0-9\+&@#/%=~_|]'
+
+  fonts=`cat $1 | grep url | cut -d, -f 3 | cut -d "(" -f 2 | cut -d ")" -f1`
+  for url in $fonts; do
+    name=`basename $url`
+    if [[ $url =~ $regex ]]; then
+      echo "$name ..."
+      wget -q $url -O ../fonts/$name
+      if [ $? != 0 ]; then
+        echo "Error downloading $url"
+        exit 1
+      fi
+      sed -i ".backup" -e "s,$url,fonts\/$name,g" "$1"
+    fi
+  done
+else
+  echo "This script download font files related in css"
+  echo "It put them in ../fonts folder and change css file"
+  myself=`basename $0`
+  echo "    \$ $myself file-name.css"
+fi

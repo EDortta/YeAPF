@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.61-173 built on 2018-12-12 17:54 (-2 DST)
-    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-12-12 17:53:04 (-2 DST)
+    YeAPF 0.8.61-182 built on 2019-02-25 20:32 (-3 DST)
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+    2019-02-21 09:28:22 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -1729,7 +1729,7 @@
           $tableName=strtoupper($tableName);
           $sql="SELECT RDB\$RELATION_NAME FROM RDB\$RELATIONS WHERE RDB\$VIEW_BLR IS NULL AND RDB\$RELATION_NAME='$tableName'";
         } else
-          _die($GLOBALS['ydb_type']." not knowed as 'dbType' value on db.csv");
+          _die($GLOBALS['ydb_type']." not known as 'dbType' value on db.csv");
         $r=db_sql($sql);
         $requestedTables[$tableName]="$r";
       }

@@ -3,17 +3,17 @@
   /*
    * tools
    * tools/ylicenseExpiration.php
-   * YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
-   * Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2018-05-30 11:21:05 (-3 DST)
+   * YeAPF 0.8.61-182 built on 2019-02-25 20:32 (-3 DST)
+   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+   * 2019-02-25 20:31:46 (-3 DST)
    */
 
   function dataSQL($data, $hora='',$forceInternalFormat=false)
   {
     global $usingMySql;
 
-    $data=ereg_replace("[^0-9]", "", $data);
-    $hora=ereg_replace("[^0-9]", "", $hora);
+    $data=preg_replace("/[^0-9]/", "", $data);
+    $hora=preg_replace("/[^0-9]/", "", $hora);
     if (($usingMySql) || ($forceInternalFormat)) {
       $data=substr($data,4,4).substr($data,2,2).substr($data,0,2);
       while (strlen($data)<8)
@@ -61,7 +61,7 @@
     return $ret;
   }
 
-  echo basename("tools/ylicenseExpiration.php")."\nYeAPF 0.8.61 tools\nCopyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+  echo basename("tools/ylicenseExpiration.php")."\nYeAPF 0.8.61 tools\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
 
   if ($argc<=1) {
     echo "Exemplos:\n\tliberacao para uma data especifica: 18/06/2014 13:53\n";

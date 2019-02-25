@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.nodes.php
-    YeAPF 0.8.61-130 built on 2018-11-05 10:50 (-2 DST)
-    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-11-05 10:36:50 (-2 DST)
+    YeAPF 0.8.61-182 built on 2019-02-25 20:32 (-3 DST)
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+    2019-02-25 20:31:46 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -34,7 +34,7 @@
     }
 
     /* Common to both sides */
-    public function generateKey($maxLen = 7, $onlyUpperCase=true) {
+    public static function generateKey($maxLen = 7, $onlyUpperCase=true) {
       $seq = "QWERTYUIOPASDFGHJKLZXCVBNM0123456789";
       if (!$onlyUpperCase)
         $seq.="qwertyuiopasdfghjklzxcvbnm";
@@ -48,7 +48,7 @@
       return $key;
     }
 
-    public function isWorkingAsNodeController() {
+    public static function isWorkingAsNodeController() {
       if (db_status(_DB_CONNECTED_) == _DB_CONNECTED_) {
         $cc1 = db_sql("select count(*) from is_node_control");
         $cc2 = db_sql("select count(*) from is_server_control");
@@ -57,7 +57,7 @@
       else return false;
     }
 
-    public function isWorkingAsAppNode() {
+    public static function isWorkingAsAppNode() {
       global $cfgNodePrefix;
       _recordWastedTime("isWorkingAsAppNode()");
       $ret = false;
@@ -72,7 +72,7 @@
     }
 
     /* nodeController side */
-    public function reserveSegments($serverKey, $nodeName, $count = 10) {
+    public static function reserveSegments($serverKey, $nodeName, $count = 10) {
       global $cfgMaxSegmentReservationChunkCount, $cfgMaxUnattachedSegments;
       $ret=-1;
       if (self::isWorkingAsNodeController()) {
@@ -128,7 +128,7 @@
       return $ret;
     }
 
-    public function associateSegment($serverKey, $nodeName, $segment, $identity) {
+    public static function associateSegment($serverKey, $nodeName, $segment, $identity) {
       $ret = array('errorMsg'=>'NodeController not found');
       if (self::isWorkingAsNodeController()) {
         $ret=array('errorMsg'=>'System cannot be locked');
@@ -174,7 +174,7 @@
       return $ret;
     }
 
-    public function requestSegmentsId($serverKey, $nodeName, $count) {
+    public static function requestSegmentsId($serverKey, $nodeName, $count) {
       $ret=array();
 
       $sequence=_generateSegmentsId($serverKey, $nodeName, $count);
@@ -192,7 +192,7 @@
       return $ret;
     }
 
-    public function validateSequence($serverKey, $nodeName, $r) {
+    public static function validateSequence($serverKey, $nodeName, $r) {
       $ret=array();
 
       $x=y_uniqid();
@@ -210,7 +210,7 @@
       return $ret;
     }
 
-    public function checkServerKey($serverKey, $nodeName) {
+    public static function checkServerKey($serverKey, $nodeName) {
       $ret=array();
 
       $ret['rn']=-1;
@@ -247,7 +247,7 @@
 
     /* appNode side */
 
-    public function _request($url, &$canEvaluate) {
+    public static function _request($url, &$canEvaluate) {
       $ret=false;
       $url=urlAntiCache($url);
       self::registerAction( 1,"NODE: url '$url'");
@@ -269,7 +269,7 @@
       return $ret;
     }
 
-    public function requestSegmentReservation($count=9) {
+    public static function requestSegmentReservation($count=9) {
       global $cfgIdServerURL;
       $ret=-4;
       if (!self::isWorkingAsNodeController()) {
@@ -339,7 +339,7 @@
       return $ret;
     }
 
-    public function unassignedSegmentCount($allNodes=false) {
+    public static function unassignedSegmentCount($allNodes=false) {
       $serverKey = $GLOBALS['cfgDBNode']['server_key'];
       $nodePrefix = $GLOBALS['cfgDBNode']['node_prefix'];
       if ($allNodes)
@@ -353,14 +353,14 @@
       return db_sql($sql);
     }
 
-    public function registerAction($level, $description) {
+    public static function registerAction($level, $description) {
       global $dbgYNode;
       _dumpy(512, $level, $description);
       _record($dbgYNode, $description);
       _recordError($description);
     }
 
-    public function requestSegmentAssociation($identity) {
+    public static function requestSegmentAssociation($identity) {
       global $cfgIdServerURL, $cfgMainFolder, $cfgNodePrefix;
 
       $ret = -4;
@@ -464,7 +464,7 @@
       return $ret;
     }
 
-    public function requestNodeSequenceVerification($force=false) {
+    public static function requestNodeSequenceVerification($force=false) {
       global $cfgIdServerURL, $cfgMainFolder, $cfgNodePrefix;
       $ret = -3;
       $ok = false;
@@ -584,7 +584,7 @@
       return $ret;
     }
 
-    public function checkNodeConfig() {
+    public static function checkNodeConfig() {
       global $cfgNodePrefix, $cfgMainFolder;
       $ret = true;
       $secondsPerDay = 24 * 60 * 60;
@@ -652,7 +652,7 @@
       return $ret;
     }
 
-    public function thisNodeExists($onlyEnabled = true) {
+    public static function thisNodeExists($onlyEnabled = true) {
       global $cfgNodePrefix;
 
       if ($onlyEnabled) {
@@ -668,17 +668,17 @@
       return ($cc == 1);
     }
 
-    public function disableThisNode() {
+    public static function disableThisNode() {
       global $cfgNodePrefix;
       db_sql("update is_node_control set enabled='N' where nodePrefix='$cfgNodePrefix'");
     }
 
-    public function enableThisNode() {
+    public static function enableThisNode() {
       global $cfgNodePrefix;
       db_sql("update is_node_control set enabled='Y' where nodePrefix='$cfgNodePrefix'");
     }
 
-    public function nodeKeepAlive() {
+    public static function nodeKeepAlive() {
       global $cfgNodePrefix, $cfgClientConfig, $serverIP;
       if (db_status(_DB_LOCKED) == 0) {
         if (db_tableExists('is_node_control')) {
@@ -726,7 +726,7 @@
     }
 
     /* appNode side diagnosis functions */
-    public function diag_getSegmentReservationList() {
+    public static function diag_getSegmentReservationList() {
       $ret=array();
       $serverKey = $GLOBALS['cfgDBNode']['server_key'];
       $nodeName = $GLOBALS['cfgDBNode']['node_name'];
@@ -740,7 +740,7 @@
       return $ret;
     }
 
-    public function diag_getNextNodeVerification() {
+    public static function diag_getNextNodeVerification() {
       $now = date('U');
       $tempTimeMark = sys_get_temp_dir() . "/ctrl-tm-seq";
       if (file_exists($tempTimeMark)) {
