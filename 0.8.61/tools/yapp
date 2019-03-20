@@ -2,9 +2,9 @@
 <?php
   /*
   tools/yapp
-  YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
-  Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-  2018-08-02 22:38:27 (-3 DST)
+  YeAPF 0.8.61-221 built on 2019-03-20 19:24 (-3 DST)
+  Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+  2019-03-20 17:22:06 (-3 DST)
   */
   $mydir = dirname($_SERVER['SCRIPT_FILENAME']);
   $cmRequired = false;
@@ -28,23 +28,45 @@
     );
     $auxArgs = $args->getOptionList();
     foreach ($auxArgs as $key => $value) {
-      $yappContext['app'.ucfirst($key)] = $value;
+      if (mb_strtolower(mb_substr($key, 0, 3)!='app'))
+        $yappContext['app'.ucfirst($key)] = $value;
+      else
+        $yappContext[$key] = $value;
     }
     foreach($yappContext as $yKey => $yValue) {
       $yapp_ini = preg_replace("/\%\($yKey\)/", "$yValue", $yapp_ini);
     }
     $yapp_ini = parse_ini_string($yapp_ini, true);
 
+    $yapp_ini_return = array('parameters'=>array());
+    if (!isset($yapp_ini['subst']))
+      $yapp_ini_return['subst']=array('*');
+    else
+      $yapp_ini_return['subst']=$yapp_ini['subst'];
+
     if (isset($yapp_ini['parameters'])) {
       foreach($yapp_ini['parameters'] as $param=>$default) {
-        $keyName = 'app'.ucfirst($param);
-        if (!isset($yappContext[$keyName])) {
-          $yappContext['app'.ucfirst($param)] = $args->argValue($param, $default);
+        if (mb_strtolower(mb_substr($param, 0, 3)!='app'))
+          $keyName = 'app'.ucfirst($param);
+        else
+          $keyName = $param;
+        if (!isset($yapp_ini_return['parameters'][$keyName])) {
+          $yapp_ini_return['parameters'][$keyName] = $args->argValue($param, $default);
         }
       }
-    }
+    } else {
 
-    return $yapp_ini;
+    }
+    /*
+    foreach ($yappContext as $key => $value) {
+      if (mb_substr($key, 0, 3)=='app') {
+        if (!((mb_substr($key, 3)=='Type') || (mb_substr($key, 3)=='Name') || (mb_substr($key, 3)=='Folder')))   {
+          $yapp_ini['parameters'][$key]=trim($value);
+        }
+      }
+    }*/
+
+    return $yapp_ini_return;
   }
 
   function showAuxParameters($dirName) {
@@ -64,7 +86,34 @@
     }
   }
 
-  echo basename("tools/yapp") . "\nYeAPF 0.8.61 tools\nCopyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+  function substFileMacros($aFolder) {
+    global $yappContext;
+
+    echo " (subst) $aFolder\n";
+    if ((mb_substr($aFolder, mb_strlen($aFolder)-1,1))!="*")
+      $folder=$aFolder."/*";
+    else
+      $folder=$aFolder;
+
+    $files=glob("$folder");
+    foreach($files as $fileName) {
+      echo " (subst) $fileName\n";
+      if (!(($fileName=='.') || ($fileName=='..'))) {
+        if (is_dir("$fileName")) {
+          substFileMacros("$fileName");
+        } else {
+
+          $tempFile = file_get_contents("$fileName");
+          foreach($yappContext as $yKey => $yValue) {
+            $tempFile = preg_replace("/\%\($yKey\)/", "$yValue", $tempFile);
+          }
+          file_put_contents("$fileName", $tempFile);
+        }
+      }
+    }
+  }
+
+  echo basename("tools/yapp") . "\nYeAPF 0.8.61 tools\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
   $args = new ArgumentsProcessor();
   $appFolder = $args->getSrc(0);
   $toHelp = $args->argValue('help', __FALSE__) == __TRUE__;
@@ -188,7 +237,7 @@
       echo "\t\tYour source of distribution in '$YFolder/skel/webApp/templates' does not contain any template\n";
     }
 
-    echo "\t--fromSample <sample-name>\t(Cannot be user with --appType)\n";
+    echo "\t--fromSample <sample-name>\t(Cannot be used with --appType)\n";
     if (is_dir("$YFolder/samples")) {
       $d = dir("$YFolder/samples");
       while ($entry = $d->read()) {
@@ -319,30 +368,11 @@
 
     if (file_exists($yapp_ini_filename)) {
       $yapp_ini = process_ini_file($yapp_ini_filename);
-      foreach ($yapp_ini['subst'] as $key => $value) {
-        if (file_exists("$appFolder/$value")) {
-          if ($toForce) {
-            echo "Removing '$appFolder/$value'\n";
-            unlink("$appFolder/$value");
-          }
+      print_r($yapp_ini);
+      if (isset($yapp_ini['subst'])) {
+        foreach ($yapp_ini['subst'] as $value) {
+          substFileMacros("$appFolder/$value");
         }
-
-        if (!is_file("$appFolder/$value")) {
-          echo "Renaming '$appFolder/$key' to '$appFolder/$value'\n";
-
-          if (!rename("$appFolder/$key", "$appFolder/$value")) {
-            die("Was not possible to rename...\n");
-          }
-
-          $tempFile = file_get_contents("$appFolder/$value");
-          foreach($yappContext as $yKey => $yValue) {
-            $tempFile = preg_replace("/\%\($yKey\)/", "$yValue", $tempFile);
-          }
-          file_put_contents("$appFolder/$value", $tempFile);
-        } else {
-          die("Was not possible to create '$appFolder/$value'\nThis file already exists\nDo you need to use --force?\n");
-        }
-
       }
     }
 
@@ -378,7 +408,7 @@
     }
 
     /* save application tools environment */
-    $yeapfAppIni = "[app]\nappType=$appType\ntemplate=$template\nfromSample=$fromSample\nfolder=" . getcwd() . "\ndate=" . date("Y-m-dTH:i:s") . "\nyeapfVersion=0.8.61-105\n";
+    $yeapfAppIni = "[app]\nappType=$appType\ntemplate=$template\nfromSample=$fromSample\nfolder=" . getcwd() . "\ndate=" . date("Y-m-dTH:i:s") . "\nyeapfVersion=0.8.61-221\n";
     if (!file_put_contents("$yeapfAppIniFilename", $yeapfAppIni)) {
       echo "\nWARNING!\n\tWas not possible to write '$yeapfAppIniFilename'\n";
     }
@@ -394,7 +424,7 @@
             $cfgURL = "http://localhost/" . $yeapfConfig['myself'] . "/configure.php";
             echo "Calling '$cfgURL' ...\n";
             file_get_contents($cfgURL);
-            echo "Ok\nThis folder was updated to YeAPF v0.8.61-105\n";
+            echo "Ok\nThis folder was updated to YeAPF v0.8.61-221\n";
           }
           else {
             echo "Remember to call 'configure.php' from your navigator\n";

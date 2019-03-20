@@ -1,9 +1,9 @@
 <?php
   /*
     tools/spread-js.php
-    YeAPF 0.8.61-144 built on 2018-11-20 06:55 (-2 DST)
-    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-11-20 06:47:06 (-2 DST)
+    YeAPF 0.8.61-221 built on 2019-03-20 19:24 (-3 DST)
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+    2019-03-20 10:11:09 (-3 DST)
 
     This script will distribute monolite version of yloader.js
     among different application skeletons
@@ -36,7 +36,7 @@
       grantDirectory($tgtFolder);
       $auxFile = _file($srcFileName);
       if ($addHeader) {
-        $auxFile = "/* YeAPF 0.8.61-144 built on 2018-11-20 06:55 (-2 DST) Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
+        $auxFile = "/* YeAPF 0.8.61-221 built on 2019-03-20 19:24 (-3 DST) Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
       }
       $tgtFileName=basename($srcFileName);
       if (file_put_contents("$tgtFolder/$tgtFileName", $auxFile))
@@ -53,15 +53,19 @@
   function copyMobileFiles($targetFolder)
   {
     grantDirectory($targetFolder);
-    copyFile("app-src/js/ysandboxifc.js",       $targetFolder);
-    copyFile("app-src/js/ystorage.js",          $targetFolder);
-    copyFile("app-src/js/yifc.js",              $targetFolder);
-    copyFile("app-src/js/ycomm-worker.js",      $targetFolder);
+    copyFile("app-src/js/ysandboxifc.js",                           $targetFolder);
+    copyFile("app-src/js/ystorage.js",                              $targetFolder);
+    copyFile("app-src/js/yifc.js",                                  $targetFolder);
+    copyFile("app-src/js/ycomm-worker.js",                          $targetFolder);
+    copyFile("app-src/js/ystorage-indexedDB-interface.js",          $targetFolder);
+    copyFile("app-src/js/ystorage-indexedDB-slave.js",              $targetFolder);
 
-    copyFile("app-src/js/min/ysandboxifc.min.js",   $targetFolder, true);
-    copyFile("app-src/js/min/ystorage.min.js",      $targetFolder, true);
-    copyFile("app-src/js/min/yifc.min.js",          $targetFolder, true);
-    copyFile("app-src/js/min/ycomm-worker.min.js",  $targetFolder, true);
+    copyFile("app-src/js/min/ysandboxifc.min.js",                   $targetFolder, true);
+    copyFile("app-src/js/min/ystorage.min.js",                      $targetFolder, true);
+    copyFile("app-src/js/min/yifc.min.js",                          $targetFolder, true);
+    copyFile("app-src/js/min/ycomm-worker.min.js",                  $targetFolder, true);
+    copyFile("app-src/js/min/ystorage-indexedDB-interface.min.js",  $targetFolder, true);
+    copyFile("app-src/js/min/ystorage-indexedDB-slave.min.js",      $targetFolder, true);
   }
 
   function copyYeapfAppFiles($targetFolder)
@@ -96,7 +100,7 @@
   if (file_exists($minJS)) {
     echo "Minified version source: $minJS\n";
     $yeapf_minJS = join("", file($minJS));
-    $yeapf_minJS = "/* YeAPF 0.8.61-144 built on 2018-11-20 06:55 (-2 DST) Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
+    $yeapf_minJS = "/* YeAPF 0.8.61-221 built on 2019-03-20 19:24 (-3 DST) Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
   }
 
   grantDirectory("skel/chromeApp/js");
@@ -126,6 +130,15 @@
         }
       }
     }
+  }
+
+  /* WebSockets */
+  echo "Updating WebSockets sample from library\n";
+  $phpSpreadList=array("users.php", "websockets.php");
+  $folderName="lib/PHP-WebSockets";
+  foreach($phpSpreadList as $script) {
+    echo " +-- $folderName/$script\n";
+    copy("$folderName/$script", "skel/webSocket");
   }
 
 /*
@@ -210,18 +223,26 @@
   copyMobileFiles("skel/workbench/www/js");
   copyMobileFiles("skel/MoSyncApp/LocalFiles/js");
 
-  copyFile("app-src/js/ycomm-worker.js",              "skel/webApp/js");
-  copyFile("app-src/js/min/ycomm-worker.min.js",      "skel/webApp/js", false);
-  copyFile("app-src/js/min/ystorage.min.js",          "skel/webApp/js", false);
+  copyFile("app-src/js/ycomm-worker.js",                         "skel/webApp/js");
+  copyFile("app-src/js/min/ycomm-worker.min.js",                 "skel/webApp/js", false);
+  copyFile("app-src/js/min/ystorage.min.js",                     "skel/webApp/js", false);
+  copyFile("app-src/js/min/ystorage-indexedDB-interface.min.js", "skel/webApp/js", false);
+  copyFile("app-src/js/min/ystorage-indexedDB-slave.min.js",     "skel/webApp/js", false);
 
   /* samples */
   $jsSpreadTargets = array("samples/html-editor", "samples/key-admin", "samples/yIndexedDB", "skel/cordova");
   foreach($jsSpreadTargets as $targetFolder) {
     echo "ystorage and yloader -> $targetFolder\n";
-    copyFile("app-src/js/min/ystorage.min.js",          "$targetFolder/js", false);
-    copyFile("skel/webApp/js/yloader.min.js",           "$targetFolder/js", false);
-    copyFile("app-src/js/min/ystorage.js",          "$targetFolder/js", false);
-    copyFile("skel/webApp/js/yloader.js",           "$targetFolder/js", false);
+
+    copyFile("app-src/js/min/ystorage.min.js",                     "$targetFolder/js", false);
+    copyFile("app-src/js/min/ystorage-indexedDB-interface.min.js", "$targetFolder/js", false);
+    copyFile("app-src/js/min/ystorage-indexedDB-slave.min.js",     "$targetFolder/js", false);
+    copyFile("skel/webApp/js/yloader.min.js",                      "$targetFolder/js", false);
+
+    copyFile("app-src/js/min/ystorage.js",                         "$targetFolder/js", false);
+    copyFile("app-src/js/min/ystorage-indexedDB-interface.js",     "$targetFolder/js", false);
+    copyFile("app-src/js/min/ystorage-indexedDB-slave.js",         "$targetFolder/js", false);
+    copyFile("skel/webApp/js/yloader.js",                          "$targetFolder/js", false);
 
   }
 

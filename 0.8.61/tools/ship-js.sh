@@ -1,6 +1,6 @@
 #!/bin/bash
 echo "YeAPF 0.8.61 shipping js parts";
-echo "Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com";
+echo "Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com";
 
 tmp=`mktemp yeapf-db.XXXXXXX`
 echo "Generating 7 years license..."
@@ -16,7 +16,7 @@ echo "Minifying... ($temp)"
 echo "    yloader.js"
 java -jar tools/compressors/compiler.jar --language_in=ECMASCRIPT5 --js $temp --js_output_file $new
 
-for a in 'ysandboxifc' 'ystorage' 'yifc' 'yapp' 'ycomm-worker'
+for a in 'ysandboxifc' 'ystorage' 'yifc' 'yapp' 'ycomm-worker' 'ystorage-indexedDB-interface' 'ystorage-indexedDB-slave'
 do
   echo "    $a.js"
 

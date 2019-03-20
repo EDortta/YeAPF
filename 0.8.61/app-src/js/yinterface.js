@@ -1,8 +1,8 @@
 /*
     app-src/js/yinterface.js
-    YeAPF 0.8.61-105 built on 2018-10-16 08:01 (-3 DST)
-    Copyright (C) 2004-2018 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-09-10 07:27:59 (-3 DST)
+    YeAPF 0.8.61-221 built on 2019-03-20 19:24 (-3 DST)
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+    2019-03-10 07:50:09 (-3 DST)
 */
 
 var yInterfaceObj = function() {
@@ -19,8 +19,10 @@ var yInterfaceObj = function() {
         /* se for um click, pego o destino */
         if (e.target)
           e = e.target;
-        while ((e) && (e.nodeName != 'LI'))
-          e = e.parentNode;
+        while (  (e) &&
+                  !(  (e.getAttribute('data-tab') !== null) ||
+                     (e.nodeName == 'LI'))  )
+           e = e.parentNode;
         e.addClass('active');
         var tab = e.getAttribute('data-tab');
         mTabNav.showTab(tab);

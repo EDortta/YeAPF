@@ -113,7 +113,7 @@ abstract class WebSocketServer {
               case 111: // ECONNREFUSED -- Connection refused -- We shouldn't see this one, since we're listening... Still not a critical error.
               case 112: // EHOSTDOWN    -- Host is down -- Again, we shouldn't see this, and again, not critical because it's just one connection and we still want to listen to/for others.
               case 113: // EHOSTUNREACH -- No route to host
-              case 121: // EREMOTEIO    -- Rempte I/O error -- Their hard drive just blew up.
+              case 121: // EREMOTEIO    -- Remote I/O error -- Their hard drive just blew up.
               case 125: // ECANCELED    -- Operation canceled
 
                 $this->stderr("Unusual disconnect on socket " . $socket);

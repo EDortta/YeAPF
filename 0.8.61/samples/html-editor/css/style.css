@@ -65,3 +65,19 @@
     font-weight: 800;
     text-shadow: 1px 1px 1px #025aa52e;
 }
+
+.target-model {
+
+}
+
+.button-overlap-model {
+    display: none;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    z-index: 2;
+}
+
+.target-model:hover .button-overlap-model {
+    display: block;
+}

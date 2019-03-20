@@ -1,8 +1,8 @@
 /*********************************************
   * skel/workbench/www/js/yloader.js
-  * YeAPF 0.8.61-182 built on 2019-02-25 20:32 (-3 DST)
+  * YeAPF 0.8.61-221 built on 2019-03-20 19:24 (-3 DST)
   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2019-02-25 20:32:13 (-3 DST)
+  * 2019-03-20 10:11:09 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.61-182 built on 2019-02-25 20:32 (-3 DST)");
+ console.log("YeAPF 0.8.61-221 built on 2019-03-20 19:24 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -317,7 +317,7 @@
      
      ( function () {
        y$ = function (aElementId, aTagName, aIndex) {
-         var ret=undefined, auxRet;
+         var ret, auxRet;
          if (("string" == typeof aElementId) && (aElementId>'')) {
            if (aElementId.substr(0,1)=='#') {
              if (aElementId.indexOf(' ')>0) {
@@ -337,12 +337,12 @@
                if (ret.length===0)
                  ret=undefined;
              } else {
-               ret=undefined
+               ret=undefined;
              }
            }
            if (!ret) {
              /* search by classes */
-             var c, className, classes = aElementId.split(' '), classesReturn = undefined, first=true;
+             var c, className, classes = aElementId.split(' '), classesReturn, first=true;
              for(c=0; c<classes.length; c++) {
                className=trim(classes[c]);
                if (className.substr(0,1)=='.')
@@ -386,7 +386,7 @@
            ret = new Event(eventName);
          }
          return ret;
-       }
+       };
      }
      
      
@@ -650,7 +650,7 @@
            return string;
          }
      
-     }
+     };
      
      /*
       * http://snipplr.com/view/1853/get-elements-by-attribute/
@@ -676,7 +676,7 @@
      
      if (typeof getElementsByClassName=="undefined") {
        console.log("Using own 'getElementsByClassName()' function");
-       function getElementsByClassName(oRootElem, strTagName, aClassName) {
+       window.getElementsByClassName = function (oRootElem, strTagName, aClassName) {
          var arrElements = oRootElem.getElementsByTagName(strTagName);
          var arrReturnElements = [];
          var oCurrent;
@@ -689,7 +689,7 @@
          if (arrReturnElements===null)
            arrReturnElements=document.getElementsByClassName(aClassName);
          return arrReturnElements;
-       }
+       };
      }
      
      function getStyleRuleValue(className, styleItemName) {
@@ -709,7 +709,7 @@
            }
      
        }
-     };
+     }
      
      function setStyleRuleValue(className, styleItemName, value) {
        /* original from http://stackoverflow.com/questions/6338217/get-a-css-value-with-javascript */
@@ -728,7 +728,34 @@
            }
      
        }
-     };
+     }
+     
+     function createStyleRule(className, styleDefinition) {
+       var style = document.createElement('style');
+       style.type = 'text/css';
+       aux = '.{0} {'.format(className);
+       for(var e in styleDefinition) {
+         if (styleDefinition.hasOwnProperty(e)) {
+           aux+="\n\t{0}: {1};".format(e, styleDefinition[e]);
+         }
+       }
+       aux+='}\n';
+     
+       style.innerHTML = aux;
+       document.getElementsByTagName('head')[0].appendChild(style);
+     }
+     
+     function extractStyleRule(className) {
+       var ret={};
+       var k=getStyleRuleValue(className);
+       for(var j in k) {
+         if (k.hasOwnProperty(j)) 
+           if (k[j]>'') 
+             if(!isNumber(j)) 
+               ret[j]=k[j];
+           }
+       return ret;
+     }
      
      var getClientSize = function () {
        var auxDE = (document && document.documentElement)?document.documentElement:{clientWidth:800, clientHeight: 600};
@@ -912,7 +939,7 @@
              }
            }
            return ret;
-         }
+         };
        }
      
      
@@ -945,8 +972,8 @@
          var a=this;
          return  a.filter(function(item, pos) {
              return a.indexOf(item) == pos;
-         })
-       }
+         });
+       };
      }
      
      /* Object extensions */
@@ -965,7 +992,7 @@
      function isPropertySupported(property)
      {
        return property in document.body.style;
-     };
+     }
      
      function isEmpty(obj) {
          for(var prop in obj) {
@@ -979,7 +1006,7 @@
        String.prototype.asPhone = function() {
          var aux=this.replace(/\D+/g, ''), i;
          return aux.replace(/(\d{2,3})(\d{3})(\d{3})/, '$1-$2-$3');
-       }
+       };
      }
      
      if (!String.prototype.abbreviate) {
@@ -1069,7 +1096,7 @@
      if (!String.prototype.stripTags) {
        String.prototype.stripTags=function() {
          return (this || '').replace(/<(?:.|\n)*?>/gm, '');
-       }
+       };
      }
      
      if (!String.prototype.repeat) {
@@ -1149,7 +1176,7 @@
          [ "cem", "cento", "duzentos", "trezentos", "quatrocentos", "quinhentos", "seiscentos", "setecentos", "oitocentos", "novecentos" ],
          [ "mil", "milhÃ£o", "bilhÃ£o", "trilhÃ£o", "quadrilhÃ£o", "quintilhÃ£o", "sextilhÃ£o", "setilhÃ£o", "octilhÃ£o", "nonilhÃ£o", "decilhÃ£o", "undecilhÃ£o", "dodecilhÃ£o", "tredecilhÃ£o", "quatrodecilhÃ£o", "quindecilhÃ£o", "sedecilhÃ£o", "septendecilhÃ£o", "octencilhÃ£o", "nonencilhÃ£o" ]
        ];
-       var a, n, v, i, n = this.replace( c ? /[^,\d]/g : /\D/g, "" ).split( "," ),
+       var a, v, i, n = this.replace( c ? /[^,\d]/g : /\D/g, "" ).split( "," ),
          e = " e ",
          $ = "real",
          d = "centavo",
@@ -1168,7 +1195,7 @@
          a && r.push( a + ( c ? ( " " + ( v.join( "" ) * 1 > 1 ? j ? d + "s" : ( /0{6,}$/.test( n[ 0 ] ) ? "de " : "" ) + $.replace( "l", "is" ) : j ? d : $ ) ) : "" ) );
        }
        return r.join( e );
-     }
+     };
      
      if (!String.prototype.isPIS) {
        String.prototype.isPIS = function() {
@@ -1192,7 +1219,7 @@
              }
            }
            return ret;
-       }
+       };
      }
      
      if (!String.prototype.isCNS) {
@@ -1206,7 +1233,7 @@
            ret =( s % 11 )==0;
          }
          return ret;
-     }}
+     }};
      
      if (!String.prototype.isCPF) {
        //+ Carlos R. L. Rodrigues
@@ -4156,7 +4183,7 @@
                  if (canDo)
                    that.info.overElement.ondrop(aux);
                }
-             }        
+             }
            }
      
          }
@@ -9138,9 +9165,9 @@
  /* START yinterface.js */
      /*
          skel/workbench/www/js/yloader.js
-         YeAPF 0.8.61-182 built on 2019-02-25 20:32 (-3 DST)
+         YeAPF 0.8.61-221 built on 2019-03-20 19:24 (-3 DST)
          Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-         2019-02-25 20:32:13 (-3 DST)
+         2019-03-20 10:11:09 (-3 DST)
      */
      
      var yInterfaceObj = function() {
@@ -9157,8 +9184,10 @@
              /* se for um click, pego o destino */
              if (e.target)
                e = e.target;
-             while ((e) && (e.nodeName != 'LI'))
-               e = e.parentNode;
+             while (  (e) &&
+                       !(  (e.getAttribute('data-tab') !== null) ||
+                          (e.nodeName == 'LI'))  )
+                e = e.parentNode;
              e.addClass('active');
              var tab = e.getAttribute('data-tab');
              mTabNav.showTab(tab);

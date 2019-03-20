@@ -3,7 +3,7 @@ Skeleton and Samples Folder
 
 [ skeleton ]
 This folder contains different skeletons that can be used to build YeAPF applications.
-A Skeleton is a set of files that will be copied onto a user application folder substituing (more of the time) the files present there but keeping untouched user files.
+A Skeleton is a set of files that will be copied onto an user application folder substituing (more of the time) the files present there but keeping untouched user files.
 The most important and well mantained skeleton is skel/webApp.
 This is the source from wich the other are updated.
 
@@ -16,7 +16,7 @@ Differently from skeleton, a sample will override the user files (you need to us
 [ yapp.ini ]
 You can place a yapp.ini file into any of these folders.
 This ini file has two sections: subst and parameters.
-[ subst ] is the substitution pattern to be used with the filenames.
+[ subst ] is a list of  filenames that will be subject of macro substitution. (Defaults to '*')
 [ parameters ] is a list (with default values) that the user can use as yapp parameter.
 
 Some macros are ready to use. The complete list is: template, fromSample, appName, appType, appFolder.

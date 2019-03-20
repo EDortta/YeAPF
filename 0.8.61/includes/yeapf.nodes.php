@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.nodes.php
-    YeAPF 0.8.61-182 built on 2019-02-25 20:32 (-3 DST)
+    YeAPF 0.8.61-221 built on 2019-03-20 19:24 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-02-25 20:31:46 (-3 DST)
+    2019-02-26 16:53:01 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -496,7 +496,7 @@
           }
 
           $toTest = $toTest || $force;
-          if ($force) self::registerAction( 1,"NODE: checked enforced");
+          if ($force) self::registerAction( 1,"NODE: check enforced");
 
           if ($toTest) {
             $validServerURL = (isset($cfgIdServerURL)) && (!filter_var($cfgIdServerURL, FILTER_VALIDATE_URL) === false);
@@ -541,7 +541,8 @@
                 }
                 if (is_writable("$cfgMainFolder/.config")) {
                   if ($check == $ret['c']) {
-                    $writtenBytes = @file_put_contents("$cfgMainFolder/.config/cloudAppNode.seq", $ret['a'] . ':' . $ret['b']);
+                    $auxSequence=$ret['a'] . ':' . $ret['b'];
+                    $writtenBytes = @file_put_contents("$cfgMainFolder/.config/cloudAppNode.seq", $auxSequence);
                     if ((false===$writtenBytes) || ($writtenBytes==0)) {
                       self::registerAction( 1, "NODE: file '$cfgMainFolder/.config/cloudAppNode.seq' cannot be created");
                       $ok=false;
@@ -551,13 +552,13 @@
                       $ok = true;
                     }
                   } else {
-                    self::registerAction( 1,"NODE: Is this a clone node?");
+                    self::registerAction( 1,"NODE: Is this a cloned node?");
                     if (is_array($ret))
                       foreach($ret as $k => $v) self::registerAction( 1,"NODE: $k = '$v'");
-                  }                  
+                  }
                 } else {
                   self::registerAction( 1, "NODE: folder '$cfgMainFolder/.config' cannot be written");
-                  $ok=false;                  
+                  $ok=false;
                 }
               } else {
                 self::registerAction( 1,"NODE: '$cfgIdServerURL' is not a valid url");

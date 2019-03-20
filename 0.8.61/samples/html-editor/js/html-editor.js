@@ -6,6 +6,34 @@ var htmlEditorObject = function() {
   /* DragAndDrop */
   that.componentDropped = function(aDraggedElement) {
     var componentName = aDraggedElement.getAttribute("data-component");
+    var newId = function() {
+      return dec2hex(Math.floor(((new Date()).getTime() - 1542657731593) / 10));
+    }
+
+    var addButtons = function(parentNode) {
+      var c=0;
+      var buttonsSpace = document.createElement("div");
+      var buttons =      ['fa-times',    'fa-caret-square-o-left', 'fa-caret-square-o-right', 'fa-wrench'];
+      var buttonsClass = ['btn-warning', 'btn-success',            'btn-success',             'btn-info'];
+
+      var classNameT = "target-"+newId();
+      var classDefinitionT = extractStyleRule('.target-model');
+      createStyleRule(classNameT, classDefinitionT);
+
+      var classNameBO = "button-overlap-"+newId();
+      var classDefinitionBO = extractStyleRule('.button-overlap-model');
+      createStyleRule(classNameBO, classDefinitionBO);
+
+      createStyleRule("{0}:hover {1}".format(classNameT, classNameBO));
+
+      buttonsSpace.addClass(classNameBO);
+      for (c=0; c<buttons.length; c++) {
+        buttonsSpace.innerHTML+="<button type='button' class='btn-xs {0}'><i class='fa {1}'></i></button>".format(buttonsClass[c], buttons[c]);
+      }
+      parentNode.appendChild(buttonsSpace);
+      parentNode.addClass(classNameT);
+    }
+
     if (componentName == "rowsplace") {
       var colDef = (y$('rowplace').value || '').replace(/\ \ /g," ");
       var columns = colDef.split(' ');
@@ -20,6 +48,7 @@ var htmlEditorObject = function() {
         row.addClass("target");
         row.ondrop = that.componentDropped;
         row.ondragover = that.componentDraggedOver;
+
         for(c=0; c<columns.length; c++) {
           if (str2int(columns[c])) {
             var col = document.createElement("div");
@@ -29,6 +58,7 @@ var htmlEditorObject = function() {
             col.ondrop = that.componentDropped;
             col.ondragover = that.componentDraggedOver;
             row.appendChild(col);
+            addButtons(col);
           }
         }
       }
@@ -36,7 +66,7 @@ var htmlEditorObject = function() {
       var re=/id\=([\"A-Za-z_\-0-9]+)/g;
       var innerHTML = aDraggedElement.innerHTML;
       var result;
-      var shuffle = dec2hex(Math.floor(((new Date()).getTime() - 1542657731593) / 500));
+      var shuffle = dec2hex(Math.floor(((new Date()).getTime() - 1542657731593) / 100));
       var replacements = [];
       while (result = re.exec(innerHTML)) {
         var toSearch = result[0];
