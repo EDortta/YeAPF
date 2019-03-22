@@ -1,0 +1,22 @@
+#!/bin/bash
+#############################################################
+#   tools/gzcompress
+#   YeAPF 0.8.62-2 built on 2019-03-22 10:21 (-3 DST)
+#   2018-05-30 11:21:05 (-3 DST)
+#############################################################
+
+
+if [ ! -f '.ycompressed.flag' ]; then
+  find . -regex ".*\(.js\)$" -exec bash -c 'echo Minifying "{}" && minifyjs {}' \;
+  find . -regex ".*\(.css\)$" -exec bash -c 'echo Minifying "{}" && minifycss {}' \;
+  find . -regex ".*\(.html\)$" -exec bash -c 'echo Minifying "{}" && minifyhtml {}' \;
+
+  # find . \( -type f -name '*.min.js' -o -type f -name '*.min.css' \) -exec bash -c 'echo Compressing "{}" && gzip -c --best "{}" > "{}.gz"' \;
+
+  find . \( \( ! -name '*.gz' ! -name '*.min.css' -name '*.css' \) -o \( ! -name '*.gz' ! -name '*.min.js' -name '*.js' \)  -o \( ! -name '*.gz' ! -name '*.min.html' -name '*.html' \) \) -exec bash -c 'substref {}' \;
+  touch .ycompressed.flag
+
+  # find . -regex ".*\(css\|js\)$" -exec bash -c 'a=`basename {}` && b=s/$a/$a.gz/g && sed -i $b * ' \;
+else
+  echo "Already compressed"
+fi

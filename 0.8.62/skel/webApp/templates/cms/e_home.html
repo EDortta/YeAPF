@@ -1,0 +1,24 @@
+<div class="holder_content">
+  #set(group,1)
+  #for("select n.id, titulo, subtitulo, resumo, texto
+        from noticias n
+        left join pessoas p on p.id=pessoa
+        left join sessoes s on s.id=sessao
+        where n.censura='S' and gramatica='S' and destaque='S'
+        order by data desc
+        limit 0,3")
+    <section class="group#(group)">
+      <div style='height: 404px; overflow: hidden'>
+       <h3>#(titulo)</h3>
+       <h2>#(subtitulo)</h2>
+       <div style='padding: 8px'><em>#(resumo)</em></div>
+       #pic(id) #words(#noHTML(texto),0,50)
+      </div>
+      <div>
+        <a href="?s=articles&id=#(id)"><span class="button">Ler mais</span></a>
+      </div>
+    </section>
+    #add(group,1)
+  #next
+</div>
+

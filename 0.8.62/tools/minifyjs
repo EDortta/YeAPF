@@ -1,0 +1,39 @@
+#!/bin/bash
+# Call the closure compiler to minify js.
+# Takes a filename myjs.x.y.js and outputs myjs.x.y.min.js, a minified version.
+# http://joequery.me/code/minify-js-commandline/
+
+# The location of the closure compiler jar. You'll probably need to edit this.
+#CLOSURE_COMPILER=/usr/local/bin/compiler.jar
+CLOSURE_COMPILER=~/www/YeAPF/tools/compressors/compiler.jar
+
+case "$1" in
+""|"-h"|"--help")
+    echo "Usage: minifyjs path/to/js/file.js"
+    exit 1;
+    ;;
+esac
+
+if [ ! -f "$CLOSURE_COMPILER" ]; then
+  echo "$CLOSURE_COMPILER Not found"
+  exit 1;
+fi
+
+jsDir=`dirname $1`
+jsFile=`basename $1`
+
+if [ ! -d "$1" ]; then
+
+  # There's no way to get "from the beginning to the Nth to last field" when
+  # specifying a range via cut, but we can get "from the Nth field to the end".
+  # By reversing the string, cutting, and reversing back, we get the desired
+  # effect. The following gets myfile.min.js from myfile.js
+  minjsFile=`echo $jsFile | rev | cut -d"." -f2- | rev`.min.js
+
+  jsFilePath=$jsDir/$jsFile
+  minjsFilePath=$jsDir/$minjsFile
+
+
+  java -jar $CLOSURE_COMPILER --language_in=ECMASCRIPT5 --js=$jsFilePath --js_output_file=$minjsFilePath
+  echo "$jsFilePath minified. Now located at $minjsFilePath"
+fi

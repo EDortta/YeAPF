@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HTML Editor</title>
+  <meta name="description" content="Simple HTML editor">
+  <meta name="author" content="Esteban D.Dortta">
+  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/bootstrap-dialog.min.css" rel="stylesheet">
+  <link href="css/font-awesome.css" rel="stylesheet">
+  <link href="css/tether.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
+</head>
+
+<body>
+  <div id="status">
+
+  </div>
+
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="tabbable" id="">
+          <ul class="nav nav-tabs">
+            <li class="nav-item">
+              <a class="nav-link active" href="#tab1" data-toggle="tab">Arquivos</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#tab2" data-toggle="tab">Editor</a>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active" id="tab1">
+              [ * ]
+            </div>
+            <div class="tab-pane" id="tab2">
+              <div class="row" style="min-height: 91.3vh;">
+                <!--
+                    #####    ##    #####    ####   ######   #####
+                      #     #  #   #    #  #    #  #          #
+                      #    #    #  #    #  #       #####      #
+                      #    ######  #####   #  ###  #          #
+                      #    #    #  #   #   #    #  #          #
+                      #    #    #  #    #   ####   ######     #
+                -->
+                <div class="col-md-8">
+                  <div id="mainTarget" class='target' droppable=yes>
+                  </div>
+                </div>
+                <!--
+                    ####    ####   #    #  #####    ####   #    #  ######  #    #   #####   ####
+                   #    #  #    #  ##  ##  #    #  #    #  ##   #  #       ##   #     #    #
+                   #       #    #  # ## #  #    #  #    #  # #  #  #####   # #  #     #     ####
+                   #       #    #  #    #  #####   #    #  #  # #  #       #  # #     #         #
+                   #    #  #    #  #    #  #       #    #  #   ##  #       #   ##     #    #    #
+                    ####    ####   #    #  #        ####   #    #  ######  #    #     #     ####  
+                -->
+                <div id="componentsList" class="col-md-4 pre-scrollable">
+                  <form id="components" class="form-horizontal">
+                    <fieldset>
+                      <div class="">
+                        <div class="card active" id="columnsAndRows">
+                          <h5 class="card-header">Colunas e linhas</h5>
+                          <div class="component card-body" draggable=yes data-component="rowsplace">
+                            <!-- Text input-->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="rowplace">Linha</label>
+                              <div class="col-md-12">
+                                <input id="rowplace" name="rowplace" type="text" placeholder="preencha a distribui&ccedil;&atilde;o de colunas" class="form-control ">
+                              </div>
+                              <div class="col-md-12">
+                                <small>
+                                  O sistema de 12 colunas por linha exige que a soma do n&uacute;mero de colunas d&ecirc; doze ou menos.<br>
+                                  Ou seja, 12, 8+4, 11+1 s&atilde;o alguns valores v&aacute;lidos como nos exemplos a seguir:
+                                </small>
+                                <div class="form-group">
+                                  <button class="btn-choose-rowcolumns btn btn-xs btn-info" type="button">12</button>
+                                  <button class="btn-choose-rowcolumns btn btn-xs btn-info" type="button">2 + 10</button>
+                                  <button class="btn-choose-rowcolumns btn btn-xs btn-info" type="button">2 + 8 + 2</button>
+                                  <button class="btn-choose-rowcolumns btn btn-xs btn-info" type="button">6 + 6</button>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- Tabs of snippets go here -->
+                        <div class="card active" id="input">
+                          <h5 class="card-header">Entrada</h5>
+                          <div class="component card-body" draggable=yes data-component="textinput">
+                            <!-- Text input-->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="textinput">Textual simples</label>
+                              <div class="col-md-12">
+                                <input id="textinput" name="textinput" type="text" placeholder="exemplo..." class="form-control ">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="component card-body" draggable=yes data-component="passwordinput">
+                            <!-- Password input-->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="passwordinput">Senha</label>
+                              <div class="col-md-12">
+                                <input id="passwordinput" name="passwordinput" type="password" placeholder="exemplo..." class="form-control ">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="component card-body" draggable=yes data-component="searchinput">
+                            <!-- Search input-->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="searchinput">Busca</label>
+                              <div class="col-md-12">
+                                <input id="searchinput" name="searchinput" type="text" placeholder="exemplo..." class="search-query form-control">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="component card-body" draggable=yes data-component="prependedtext">
+                            <!-- Prepended text-->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="prependedtext">Com prefixo</label>
+                              <div class="col-md-12">
+                                <div class="input-group">
+                                  <span class="input-group-addon">prefixo</span>
+                                  <input id="prependedtext" name="prependedtext" class="col-md-6 form-control" placeholder="exemplo..." type="text">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="component card-body" draggable=yes data-component="appendedtext">
+                            <!-- Appended Input-->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="appendedtext">Com sufixo</label>
+                              <div class="col-md-12">
+                                <div class="input-group">
+                                  <input id="appendedtext" name="appendedtext" class="form-control " placeholder="exemplo..." type="text">
+                                  <span class="input-group-addon">sufixo</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="component card-body" draggable=yes data-component="prependedcheckbox">
+                            <!-- Prepended checkbox -->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="prependedcheckbox">Checagem no prefixo</label>
+                              <div class="col-md-12">
+                                <div class="input-group">
+                                  <span class="input-group-addon"><input type="checkbox"></span>
+                                  <input id="prependedcheckbox" name="prependedcheckbox" class="form-control " type="text" placeholder="exemplo...">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="component card-body" draggable=yes data-component="appendedcheckbox">
+                            <!-- Appended checkbox -->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="appendedcheckbox">Checagem no posfixo</label>
+                              <div class="col-md-12">
+                                <div class="input-group">
+                                  <input id="appendedcheckbox" name="appendedcheckbox" class="form-control " type="text" placeholder="exemplo...">
+                                  <span class="input-group-addon"><input type="checkbox"></span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="component card-body" draggable=yes data-component="buttonrightdropdown">
+                            <!-- Button Drop Down -->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="buttonrightdropdown">Op&ccedil;&otilde;es pela direita</label>
+                              <div class="col-md-12">
+                                <div class="input-group">
+                                  <input id="buttonrightdropdown" name="buttonrightdropdown" class="form-control " placeholder="exemplo..." type="text">
+                                  <div class="input-group-btn">
+                                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                      A&ccedil;&atilde;o
+                                      <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right">
+                                      <li><a href="#">Primeira op&ccedil;&atilde;o</a></li>
+                                      <li><a href="#">Segunda op&ccedil;&atilde;o</a></li>
+                                      <li><a href="#">Terceira op&ccedil;&atilde;o</a></li>
+                                    </ul>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="component card-body" draggable=yes data-component="buttonleftdropdown">
+                            <!-- Button Drop Down -->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="buttonleftdropdown">Op&ccedil;&otilde;es pela esquerda</label>
+                              <div class="col-md-12">
+                                <div class="input-group">
+                                  <div class="input-group-btn">
+                                    <button class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                                      A&ccedil;&atilde;o
+                                      <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu pull-right">
+                                      <li><a href="#">Primeira op&ccedil;&atilde;o</a></li>
+                                      <li><a href="#">Segunda op&ccedil;&atilde;o</a></li>
+                                      <li><a href="#">Terceira op&ccedil;&atilde;o</a></li>
+                                    </ul>
+                                  </div>
+                                  <input id="buttonleftdropdown" name="buttonleftdropdown" class="form-control " placeholder="exemplo..." type="text">
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="component card-body" draggable=yes data-component="textarea">
+                            <!-- Textarea -->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="textarea">&Aacute;rea de texto livre</label>
+                              <div class="col-md-12">
+                                <textarea id="textarea" name="textarea" class="form-control ">default text</textarea>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="card" id="radioscheckboxes">
+                          <h5 class="card-header">Checagens</h5>
+                          <div class="component card-body" draggable=yes data-component="radios">
+                            <!-- Multiple Radios -->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="radios">Sele&ccedil;&atilde;o &uacute;nica</label>
+                              <div class="col-lg-12">
+                                <div class="radio">
+                                  <label for="radios-0">
+                                    <input type="radio" name="radios" id="radios-0" value="Option one" checked="checked">
+                                    Primeira op&ccedil;&atilde;o
+                                  </label></div>
+                                <div class="radio">
+                                  <label for="radios-1">
+                                    <input type="radio" name="radios" id="radios-1" value="Option two">
+                                    Segunda op&ccedil;&atilde;o
+                                  </label></div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="component card-body" draggable=yes data-component="inlineradios">
+                            <!-- Multiple Radios (inline) -->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="inlineradios">Sele&ccedil;&atilde;o &uacute;nica em linha</label>
+                              <div class="col-lg-12">
+                                <label class="radio-inline" for="radios-A">
+                                  <input type="radio" name="inlineradios" id="radios-A" value="1" checked="checked">
+                                  1
+                                </label>
+                                <label class="radio-inline" for="radios-B">
+                                  <input type="radio" name="inlineradios" id="radios-B" value="2">
+                                  2
+                                </label>
+                                <label class="radio-inline" for="radios-C">
+                                  <input type="radio" name="inlineradios" id="radios-C" value="3">
+                                  3
+                                </label>
+                                <label class="radio-inline" for="radios-D">
+                                  <input type="radio" name="inlineradios" id="radios-D" value="4">
+                                  4
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="component card-body" draggable=yes data-component="checkboxes">
+                            <!-- Multiple Checkboxes -->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="checkboxes">Sele&ccedil;&atilde;o m&uacute;ltiple</label>
+                              <div class="col-lg-12">
+                                <div class="checkbox">
+                                  <label for="checkboxes-0">
+                                    <input type="checkbox" name="checkboxes" id="checkboxes-0" value="Option one">
+                                    Primeira op&ccedil;&atilde;o
+                                  </label>
+                                </div>
+                                <div class="checkbox">
+                                  <label for="checkboxes-1">
+                                    <input type="checkbox" name="checkboxes" id="checkboxes-1" value="Option two">
+                                    Segunda op&ccedil;&atilde;o
+                                  </label>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="component card-body" draggable=yes data-component="inlinecheckboxes">
+                            <!-- Multiple Checkboxes (inline) -->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="inlinecheckboxes">Sele&ccedil;&atilde;o m&uacute;ltiple em linha</label>
+                              <div class="col-lg-12">
+                                <label class="checkbox-inline" for="checkboxes-A">
+                                  <input type="checkbox" name="inlinecheckboxes" id="checkboxes-A" value="1">
+                                  1
+                                </label>
+                                <label class="checkbox-inline" for="checkboxes-B">
+                                  <input type="checkbox" name="inlinecheckboxes" id="checkboxes-B" value="2">
+                                  2
+                                </label>
+                                <label class="checkbox-inline" for="checkboxes-C">
+                                  <input type="checkbox" name="inlinecheckboxes" id="checkboxes-C" value="3">
+                                  3
+                                </label>
+                                <label class="checkbox-inline" for="checkboxes-D">
+                                  <input type="checkbox" name="inlinecheckboxes" id="checkboxes-D" value="4">
+                                  4
+                                </label>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="card" id="select">
+                          <h5 class="card-header">Op&ccedil;&otilde;es</h5>
+                          <div class="component card-body" draggable=yes data-component="selectbasic">
+                            <!-- Select Basic -->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="selectbasic">Selecionador b&aacute;sico</label>
+                              <div class="col-md-12">
+                                <select id="selectbasic" name="selectbasic" class="form-control ">
+                                  <option>Primeira op&ccedil;&atilde;o</option>
+                                  <option>Segunda op&ccedil;&atilde;o</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="component card-body" draggable=yes data-component="selectmultiple">
+                            <!-- Select Multiple -->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="selectmultiple">Selecionador m&uacute;ltiple</label>
+                              <div class="col-md-12">
+                                <select id="selectmultiple" name="selectmultiple" class="form-control " multiple="multiple">
+                                  <option>Primeira op&ccedil;&atilde;o</option>
+                                  <option>Segunda op&ccedil;&atilde;o</option>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="card" id="buttons">
+                          <h5 class="card-header">Bot&otilde;es</h5>
+                          <div class="component card-body" draggable=yes data-component="filebutton">
+                            <!-- File Button -->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="filebutton">Arquivo</label>
+                              <div class="col-lg-12">
+                                <input id="filebutton" name="filebutton" type="file">
+                              </div>
+                            </div>
+                          </div>
+                          <div class="component card-body" draggable=yes data-component="singlebutton">
+                            <!-- Button -->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="singlebutton">Bot&atilde;o simples</label>
+                              <div class="col-lg-12">
+                                <button id="singlebutton" name="singlebutton" class="btn btn-primary">Bot&atilde;o</button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </fieldset>
+                  </form>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="js/jquery.min.js"></script>
+  <script src="js/tether.min.js"></script>
+  <script src="js/bootstrap.min.js"></script>
+  <script src="js/bootstrap-dialog.min.js"></script>
+  <script src="js/yloader.js"></script>
+  <script src="js/html-editor.js"></script>
+</body>
+
+</html>

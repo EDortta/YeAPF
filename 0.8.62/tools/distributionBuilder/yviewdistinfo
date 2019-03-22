@@ -1,0 +1,59 @@
+#!/usr/bin/php
+<?php
+/*
+    tools/distributionBuilder/yviewdistinfo
+    YeAPF 0.8.62-2 built on 2019-03-22 10:21 (-3 DST)
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+    2018-05-30 11:21:05 (-3 DST)
+*/
+
+  $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
+  $cmRequired=false;
+  if (file_exists("$mydir/yclilib.php"))
+    $cmLocation = "$mydir/yclilib.php";
+  else
+    $cmLocation = "$mydir/../yclilib.php";
+
+  (@include_once "$cmLocation") or die("yclilib.php not found\n");
+
+  function arrayValue($array, $key, $default='')
+  {
+    $ret='';
+    if (isset($array[$key]))
+      $ret=$array[$key];
+    else
+      $ret=$default;
+    return $ret;
+  }
+
+  $cwd=getcwd();
+  $args = new ArgumentsProcessor(false);
+  $myself = basename($argv[0]);
+
+  $versionDef = isset($argv[1])?$argv[1]:'.';
+  $versionDef = "$versionDef/version.def";
+  if (!file_exists($versionDef))
+    $versionDef=".distribution/$versionDef";
+  
+  if ((!file_exists($versionDef)) && ($argc<=1)) {
+    if ((is_dir(".distribution")) && (file_exists("version.inf"))) {
+      $curVersion = join(file('version.inf'));
+      $curVersion = substr($curVersion,0,strpos($curVersion, "-"));
+      $versionDef = ".distribution/$curVersion/version.def";
+    }
+  }
+  if (file_exists("$versionDef")) {
+    echo "[ $versionDef ]\n";
+    $vd=unserialize(join(file($versionDef)));
+    foreach($vd as $k => $v) {
+      if (!is_numeric($k)) {
+        if (is_array($v)) {
+          $k=substr($k.str_repeat(' ',80),0,80);
+          echo "    $k :".arrayValue($v,'LAST_FILE_MODIFICATION')." :".arrayValue($v,'MD5')." :".arrayValue($v,'WARNING')."\n";
+        } else
+          echo "$k = $v\n";
+      }
+    }
+  } else
+    echo "'$versionDef' not found\n";
+?>

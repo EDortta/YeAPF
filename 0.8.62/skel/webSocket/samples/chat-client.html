@@ -1,0 +1,120 @@
+<html>
+
+<head>
+  <title>WebSocket</title>
+  <style type="text/css">
+  html,
+  body {
+    font: normal 0.9em arial, helvetica;
+  }
+
+  #log {
+    width: 600px;
+    height: 300px;
+    border: 1px solid #7F9DB9;
+    overflow: auto;
+  }
+
+  #msg {
+    width: 400px;
+  }
+  </style>
+  <script type="text/javascript">
+  var socket, uname;
+
+  function register() {
+    uname=($("userName").value || "").trim();
+    if (uname>"") {
+      $("userNameSpace").style.display="none";
+      $("chatSpace").style.display="";
+      init();
+    }
+  }
+
+  function init() {
+    var host = "ws://127.0.0.1:%(appPort)/echobot"; // SET THIS TO YOUR SERVER
+    try {
+      socket = new WebSocket(host);
+      log('WebSocket - status ' + socket.readyState);
+      socket.onopen = function(msg) {
+        log("Welcome - status " + this.readyState);
+        socket.send("uname:"+uname);
+      };
+      socket.onmessage = function(msg) {
+        log("<b>" + msg.data + '</b>');
+      };
+      socket.onclose = function(msg) {
+        log("Disconnected - status " + this.readyState);
+      };
+    } catch (ex) {
+      log(ex);
+    }
+    $("msg").focus();
+  }
+
+  function send() {
+    var txt, msg;
+    txt = $("msg");
+    msg = txt.value;
+    if (!msg) {
+      alert("Message can not be empty");
+      return;
+    }
+    txt.value = "";
+    txt.focus();
+    try {
+      socket.send("msg:"+msg);
+      log(uname+' >> <b>' + msg + '</b>');
+    } catch (ex) {
+      log(ex);
+    }
+  }
+
+  function quit() {
+    if (socket != null) {
+      log("Goodbye!");
+      socket.close();
+      socket = null;
+    }
+  }
+
+  function reconnect() {
+    quit();
+    init();
+  }
+
+  // Utilities
+  function $(id) {
+    return document.getElementById(id);
+  }
+
+  function log(msg) {
+    $("log").innerHTML += "<br>" + msg;
+  }
+
+  function onkey(event) {
+    if (event.keyCode == 13) {
+      send();
+    }
+  }
+  </script>
+</head>
+
+<body>
+  <h3>WebSocket v2.00</h3>
+  <div id=userNameSpace>
+    <label>User name</label>
+    <input id=userName type=text>
+    <button onclick="register()">Register</button>
+  </div>
+  <div id=chatSpace style="display: none;">
+    <div id="log"></div>
+    <input id="msg" type="textbox" onkeypress="onkey(event)" />
+    <button onclick="send()">Send</button>
+    <button onclick="quit()">Quit</button>
+    <button onclick="reconnect()">Reconnect</button>
+  </div>
+  <p><a href="https://github.com/ghedipunk/PHP-Websockets.git">Original GIT project</a></p>
+</body>
+
+</html>

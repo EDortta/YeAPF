@@ -1,0 +1,73 @@
+<div class=tnContainer>
+  <div class=tnNavigator style='height:28px'>
+    <div style='float: left'><input type=button onclick='javascript:mTabNav.showPrior()' value='Anterior'></div>
+    <div style='float: right'><input type=button onclick='javascript:mTabNav.showNext()' value='Seguinte'></div>
+  </div>
+
+  <div class=tnTab>
+    <h1>Primeira</h1>
+    Escreva aqui o conteúdo da sua primeira aba
+  </div>
+
+  <div class=tnTab id='segundaAba'>
+    <h1>Segunda</h1>
+    Esta é a segunda aba
+  </div>
+
+  <div class=tnTab id='terceiraAba'>
+    <h1>Terceira</h1>
+    Esta é a terceira aba que não vai aparecer porque ontabchange devolve false
+  </div>
+
+  <div class=tnTab id='quartaAba'>
+    <h1>Terceira</h1>
+    Esta é a quarta aba<br>
+    Você chegou aqui por clicar no botão especifico
+  </div>
+
+</div>
+
+<div class=tnNavigator>
+  <ol>
+    <li><a href='javascript:irSegundaAba()'>Mostrar a aba chamada 'segundaAba'</a></li>
+    <li><a href='javascript:abrirAba("quartaAba")'>Mostrar a aba chamada 'quartaAba'</a></li>
+  </ol>
+  <b>Este arquivo é e_main_body.html</b>
+</div>
+
+<script>
+  var mTabNav=new TabNav();
+  mTabNav.init();
+
+  // acontece logo antes do tab ser mostrado
+  mTabNav.ontabfocus = function(aTab) {
+    alert(aTab.id+' com foco');
+  }
+
+  // acontece logo antes do tab ser escondido
+  // caso queira que o tab seja ocultado (e outro mostrado), devolva TRUE
+  // pra ficar no mesmo tab, devolva FALSE
+  mTabNav.ontabblur = function(aTab) {
+    alert(aTab.id+' perdendo foco');
+    if (aTab.id=='terceiraAba')
+      return false;
+    else
+      return true;
+  }
+
+  // acontece logo antes de mudar para um tab
+  // deve retornar um booleano permitindo (TRUE) ou impedindo (FALSE) a mudança
+  mTabNav.ontabchange = function(aTab) {
+    return (aTab.id!='terceiraAba');
+  }
+
+  function irSegundaAba()
+  {
+    mTabNav.showTab($('segundaAba'));
+  }
+
+  function abrirAba(nomeAba)
+  {
+    mTabNav.showTab($(nomeAba));
+  }
+</script>

@@ -1,0 +1,75 @@
+#!/usr/bin/php
+<?php
+/*
+    tools/ydbviewconfig
+    YeAPF 0.8.62-2 built on 2019-03-22 10:21 (-3 DST)
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+    2018-05-30 11:21:05 (-3 DST)
+*/
+  $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
+  $cmRequired=false;
+  $dbConnect='no';
+  (@include_once "$mydir/yclilib.php") or die("yclilib.php not found\n");
+
+  $args = new ArgumentsProcessor(false);
+  $asIni = $args->argValue('i;ini', __FALSE__)==__TRUE__;
+  $onlyActive = $asIni || ($args->argValue('a;active', __FALSE__)==__TRUE__);
+  $help = $args->argValue('h;help', __FALSE__)==__TRUE__;
+  // $help=($args->argValue('h;help')==true)  tb funfa
+
+  echo basename("tools/ydbviewconfig")."\nYeAPF 0.8.62 tools\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+  /* first version: 2012 */
+  if ($help) {
+    $myself=$argv[0];
+    echo "simple usage:\n\t".basename("tools/ydbviewconfig")." [path-to-db.csv] [-a|--active] [-i|--ini]\n\t\t-a|--active\tonly active connection\n\t\t-i|--ini output as ini file (forces -a)\n";
+    exit(0);
+  }
+  _LOAD_YEAPF_();
+
+  $yeapfDB=$args->getSrc(0);
+  if ($yeapfDB=='')
+    $yeapfDB=getConfigFileName();
+
+  if ($asIni)
+    echo "; ";
+  echo "yeapfDB config file: '$yeapfDB'\n";
+
+  if (file_exists($yeapfDB)) {
+    $ini=file($yeapfDB);
+    $campos=explode(';',$ini[0]);
+    $activeNdx=-1;
+    foreach($campos as $key=>$value) {
+      if ($value=='active')
+        $activeNdx=$key;
+    }
+
+
+    for($i=1;$i<count($ini);$i++) {
+      if (trim($ini[$i])>'') {
+        $data=explode(';',$ini[$i]);
+        $n=0;
+        $active=unquote($data[$activeNdx]);
+        if ((!$onlyActive) || ($active==1)) {
+          if (!$asIni)
+            echo "\n--[ REG $i ]---------------------\n";
+          else {
+            echo "[".basename(getcwd())."-".date("YmdHis")."]\n";
+          }
+
+          foreach($campos as $c) {
+            $c=str_replace("\n","",$c);
+            if ($asIni) {
+              if (isset($data[$n]))
+              echo "$c=".$data[$n]."\n";
+            } else {
+              $c=substr($c.str_repeat(".", 38),0,38);
+              echo "$c: ".(isset($data[$n])?$data[$n]:"NULL")."\n";
+            }
+            $n++;
+          }
+        }
+      }
+    }
+  }
+
+?>

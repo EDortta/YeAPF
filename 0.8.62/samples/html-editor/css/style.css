@@ -1,0 +1,83 @@
+#status {
+    z-index: 100;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 20px;
+    border-top: solid 1px black;
+    background-color: #215AA1;
+    color: white;
+    font-weight: 100;
+    font-size: 12px;
+    padding-left: 12px;
+}
+
+.component {
+    border-bottom: dotted 1px #B3B3B3;
+    cursor: pointer;
+}
+
+.component:hover {
+    font-weight: 800;
+}
+
+.component * {
+    pointer-events: none
+}
+
+#rowplace,
+.btn-choose-rowcolumns {
+    pointer-events: auto;
+}
+
+.highlight {
+    background-color: #FFF2B1;
+}
+
+#componentsList {
+    margin-bottom: -99999px;
+    padding-bottom: 99999px;
+}
+
+#mainTarget {
+    width: 100%;
+    height: 100%;
+    padding: 1px;
+    border: dotted 1px;
+}
+
+.target {
+    margin: 0px;
+    min-height: 38px;
+    border-left: dotted 1px;
+}
+
+.target .row {
+    border-bottom: dotted 1px;
+}
+
+.editable-component:before {
+    content: attr(id);
+    font-size: 90%;
+    font-family: monospace;
+    color: #999;
+    font-weight: 800;
+    text-shadow: 1px 1px 1px #025aa52e;
+}
+
+.target-model {
+
+}
+
+.button-overlap-model {
+    display: none;
+    position: absolute;
+    right: 0px;
+    top: 0px;
+    z-index: 2;
+}
+
+.target-model:hover .button-overlap-model {
+    display: block;
+}

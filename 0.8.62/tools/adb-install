@@ -1,0 +1,32 @@
+#!/bin/bash
+# (C) 2016 Esteban D.Dortta
+#
+# tools/adb-install
+# YeAPF 0.8.62-2 built on 2019-03-22 10:21 (-3 DST)
+# Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+# 2018-07-09 14:58:37 (-3 DST)
+#
+# This set of scripts requires adb/android-sdk/cordova installed on your device.
+# Has been well tested under Ubuntu 16 and MacOSX 10.11.6
+# It is supposed to run on Cygwin
+
+if [ -f www/js/version.js ]; then
+	my_dir="$(dirname "$0")"
+	source "$my_dir/adb-lib.inc.sh"
+
+	version="$(currentVersion)"
+
+	dev=$1
+	if [ -z $dev ]; then
+	  dev=$firstdev
+	fi
+
+	if [ $devcount -eq 0 ]; then
+	  echo "Please, attach/indicate a device"
+	else
+	  echo "Installing on $dev"
+	  adb -s $dev install platforms/android/app/build/outputs/apk/debug/app-debug.apk
+	fi
+else
+	echo "www/js/version.js file not found"
+fi
