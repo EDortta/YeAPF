@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.62-2 built on 2019-03-22 10:21 (-3 DST)
+  * YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2019-03-22 10:21:08 (-3 DST)
+  * 2019-04-04 23:38:01 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.62-2 built on 2019-03-22 10:21 (-3 DST)");
+ console.log("YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -166,7 +166,7 @@
        if (ydbg.logFlag & logFlag) {
          if (ydbg.logLevel>=logLevel) {
            var aLine = '', aAnArgument, ts, d=new Date();
-           ts=d.getHours()+':'+d.getMinutes()+':'+d.getSeconds()+' ';
+           ts=("0"+d.getHours()).slice(-2)+':'+("0"+d.getMinutes()).slice(-2)+':'+("0"+d.getSeconds()).slice(-2)+' ';
            for (var i=2; i<arguments.length; i++) {
              if (aLine>'')
                aLine+=', ';
@@ -328,7 +328,7 @@
            }
            if (!ret)
              ret = document.getElementById(aElementId);
-      
+     
            if (!ret) {
              ret = document.getElementsByName(aElementId);
              if (ret.length) {
@@ -674,22 +674,24 @@
        return arrReturnElements;
      }
      
-     if (typeof getElementsByClassName=="undefined") {
-       console.log("Using own 'getElementsByClassName()' function");
-       window.getElementsByClassName = function (oRootElem, strTagName, aClassName) {
-         var arrElements = oRootElem.getElementsByTagName(strTagName);
-         var arrReturnElements = [];
-         var oCurrent;
-         for(var i=0; i<arrElements.length; i++) {
-           oCurrent = arrElements[i];
-           if ((oCurrent) && (typeof oCurrent.hasClass == 'function'))
-             if (oCurrent.hasClass(aClassName))
-               arrReturnElements.push(oCurrent);
-         }
-         if (arrReturnElements===null)
-           arrReturnElements=document.getElementsByClassName(aClassName);
-         return arrReturnElements;
-       };
+     if (typeof window == "object") {
+       if (typeof getElementsByClassName=="undefined") {
+         console.log("Using own 'getElementsByClassName()' function");
+         window.getElementsByClassName = function (oRootElem, strTagName, aClassName) {
+           var arrElements = oRootElem.getElementsByTagName(strTagName);
+           var arrReturnElements = [];
+           var oCurrent;
+           for(var i=0; i<arrElements.length; i++) {
+             oCurrent = arrElements[i];
+             if ((oCurrent) && (typeof oCurrent.hasClass == 'function'))
+               if (oCurrent.hasClass(aClassName))
+                 arrReturnElements.push(oCurrent);
+           }
+           if (arrReturnElements===null)
+             arrReturnElements=document.getElementsByClassName(aClassName);
+           return arrReturnElements;
+         };
+       }
      }
      
      function getStyleRuleValue(className, styleItemName) {
@@ -749,9 +751,9 @@
        var ret={};
        var k=getStyleRuleValue(className);
        for(var j in k) {
-         if (k.hasOwnProperty(j)) 
-           if (k[j]>'') 
-             if(!isNumber(j)) 
+         if (k.hasOwnProperty(j))
+           if (k[j]>'')
+             if(!isNumber(j))
                ret[j]=k[j];
            }
        return ret;
@@ -794,7 +796,7 @@
      if ("undefined" !== typeof Element) {
      
        if (!Element.prototype.matches)
-           Element.prototype.matches = Element.prototype.msMatchesSelector || 
+           Element.prototype.matches = Element.prototype.msMatchesSelector ||
                                        Element.prototype.webkitMatchesSelector;
      
        if (!Element.prototype.closest)
@@ -804,7 +806,7 @@
                do {
                    if (el.matches(s)) return el;
                    el = el.parentElement || el.parentNode;
-               } while (el !== null); 
+               } while (el !== null);
                return null;
            };
      
@@ -824,7 +826,7 @@
                  ret=true;
              } else {
                if (aClasses[i] == aClassName)
-                 ret = true;          
+                 ret = true;
              }
            }
          }
@@ -1937,7 +1939,7 @@
          aFormat="d/m/y";
        var ret='';
        var aDate=extractDateValues(aUDate,'yyyymmddHHMMSS');
-       if (!(aDate === null)) { 
+       if (!(aDate === null)) {
          for(var i=0; i<aFormat.length; i++)
            if (/^[d,m,y]+$/.test(aFormat[i]))
              ret+=aDate[aFormat[i]];
@@ -2073,7 +2075,7 @@
              aFrenchDate    = dateTransform(aFrenchDate,    "dd/mm/yyyy", "yyyy-mm-dd");
              aFrenchMinDate = dateTransform(aFrenchMinDate, "dd/mm/yyyy", "yyyy-mm-dd");
              aFrenchMaxDate = dateTransform(aFrenchMaxDate, "dd/mm/yyyy", "yyyy-mm-dd");
-             ret = ((aFrenchDate>=aFrenchMinDate) && (aFrenchDate<=aFrenchMaxDate));        
+             ret = ((aFrenchDate>=aFrenchMinDate) && (aFrenchDate<=aFrenchMaxDate));
            }
          }
        }
@@ -2307,7 +2309,7 @@
      
      function sign(aValue) {
        aValue = str2int(aValue);
-       if (aValue==0) 
+       if (aValue==0)
          return 0;
        else if (aValue<0)
          return -1;
@@ -2413,7 +2415,7 @@
      function pickColorFromGradient(firstColor, lastColor, weight) {
          var w1 = Math.max(0,Math.min(weight, 100))/100,
              w2 = 1 - w1,
-             color1 = decomposeColor(firstColor), 
+             color1 = decomposeColor(firstColor),
              color2 = decomposeColor(lastColor);
      
          var rgb = [Math.round(color1[0] * w1 + color2[0] * w2),
@@ -9165,9 +9167,9 @@
  /* START yinterface.js */
      /*
          skel/chromeApp/js/yloader.js
-         YeAPF 0.8.62-2 built on 2019-03-22 10:21 (-3 DST)
+         YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
          Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-         2019-03-22 10:21:08 (-3 DST)
+         2019-04-04 23:38:01 (-3 DST)
      */
      
      var yInterfaceObj = function() {
@@ -10634,10 +10636,13 @@
          that._repeatableFieldInfo = [];
      
          var tables = y$('.table');
-         if (tables)
+         if (tables) {
            tables.forEach(function(table) {
-             ycomm.dom.fillElement(table.id, {});
+             if ((table.getAttribute('data-dbtable') || 'no')=='yes') {
+               ycomm.dom.fillElement(table.id, {});
+             }
            });
+         }
      
          /* analiso a url para ver se o usuÃ¡rio quer ir para uma ancora */
          setTimeout(function() {

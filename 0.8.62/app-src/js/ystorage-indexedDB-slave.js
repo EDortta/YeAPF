@@ -2,7 +2,16 @@
 
 if ("undefined" == typeof yloader) {
   if ("undefined" != typeof importScripts)
-    importScripts("yloader.js");
+    try {
+      importScripts("yloader.js");
+    } catch(e) {
+      try {
+        importScripts("yloader.min.js");
+      } catch(e) {
+        log('Error loading yloader');
+      }
+
+    }
 }
 
 /*
@@ -369,13 +378,17 @@ var yIndexedDBSlaveObj = function() {
               tx.executeSql(
                 sqlStatement, [],
                 function(sqlTransaction, results) {
-                  for (var i = 0; i < results.rows.length; i++) {
-                    callbackRet.data = {};
-                    var auxData = results.rows.item(i).data || "";
-                    auxData = JSON.parse(auxData);
-                    mergeObject(auxData, callbackRet.data);
-                    callbackRet.return = true;
+                  if (results.rows.length==0) {
                     callback(callbackRet);
+                  } else {
+                    for (var i = 0; i < results.rows.length; i++) {
+                      callbackRet.data = {};
+                      var auxData = results.rows.item(i).data || "";
+                      auxData = JSON.parse(auxData);
+                      mergeObject(auxData, callbackRet.data);
+                      callbackRet.return = true;
+                      callback(callbackRet);
+                    }
                   }
                 },
                 function(sqlTransaction, sqlError) {
@@ -400,7 +413,7 @@ var yIndexedDBSlaveObj = function() {
       dbTag: that.context.dbTag,
       name: myObjectDescriptor.name,
       tableName: tableName,
-      action: 'getItem',
+      action: 'insertData',
       callbackId: callbackId,
       data: null,
       result: undefined
@@ -548,7 +561,7 @@ var yIndexedDBSlaveObj = function() {
 
   that.filter = function(tableName, onitem, oncomplete, condition, haltOnFirst) {
     var callback = that._genericCallBack,
-      canCall;
+      canCall, breakQuery=false;
 
     var myObjectDescriptor = that._getObjectDescriptorByTableName(tableName);
 
@@ -558,7 +571,7 @@ var yIndexedDBSlaveObj = function() {
       dbTag: that.context.dbTag,
       name: myObjectDescriptor.name,
       tableName: tableName,
-      action: 'getItem',
+      action: 'filter',
       condition: condition,
       data: null,
       result: undefined
@@ -582,7 +595,7 @@ var yIndexedDBSlaveObj = function() {
         var aux = {};
 
         if (cursor) {
-          canCall = allValues || ylex.solve(cursor.value);
+          canCall = (!breakQuery) && ( allValues || ylex.solve(cursor.value) );
 
           if (canCall) {
             mergeObject(callbackRet, aux);
@@ -590,6 +603,8 @@ var yIndexedDBSlaveObj = function() {
             aux.return = true;
             aux.callbackOnItem = onitem;
             callback(aux);
+            if (haltOnFirst)
+              breakQuery=true;
           }
 
           cursor.continue();
@@ -612,7 +627,7 @@ var yIndexedDBSlaveObj = function() {
             sqlStatement, [],
             function(tx, results) {
               var aux;
-              for (var i = 0; i < results.rows.length; i++) {
+              for (var i = 0; (breakQuery==false) && (i < results.rows.length); i++) {
                 var value = results.rows.item(i).data;
                 if (value == "undefined")
                   value = undefined;
@@ -634,6 +649,9 @@ var yIndexedDBSlaveObj = function() {
                   aux.callbackOnItem = onitem;
                   aux.return = true;
                   callback(aux);
+                  if (haltOnFirst) {
+                    breakQuery=true;
+                  }
                 }
               }
 

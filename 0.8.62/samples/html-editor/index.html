@@ -8,33 +8,79 @@
   <title>HTML Editor</title>
   <meta name="description" content="Simple HTML editor">
   <meta name="author" content="Esteban D.Dortta">
-  <link href="css/bootstrap.min.css" rel="stylesheet">
-  <link href="css/bootstrap-dialog.min.css" rel="stylesheet">
-  <link href="css/font-awesome.css" rel="stylesheet">
-  <link href="css/tether.css" rel="stylesheet">
-  <link href="css/style.css" rel="stylesheet">
+  <link href="css/bootstrap.min.css?v=16" rel="stylesheet">
+  <link href="css/font-awesome.css?v=16" rel="stylesheet">
+  <link href="css/tether.css?v=16" rel="stylesheet">
+  <link href="css/style.css?v=16" rel="stylesheet">
 </head>
 
 <body>
   <div id="status">
-
   </div>
-
   <div class="container-fluid">
     <div class="row">
       <div class="col-md-12">
         <div class="tabbable" id="">
-          <ul class="nav nav-tabs">
-            <li class="nav-item">
-              <a class="nav-link active" href="#tab1" data-toggle="tab">Arquivos</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#tab2" data-toggle="tab">Editor</a>
-            </li>
-          </ul>
+          <div class="navbar-collapse">
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <a class="nav-link active" href="#tab1" data-toggle="tab">Ajuda</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#tab2" data-toggle="tab">Editor</a>
+              </li>
+              <li class="nav-item nav-link pull-right"><button class="btn btn-sm btn-primary" type="button" id="btnDownladPage" data-toggle="modal" data-target="#myModal"><i class="fa fa-download"></i></button></li>
+            </ul>
+          </div>
           <div class="tab-content">
             <div class="tab-pane active" id="tab1">
-              [ * ]
+              <img src="img/yeapf-logo.png" style="max-width: 160px">
+              <h2>O que é</h2>
+              <p>
+                Isto aqui não passa de um esboço de uma ferramenta que estamos construindo.<br>
+                Ele pretende facilitar a geração do HTML para BS3 e BS4.<br>
+                Para quem é novo no BootStrap e em outros frameworks reponsivos <a href='https://www.w3schools.com/bootstrap/bootstrap_grid_system.asp'>este link pode ajudar</a><br>
+                De qualquer forma, vai aqui umas pequenas dicas:</p>
+              <ol style="padding-left: 64px">
+                <li>Todo componente deve ser encaixado em uma célula</li>
+                <li>Toda célula deve estar encaixada em uma linha</li>
+                <li>A largura da célula não é fixa (por padrão) mas assumem valores lógicos entre 1 e 12</li>
+                <li>A somatória das larguras de todas as células em uma linha, não pode ultrapassar de 12</li>
+                <li>Ultrapassando, esta coluna e as seguintes caem para a seguinte linha mas ainda fica dentro da mesma linha lógica</li>
+              </ol>
+              </p>
+              <p>
+                <h2>Como usar</h2>
+                <a href="https://youtu.be/Tn8m9UQJAn8">YouTube</a>
+                <ol>
+                  <li>Clique na aba <b>editor</b></li>
+                  <li>Nas ferramentas do lado direito, escolha a largura de cada célula de sua primeira linha (pode usar os botões ou digitar)<br><img src="img/colunas-e-linhas.png" style="max-height:150px"></li>
+                  <li>Com o mouse, clique sobre "<em>Colunas e linhas</em>" e arraste sobre a superficie de edição à direita. Solte o botão.</li>
+                  <li>Se já tem em mente quantas linhas vai utilizar, repita o processo quantas vezes for necessário.</li>
+                  <li>Escolha o componente que deseja utilizar pelo título do mesmo (No exemplo: "<em>Opções pela esquerda</em>"<br><img src="img/opcoes-pela-esquerda.png" style="max-height: 150px"></li>
+                  <li>Clique em qualquer coisa que quiser modificar (Verá sua seta se transformar em um caret)</li>
+                  <li>Repita tantas vezes como for necessário</li>
+                  <li>Clique no ícone de download</li>
+                  <li>Você pode apenas copiar o código para usar no seu HTML ou baixar o arquivo</li>
+                </ol>
+              </p>
+              <p>
+                <h2>Limitações</h2>
+                <ol>
+                  <li>Não tem undo/redo</li>
+                  <li>Não permite eliminar, mover, modificar os tamanhos</li>
+                  <li>Dependendo do componente tem um bug na hora de criar o nome</li>
+                  <li>Não permite criar um nome personalizado para o componente</li>
+                </ol>
+              </p>
+              <p>
+                <h2>Posso hackear e usar?</h2>
+                YeAPF é distribuido sob licença MIT<br>
+                Este aplicativo está sob a pasta samples<br>
+                Faça download, modifique use.<br>
+                Não me deve nada a não ser o crédito<br>
+              </p>
+              <small>2019-04-03 08:41:46 (-3 DST)</small>
             </div>
             <div class="tab-pane" id="tab2">
               <div class="row" style="min-height: 91.3vh;">
@@ -334,6 +380,55 @@
                             </div>
                           </div>
                         </div>
+                        <div class="card" id="dataTable">
+                          <h5 class="card-header">Tabela</h5>
+                          <div class="component card-body" draggable=yes data-component="datatable">
+                            <!-- Single Table -->
+                            <div class="form-group">
+                              <label class="col-md-12 control-label" for="filebutton">Simples</label>
+                              <div class="col-lg-12">
+                                <table class="table" id="datatable" data-dbtable='no'>
+                                  <thead>
+                                    <tr>
+                                      <td></td>
+                                      <th>Coluna 1</th>
+                                      <th>Coluna 2</th>
+                                      <th>Coluna 3</th>
+                                      <th>Coluna 4</th>
+                                      <th>Coluna 5</th>
+                                    </tr>
+                                  </thead>
+                                  <tbody>
+                                    <tr>
+                                      <th>#1</th>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                    </tr>
+                                    <tr>
+                                      <th>#2</th>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                    </tr>
+                                    <tr>
+                                      <th>#3</th>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                      <td></td>
+                                    </tr>
+                                  </tbody>
+                                </table>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
                         <div class="card" id="buttons">
                           <h5 class="card-header">Bot&otilde;es</h5>
                           <div class="component card-body" draggable=yes data-component="filebutton">
@@ -366,12 +461,32 @@
       </div>
     </div>
   </div>
-  <script src="js/jquery.min.js"></script>
-  <script src="js/tether.min.js"></script>
-  <script src="js/bootstrap.min.js"></script>
-  <script src="js/bootstrap-dialog.min.js"></script>
-  <script src="js/yloader.js"></script>
-  <script src="js/html-editor.js"></script>
+  <div class="modal fade" tabindex="-1" role="dialog" id="myModal">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Seu código</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <pre id=textToDownload style="font-size: .5em">...</pre>
+        </div>
+        <div class="modal-footer">
+          <input class="form-control" type="text" id="blockOfCodeFilename" placeholder="Nome do arquivo .html">
+          <button type="button" class="btn btn-primary" id="btnSaveSourceCode">Salvar</button>
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="js/jquery.min.js?v=16"></script>
+  <script src="js/tether.min.js?v=16"></script>
+  <script src="js/popper.min.js?v=16"></script>
+  <script src="js/bootstrap.min.js?v=16"></script>
+  <script src="js/yloader.js?v=16"></script>
+  <script src="js/html-editor.js?v=16"></script>
 </body>
 
 </html>

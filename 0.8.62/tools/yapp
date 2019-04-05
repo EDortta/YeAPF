@@ -2,9 +2,9 @@
 <?php
   /*
   tools/yapp
-  YeAPF 0.8.62-2 built on 2019-03-22 10:21 (-3 DST)
+  YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
   Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-  2019-03-21 11:58:40 (-3 DST)
+  2019-04-03 08:41:46 (-3 DST)
   */
   $mydir = dirname($_SERVER['SCRIPT_FILENAME']);
   $cmRequired = false;
@@ -369,7 +369,6 @@
 
     if (file_exists($yapp_ini_filename)) {
       $yapp_ini = process_ini_file($yapp_ini_filename);
-      print_r($yapp_ini);
       if (isset($yapp_ini['subst'])) {
         foreach ($yapp_ini['subst'] as $value) {
           substFileMacros("$appFolder/$value");
@@ -413,7 +412,7 @@
     }
 
     /* save application tools environment */
-    $yeapfAppIni = "[app]\nappType=$appType\ntemplate=$template\nfromSample=$fromSample\nfolder=" . getcwd() . "\ndate=" . date("Y-m-dTH:i:s") . "\nyeapfVersion=0.8.62-2\n";
+    $yeapfAppIni = "[app]\nappType=$appType\ntemplate=$template\nfromSample=$fromSample\nfolder=" . getcwd() . "\ndate=" . date("Y-m-dTH:i:s") . "\nyeapfVersion=0.8.62-18\n";
     if (!file_put_contents("$yeapfAppIniFilename", $yeapfAppIni)) {
       echo "\nWARNING!\n\tWas not possible to write '$yeapfAppIniFilename'\n";
     }
@@ -429,7 +428,7 @@
             $cfgURL = "http://localhost/" . $yeapfConfig['myself'] . "/configure.php";
             echo "Calling '$cfgURL' ...\n";
             file_get_contents($cfgURL);
-            echo "Ok\nThis folder was updated to YeAPF v0.8.62-2\n";
+            echo "Ok\nThis folder was updated to YeAPF v0.8.62-18\n";
           }
           else {
             echo "Remember to call 'configure.php' from your navigator\n";

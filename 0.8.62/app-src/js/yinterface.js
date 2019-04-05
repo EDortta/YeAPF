@@ -1,8 +1,8 @@
 /*
     app-src/js/yinterface.js
-    YeAPF 0.8.62-2 built on 2019-03-22 10:21 (-3 DST)
+    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-03-10 07:50:09 (-3 DST)
+    2019-04-03 08:41:45 (-3 DST)
 */
 
 var yInterfaceObj = function() {
@@ -1469,10 +1469,13 @@ var yInterfaceObj = function() {
     that._repeatableFieldInfo = [];
 
     var tables = y$('.table');
-    if (tables)
+    if (tables) {
       tables.forEach(function(table) {
-        ycomm.dom.fillElement(table.id, {});
+        if ((table.getAttribute('data-dbtable') || 'no')=='yes') {
+          ycomm.dom.fillElement(table.id, {});
+        }
       });
+    }
 
     /* analiso a url para ver se o usuário quer ir para uma ancora */
     setTimeout(function() {

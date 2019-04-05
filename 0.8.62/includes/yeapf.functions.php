@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.62-2 built on 2019-03-22 10:21 (-3 DST)
+    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-03-22 10:20:30 (-3 DST)
+    2019-04-04 23:31:49 (-3 DST)
    */
 
   /*
@@ -1824,7 +1824,7 @@
   {
     global $lastImplementation, $flgCanContinueWorking, $devSession;
 
-    xq_context('YeAPF',       'YeAPF 0.8.62-2 built on 2019-03-22 10:21 (-3 DST)');
+    xq_context('YeAPF',       'YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)');
     xq_context('devSession',  $devSession);
     xq_context('ts1',         date('U'));
 
@@ -3473,12 +3473,22 @@
 
   function changeImgRef($aStr)
   {
+    global $PHPVersion;
     $aStr=str_replace('\"',"'",$aStr);
-    $aStr=preg_replace_callback(
-              '/src=("|\')\s*(.*?)\s*\\1.*?/',
-              create_function('$matches', 'return "src=\'".doChangeRef($matches[2], $matches[1])."\'";'),
-              $aStr
-          );
+    if ($PHPVersion<70000) {
+      $aStr=preg_replace_callback(
+                '/src=("|\')\s*(.*?)\s*\\1.*?/',
+                create_function('$matches', 'return "src=\'".doChangeRef($matches[2], $matches[1])."\'";'),
+                $aStr
+            );
+    } else {
+      $aStr=preg_replace_callback(
+        '/src=("|\')\s*(.*?)\s*\\1.*?/',
+        function($matches) {
+          return "src=\'".doChangeRef($matches[2], $matches[1])."\'";
+        },
+        $aStr);
+    }
 
     return $aStr;
   }
@@ -3507,7 +3517,8 @@
   {
     global $intoFormFile, $includedFiles, $appName, $includeHistory,
            $lastCommands, $yeapfConfig, $appCharset,
-           $_IncludedFiles, $cfgCurrentFile, $isDebugging;
+           $_IncludedFiles, $cfgCurrentFile, $isDebugging,
+           $PHPVersion;;
     $s=null;
     $priorFile = $cfgCurrentFile;
     try {
@@ -3641,9 +3652,39 @@
               $s = preg_replace(PATTERN_REPLACE_INPUT_SRC, "changeImgRef('\\0')", $s);
               */
 
-              $s = preg_replace_callback(PATTERN_REPLACE_JS_SRC, create_function('$matches', 'return changeImgRef($matches[0]);'), $s);
-              $s = preg_replace_callback(PATTERN_REPLACE_IMG_SRC, create_function('$matches', 'return changeImgRef($matches[0]);'), $s);
-              $s = preg_replace_callback(PATTERN_REPLACE_INPUT_SRC, create_function('$matches', 'return changeImgRef($matches[0]);'), $s);
+              if ($PHPVersion<70000) {
+                $s = preg_replace_callback(
+                      PATTERN_REPLACE_JS_SRC,
+                      create_function('$matches', 'return changeImgRef($matches[0]);'),
+                      $s);
+                $s = preg_replace_callback(
+                      PATTERN_REPLACE_IMG_SRC,
+                      create_function('$matches', 'return changeImgRef($matches[0]);'),
+                      $s);
+                $s = preg_replace_callback(
+                      PATTERN_REPLACE_INPUT_SRC,
+                      create_function('$matches', 'return changeImgRef($matches[0]);'),
+                      $s);
+              } else {
+                $s = preg_replace_callback(
+                  PATTERN_REPLACE_JS_SRC,
+                  function ($matches) {
+                    return changeImgRef($matches[0]);
+                  },
+                  $s);
+                $s = preg_replace_callback(
+                  PATTERN_REPLACE_IMG_SRC,
+                  function ($matches) {
+                    return changeImgRef($matches[0]);
+                  },
+                  $s);
+                $s = preg_replace_callback(
+                  PATTERN_REPLACE_INPUT_SRC,
+                  function ($matches) {
+                    return changeImgRef($matches[0]);
+                  },
+                  $s);
+              }
             }
           }
 

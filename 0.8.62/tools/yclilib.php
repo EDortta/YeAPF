@@ -1,11 +1,15 @@
 <?php
 /*
     tools/yclilib.php
-    YeAPF 0.8.62-2 built on 2019-03-22 10:21 (-3 DST)
+    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-03-21 11:09:26 (-3 DST)
+    2019-04-04 23:31:49 (-3 DST)
 */
 
+  $PHPVer = phpversion();
+  $PHPVersion = explode('.', $PHPVer);
+  $PHPVersion = $PHPVersion[0]*10000 + $PHPVersion[1]*100+$PHPVersion[2];
+  unset($PHPVer);
 
   function updateFiles($sourcePath, $pattern, $target='.',  $toForce=false)
   {

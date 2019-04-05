@@ -35,4 +35,4 @@ var appBase = function () {
 
 };
 
-var app=appBase().initialize();
+var mainApp=appBase().initialize();

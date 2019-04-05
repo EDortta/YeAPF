@@ -206,15 +206,31 @@ var yIndexedDBInterfaceObj = function(aDBName, aDBVersion, aTablesDefinition, aW
 
 
   that.init = function() {
+    getScriptName = function() {
+      var scripts = document.getElementsByTagName('script');
+      var sNdx = 0;
+      var scriptName='';
+      while(sNdx<scripts.length) {
+        var auxScriptName=scripts[sNdx].src;
+        if (auxScriptName.indexOf("ystorage-indexedDB-interface")>=0)
+          scriptName=auxScriptName;
+        sNdx++;
+      }
+      return scriptName;
+    };
+
+    var currentScriptName = getScriptName();
+    var is_minified = currentScriptName.indexOf(".min.js")>-1;
+    var slaveName = (is_minified?"ystorage-indexedDB-slave.min.js":"ystorage-indexedDB-slave.js");
 
     if (aWorkerStyle==_WIDBI_AS_WORKER) {
-      wIndexedDB = new Worker("js/ystorage-indexedDB-slave.js");
+      wIndexedDB = new Worker("js/{0}".format(slaveName));
       postMessageSecondParameter=[];
       wIndexedDB.addEventListener("message", _msgReceiver);
       initializeDatabase();
     } else if (aWorkerStyle == _WIDBI_AS_IFRAME) {
       var iframe = document.createElement('iframe');
-      var html = "<script src='js/yloader.js'></script>\n<script src='js/ystorage-indexedDB-slave.js'></script>";
+      var html = "<script src='js/yloader.js'></script>\n<script src='js/{0}'></script>".format(slaveName);
       iframe.frameborder=0;
       iframe.height=0;
       iframe.width=0;

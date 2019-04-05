@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.62-2 built on 2019-03-22 10:21 (-3 DST)
+ * YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
  * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
- * 2019-03-20 10:11:08 (-3 DST)
+ * 2019-04-03 08:41:45 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -28,7 +28,7 @@
       }
       if (!ret)
         ret = document.getElementById(aElementId);
- 
+
       if (!ret) {
         ret = document.getElementsByName(aElementId);
         if (ret.length) {
@@ -374,22 +374,24 @@ function getElementsByAttribute(oRootElem, strTagName, strAttributeName, strAttr
   return arrReturnElements;
 }
 
-if (typeof getElementsByClassName=="undefined") {
-  console.log("Using own 'getElementsByClassName()' function");
-  window.getElementsByClassName = function (oRootElem, strTagName, aClassName) {
-    var arrElements = oRootElem.getElementsByTagName(strTagName);
-    var arrReturnElements = [];
-    var oCurrent;
-    for(var i=0; i<arrElements.length; i++) {
-      oCurrent = arrElements[i];
-      if ((oCurrent) && (typeof oCurrent.hasClass == 'function'))
-        if (oCurrent.hasClass(aClassName))
-          arrReturnElements.push(oCurrent);
-    }
-    if (arrReturnElements===null)
-      arrReturnElements=document.getElementsByClassName(aClassName);
-    return arrReturnElements;
-  };
+if (typeof window == "object") {
+  if (typeof getElementsByClassName=="undefined") {
+    console.log("Using own 'getElementsByClassName()' function");
+    window.getElementsByClassName = function (oRootElem, strTagName, aClassName) {
+      var arrElements = oRootElem.getElementsByTagName(strTagName);
+      var arrReturnElements = [];
+      var oCurrent;
+      for(var i=0; i<arrElements.length; i++) {
+        oCurrent = arrElements[i];
+        if ((oCurrent) && (typeof oCurrent.hasClass == 'function'))
+          if (oCurrent.hasClass(aClassName))
+            arrReturnElements.push(oCurrent);
+      }
+      if (arrReturnElements===null)
+        arrReturnElements=document.getElementsByClassName(aClassName);
+      return arrReturnElements;
+    };
+  }
 }
 
 function getStyleRuleValue(className, styleItemName) {
@@ -449,9 +451,9 @@ function extractStyleRule(className) {
   var ret={};
   var k=getStyleRuleValue(className);
   for(var j in k) {
-    if (k.hasOwnProperty(j)) 
-      if (k[j]>'') 
-        if(!isNumber(j)) 
+    if (k.hasOwnProperty(j))
+      if (k[j]>'')
+        if(!isNumber(j))
           ret[j]=k[j];
       }
   return ret;
@@ -494,7 +496,7 @@ if (typeof resizeIframe == 'undefined') {
 if ("undefined" !== typeof Element) {
 
   if (!Element.prototype.matches)
-      Element.prototype.matches = Element.prototype.msMatchesSelector || 
+      Element.prototype.matches = Element.prototype.msMatchesSelector ||
                                   Element.prototype.webkitMatchesSelector;
 
   if (!Element.prototype.closest)
@@ -504,7 +506,7 @@ if ("undefined" !== typeof Element) {
           do {
               if (el.matches(s)) return el;
               el = el.parentElement || el.parentNode;
-          } while (el !== null); 
+          } while (el !== null);
           return null;
       };
 
@@ -524,7 +526,7 @@ if ((typeof HTMLElement=="object") || (typeof HTMLElement=="function")) {
             ret=true;
         } else {
           if (aClasses[i] == aClassName)
-            ret = true;          
+            ret = true;
         }
       }
     }
@@ -1637,7 +1639,7 @@ function UDate2Date(aUDate, aFormat) {
     aFormat="d/m/y";
   var ret='';
   var aDate=extractDateValues(aUDate,'yyyymmddHHMMSS');
-  if (!(aDate === null)) { 
+  if (!(aDate === null)) {
     for(var i=0; i<aFormat.length; i++)
       if (/^[d,m,y]+$/.test(aFormat[i]))
         ret+=aDate[aFormat[i]];
@@ -1773,7 +1775,7 @@ var dateInRange = function (aFrenchDate, aFrenchMinDate, aFrenchMaxDate) {
         aFrenchDate    = dateTransform(aFrenchDate,    "dd/mm/yyyy", "yyyy-mm-dd");
         aFrenchMinDate = dateTransform(aFrenchMinDate, "dd/mm/yyyy", "yyyy-mm-dd");
         aFrenchMaxDate = dateTransform(aFrenchMaxDate, "dd/mm/yyyy", "yyyy-mm-dd");
-        ret = ((aFrenchDate>=aFrenchMinDate) && (aFrenchDate<=aFrenchMaxDate));        
+        ret = ((aFrenchDate>=aFrenchMinDate) && (aFrenchDate<=aFrenchMaxDate));
       }
     }
   }
@@ -2007,7 +2009,7 @@ function bool2str(aBool) {
 
 function sign(aValue) {
   aValue = str2int(aValue);
-  if (aValue==0) 
+  if (aValue==0)
     return 0;
   else if (aValue<0)
     return -1;
@@ -2113,7 +2115,7 @@ function rgb2hex (rgb) {
 function pickColorFromGradient(firstColor, lastColor, weight) {
     var w1 = Math.max(0,Math.min(weight, 100))/100,
         w2 = 1 - w1,
-        color1 = decomposeColor(firstColor), 
+        color1 = decomposeColor(firstColor),
         color2 = decomposeColor(lastColor);
 
     var rgb = [Math.round(color1[0] * w1 + color2[0] * w2),
