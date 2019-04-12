@@ -2,9 +2,9 @@
 <?php
   /*
   tools/yapp
-  YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+  YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
   Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-  2019-04-03 08:41:46 (-3 DST)
+  2019-04-12 10:23:47 (-3 DST)
   */
   $mydir = dirname($_SERVER['SCRIPT_FILENAME']);
   $cmRequired = false;
@@ -349,6 +349,7 @@
       foreach($exts as $e) {
         updateFiles("$YFolder/skel/$appType", "*.$e", "$appFolder", ($toCreate || $toForce));
       }
+      updateFiles("$YFolder/skel/$appType", "config.ini", "$appFolder", $toCreate);
 
       /* Update/Install support folders */
       foreach($folders as $folderName) {
@@ -359,6 +360,7 @@
       foreach($exts as $e) {
         updateFiles("$YFolder/samples/$fromSample", "*.$e", "$appFolder", ($toCreate || $toForce));
       }
+      updateFiles("$YFolder/samples/$fromSample", "config.ini", "$appFolder", $toCreate);
 
       /* Update/Install support folders */
       foreach($folders as $folderName) {
@@ -412,7 +414,7 @@
     }
 
     /* save application tools environment */
-    $yeapfAppIni = "[app]\nappType=$appType\ntemplate=$template\nfromSample=$fromSample\nfolder=" . getcwd() . "\ndate=" . date("Y-m-dTH:i:s") . "\nyeapfVersion=0.8.62-18\n";
+    $yeapfAppIni = "[app]\nappType=$appType\ntemplate=$template\nfromSample=$fromSample\nfolder=" . getcwd() . "\ndate=" . date("Y-m-dTH:i:s") . "\nyeapfVersion=0.8.62-67\n";
     if (!file_put_contents("$yeapfAppIniFilename", $yeapfAppIni)) {
       echo "\nWARNING!\n\tWas not possible to write '$yeapfAppIniFilename'\n";
     }
@@ -428,7 +430,7 @@
             $cfgURL = "http://localhost/" . $yeapfConfig['myself'] . "/configure.php";
             echo "Calling '$cfgURL' ...\n";
             file_get_contents($cfgURL);
-            echo "Ok\nThis folder was updated to YeAPF v0.8.62-18\n";
+            echo "Ok\nThis folder was updated to YeAPF v0.8.62-67\n";
           }
           else {
             echo "Remember to call 'configure.php' from your navigator\n";

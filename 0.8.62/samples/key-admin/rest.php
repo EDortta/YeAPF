@@ -1,9 +1,9 @@
 <?php
 /*
     samples/key-admin/rest.php
-    YeAPF 0.8.62-20 built on 2019-04-06 12:01 (-3 DST)
+    YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-04-06 12:01:05 (-3 DST)
+    2019-04-12 19:01:52 (-3 DST)
 
     skel/webApp / rest.php
     This file cannot be modified within skel/webApp
@@ -11,6 +11,8 @@
 */
 
   header('Content-Type: text/javascript; charset=UTF-8',true);
+  header("Access-Control-Allow-Origin: *");
+
 
   (@include_once "yeapf.php") or die("yeapf not configured");
   /* @OBSOLETE 20170111

@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webSocket/server.php
-    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+    YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-04-03 08:41:46 (-3 DST)
+    2019-04-12 10:34:34 (-3 DST)
 
     skel / webSocket / server.php
     This file cannot be modified within skel/webSocket
@@ -23,9 +23,20 @@
     }
   }
 
-  _setVarValue("webSocketsName",    "%(appName)");
-  _setVarValue("webSocketsAddress", "%(appAddress)");
-  _setVarValue("webSocketsPort",    "%(appPort)");
+  if (file_exists("config.ini")) {
+    $auxServerInfo = @parse_ini_file("config.ini", true);
+    if (isset($auxServerInfo["server"])) {
+      _setVarValue("webSocketsName",    $auxServerInfo["server"]["appName"]);
+      _setVarValue("webSocketsAddress", $auxServerInfo["server"]["appAddress"]);
+      _setVarValue("webSocketsPort",    $auxServerInfo["server"]["appPort"]);
+    } else {
+      die("config.ini has no 'server' section\n");
+    }
+
+  } else {
+    die("config.ini not found\n");
+  }
+
 
   class _Users extends WebSocketUser
   {

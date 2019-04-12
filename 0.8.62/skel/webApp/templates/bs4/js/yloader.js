@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/templates/bs4/js/yloader.js
-  * YeAPF 0.8.62-20 built on 2019-04-06 12:01 (-3 DST)
+  * YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2019-04-06 12:01:05 (-3 DST)
+  * 2019-04-12 19:01:52 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.62-20 built on 2019-04-06 12:01 (-3 DST)");
+ console.log("YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -3180,11 +3180,23 @@
       *==================================================*/
      
      if ((typeof window == 'object') && (typeof _onLoadMethods == 'undefined')) {
-       var _onLoadMethods = [];
+       var _onLoadMethods = [], _startupStage_=-1;
      
        window.addOnLoadManager = function(aFunc) {
          var i = _onLoadMethods.length;
          _onLoadMethods[i] = aFunc;
+         if (_startupStage_==0) {
+           var waitStartupStage1 = function() {
+             if (_startupStage_==1)
+               aFunc();
+             else
+               setTimeout(waitStartupStage1, 150);
+           }
+           waitStartupStage1();
+         } else {
+           if (_startupStage_==1)
+             aFunc();
+         }
        };
      
        document.addEventListener(
@@ -3195,10 +3207,12 @@
        );
      
        __startup = function() {
+         _startupStage_=0;
          for (var i = 0; i < _onLoadMethods.length; i++)
            if (_onLoadMethods.hasOwnProperty(i))
              if (_onLoadMethods[i] !== undefined)
                _onLoadMethods[i]();
+         _startupStage_=1;
        }
      
        if (typeof cordova == 'object') {
@@ -7244,17 +7258,26 @@
        /********************************************************************
        ********************************************************************/
        var ycommSSEBase = function (workgroup, user, dataLocation, pollTimeout, preferredGateway, dbgSSEDiv) {
+         window.SSE_UNINITIALIZED  =-1;
+         window.SSE_CLOSING        = 0;
+         window.SSE_NONOPERATIONAL = 1;
+         window.SSE_OPERATIONAL    = 2;
          var that = {
      
-           /* pollTimeout must be between 1 and 60 seconds */
-           pollTimeout: Math.min(60000, Math.max(typeof pollTimeout=='number'?pollTimeout:1000, 1000)),
+           /* pollTimeout must be between 60 and 900 seconds */
+           pollTimeout: Math.min(900000, Math.max(typeof pollTimeout=='number'?pollTimeout:60000, 60000)),
            prefGateway: (preferredGateway || 'SSE').toUpperCase(),
            dbgDiv: y$(dbgSSEDiv),
            debugEnabled: false,
      
+           setDebug: function(newValue) {
+             newValue=newValue || false;
+             that.debugEnabled = newValue;
+           },
+     
            debug: function() {
              var d=(new Date()),
-                 line, 
+                 line,
                  dbgClass,
                  isError=false,
                  isWarning=false;
@@ -7281,8 +7304,8 @@
                  dbgClass='';
                }
                if ('undefined' != typeof that.dbgDiv) {
-                 that.dbgDiv.innerHTML+="<div class='label {0}' style='display: inline-block'>{1}</div>".format(dbgClass, line);
-               }          
+                 that.dbgDiv.innerHTML+="<div class='label {0}' style='display: inline-block'>{1}</div><br>".format(dbgClass, line);
+               }
              }
            },
      
@@ -7343,18 +7366,18 @@
      
              var _userAlive = function(data) {
                var toClose=false;
-               if (data && data[0]) {
-                 toClose = (data[0].event || '').toUpperCase() == 'CLOSE';
+               if (data) {
+                 var info = data[0] || data;
+                 toClose = (info.event || '').toUpperCase() == 'CLOSE';
                }
                if (toClose) {
                  _userOffline();
                } else {
                  that.debug("IN: User is alive");
-                 if (that.state==1) {
-                   setTimeout(that.userAlive, that.userAliveInterval*3/4);
-                 } else {
+                 if (that.state!=SSE_OPERATIONAL) {
                    that.debug("Unexpected SSE state: "+that.state);
                  }
+                 that.scheduleUserAlive(that.userAliveInterval);
                }
              };
      
@@ -7363,15 +7386,18 @@
                that.close(e);
              };
      
-             if (that.state==1) {
+             if (that.state==SSE_OPERATIONAL) {
                var p = that.rpc("userAlive");
                p.then(_userAlive).catch(_userOffline);
+             } else {
+               that.scheduleUserAlive(Math.max(100,that.userAliveInterval/100));
              }
            },
      
            scheduleUserAlive: function (timeout_ms) {
              timeout_ms = timeout_ms || that.userAliveInterval;
              clearTimeout(that._userAliveScheduler);
+             console.log("%c scheduling UserAlive indicator for {0}ms".format(timeout_ms),'background: #222; color: #429BDA');
              that._userAliveScheduler = setTimeout(that.userAlive, timeout_ms);
            },
      
@@ -7383,22 +7409,29 @@
                  "user": that.user
                }).then(function(data) {
                  that.debug("IN: attach info");
-                 if (data && data[0] && data[0].ok) {
-                   that.w                 = workgroup;
-                   that.sse_session_id    = data[0].sse_session_id;
-                   that.userAliveInterval = Math.min(30000, Math.max(5000,data[0].userAliveInterval * 1000));
-                   that.debug("userAliveInterval: "+that.userAliveInterval);
-                   callback();
+                 if (data) {
+                   var info = data[0] || data;
+                   if (info.ok) {
+                     that.w                 = workgroup;
+                     that.sse_session_id    = info.sse_session_id;
+                     /* cfgSSEUserAliveInterleave -> userAliveInterval
+                        it comes in seconds
+                        but as js works in ms, we translate it
+                        The allowed interleave is between 61 and 900 seconds */
+                     that.userAliveInterval = Math.min(900, Math.max(61,info.userAliveInterval)) * 1000;
+                     that.debug("set userAliveInterval value to {0}ms ".format(that.userAliveInterval));
+                     callback();
+                   }
                  }
                });
            },
      
            sendPing: function(callback) {
-             if (that.state==1) {
+             if (that.state==SSE_OPERATIONAL) {
                that.rpc(
                  "ping",
                  {w: workgroup, user: that.user}
-               ).then(callback);          
+               ).then(callback);
              }
            },
      
@@ -7411,7 +7444,7 @@
                that.events[eventName] = [];
              that.events[eventName].push([that.state, func]);
      
-             if (that.state==1) {
+             if (that.state==SSE_OPERATIONAL) {
                if (!that.pollEnabled)
                  that.evtSource.addEventListener(eventName, func);
                if (trim(eventName.toLowerCase()) == "ready") {
@@ -7423,7 +7456,7 @@
      
            dispatchEvent: function (eventName, params) {
              var ret=false;
-             if (that.state==1) {
+             if ((that.state==SSE_OPERATIONAL) || (eventName=="onerror")) {
                if (typeof that.events !== "undefined") {
                  for(var implementations=0; implementations<(that.events[eventName] || []).length; implementations++) {
                    var eventDef = that.events[eventName][implementations];
@@ -7449,7 +7482,7 @@
            startPolling : function() {
              clearTimeout(that.evtGuardian);
              that.pollEnabled=true;
-             that.state=1;
+             that.state=SSE_OPERATIONAL;
              that.dispatchEvent("ready", {"gateway": "Polling"});
              setTimeout(that.poll, 125);
              that.debug("STATUS: polling for messages. pollTimeout: {0}ms".format(that.pollTimeout));
@@ -7467,7 +7500,7 @@
                that.closing=true;
                clearTimeout(that.evtGuardian);
                that.debug('DESTROYING');
-               that.state=-1;
+               that.state=SSE_UNINITIALIZED;
                that.evtSource=null;
                that.GUID=null;
            },
@@ -7476,7 +7509,7 @@
              clearTimeout(that.evtGuardian);
              if (!that.closing) {
                that.closing=true;
-               that.state=0;
+               that.state=SSE_CLOSING;
                that.debug("STATUS: CLOSE");
                that.rpc(
                  "detachUser",
@@ -7484,10 +7517,10 @@
                    w: workgroup,
                    user: that.user
                  }).then(function() {
-                   that.state=-1;
+                   that.state=SSE_UNINITIALIZED;
                    that.pollEnabled = false;
                    that.__destroy__();
-                   that.closing=false;              
+                   that.closing=false;
                  }).catch(function() {
                    that.closing=false; setTimeout(that.close, 1500);
                  });
@@ -7496,36 +7529,42 @@
      
            closeEvent: function(e) {
              clearTimeout(that.evtGuardian);
+             console.log("%c close: {0}".format(e.data || "NULL"),"color: #8787FF");
              that.__destroy__();
            },
      
-           error: function(e) {
+           errorEvent: function(e) {
              clearTimeout(that.evtGuardian);
+             console.log("%c error: {0}".format(e.data || "NULL"),"color: #8787FF");
              that.debug("ERROR: while using SSE");
              that.dispatchEvent('onerror');
+             that.state=SSE_NONOPERATIONAL;
+             setTimeout(that.startup, 2500);
            },
      
            openEvent: function (e) {
              clearTimeout(that.evtGuardian);
+             console.log("%c open: {0}".format(e.data || "NULL"),"color: #8787FF");
              that.debug("STATUS: OPEN");
              /* the first UAI happens in 1/100th after OPEN */
              that.scheduleUserAlive(that.userAliveInterval/100);
              that.dispatchEvent('onopen');
-             
+     
              if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOnline =='function'))
                ycomm.msg.notifyServerOnline();
            },
      
-           message: function (e) {
+           messageEvent: function (e) {
              /* as connected, clear guardian timeout */
              clearTimeout(that.evtGuardian);
+             console.log("%c message: {0}".format(e.data || "NULL"),"color: #8787FF");
              if ((!e) || (e.target.readyState==2)) {
                that.close();
              } else {
                that.debug("MESSAGE");
-               if (that.state===0) {
+               if (that.state>SSE_CLOSING) {
                  /* firs message just synchro the message table */
-                 that.state=1;
+                 that.state=SSE_OPERATIONAL;
                  that.debug("userAliveInterval: {0}ms".format(that.userAliveInterval));
      
                  for(var eventName in that.events) {
@@ -7542,7 +7581,7 @@
                  that.dispatchEvent("onready", {"gateway": "SSE"});
                }
      
-               if (that.state>0) { 
+               if (that.state>SSE_UNINITIALIZED) {
                  if (typeof that.onmessage=="function") {
                    that.onmessage(e.data);
                  }
@@ -7550,34 +7589,45 @@
              }
            },
      
+           pingEvent: function(e) {
+             console.log("%c ping: {0}".format(e.data || "NULL"),"color: #8787FF");
+           },
+     
            startup: function(gateway) {
              gateway = (gateway || that.prefGateway || 'SSE').toUpperCase();
+             console.log("%c startup: {0}".format(gateway),"color: #8787FF");
              that.prefGateway = gateway;
              if (that.evtGuardian) {
                clearTimeout(that.evtGuardian);
              }
-             if (typeof that.GUID != "string") {
-               that.GUID=generateUUID();
+             if ((typeof that.GUID != "string") || (that.state<=SSE_NONOPERATIONAL)) {
+     
+               if (typeof that.GUID != "string")
+                 that.GUID=generateUUID();
+     
                that.attachUser(
                  function() {
-                   that.state=0;
+                   that.state=SSE_NONOPERATIONAL;
                    /* first try to use EventSource() */
                    if ((that.prefGateway=='SSE') && (typeof window.EventSource == "function")) {
                      that.debug("INFO: Attaching events");
                      if (!that.evtSource) {
                        that.debug("INFO: All new evtSource");
                        that.evtSource = new EventSource(that._dataLocation_+"?si="+md5(that.sse_session_id));
-                       that.evtSource.addEventListener("error",   that.error,   false);
+                       that.evtSource.onerror=that.errorEvent;
                      } else {
                        that.debug("INFO: Reusing component");
                      }
      
                      that.evtSource.onopen    = that.openEvent;
                      that.evtSource.onclose   = that.closeEvent;
-                     that.evtSource.onmessage = that.message;
-                     
-                     that.debug("INFO: Configuring guardianTimeout");
-                     that.evtGuardian = setTimeout(that.guardianTimeout, 30000);
+                     that.evtSource.onmessage = that.messageEvent;
+                     that.addEventListener("ping",  that.pingEvent, false);
+                     that.addEventListener("reset", that.resetEvent, false);
+     
+                     that.debug("INFO: Configuring guardianTimeout to {0}ms".format(that.userAliveInterval * 1.5));
+                     that.evtGuardian = setTimeout(that.guardianTimeout, that.userAliveInterval * 1.5);
+                     that.scheduleUserAlive(that.userAliveInterval/100);
                    } else {
                      that.startPolling();
                    }
@@ -7589,14 +7639,15 @@
              }
            },
      
-           reset: function() {
+           resetEvent: function() {
              that.close();
              that.__destroy__();
+             that.state=SSE_NONOPERATIONAL;
              setTimeout(that.startup, 3500);
            },
      
            init: function() {
-             that.state = -1;
+             that.state=SSE_UNINITIALIZED;
              if ((typeof dataLocation=="undefined") || (dataLocation === null)) {
                /* default data location is current location/sse.php */
                that._dataLocation_ = (
@@ -7634,6 +7685,24 @@
              return that;
            }
          };
+     
+         var __state=-2;
+         var __getState = function() {
+           return __state;
+         };
+         var __setState = function(newState) {
+           if (newState != __state) {
+             console.log("%c SSE state changed from {0} to {1}".format(__state, newState), 'background: #222; color: #bada55');
+             __state = newState;
+           }
+         };
+     
+         Object.defineProperty(that, "state", {
+           'configurable': false,
+           'enumerable': false,
+           'get': __getState,
+           'set': __setState
+         });
      
          return that.init();
        };
@@ -9238,9 +9307,9 @@
  /* START yinterface.js */
      /*
          skel/webApp/templates/bs4/js/yloader.js
-         YeAPF 0.8.62-20 built on 2019-04-06 12:01 (-3 DST)
+         YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
          Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-         2019-04-06 12:01:05 (-3 DST)
+         2019-04-12 19:01:52 (-3 DST)
      */
      
      var yInterfaceObj = function() {

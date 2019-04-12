@@ -1,9 +1,9 @@
 <?php
 /*
     tools/yclilib.php
-    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+    YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-04-04 23:31:49 (-3 DST)
+    2019-04-12 10:16:40 (-3 DST)
 */
 
   $PHPVer = phpversion();
@@ -13,7 +13,7 @@
 
   function updateFiles($sourcePath, $pattern, $target='.',  $toForce=false)
   {
-    $specialFiles = array('yeapf.db.ini', 'search.path', 'e_index.html', 'e_main_menu.html', 'yapp.ini');
+    $specialFiles = array('yeapf.db.ini', 'search.path', 'e_index.html', 'e_main_menu.html', 'yapp.ini', 'config.ini');
     echo "\r  --+ $sourcePath/$pattern\n";
     $files = glob("$sourcePath/$pattern");
     foreach($files as $fileName) {

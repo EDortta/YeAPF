@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+    YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-12-06 14:43:19 (-3 DST)
+    2019-04-11 11:17:21 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -95,27 +95,29 @@
 
   function registerAPIUsageFinish() {
     global $s, $a, $__API_START_TS, $currentDBVersion, $cfgApiProfilerEnabled;
-    if (($currentDBVersion>=19) && ($cfgApiProfilerEnabled=='yes')) {
-      if ($__API_START_TS>0) {
-        if (lock("api-usage-$s-$a")) {
-          $info=db_sql("select counter, wastedTime, avgTime from is_api_usage where s='$s' and a='$a'", false);
-          extract($info);
-          if (!isset($counter)) {
-            $counter=0;
-            db_sql("insert into is_api_usage(s,a, disabled, wastedTime, avgTime, counter) values ('$s', '$a', 'N', 0, 0, 0)");
+    if ($cfgApiProfilerEnabled=='yes') {
+      if ($currentDBVersion>=19) {
+        if ($__API_START_TS>0) {
+          if (lock("api-usage-$s-$a")) {
+            $info=db_sql("select counter, wastedTime, avgTime from is_api_usage where s='$s' and a='$a'", false);
+            extract($info);
+            if (!isset($counter)) {
+              $counter=0;
+              db_sql("insert into is_api_usage(s,a, disabled, wastedTime, avgTime, counter) values ('$s', '$a', 'N', 0, 0, 0)");
+            }
+            $counter++;
+            $__API_WASTED_TIME = date('U') - $__API_START_TS;
+            $wastedTime+=$__API_WASTED_TIME;
+            $avgTime = $wastedTime / $counter;
+            db_sql("update is_api_usage set counter=$counter, wastedTime=$wastedTime, avgTime=$avgTime where s='$s' and a='$a'");
+            _dump("API-USAGE ($s.$a) finish");
+            unlock("api-usage-$s-$a");
           }
-          $counter++;
-          $__API_WASTED_TIME = date('U') - $__API_START_TS;
-          $wastedTime+=$__API_WASTED_TIME;
-          $avgTime = $wastedTime / $counter;
-          db_sql("update is_api_usage set counter=$counter, wastedTime=$wastedTime, avgTime=$avgTime where s='$s' and a='$a'");
-          _dump("API-USAGE ($s.$a) finish");
-          unlock("api-usage-$s-$a");
         }
+      } else {
+        if ($currentDBVersion<19)
+          _dump("currentDBVersion need to be 19 at least. You're on '$currentDBVersion'");
       }
-    } else {
-      if ($currentDBVersion<19)
-        _dump("currentDBVersion need to be 19 at least. You're on '$currentDBVersion'");
     }
   }
 
@@ -943,22 +945,22 @@
         $returnAsScript=true;
     }
 
-    if (  isset($GLOBALS['fieldName']) && 
-          isset($GLOBALS['fieldValue']) && 
+    if (  isset($GLOBALS['fieldName']) &&
+          isset($GLOBALS['fieldValue']) &&
           isset($GLOBALS['ts']) ) {
       $returnAsScript=true;
     }
 
     if (isset($GLOBALS['xq_output_format'])) {
-      /* 
+      /*
           format to be used when returning to caller
-          json  - JSON: the default way 
-          csv*  - comma separated values: 
+          json  - JSON: the default way
+          csv*  - comma separated values:
                   The first line has the KEYS and from the second line, the VALUES.
                   Values are escaped separated by ';' and quoted if you have ';' in valuess
           pair* - key,value pair:
-                  It's more or less as an ini file. 
-                  The first key of the first row is used in each row as the session key and 
+                  It's more or less as an ini file.
+                  The first key of the first row is used in each row as the session key and
                   each row (including the first) are represented as a key,value pair using '=' to separate them.
 
           * WARNING - ONLY FIRST LEVEL OF DATA ARE RETURNED.
@@ -971,7 +973,7 @@
         $returnFormat=$auxReturnFormat;
 
         if ($returnFormat!='json') {
-          
+
           $data = json_decode($jsonData, true);
           reset($data);
 
@@ -987,7 +989,7 @@
                 reset($data[$first_key]);
                 $first_key = key($data[$first_key]);
               } else {
-                
+
               }
 
               break;
@@ -995,7 +997,7 @@
             default:
 
               break;
-          }        
+          }
         }
       }
     }
@@ -1017,8 +1019,8 @@
   function qyeapf($a) {
 
     extract(xq_extractValuesFromQuery());
- 
-    $ret="";
+
+    $ret=array();
     if ($a=='ping') {
       $ret['serverTime'] = date('U');
       $ret['offset'] = date('Z');

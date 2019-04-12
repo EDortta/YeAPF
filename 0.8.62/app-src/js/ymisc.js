@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.62-20 built on 2019-04-06 12:01 (-3 DST)
+ * YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
  * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
- * 2019-04-06 11:14:56 (-3 DST)
+ * 2019-04-11 10:45:21 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -2880,11 +2880,23 @@ var md5 = function(str) {
  *==================================================*/
 
 if ((typeof window == 'object') && (typeof _onLoadMethods == 'undefined')) {
-  var _onLoadMethods = [];
+  var _onLoadMethods = [], _startupStage_=-1;
 
   window.addOnLoadManager = function(aFunc) {
     var i = _onLoadMethods.length;
     _onLoadMethods[i] = aFunc;
+    if (_startupStage_==0) {
+      var waitStartupStage1 = function() {
+        if (_startupStage_==1)
+          aFunc();
+        else
+          setTimeout(waitStartupStage1, 150);
+      }
+      waitStartupStage1();
+    } else {
+      if (_startupStage_==1)
+        aFunc();
+    }
   };
 
   document.addEventListener(
@@ -2895,10 +2907,12 @@ if ((typeof window == 'object') && (typeof _onLoadMethods == 'undefined')) {
   );
 
   __startup = function() {
+    _startupStage_=0;
     for (var i = 0; i < _onLoadMethods.length; i++)
       if (_onLoadMethods.hasOwnProperty(i))
         if (_onLoadMethods[i] !== undefined)
           _onLoadMethods[i]();
+    _startupStage_=1;
   }
 
   if (typeof cordova == 'object') {

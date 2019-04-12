@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+    YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2019-04-11 17:28:40 (-3 DST)
    */
 
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -21,14 +21,23 @@
     static $__initialized = false;
 
     function __constructor() {
-      global $cfgSSECloseConnectionTimeout;
+      global $cfgSSECloseConnectionTimeout, $cfgSSEGarbageCollectTTL;
+
+      $cfgSSEGarbageCollectTTL=intval($cfgSSEGarbageCollectTTL);
+      $cfgSSEGarbageCollectTTL=min(60, $cfgSSEGarbageCollectTTL);
 
       if (!self::$__initialized) {
         self::$__initialized = true;
 
+        /* cfgSSECloseConnectionTimeout is expressed in seconds
+           it indicates the maximum time an SSE connection is allowed to live.
+           After that time, a reconnection is needed. 
+           -1 means 'forever' */
+
         if ($cfgSSECloseConnectionTimeout>0)
           self::$__CloseConnectionTimeout=$cfgSSECloseConnectionTimeout;
         self::$__Startup=date('U');
+        self::$eventSequence=$_SERVER["HTTP_LAST_EVENT_ID"];
         _dumpY(8,0,"SSE::__constructor() ");
       }
     }
@@ -36,8 +45,8 @@
     /* indicates that the SSE can be used */
   	public function enabled($sse_session_id, $w, $u, $evaluateTimestamp = true)
     {
-      global $messagePeekerInterval, $cfgMainFolder;
-      
+      global $cfgMainFolder;
+
       $now=date('U');
       $connectionTime = $now-self::$__Startup;
 
@@ -63,12 +72,13 @@
                       clearstatcache();
                       $fT = filemtime($sessionFile);
                       $cT = date('U');
-                      $difT = $cT - $fT; 
-                      /* maximum idle time is eight times the messagePeekerInterval */
+                      $difT = $cT - $fT;
+                      /* ycomm-sse.js will send 'userAlive' event at 7/8 of planned time
+                         so maximum  timeou is 8/8 of planned time */
                       $maxT = self::getMaxUserAliveInterval() * 8;
                       $ret = ($difT<=$maxT);
                       $dif = minutes2time((date('U')-self::$__Startup)/60);
-                      _dumpY(8,0,"SSE difT: $difT maxT: $maxT online: $dif");
+                      _dumpY(8,0,"SSE difT: $difT maxT: $maxT online: $dif (min)");
                     }
                     if ($ret)
                       self::$queue_folder="$cfgMainFolder/.sse/$w/$u";
@@ -96,21 +106,23 @@
         _dumpY(8,3,"SSE::disabled - flags/sse.disabled present");
       }
 
-      _dumpY(8,3,"SSE::enabled = ".intval($ret). "Connection Time: $connectionTime");
+      _dumpY(8,3,"SSE::enabled = ".intval($ret). " Connection Time: $connectionTime");
   		return $ret;
   	}
 
-    public function getMaxUserAliveInterval() 
-    {      
-      global $messagePeekerInterval;      
-      /*  allow times between 750 and 12000 ms 
-          BUT... as the file time stamp in UNIX are measured in seconds, 
-          we translate it to seconds */
+    public function getMaxUserAliveInterval()
+    {
+      global $cfgSSEUserAliveInterleave;
+      /*  In order to conserve TCP/IP stack resources,
+          'userAlive' events need to be sent out of the tipically 60s TIME_WAIT delay.
+          allow times between  15s and 900s (1m1s and 15m)
+          Default value: 120s
+       */
       if (self::$uai<=0) {
-        self::$uai = (min(12000, max(750, isset($messagePeekerInterval)?intval($messagePeekerInterval):0)))/1000;
+        self::$uai = (min(900, max(15, isset($cfgSSEUserAliveInterleave)?intval($cfgSSEUserAliveInterleave):120)));
         _dumpY(8,0,"SSE::uai (userAliveInterval) : ".self::$uai);
       }
-      return self::$uai;      
+      return self::$uai;
     }
 
     /* flush the output to the client */
@@ -129,7 +141,7 @@
       $arg_list = func_get_args();
       foreach($arg_list as $arg) {
         self::$__needToFlush=true;
-        _dumpY(8,0,"SSE::__echo() $arg");
+        _dumpY(8,0,"SSE::__echo() ".preg_replace('/[[:^print:]]/', '', $arg));
         echo $arg;
       }
     }
@@ -140,10 +152,11 @@
       if (is_array($eventData))
         $eventData=json_encode($eventData);
       _dumpY(8,3,"SSE::sendEvent('$eventName', '$eventData')");
-      $evId = md5(date('U').':'.(self::$eventSequence++));
+      $evId = (self::$eventSequence++);
       self::__echo("event: $eventName\n");
       self::__echo("id: $evId\n");
-      self::__echo("data: $eventData\n\n");
+      if ($eventData>"")
+        self::__echo("data: $eventData\n\n");
       self::__flush(true);
     }
 
@@ -188,8 +201,8 @@
 
               if ($ok) {
                 _dumpY(8,0,"SSE::popQueue(".basename(self::$queue_folder).") - get file '".basename($messageFileName)."'");
-                _dumpy(8,0,"SSE::\npopQueue QF ".self::$queue_folder);
-                _dumpy(8,0,"SSE::\npopQueue MF $messageFileName");
+                _dumpY(8,0,"SSE::\npopQueue QF ".self::$queue_folder);
+                _dumpY(8,0,"SSE::\npopQueue MF $messageFileName");
                 $f=fopen($messageFileName, "r");
                 if ($f) {
                   $eventName = trim(preg_replace('/[[:^print:]]/', '', fgets($f)));
@@ -229,7 +242,7 @@
       global $cfgMainFolder;
       if ($u=='')
         $u=$GLOBALS['u'];
-      
+
       _dumpY(8,1,"SSE::detachUser('$u', '$w')");
       $ndxFile="$cfgMainFolder/.sse/$u.ndx";
       if (file_exists($ndxFile)) {
@@ -245,13 +258,13 @@
       }
     }
 
-    public function userAttached($w, $u) 
+    public function userAttached($w, $u)
     {
       global $cfgMainFolder;
       $ret = false;
       if ($u=='')
         $u=$GLOBALS['u'];
-      
+
       _dumpY(8,1,"SSE::userAttached('$u', '$w')");
       $ndxFile="$cfgMainFolder/.sse/$u.ndx";
       if (file_exists($ndxFile)) {
@@ -295,9 +308,16 @@
                 $sse_session_id = UUID::v4();
                 $si             = md5($sse_session_id);
 
+                _dumpY(8,3,"Creating $cfgMainFolder/.sse/$w/$u/.user");
                 file_put_contents("$cfgMainFolder/.sse/$w/$u/.user", "$u");
+
+                _dumpY(8,3,"Creating $cfgMainFolder/.sse/$u.ndx");
                 file_put_contents("$cfgMainFolder/.sse/$u.ndx", "$w\n1000\n$sse_session_id\n");
+
+                _dumpY(8,3,"Creating $cfgMainFolder/.sse/sessions/$sse_session_id.session");
                 file_put_contents("$cfgMainFolder/.sse/sessions/$sse_session_id.session", "$w\n$u\n");
+
+                _dumpY(8,3,"Creating $cfgMainFolder/.sse/sessions/$si.md5");
                 file_put_contents("$cfgMainFolder/.sse/sessions/$si.md5", $sse_session_id);
                 $ret=$sse_session_id;
 
@@ -315,7 +335,7 @@
 
     public function _garbageCollect($dir)
     {
-      global $cfgMainFolder;
+      global $cfgMainFolder, $cfgSSEGarbageCollectTTL;
 
       // _dumpY(8,0,"SSE:: garbageCollect ".dirname($_SERVER['SCRIPT_FILENAME']));
       $dir=preg_replace('/[[:^print:]]/', '', $dir);
@@ -324,29 +344,29 @@
       foreach(glob("$dir/". '{,.}[!.,!..]*',GLOB_MARK|GLOB_BRACE) as $filename) {
         if (is_dir($filename))
           self::_garbageCollect($filename);
-        
+
         if (basename($filename)!='sessions'){
           $ftime=filectime($filename);
           $timeDiff=time() - $ftime;
-          if ($timeDiff > 900) {
+          if ($timeDiff > $cfgSSEGarbageCollectTTL) {
             _dumpY(8,5,"SSE:: garbageCollect $timeDiff ".basename($filename));
             if (is_dir($filename)) {
-              _dumpY(8,10,"SSE:: garbageCollect remove directory ");
+              _dumpY(8,6,"SSE:: garbageCollect remove directory $filename");
               @rmdir($filename);
             } else {
-              _dumpY(8,10,"SSE:: garbageCollect remove file ");
-              @unlink($filename);              
+              _dumpY(8,6,"SSE:: garbageCollect remove file $filename");
+              @unlink($filename);
             }
-          }  
-        }          
-      
+          }
+        }
+
       }
     }
 
-    public function garbageCollect() 
+    public function garbageCollect()
     {
       global $cfgMainFolder;
-      if (lock("sse-garbage-collect")) {
+      if (lock("sse-garbage-collect", true)) {
         _dumpY(8,0,"SSE::garbageCollect()");
         clearstatcache();
         self::_garbageCollect("$cfgMainFolder/.sse");
@@ -379,7 +399,7 @@
       return $ret;
     }
 
-    public function reportUserOnline($u_target) 
+    public function reportUserOnline($u_target)
     {
       global $cfgMainFolder;
       $u_target = preg_replace('/[[:^print:]]/', '', $u_target);
@@ -390,9 +410,9 @@
         $sessionFile="$cfgMainFolder/.sse/sessions/$sse_session_id.session";
         if (file_exists($sessionFile)) {
           touch($sessionFile);
-        } 
+        }
       }
-    } 
+    }
 
     /* messages being sent from a client (rest or query) to another client (sse) */
     function __enqueueMessage($u_target, $message, $data='')
@@ -416,7 +436,7 @@
           $sessionFile="$cfgMainFolder/.sse/sessions/$sse_session_id.session";
           if (file_exists($sessionFile)) {
             touch($sessionFile);
-          } 
+          }
         }
         $usr_folder = "$cfgMainFolder/.sse/$w_target/$u_target";
         if (is_dir($usr_folder)) {
@@ -435,6 +455,8 @@
 
           rename($messageFileI, $messageFileF);
 
+          $messageFile = $messageFileF;
+
         } else {
           _dumpY(8,3,"SSE:: user folder '$usr_folder' cannot be accessed");
         }
@@ -444,10 +466,10 @@
       return $messageFile;
     }
 
-    /*  push a event to be processed later by the caller itself 
+    /*  push a event to be processed later by the caller itself
         The (s,a) pair will be used to imitate an application normal call (xmlHttpRequest, RESTful, URL ...)
         These calls will be atended by a 'w' prefixed function as when a webSocket or a RESTful is used.
-        The 'w' function will use SSE::postMessage() or SSE::sendMesage() in order to send it result to 
+        The 'w' function will use SSE::postMessage() or SSE::sendMesage() in order to send it result to
         the original client (or not).
      */
     public function postpone_w($s, $a, $data)
@@ -460,8 +482,8 @@
           $data["s"]=$s;
           $data["a"]=$a;
           $data=json_encode($data);
-          self::__enqueueMessage($u, 'postpone_w', $data);
         }
+        self::__enqueueMessage($u, 'postpone_w', $data);
       } else {
         _dumpY(8,0,"You cannot postpone a message without 'u' parameter");
       }
@@ -472,7 +494,12 @@
        returns false if the queue does not exists */
     public function sendMessage($u_target, $message, $data='')
     {
+
+      if (is_array($data))
+        $data=json_encode($data);
+
       _dumpY(8,2,"SSE::sendMessage('$u_target', '$message', '$data')");
+
       $ret=false;
       $messageFile=self::__enqueueMessage($u_target, $message, $data);
       if ($messageFile>'') {
@@ -487,7 +514,12 @@
     /* post a message and return immediatly */
     public function postMessage($u_target, $message, $data='')
     {
+
+      if (is_array($data))
+        $data=json_encode($data);
+
       _dumpY(8,2,"SSE::postMessage('$u_target', '$message', '$data')");
+
       $ret=false;
       $messageFile=self::__enqueueMessage($u_target, $message, $data);
       if ($messageFile>'') {
@@ -526,7 +558,10 @@
             while (($f = readdir($dh)) !== false ) {
               $u_target = basename($f);
               if (!is_dir($f)) {
-                self::postMessage($u_target, $message, $data);
+                $fileinfo=pathinfo($f);
+                if ($fileinfo['filename']!=$except_u_target) {
+                  self::postMessage($u_target, $message, $data);
+                }
               }
             }
             closedir($dh);
@@ -536,12 +571,10 @@
     }
   }
 
-
-  function q_sse($a)
-  {
+  function em__sse($a, $values=null) {
     global $userContext, $sysDate, $u,
-           $fieldValue, $fieldName,
-           $userMsg, $xq_start, $__sse_ret,
+           $userMsg, $xq_start, $xq_requestedRows,
+           $__sse_ret,
            $cfgMainFolder;
 
     $useColNames = true;
@@ -549,12 +582,15 @@
     $ret='';
 
     extract(xq_extractValuesFromQuery());
+    if (($values) && is_array($values)) {
+      extract($values);
+    }
     $xq_start=isset($xq_start)?intval($xq_start):0;
 
     switch($a)
     {
-      case 'attachUser':      
-        $sse_session_id       = SSE::attachUser($w, $user);        
+      case 'attachUser':
+        $sse_session_id       = SSE::attachUser($w, $user);
         $userAliveInterval    = SSE::getMaxUserAliveInterval() * 7;
         $ret = array(
               'ok'             => $sse_session_id>'',
@@ -581,7 +617,7 @@
           $sessionFile="$cfgMainFolder/.sse/sessions/$sse_session_id.session";
           if (file_exists($sessionFile)) {
             touch($sessionFile);
-          } 
+          }
 
           if ($a=='peekMessage') {
             $sse_dispatch = function($eventName, $eventData) {
@@ -602,9 +638,47 @@
         break;
     }
 
-    xq_produceReturnLines($ret, $useColNames, $countLimit);
+    $retString = var_export($ret, true);
+    _dumpY(8,1,"'$a': $retString");
 
+    return $ret;
   }
+
+  function q_sse($a, $values=null)
+  {
+    global $xq_requestedRows;
+    $ret=em__sse($a, $values);
+    xq_produceReturnLines($ret, true, $xq_requestedRows);
+  }
+
+  /*
+   * w_sse is called when service is triggered by a WebSocket or REST
+   *   https://en.wikipedia.org/wiki/WebSockets
+   *   https://en.wikipedia.org/wiki/REST
+   * The result is a JSON formatted as string.
+   */
+
+  function w_sse($a, $values=null)
+  {
+    /* call em__sse to process the event */
+    $ret = em__sse($a, $values);
+
+    return jr_produceReturnLines($ret);
+  }
+
+  /*
+   * r_sseis called when service is triggered by REST interface
+   * The result is a js script with json encoded data
+   * if the callback function is not defined, its defaults to restCallBack.
+   * If the callback function does not exists on
+   * client side, no error happens but a console.log is triggered
+   */
+  function r_sse($a, $values=null)
+  {
+    $jsonRet=w_sse($a, $values);
+    echo produceRestOutput($jsonRet);
+  }
+
 
   SSE::__constructor();
 

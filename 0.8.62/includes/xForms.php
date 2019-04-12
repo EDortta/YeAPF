@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xForms.php
-    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+    YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-12-12 12:52:37 (-3 DST)
+    2019-04-11 11:11:57 (-3 DST)
 */
 
   global $cfgMainFolder;
@@ -1696,7 +1696,7 @@
 
         $beforeInsertFunc="before_insert_$tableName";
         if (function_exists($beforeInsertFunc))
-          $beforeInsertFunc();
+          $beforeInsertFunc($fields);
 
         foreach($fields as $f=>$v) {
           _dumpY(64,5,"|$keyList|$aux01:$f,");

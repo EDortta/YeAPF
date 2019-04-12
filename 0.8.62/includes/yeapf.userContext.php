@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.userContext.php
-    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+    YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-03-22 10:20:30 (-3 DST)
+    2019-04-10 19:59:02 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -896,7 +896,7 @@
 
         if (isset($this->userContext['vars'])) {
           foreach($this->userContext['vars'] as $key => $value) {
-            _dumpy(8,2,"\t$key = $value");
+            _dumpY(8,2,"\t$key = $value");
             if (($varNames[0]=='*') || (in_array($key, $varNames))) {
               if (!is_numeric($key)) {
                 _dumpY(8,0,"uc:  loading user var '$key' as '$value'");

@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/templates/bs4-backup/sse.php
-    YeAPF 0.8.62-20 built on 2019-04-06 12:01 (-3 DST)
+    YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-04-06 12:01:05 (-3 DST)
+    2019-04-12 19:01:52 (-3 DST)
 
     skel/webApp / sse.php
     This file cannot be modified within skel/webApp
@@ -19,22 +19,24 @@
   header("Content-Type: text/event-stream\n\n", true);
   header("Cache-Control: no-cache");
   header("Connection: Keep-Alive");
+  header("Access-Control-Allow-Origin: *");
+  header('X-Accel-Buffering: no');
 
   date_default_timezone_set("America/Sao_Paulo");
 
+  _dumpY(8,0,"SSE - conn - stage 1");
+
   SSE::garbageCollect();
 
-  echo "retry: 15000\ndata:welcome\n\n";
-  for($n=1000; $n>0; $n--) echo "\n\n";
-  while (@ob_end_flush());
-  flush();
+  $sse_dispatch = function($eventName, $eventData) {
+    SSE::sendEvent($eventName, $eventData);
+  };
 
-  /* this message will help SSE client to recognizes as valid SSE connection */
-  SSE::sendEvent("message", "connected");
-
-  _dumpY(8,0,"SSE - conn");
-
-  set_time_limit(0);
+  $sse_session_id=SSE::getSessionId(isset($si)?$si:"");
+  _dumpY(8,0,"SSE - session_id = $sse_session_id");
+  _dumpY(8,1,"SSE - cfgSSECloseConnectionTimeout = $cfgSSECloseConnectionTimeout");
+  _dumpY(8,1,"SSE - cfgSSEUserAliveInterleave    = $cfgSSEUserAliveInterleave");
+  _dumpY(8,1,"SSE - cfgSSEGarbageCollectTTL      = $cfgSSEGarbageCollectTTL");
 
   /* @params
      si - md5(sse_session_id)
@@ -46,18 +48,27 @@
      through index/body/query/rest -> yeapf.sse.php -> SSE:grantUserFolder()
   */
 
-  $sse_dispatch = function($eventName, $eventData) {
-    SSE::sendEvent($eventName, $eventData);
-  };
-
-  $sse_session_id=SSE::getSessionId(isset($si)?$si:"");
   if ($sse_session_id>"") {
+    echo "retry: 15000\ndata: welcome $sse_session_id\n\n";
+    for($n=10; $n>0; $n--) echo "\n\n";
+    @ob_flush();
+    flush();
+
+    /* this message will help SSE client to recognizes as valid SSE connection */
+    $sse_dispatch("message", "connected");
+
+    _dumpY(8,0,"SSE - conn - stage 2");
+
+    set_time_limit(0);
+
+    _dumpY(8,0,"SSE - conn - stage 3");
     /* exposes $w and $u as global variables */
     $sessionInfo = SSE::getSessionInfo($sse_session_id);
     extract($sessionInfo);
 
     SSE::broadcastMessage('userConnected', array('u'=>$u), $w, $u);
 
+    _dumpY(8,0,"SSE - conn - stage 4");
     /* run the loop while this session is enabled */
     while (SSE::enabled($sse_session_id, $w, $u)) {
       _dumpY(8,0,"$sse_session_id QUEUE");
@@ -73,9 +84,10 @@
 
       $cTime=date("U");
     }
+    _dumpY(8,0,"SSE - conn - stage 5");
     /*
     if (SSE::userAttached($w,$u)) {
-      SSE::detachUser($w, $u);      
+      SSE::detachUser($w, $u);
     }
     */
   }

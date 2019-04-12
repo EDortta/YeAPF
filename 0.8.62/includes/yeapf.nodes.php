@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.nodes.php
-    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+    YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-02-26 16:53:01 (-3 DST)
+    2019-04-11 11:17:12 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -355,7 +355,7 @@
 
     public static function registerAction($level, $description) {
       global $dbgYNode;
-      _dumpy(512, $level, $description);
+      _dumpY(512, $level, $description);
       _record($dbgYNode, $description);
       _recordError($description);
     }
@@ -681,6 +681,7 @@
 
     public static function nodeKeepAlive() {
       global $cfgNodePrefix, $cfgClientConfig, $serverIP;
+      $ret=array();
       if (db_status(_DB_LOCKED) == 0) {
         if (db_tableExists('is_node_control')) {
           if (thisNodeExists()) {
