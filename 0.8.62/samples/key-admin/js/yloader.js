@@ -1,8 +1,8 @@
 /*********************************************
   * samples/key-admin/js/yloader.js
-  * YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
+  * YeAPF 0.8.62-70 built on 2019-04-18 20:33 (-3 DST)
   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2019-04-12 19:01:53 (-3 DST)
+  * 2019-04-18 20:33:12 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)");
+ console.log("YeAPF 0.8.62-70 built on 2019-04-18 20:33 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -7304,7 +7304,13 @@
                  dbgClass='';
                }
                if ('undefined' != typeof that.dbgDiv) {
-                 that.dbgDiv.innerHTML+="<div class='label {0}' style='display: inline-block'>{1}</div><br>".format(dbgClass, line);
+                 var aux="<div class='label {0}' style='display: inline-block'>{1}</div><br>".format(dbgClass, line);
+                 var currentText = that.dbgDiv.innerHTML.split("<br>");
+                 if (currentText.length>100) {
+                   currentText.splice(0,100-currentText.length);
+                   that.dbgDiv.innerHTML=currentText.join("<br>");
+                 }
+                 that.dbgDiv.innerHTML+=aux;
                }
              }
            },
@@ -9307,9 +9313,9 @@
  /* START yinterface.js */
      /*
          samples/key-admin/js/yloader.js
-         YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
+         YeAPF 0.8.62-70 built on 2019-04-18 20:33 (-3 DST)
          Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-         2019-04-12 19:01:53 (-3 DST)
+         2019-04-18 20:33:12 (-3 DST)
      */
      
      var yInterfaceObj = function() {

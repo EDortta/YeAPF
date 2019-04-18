@@ -1,8 +1,8 @@
   /********************************************************************
   * app-src/js/ycomm-sse.js
-  * YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
+  * YeAPF 0.8.62-70 built on 2019-04-18 20:33 (-3 DST)
   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2019-04-11 15:54:47 (-3 DST)
+  * 2019-04-18 20:32:49 (-3 DST)
   ********************************************************************/
   var ycommSSEBase = function (workgroup, user, dataLocation, pollTimeout, preferredGateway, dbgSSEDiv) {
     window.SSE_UNINITIALIZED  =-1;
@@ -51,7 +51,13 @@
             dbgClass='';
           }
           if ('undefined' != typeof that.dbgDiv) {
-            that.dbgDiv.innerHTML+="<div class='label {0}' style='display: inline-block'>{1}</div><br>".format(dbgClass, line);
+            var aux="<div class='label {0}' style='display: inline-block'>{1}</div><br>".format(dbgClass, line);
+            var currentText = that.dbgDiv.innerHTML.split("<br>");
+            if (currentText.length>100) {
+              currentText.splice(0,100-currentText.length);
+              that.dbgDiv.innerHTML=currentText.join("<br>");
+            }
+            that.dbgDiv.innerHTML+=aux;
           }
         }
       },
