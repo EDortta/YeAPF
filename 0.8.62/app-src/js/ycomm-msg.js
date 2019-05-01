@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-msg.js
- * YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+ * YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)
  * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-09-18 06:22:46 (-3 DST)
+ * 2019-05-01 08:42:44 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * These routines were written in order to help interprocess process messages
  * but as an remote process messages implementation.
@@ -133,13 +133,13 @@ var ycommMsgBase = function() {
         notificationArea.style.display = 'none';
 
       if (typeof _notifyServerOnline =='function')
-        setTimeout(_notifyServerOnline,500);        
+        setTimeout(_notifyServerOnline,500);
     }
   };
 
   that.notifyServerOffline = function() {
     that.serverOfflineFlag=(that.serverOfflineFlag || 0)+1;
-    
+
     var notificationArea = y$('notificationArea');
     if (!notificationArea) {
       notificationArea = document.createElement('div');
@@ -163,7 +163,7 @@ var ycommMsgBase = function() {
     notificationArea.style.width = document.body.clientWidth + 'px';
     notificationArea.style.height = document.body.clientHeight + 'px';
     notificationArea.style.display = '';
-  
+
     if (typeof _notifyServerOffline =='function')
       setTimeout(_notifyServerOffline,500);
 

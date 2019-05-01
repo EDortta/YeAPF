@@ -1,8 +1,8 @@
 /*
     app-src/js/yinterface.js
-    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+    YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-04-03 08:41:45 (-3 DST)
+    2019-04-29 11:17:53 (-3 DST)
 */
 
 var yInterfaceObj = function() {
@@ -23,9 +23,15 @@ var yInterfaceObj = function() {
                   !(  (e.getAttribute('data-tab') !== null) ||
                      (e.nodeName == 'LI'))  )
            e = e.parentNode;
-        e.addClass('active');
-        var tab = e.getAttribute('data-tab');
-        mTabNav.showTab(tab);
+        if (!e.hasClass("disabled")) {
+          e.addClass('active');
+          var tab = e.getAttribute('data-tab');
+          if ("string"==typeof tab)
+            mTabNav.showTab(tab);
+          else {
+            console.warn((e.id || "unidentified") +" does not has data-tab attribute");
+          }
+        }
       } else if (typeof e == "string") {
         /* pode ser uma ancora */
         var i, href;
@@ -1239,8 +1245,8 @@ var yInterfaceObj = function() {
                     jList[i].query.action,
                     JSON.stringify(jList[i].query.lineSpec || {}),
                     JSON.stringify(jList[i].resultSpec || {}));
-                  addToEventList(elementId, "keyup", "interface.input_keyup");
-                  addToEventList(elementId, "input", "interface.input_input");
+                  addToEventList(elementId, "keyup", "yInterface.input_keyup");
+                  addToEventList(elementId, "input", "yInterface.input_input");
                 } else {
                   if ("undefined" != typeof jList[i].rightAddon) {
                     html += inputModelWithRightAddon.format(
@@ -1463,6 +1469,9 @@ var yInterfaceObj = function() {
     addEvent(".op-menu", "click", that.openTab);
     addEvent(".btn-atualizar", "click", that.refreshTable);
     addEvent(".btn-adicionar", "click", that.insertData);
+
+    addEvent(".btn-update", "click", that.refreshTable);
+    addEvent(".btn-add", "click", that.insertData);
 
     /* apenas para desenvolvimento. Em produção tem que estar TRUE */
     that.allowCacheForm = false;

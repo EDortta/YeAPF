@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.nodes.php
-    YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
+    YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-04-11 11:17:12 (-3 DST)
+    2019-04-29 17:24:44 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -355,6 +355,9 @@
 
     public static function registerAction($level, $description) {
       global $dbgYNode;
+      if (outIsXML()) {
+        $description=str_replace("&", "[and]", $description);
+      }
       _dumpY(512, $level, $description);
       _record($dbgYNode, $description);
       _recordError($description);

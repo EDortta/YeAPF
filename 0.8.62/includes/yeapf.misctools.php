@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misctools.php
-    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+    YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-07-24 06:51:00 (-3 DST)
+    2019-04-30 08:15:56 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -728,7 +728,7 @@
             foreach($elem2 as $k=>$v) {
               $v=trim($v);
               if ($v>'') {
-                $content .= $key2."[] = \"$v\"\n";
+                $content .= $key2."[]=\"$v\"\n";
               }
             }
             /*
@@ -737,9 +737,9 @@
             */
           } else {
             if ($elem2=="")
-              $content .= $key2." = \n";
+              $content .= $key2."=\n";
             else
-              $content .= $key2." = \"".$elem2."\"\n";
+              $content .= $key2."=\"".$elem2."\"\n";
           }
         }
         $content.="\n";
@@ -750,24 +750,24 @@
           foreach($elem as $k=>$v) {
             $v=trim($v);
             if ($v>'') {
-              $content .= $key."[] = \"$v\"\n";
+              $content .= $key."[]=\"$v\"\n";
             }
           }
         } else {
           if ($elem=="")
-            $content .= $key." = \n";
+            $content .= $key."=\n";
           else
-            $content .= $key." = \"".$elem."\"\n";
+            $content .= $key."=\"".$elem."\"\n";
         }
       }
     }
 
-    if (!$handle = fopen($path, 'w')) {
-      return false;
-    }
-
-    $success = fwrite($handle, $content);
-    fclose($handle);
+    $handle = fopen($path, 'w');
+    if ($handle) {
+      $success = fwrite($handle, $content);
+      fclose($handle);
+    } else
+      $success=false;
 
     return $success;
   }
@@ -859,7 +859,7 @@
     $seq=intval(@file_get_contents($cfgSeqName) || 0);
     $seq=($seq+1)%count($services);
 
-    $currentIP=@file_get_contents($cfgName)||'';
+    $currentIP=@file_get_contents($cfgName);
 
     if (($dif > $secondsPerDay / 6) || ($currentIP=='')) {
       set_time_limit(0);

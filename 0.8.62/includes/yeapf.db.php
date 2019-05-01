@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+    YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-02-21 09:28:22 (-3 DST)
+    2019-04-23 16:06:00 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -167,6 +167,15 @@
   function db_connectionTypeIs($adbType)
   {
     return $GLOBALS['ydb_type']==$adbType;
+  }
+
+  function db_getFirebirdDialect() {
+    $sql="select mon\$sql_dialect from mon\$database";
+    try {
+      return db_sql($sql);
+    } catch (Exception $e) {
+      return 1;
+    }
   }
 
   function db_getConnectionTypeName()

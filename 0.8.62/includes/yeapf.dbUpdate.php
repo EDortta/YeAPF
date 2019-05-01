@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dbUpdate.php
-    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+    YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-11-22 15:51:19 (-3 DST)
+    2019-04-23 16:10:00 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -729,11 +729,17 @@
             }
 
             if (!db_tableExists("is_sequence")) {
+              $seq_value_type="BIGINT";
+              if (db_connectionTypeIs(_FIREBIRD_)) {
+                if (db_getFirebirdDialect()<3)
+                  $seq_value_type="INT";
+              }
               $sql="CREATE TABLE is_sequence (
                       nodePrefix char(3) NOT NULL,
                       segment char(4) NOT NULL,
-                      seq_value bigint NOT NULL
+                      seq_value $seq_value_type NOT NULL
                     )";
+              unset($seq_value_type);
               _db_upd_do($sql);
               $sql="create index idx_sequence on is_sequence(nodePrefix, segment)";
               _db_upd_do($sql);
@@ -753,9 +759,9 @@
 
               _db_upd_do("ALTER TABLE is_segment_control ADD PRIMARY KEY ( serverKey , nodePrefix, segment )");
               if (db_connectionTypeIs(_FIREBIRD_) || db_connectionTypeIs(_PGSQL_)) {
-                _db_upd_do("create unique index ndxIdentity on is_segment_control (identity)");
+                _db_upd_do("create unique index ndxIdentitySegCon on is_segment_control (identity)");
               } else {
-                _db_upd_do("ALTER TABLE is_segment_control ADD UNIQUE ndxIdentity ( identity )");
+                _db_upd_do("ALTER TABLE is_segment_control ADD UNIQUE ndxIdentitySegCon ( identity )");
               }
             }
 
@@ -773,9 +779,9 @@
               _db_upd_do($sql);
               _db_upd_do("alter table is_segment_reservation add primary key ( serverKey , nodePrefix, segment )");
               if (db_connectionTypeIs(_FIREBIRD_) || db_connectionTypeIs(_PGSQL_)) {
-                _db_upd_do("create unique index ndxIdentity on is_segment_reservation (identity)");
+                _db_upd_do("create unique index ndxIdentitySegRes on is_segment_reservation (identity)");
               } else {
-                _db_upd_do("alter table is_segment_reservation ADD UNIQUE ndxIdentity ( identity )");
+                _db_upd_do("alter table is_segment_reservation ADD UNIQUE ndxIdentitySegRes ( identity )");
               }
             }
 

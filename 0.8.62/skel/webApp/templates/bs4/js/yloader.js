@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/templates/bs4/js/yloader.js
-  * YeAPF 0.8.62-70 built on 2019-04-18 20:33 (-3 DST)
+  * YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)
   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2019-04-18 20:33:12 (-3 DST)
+  * 2019-05-01 13:06:06 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.62-70 built on 2019-04-18 20:33 (-3 DST)");
+ console.log("YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -1389,6 +1389,28 @@
            dig_enc = "" + d1 + "" + d2;
            return (dig_enc == dig_forn);
          }
+       }
+     }
+     
+     if (!String.prototype.isCreditCard) {
+       String.prototype.isCreditCard = function() {
+         var digit, digits, flag, sum, _i, _len;
+         flag = true;
+         sum = 0;
+         var auxCartao = this.replace(/\D/g, '');
+         digits = (auxCartao + '').split('').reverse();
+         for (_i = 0, _len = digits.length; _i < _len; _i++) {
+           digit = digits[_i];
+           digit = parseInt(digit, 10);
+           if ((flag = !flag)) {
+             digit *= 2;
+           }
+           if (digit > 9) {
+             digit -= 9;
+           }
+           sum += digit;
+         }
+         return (auxCartao.length>0) && (sum % 10 === 0);
        }
      }
      
@@ -5200,27 +5222,26 @@
        ycomm.explodeData = function(xmlDoc) {
          var xmlArray = xml2array(xmlDoc);
      
-         var xCallBackFunction,
-             xData, retData,
-             xRoot = xmlArray['root'] || {},
-             xDataContext = xRoot['dataContext'] || {},
+         var i, xData, retData,
+             xRoot = xmlArray.root || {},
+             xDataContext = xRoot.dataContext || {},
      
-             xError = xRoot['error'] ||
-                      xDataContext['error'] ||
-                      xDataContext['lastError'],
+             xError = xRoot.error ||
+                      xDataContext.error ||
+                      xDataContext.lastError,
      
-             xCallBackFunction = xmlArray['root']['callBackFunction'],
+             xCallBackFunction = xmlArray.root.callBackFunction,
              xGeometry = null,
-             xUserMsg = xDataContext['userMsg'],
-             xSysMsg = xDataContext['sysMsg'];
-             xStack = xDataContext['stack'];
+             xUserMsg = xDataContext.userMsg,
+             xSysMsg = xDataContext.sysMsg;
+             xStack = xDataContext.stack;
      
          if (xStack) {
-           var requestedS = xDataContext['s'];
-           var requestedA = xDataContext['a'];
-           var requestedV = xDataContext['v'];
+           var requestedS = xDataContext.s;
+           var requestedA = xDataContext.a;
+           var requestedV = xDataContext.v;
            console.log("/------- {0}.{1}.v{2} ---".format(requestedS, requestedA, requestedV));
-           for(var i in xStack) {
+           for(i in xStack) {
              console.log("| STACK: %c"+xStack[i],"color: #FF4D48");
            }
            console.log("\------- {0}.{1}.v{2} ---".format(requestedS, requestedA, requestedV));
@@ -5258,7 +5279,6 @@
          /* only continue if the user is logged */
          if (ycomm.canReceiveMessages) {
            if (xDataContext) {
-             var i;
              if (xDataContext.requiredFields) {
                var reqFields = xDataContext.requiredFields.split(',');
                for(i = 0; i<reqFields.length; i++) {
@@ -5283,23 +5303,23 @@
      
            if (xRoot) {
      
-             if (xDataContext['formID']!=undefined) {
+             if (xDataContext.formID!=undefined) {
                if (formID=='') {
-                 formID=xDataContext['formID'];
+                 formID=xDataContext.formID;
                  // alert("FORMID: "+formID);
                }
              }
      
-             xDataContext['firstRow'] = parseInt(xDataContext['firstRow']);
-             xDataContext['rowCount'] = parseInt(xDataContext['rowCount']);
-             xDataContext['requestedRows'] = parseInt(xDataContext['requestedRows']);
+             xDataContext.firstRow = parseInt(xDataContext.firstRow);
+             xDataContext.rowCount = parseInt(xDataContext.rowCount);
+             xDataContext.requestedRows = parseInt(xDataContext.requestedRows);
      
-             var auxRowCount = xDataContext['rowCount'];
+             var auxRowCount = xDataContext.rowCount;
      
-             if (xRoot['data'])
-               xData=xRoot['data']['row'];
+             if (xRoot.data)
+               xData=xRoot.data.row;
              else
-               xData=xRoot['row'];
+               xData=xRoot.row;
      
              if (auxRowCount==1) {
                xData=new Array(xData);
@@ -5317,8 +5337,8 @@
                  }
              }
      
-             if (xRoot['data']!==undefined)
-               xGeometry = xRoot['data']['geometry'];
+             if (xRoot.data!==undefined)
+               xGeometry = xRoot.data.geometry;
      
            }
          } /* end of (ycomm.canReceiveMessages==true) */
@@ -5332,18 +5352,6 @@
            userMsg: xUserMsg
          };
      
-         return ret;
-     
-       };
-     
-       ycomm.text2data = function (aResponseText) {
-         var ret={};
-     
-         if (typeof DOMParser == 'function')  {
-           var parser = new DOMParser();
-           var xmlDoc = parser.parseFromString(aResponseText, "application/xml");
-           ret=ycomm.explodeData(xmlDoc);
-         }
          return ret;
        };
      
@@ -5365,7 +5373,18 @@
            _ycomm_stat[via][s][a].count++;
            _dumpy(4,2,"via: {0} s: {1} a: {2} count: {3}".format(via, s, a, _ycomm_stat[via][s][a].count));
          }
-       }
+       };
+     
+       ycomm.text2data = function (aResponseText) {
+         var ret={};
+     
+         if (typeof DOMParser == 'function')  {
+           var parser = new DOMParser();
+           var xmlDoc = parser.parseFromString(aResponseText, "application/xml");
+           ret=ycomm.explodeData(xmlDoc);
+         }
+         return ret;
+       };
      
        ycomm.dataLength = function (data) {
          var cc=0;
@@ -5373,7 +5392,7 @@
            for (var i in data) { 
              if (data.hasOwnProperty(i)) 
                cc++; 
-           };
+           }
          }
          return cc;
        };
@@ -5488,7 +5507,7 @@
              }
            );
            return promiseRet;
-         };
+       };
      
      
  /* END ycomm-ajax.js */
@@ -5529,7 +5548,7 @@
      
        ycomm.getLoad = function () {
          return ycomm._load;
-       };  
+       };
      
        ycomm._removeJSONP = function (scriptSequence, callback) {
          var head = document.head;
@@ -5637,10 +5656,10 @@
            if (typeof callbackFunction=='function') {
              /* the user has passed an annon function
               * CallBack sequencer */
-             ycomm._CBSeq++;
+             var mySequence = ++ycomm._CBSeq;
      
              /* name for the callback function */
-             callbackFunctionName="ycb"+ycomm._CBSeq;
+             callbackFunctionName="ycb"+mySequence;
      
              /* callback control... for garbage collect */
              ycomm._CBControl[callbackFunctionName]={ready: false};
@@ -7171,13 +7190,13 @@
              notificationArea.style.display = 'none';
      
            if (typeof _notifyServerOnline =='function')
-             setTimeout(_notifyServerOnline,500);        
+             setTimeout(_notifyServerOnline,500);
          }
        };
      
        that.notifyServerOffline = function() {
          that.serverOfflineFlag=(that.serverOfflineFlag || 0)+1;
-         
+     
          var notificationArea = y$('notificationArea');
          if (!notificationArea) {
            notificationArea = document.createElement('div');
@@ -7201,7 +7220,7 @@
          notificationArea.style.width = document.body.clientWidth + 'px';
          notificationArea.style.height = document.body.clientHeight + 'px';
          notificationArea.style.display = '';
-       
+     
          if (typeof _notifyServerOffline =='function')
            setTimeout(_notifyServerOffline,500);
      
@@ -7715,6 +7734,151 @@
      
  /* END ycomm-sse.js */
  _dump("ycomm-sse");
+ /* START ycomm-websocket.js */
+       /********************************************************************
+       ********************************************************************/
+     
+       ycommWebSocketClientObj = function (webSocketServerURL, u, deviceId) {
+       /* just in case you forget to use webSocketServerURL */
+       var dummy = {
+         yank: function(s, a, limits, aCallbackFunction) {
+           console.log("bad configured");
+           if ("function" == typeof aCallbackFunction) {
+             /* https://www.restapitutorial.com/httpstatuscodes.html */
+             aCallbackFunction(501, "Bad configured", null, null, null);
+           }
+         }
+       };
+     
+       /* implementation */
+       var that = {};
+       var uname = u || guid(), socket, heartbeatGuardian;
+       var host = null;
+       var functionNameSeed="F"+(guid().replace(/-/g, '').toLowerCase().substr(8,12))+"_";
+       var functionCounter=1000;
+     
+       /* private functions */
+       var formatDate = function(date) {
+         var hours = date.getHours();
+         var minutes = date.getMinutes();
+         hours = hours < 10 ? '0' + hours : hours;
+         minutes = minutes < 10 ? '0' + minutes : minutes;
+         var strTime = hours + ':' + minutes;
+         return date.getFullYear() + "/" + (date.getMonth() + 1) + "/" + date.getDate() + "  " + strTime;
+       };
+     
+       var now = function() {
+         var d = new Date();
+         return formatDate(d);
+       };
+     
+       var log = function(msg) {
+         console.log("%c {0} {1}".format(now(), msg || ""), "color: ##5157FF");
+       };
+     
+       var getRndInteger=function(min, max) {
+         return Math.floor(Math.random() * (max - min)) + min;
+       };
+     
+       var configureSocket = function() {
+         if (heartbeatGuardian)
+           clearInterval(heartbeatGuardian);
+         try {
+           socket = new WebSocket(host);
+           log('WebSocket - status ' + socket.readyState);
+           /* ON OPEN */
+           socket.onopen = function(msg) {
+             log("Welcome - status " + this.readyState);
+             socket.send("uname:" + uname);
+             heartbeatGuardian = setInterval(heartbeat, 30000);
+             if ("function" == typeof that.onopen) {
+               that.onopen(msg);
+             }
+           };
+           /* ON MESSAGE */
+           socket.onmessage = function(msg) {
+             log("<b>" + msg.data + '</b>');
+           };
+           /* ON CLOSE */
+           socket.onclose = function(msg) {
+             if (heartbeatGuardian)
+               clearInterval(heartbeatGuardian);
+             log("Disconnected - status " + this.readyState);
+             setTimeout(configureSocket, 1500);
+             if ("function" == typeof that.onclose) {
+               that.onclose(msg);
+             }
+           };
+         } catch (ex) {
+           log(ex);
+         }
+       };
+     
+       var heartbeat = function() {
+         if (socket.readyState==1)
+           socket.send(".");
+         else
+           that.reconnect();
+       };
+     
+       that.quit = function() {
+         if (socket != null) {
+           log("Goodbye!");
+           socket.close();
+           socket = null;
+         }
+       };
+     
+       that.reconnect = function() {
+         that.quit();
+         configureSocket();
+       };
+     
+     
+       that.yank = function(s, a, jsonParams, aCallbackFunction) {
+         aCallbackFunction = aCallbackFunction || function() {};
+     
+         var mySequence = ++functionCounter;
+         var callbackFunctionName = functionNameSeed+mySequence;
+         /* callback control... for garbage collect */
+         ycomm._CBControl[callbackFunctionName]={ready: false};
+     
+         var rootSystem = window || self;
+     
+         rootSystem[callbackFunctionName]=function(status, error, data, userMsg, context, geometry) {
+           aCallbackFunction(status, error, data, userMsg, context, geometry);
+           _dumpy(4,1,callbackFunctionName);
+         };
+     
+         var jsonAsParams=that.urlJsonAsParams(jsonParams);
+         var fieldName=jsonAsParams[0];
+         var fieldValue=jsonAsParams[1];
+         var yeapf_message = {
+           "s":          s,
+           "a":          a,
+           "fieldName":  fieldName,
+           "fieldValue": fieldValue,
+           "callbackId": callbackFunctionName
+         };
+         socket.send(JSON.stringify(yeapf_message));
+       };
+     
+       /* private initializer */
+       var _initialize = function() {
+         webSocketServerURL = webSocketServerURL || "";
+         if (webSocketServerURL>"") {
+           host = webSocketServerURL;
+           _deviceId = deviceId || guid();
+     
+           return that;
+         } else {
+           console.alert("You need to indicate the webService URL in order to use ycommWebSocketClientObj()");
+           return dummy;
+         }
+       };
+     };
+ /* END ycomm-websocket.js */
+ _dump("ycomm-websocket");
  /* START ycalendar.js */
      /*********************************************
       * First Version (C) August 2013 - esteban daniel dortta - dortta@yahoo.com
@@ -9313,9 +9477,9 @@
  /* START yinterface.js */
      /*
          skel/webApp/templates/bs4/js/yloader.js
-         YeAPF 0.8.62-70 built on 2019-04-18 20:33 (-3 DST)
+         YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)
          Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-         2019-04-18 20:33:12 (-3 DST)
+         2019-05-01 13:06:06 (-3 DST)
      */
      
      var yInterfaceObj = function() {
@@ -9336,9 +9500,15 @@
                        !(  (e.getAttribute('data-tab') !== null) ||
                           (e.nodeName == 'LI'))  )
                 e = e.parentNode;
-             e.addClass('active');
-             var tab = e.getAttribute('data-tab');
-             mTabNav.showTab(tab);
+             if (!e.hasClass("disabled")) {
+               e.addClass('active');
+               var tab = e.getAttribute('data-tab');
+               if ("string"==typeof tab)
+                 mTabNav.showTab(tab);
+               else {
+                 console.warn((e.id || "unidentified") +" does not has data-tab attribute");
+               }
+             }
            } else if (typeof e == "string") {
              /* pode ser uma ancora */
              var i, href;
@@ -10552,8 +10722,8 @@
                          jList[i].query.action,
                          JSON.stringify(jList[i].query.lineSpec || {}),
                          JSON.stringify(jList[i].resultSpec || {}));
-                       addToEventList(elementId, "keyup", "interface.input_keyup");
-                       addToEventList(elementId, "input", "interface.input_input");
+                       addToEventList(elementId, "keyup", "yInterface.input_keyup");
+                       addToEventList(elementId, "input", "yInterface.input_input");
                      } else {
                        if ("undefined" != typeof jList[i].rightAddon) {
                          html += inputModelWithRightAddon.format(
@@ -10776,6 +10946,9 @@
          addEvent(".op-menu", "click", that.openTab);
          addEvent(".btn-atualizar", "click", that.refreshTable);
          addEvent(".btn-adicionar", "click", that.insertData);
+     
+         addEvent(".btn-update", "click", that.refreshTable);
+         addEvent(".btn-add", "click", that.insertData);
      
          /* apenas para desenvolvimento. Em produÃ§Ã£o tem que estar TRUE */
          that.allowCacheForm = false;

@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
+ * YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)
  * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
- * 2019-04-11 10:45:21 (-3 DST)
+ * 2019-04-23 10:56:30 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -1089,6 +1089,28 @@ if (!String.prototype.isCNH) {
       dig_enc = "" + d1 + "" + d2;
       return (dig_enc == dig_forn);
     }
+  }
+}
+
+if (!String.prototype.isCreditCard) {
+  String.prototype.isCreditCard = function() {
+    var digit, digits, flag, sum, _i, _len;
+    flag = true;
+    sum = 0;
+    var auxCartao = this.replace(/\D/g, '');
+    digits = (auxCartao + '').split('').reverse();
+    for (_i = 0, _len = digits.length; _i < _len; _i++) {
+      digit = digits[_i];
+      digit = parseInt(digit, 10);
+      if ((flag = !flag)) {
+        digit *= 2;
+      }
+      if (digit > 9) {
+        digit -= 9;
+      }
+      sum += digit;
+    }
+    return (auxCartao.length>0) && (sum % 10 === 0);
   }
 }
 

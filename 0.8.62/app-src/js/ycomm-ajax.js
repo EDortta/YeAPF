@@ -1,8 +1,8 @@
   /********************************************************************
    * app-src/js/ycomm-ajax.js
-   * YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+   * YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)
    * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-   * 2018-09-18 06:22:48 (-3 DST)
+   * 2019-05-01 08:55:49 (-3 DST)
    *
    * Com o advento do WebSocket, precisamos de novas formas para
    * provocar o servidor.
@@ -90,27 +90,26 @@
   ycomm.explodeData = function(xmlDoc) {
     var xmlArray = xml2array(xmlDoc);
 
-    var xCallBackFunction,
-        xData, retData,
-        xRoot = xmlArray['root'] || {},
-        xDataContext = xRoot['dataContext'] || {},
+    var i, xData, retData,
+        xRoot = xmlArray.root || {},
+        xDataContext = xRoot.dataContext || {},
 
-        xError = xRoot['error'] ||
-                 xDataContext['error'] ||
-                 xDataContext['lastError'],
+        xError = xRoot.error ||
+                 xDataContext.error ||
+                 xDataContext.lastError,
 
-        xCallBackFunction = xmlArray['root']['callBackFunction'],
+        xCallBackFunction = xmlArray.root.callBackFunction,
         xGeometry = null,
-        xUserMsg = xDataContext['userMsg'],
-        xSysMsg = xDataContext['sysMsg'];
-        xStack = xDataContext['stack'];
+        xUserMsg = xDataContext.userMsg,
+        xSysMsg = xDataContext.sysMsg;
+        xStack = xDataContext.stack;
 
     if (xStack) {
-      var requestedS = xDataContext['s'];
-      var requestedA = xDataContext['a'];
-      var requestedV = xDataContext['v'];
+      var requestedS = xDataContext.s;
+      var requestedA = xDataContext.a;
+      var requestedV = xDataContext.v;
       console.log("/------- {0}.{1}.v{2} ---".format(requestedS, requestedA, requestedV));
-      for(var i in xStack) {
+      for(i in xStack) {
         console.log("| STACK: %c"+xStack[i],"color: #FF4D48");
       }
       console.log("\------- {0}.{1}.v{2} ---".format(requestedS, requestedA, requestedV));
@@ -148,7 +147,6 @@
     /* only continue if the user is logged */
     if (ycomm.canReceiveMessages) {
       if (xDataContext) {
-        var i;
         if (xDataContext.requiredFields) {
           var reqFields = xDataContext.requiredFields.split(',');
           for(i = 0; i<reqFields.length; i++) {
@@ -173,23 +171,23 @@
 
       if (xRoot) {
 
-        if (xDataContext['formID']!=undefined) {
+        if (xDataContext.formID!=undefined) {
           if (formID=='') {
-            formID=xDataContext['formID'];
+            formID=xDataContext.formID;
             // alert("FORMID: "+formID);
           }
         }
 
-        xDataContext['firstRow'] = parseInt(xDataContext['firstRow']);
-        xDataContext['rowCount'] = parseInt(xDataContext['rowCount']);
-        xDataContext['requestedRows'] = parseInt(xDataContext['requestedRows']);
+        xDataContext.firstRow = parseInt(xDataContext.firstRow);
+        xDataContext.rowCount = parseInt(xDataContext.rowCount);
+        xDataContext.requestedRows = parseInt(xDataContext.requestedRows);
 
-        var auxRowCount = xDataContext['rowCount'];
+        var auxRowCount = xDataContext.rowCount;
 
-        if (xRoot['data'])
-          xData=xRoot['data']['row'];
+        if (xRoot.data)
+          xData=xRoot.data.row;
         else
-          xData=xRoot['row'];
+          xData=xRoot.row;
 
         if (auxRowCount==1) {
           xData=new Array(xData);
@@ -207,8 +205,8 @@
             }
         }
 
-        if (xRoot['data']!==undefined)
-          xGeometry = xRoot['data']['geometry'];
+        if (xRoot.data!==undefined)
+          xGeometry = xRoot.data.geometry;
 
       }
     } /* end of (ycomm.canReceiveMessages==true) */
@@ -222,18 +220,6 @@
       userMsg: xUserMsg
     };
 
-    return ret;
-
-  };
-
-  ycomm.text2data = function (aResponseText) {
-    var ret={};
-
-    if (typeof DOMParser == 'function')  {
-      var parser = new DOMParser();
-      var xmlDoc = parser.parseFromString(aResponseText, "application/xml");
-      ret=ycomm.explodeData(xmlDoc);
-    }
     return ret;
   };
 
@@ -255,7 +241,18 @@
       _ycomm_stat[via][s][a].count++;
       _dumpy(4,2,"via: {0} s: {1} a: {2} count: {3}".format(via, s, a, _ycomm_stat[via][s][a].count));
     }
-  }
+  };
+
+  ycomm.text2data = function (aResponseText) {
+    var ret={};
+
+    if (typeof DOMParser == 'function')  {
+      var parser = new DOMParser();
+      var xmlDoc = parser.parseFromString(aResponseText, "application/xml");
+      ret=ycomm.explodeData(xmlDoc);
+    }
+    return ret;
+  };
 
   ycomm.dataLength = function (data) {
     var cc=0;
@@ -263,7 +260,7 @@
       for (var i in data) { 
         if (data.hasOwnProperty(i)) 
           cc++; 
-      };
+      }
     }
     return cc;
   };
@@ -378,5 +375,5 @@
         }
       );
       return promiseRet;
-    };
+  };
 

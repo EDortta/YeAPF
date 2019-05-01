@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-rest.js
- * YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+ * YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)
  * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-09-13 18:46:24 (-3 DST)
+ * 2019-05-01 12:18:48 (-3 DST)
  *
  * ycomm-rest.js is a set of prototyped functions
  * build in order to use REST protocol
@@ -37,7 +37,7 @@
 
   ycomm.getLoad = function () {
     return ycomm._load;
-  };  
+  };
 
   ycomm._removeJSONP = function (scriptSequence, callback) {
     var head = document.head;
@@ -145,10 +145,10 @@
       if (typeof callbackFunction=='function') {
         /* the user has passed an annon function
          * CallBack sequencer */
-        ycomm._CBSeq++;
+        var mySequence = ++ycomm._CBSeq;
 
         /* name for the callback function */
-        callbackFunctionName="ycb"+ycomm._CBSeq;
+        callbackFunctionName="ycb"+mySequence;
 
         /* callback control... for garbage collect */
         ycomm._CBControl[callbackFunctionName]={ready: false};

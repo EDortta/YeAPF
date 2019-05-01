@@ -4,9 +4,9 @@
  *      slotEmptyImplementation.php
  *      This file is part of YeAPF
  *      (Yet Another PHP Framework)
- *      YeAPF 0.8.62-70 built on 2019-04-18 20:33 (-3 DST)
+ *      YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)
  *      Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
- *      2019-04-18 20:33:12 (-3 DST)
+ *      2019-05-01 13:06:06 (-3 DST)
  *
  *
  *      The MIT License (MIT)
@@ -36,7 +36,7 @@
   function em_#(s)($a, $values=null) {
     global $userContext, $sysDate, $u,
            $userMsg, $xq_start, $xq_requestedRows,
-           $devSession;
+           $devSession, $cfgMainFolder;
 
     /* numer of rows to limit queries result
        By Default 20

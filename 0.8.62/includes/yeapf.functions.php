@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+    YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-04-04 23:31:49 (-3 DST)
+    2019-04-27 10:48:02 (-3 DST)
    */
 
   /*
@@ -1824,7 +1824,7 @@
   {
     global $lastImplementation, $flgCanContinueWorking, $devSession;
 
-    xq_context('YeAPF',       'YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)');
+    xq_context('YeAPF',       'YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)');
     xq_context('devSession',  $devSession);
     xq_context('ts1',         date('U'));
 
@@ -3485,7 +3485,7 @@
       $aStr=preg_replace_callback(
         '/src=("|\')\s*(.*?)\s*\\1.*?/',
         function($matches) {
-          return "src=\'".doChangeRef($matches[2], $matches[1])."\'";
+          return "src='".doChangeRef($matches[2], $matches[1])."'";
         },
         $aStr);
     }
