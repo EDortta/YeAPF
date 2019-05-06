@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
+    YeAPF 0.8.62-96 built on 2019-05-06 18:30 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-04-11 11:17:21 (-3 DST)
+    2019-05-02 10:14:18 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -932,8 +932,9 @@
     if ((!isset($callback)) || ($callback==''))
       $callback='ycomm.dummy';
 
-    $_xq_context_['callback']=$callbackId;
-    $_xq_context_['scriptSequence']=$scriptSequence;
+
+    xq_context('callback', $callbackId);
+    xq_context('scriptSequence', $scriptSequence);
 
     $context=json_encode($_xq_context_);
 
@@ -1047,7 +1048,7 @@
     xq_produceReturnLines($ret, true, $countLimit);
   }
 
-  function ryeapf($a) {
+  function wyeapf($a) {
     global $callback, $cfgMainFolder, $cfgNodePrefix, $cfgClientConfig, $server_IP;
     extract(xq_extractValuesFromQuery());
 
@@ -1078,7 +1079,11 @@
     }
 
     $jsonRet = json_encode($ret);
+    return $jsonRet;
+  }
 
+  function ryeapf($a) {
+    $jsonRet = wyeapf($a);
     echo produceRestOutput($jsonRet);
   }
 

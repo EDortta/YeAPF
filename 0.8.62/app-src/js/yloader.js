@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yloader.js
- * YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+ * YeAPF 0.8.62-96 built on 2019-05-06 18:30 (-3 DST)
  * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
- * 2019-02-14 17:20:38 (-3 DST)
+ * 2019-05-02 08:45:05 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * Purpose:  Detect on which device this app is running
  *           and load wormhole.js library if it is mobile.
@@ -114,8 +114,8 @@ if (typeof yloader=='undefined') {
       'yopcontext.js',
       'ymisc.js',     'ydebug.js',     'yanalise.js',   'ycfgdb.js',
       'ydragdrop.js', 'ytabnav.js',
-      'ycomm.js',     'ycomm-ajax.js', 'ycomm-rest.js', 'ycomm-dom.js', 
-      'ycomm-msg.js', 'ycomm-sse.js', 
+      'ycomm.js',     'ycomm-ajax.js', 'ycomm-rest.js', 'ycomm-dom.js',
+      'ycomm-msg.js', 'ycomm-sse.js', 'ycomm-websocket.js',
       'ycalendar.js', 'ydyntable.js'
     ];
 

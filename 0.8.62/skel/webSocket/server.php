@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webSocket/server.php
-    YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
+    YeAPF 0.8.62-96 built on 2019-05-06 18:30 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-04-12 10:34:34 (-3 DST)
+    2019-05-06 12:10:56 (-3 DST)
 
     skel / webSocket / server.php
     This file cannot be modified within skel/webSocket
@@ -66,8 +66,8 @@
         YeAPF webService client will communicate with the server using JSON
         It is required that the call contain at least one of the three essential tripod (s,a,u) in thar order of priority
         Anyway, when 'u' appears by the first time YeAPF will load userContext as in body, query and rest
-        The target parameter (t) if present and set to '*', makes the result of the query be propagated throught all the clients.
-        If (t) is present and differs from '*' can begin with 'uname:', 'ip:', 'id:' and 'u:' followed by a correct value determining the target for which the query result will be sent. It target can be negated if starts with '!'
+        The target parameter (xq_target) if present and set to '*', makes the result of the query be propagated throught all the clients.
+        If (xq_target) is present and differs from '*' can begin with 'uname:', 'ip:', 'id:' and 'u:' followed by a correct value determining the target for which the query result will be sent. It target can be negated if starts with '!'
       */
       if (mb_substr($jMessage, 0, 1)=="{") {
         $message=@json_decode($jMessage, true, 512, JSON_OBJECT_AS_ARRAY);
@@ -99,18 +99,30 @@
             list($implemented, $impReturn) = implementation($message['s'], $message['a'], 'w', false, $message);
             $__impt1=decimalMicrotime();
             $__impT=$__impt1-$__impt0;
-            _recordWastedTime("Time wasted in user implementation of $s.$a: $__impT ($__impt1 - $__impt0)");
+            _recordWastedTime("Time wasted in user implementation of ".$message['s'].".".$message['a'].": $__impT ($__impt1 - $__impt0)");
             yeapfStage("afterImplementation");
 
             if (!$implemented) {
               $impReturn="{}";
             }
 
-            $this->send($user, "$impReturn");
+            $result = array(
+              "callbackId"=>$message["callbackId"],
+              "dataContext"=>$GLOBALS['_xq_context_'],
+              "parameters"=>$message,
+              "data"=> json_decode($impReturn, true, 512, JSON_BIGINT_AS_STRING)
+            );
+            unset($result["parameters"]["callbackId"]);
+            unset($result["parameters"]["fieldName"]);
+            unset($result["parameters"]["fieldValue"]);
 
-            /* (t) parameters means 'target' */
-            if (isset($message['t'])) {
-              $target=$message['t'];
+            $result = json_encode($result);
+
+            $this->send($user, "$result");
+
+            /* (xq_target) parameters means 'target' */
+            if (isset($message['xq_target'])) {
+              $target=$message['xq_target'];
               foreach ($this->users as $auxUser) {
                 if (!$auxUser->hasSentClose) {
                   $canSend = false;
@@ -118,25 +130,30 @@
                     $canSend=true;
                   else {
                     $target=explode(":", $target);
-                    $negate=mb_substr($target[1], 0, 1);
+                    if (!isset($target[1]))
+                      $target[1]='';
+                    $negate=@mb_substr($target[1], 0, 1);
                     if ($negate == '!') {
                       $negate=true;
-                      $target[1]=mb_substr($target[1], 1);
+                      $target[1]=@mb_substr($target[1], 1);
                     } else {
                       $negate=false;
                     }
 
                     if ($target[0] == 'uname') {
-                      $canSend = ($auxUser->uname == $target[1]);
+                      $canSend = ($target[1]>'') && ($auxUser->uname == $target[1]);
                     }
                     if ($target[0] == 'ip') {
-                      $canSend = ($auxUser->ip == $target[1]);
+                      $canSend = ($target[1]>'') && ($auxUser->ip == $target[1]);
                     }
                     if ($target[0] == 'id') {
-                      $canSend = ($auxUser->id == $target[1]);
+                      $canSend = ($target[1]>'') && ($auxUser->id == $target[1]);
                     }
                     if ($target[0] == 'u') {
-                      $canSend = ($auxUser->u == $target[1]);
+                      $canSend = ($target[1]>'') && ($auxUser->u == $target[1]);
+                    }
+                    if ($target[0] == 'w') {
+                      $canSend = ($target[1]>'') && ($auxUser->w == $target[1]);
                     }
                     if ($negate)
                       $canSend=!$canSend;

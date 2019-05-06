@@ -1,9 +1,9 @@
 <?php
 /*
     tools/install-script.php
-    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+    YeAPF 0.8.62-96 built on 2019-05-06 18:30 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-06-01 09:31:47 (-3 DST)
+    2019-05-06 11:43:31 (-3 DST)
 */
 
   function installFile($entry)
@@ -45,10 +45,10 @@
   echo "Mac? = ".($onDarwinOS?'TRUE':'FALSE')."\n";
 
   $chmodScript='';
-  if ($argv[1]=='Cygwin') {
-    //
+  if ($argv[1]=='CYGWIN') {
+    $targetPath="c:/cygwin64/bin/";
   } else {
-    $targetPath=$onWinOS?"C:\Windows":$onDarwinOS?"/usr/local/bin":"/usr/bin";
+    $targetPath=($onWinOS?"C:\\Windows":($onDarwinOS?"/usr/local/bin":"/usr/bin"));
   }
 
   $yeapfPath=dirname(getcwd());
