@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.nodes.php
-    YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)
+    YeAPF 0.8.62-97 built on 2019-05-07 11:03 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-04-29 17:24:44 (-3 DST)
+    2019-05-07 11:00:11 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -589,69 +589,76 @@
     }
 
     public static function checkNodeConfig() {
-      global $cfgNodePrefix, $cfgMainFolder;
+      global $cfgNodePrefix, $cfgMainFolder, $cfgNotANodeFolder;
       $ret = true;
       $secondsPerDay = 24 * 60 * 60;
       _recordWastedTime("checkNodeConfig()");
-      if (self::isWorkingAsAppNode()) {
-        $ret = false;
-        $now = date('U');
-        $dbNodeInfo = db_sql("select n.serverKey, n.enabled as nodeEnabled,
-                                     n.last_verification, n.external_ip,
-                                     n.nodePrefix,
-                                     s.enabled as serverEnabled,
-                                     s.serverKey as sp2
-                              from      is_node_control n
-                              left join is_server_control s on s.serverKey=n.serverKey
-                              where nodePrefix='$cfgNodePrefix'", false);
-        extract($dbNodeInfo);
-        if ($serverKey > '') {
-          $currentIP = getCurrentIp();
-          if ($last_verification == '') $last_verification = $now;
-          $dif = intval(intval($now) - intval($last_verification));
-          if ($currentIP != $external_ip) {
-            _recordError("Error: node_control says '$external_ip' while your current ip is '$currentIP'");
-            db_close();
-            db_set_flag(_DB_LOCKED | _DB_LOCK_EXTERNAL_IP_MISTAKE);
-          }
-          else
-          if ($dif > $secondsPerDay) {
-            $difHours = floor($dif / 60 / 60);
-            _recordError("Error: node_control has been checked $difHours hours ago. It need to be checked each 24 hours");
-            db_close();
-            db_set_flag(_DB_LOCKED | _DB_LOCK_TIME_MISTAKE);
-          }
-          else
-          if ($serverEnabled != 'Y') {
-            _recordError("Error: server_control has been disabled");
-            db_close();
-            db_set_flag(_DB_LOCKED | _DB_LOCK_DISABLED);
-          }
-          else
-          if ($nodeEnabled == 'N') {
-            _recordError("Error: node_control has been disabled");
-            db_close();
-            db_set_flag(_DB_LOCKED | _DB_LOCK_DISABLED);
-          }
-          else
-          if ($nodePrefix != $cfgNodePrefix) {
-            _recordError("Error: node_control node prefix '$nodePrefix' differs from '$cfgNodePrefix' declared in $cfgMainFolder/.config/cloudAppNode.ini");
-            db_close();
-            db_set_flag(_DB_LOCKED | _DB_LOCK_NODE_PREFIX_MISTAKE);
-          }
-        } else if ($cfgNodePrefix != 'UNK') {
-          _recordError("Error: node_prefix '$cfgNodePrefix' defined in $cfgMainFolder/.config/cloudAppNode.ini cannot be located is_node_control");
-          db_close();
-          db_set_flag(_DB_LOCKED | _DB_LOCK_WRONG_SERVER_PREFIX);
-        } else if (yNode::requestNodeSequenceVerification() === false) {
-          _recordError("Error: this node is out of sequence with id controller");
-          db_close();
-          db_set_flag(_DB_LOCKED | _DB_LOCK_WRONG_SEQUENCE);
-        }
 
-        $ret = (db_status(_DB_LOCKED) == 0);
+      if (!isset($cfgNotANodeFolder)) {
+        $cfgNotANodeFolder=false;
+      } else {
+        $cfgNotANodeFolder=is_bool($cfgNotANodeFolder)?$cfgNotANodeFolder:(mb_strtolower(trim($cfgNotANodeFolder))=='yes');
       }
+      if (!$cfgNotANodeFolder) {
+        if (self::isWorkingAsAppNode()) {
+          $ret = false;
+          $now = date('U');
+          $dbNodeInfo = db_sql("select n.serverKey, n.enabled as nodeEnabled,
+                                       n.last_verification, n.external_ip,
+                                       n.nodePrefix,
+                                       s.enabled as serverEnabled,
+                                       s.serverKey as sp2
+                                from      is_node_control n
+                                left join is_server_control s on s.serverKey=n.serverKey
+                                where nodePrefix='$cfgNodePrefix'", false);
+          extract($dbNodeInfo);
+          if ($serverKey > '') {
+            $currentIP = getCurrentIp();
+            if ($last_verification == '') $last_verification = $now;
+            $dif = intval(intval($now) - intval($last_verification));
+            if (($currentIP != $external_ip) && ($external_ip!="*")) {
+              _recordError("Error: node_control says '$external_ip' while your current ip is '$currentIP'");
+              db_close();
+              db_set_flag(_DB_LOCKED | _DB_LOCK_EXTERNAL_IP_MISTAKE);
+            }
+            else
+            if ($dif > $secondsPerDay) {
+              $difHours = floor($dif / 60 / 60);
+              _recordError("Error: node_control has been checked $difHours hours ago. It need to be checked each 24 hours");
+              db_close();
+              db_set_flag(_DB_LOCKED | _DB_LOCK_TIME_MISTAKE);
+            }
+            else
+            if ($serverEnabled != 'Y') {
+              _recordError("Error: server_control has been disabled");
+              db_close();
+              db_set_flag(_DB_LOCKED | _DB_LOCK_DISABLED);
+            }
+            else
+            if ($nodeEnabled == 'N') {
+              _recordError("Error: node_control has been disabled");
+              db_close();
+              db_set_flag(_DB_LOCKED | _DB_LOCK_DISABLED);
+            }
+            else
+            if ($nodePrefix != $cfgNodePrefix) {
+              _recordError("Error: node_control node prefix '$nodePrefix' differs from '$cfgNodePrefix' declared in $cfgMainFolder/.config/cloudAppNode.ini");
+              db_close();
+              db_set_flag(_DB_LOCKED | _DB_LOCK_NODE_PREFIX_MISTAKE);
+            }
+          } else if ($cfgNodePrefix != 'UNK') {
+            _recordError("Error: node_prefix '$cfgNodePrefix' defined in $cfgMainFolder/.config/cloudAppNode.ini cannot be located is_node_control");
+            db_close();
+            db_set_flag(_DB_LOCKED | _DB_LOCK_WRONG_SERVER_PREFIX);
+          } else if (yNode::requestNodeSequenceVerification() === false) {
+            _recordError("Error: this node is out of sequence with id controller");
+            db_close();
+            db_set_flag(_DB_LOCKED | _DB_LOCK_WRONG_SEQUENCE);
+          }
 
+          $ret = (db_status(_DB_LOCKED) == 0);
+        }
+      }
       _recordWastedTime("is_node_control checked");
       return $ret;
     }

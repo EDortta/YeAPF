@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)
+    YeAPF 0.8.62-97 built on 2019-05-07 11:03 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-04-27 10:48:02 (-3 DST)
+    2019-05-07 10:56:53 (-3 DST)
    */
 
   /*
@@ -347,8 +347,8 @@
   if (file_exists("$cfgMainFolder/flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." 0.8.62 ".": loading $user_IP config file\n",3,"$cfgCurrentFolder/logs/yeapf.loader.log");
 
 
-  if (file_exists(".config/yeapf.config.files.$safe_user_IP"))
-    include_once ".config/yeapf.config.files.$safe_user_IP";
+  if (file_exists("$cfgMainFolder/.config/yeapf.config.files.$safe_user_IP"))
+    include_once "$cfgMainFolder/.config/yeapf.config.files.$safe_user_IP";
 
   if (!isset($yeapfConfig))
     $yeapfConfig = array();
@@ -1392,11 +1392,11 @@
 
   function _saveConfigFile()
   {
-    global $yeapfConfig, $user_IP, $safe_user_IP;
+    global $yeapfConfig, $user_IP, $safe_user_IP, $cfgMainFolder;
 
     if (lock('yeapfConfig')) {
       asort($yeapfConfig['files']);
-      $f=fopen(".config/yeapf.config.files.$safe_user_IP",'w');
+      $f=fopen("$cfgMainFolder/.config/yeapf.config.files.$safe_user_IP",'w');
       if ($f) {
         $date=date("Y-m-d");
         $time=date("G:i:s");
@@ -1824,7 +1824,7 @@
   {
     global $lastImplementation, $flgCanContinueWorking, $devSession;
 
-    xq_context('YeAPF',       'YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)');
+    xq_context('YeAPF',       'YeAPF 0.8.62-97 built on 2019-05-07 11:03 (-3 DST)');
     xq_context('devSession',  $devSession);
     xq_context('ts1',         date('U'));
 

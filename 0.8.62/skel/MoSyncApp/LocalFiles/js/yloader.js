@@ -1,8 +1,8 @@
 /*********************************************
   * skel/MoSyncApp/LocalFiles/js/yloader.js
-  * YeAPF 0.8.62-96 built on 2019-05-06 18:30 (-3 DST)
+  * YeAPF 0.8.62-97 built on 2019-05-07 11:03 (-3 DST)
   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2019-05-06 18:30:57 (-3 DST)
+  * 2019-05-07 11:03:04 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.62-96 built on 2019-05-06 18:30 (-3 DST)");
+ console.log("YeAPF 0.8.62-97 built on 2019-05-07 11:03 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -7881,11 +7881,12 @@
        };
      
        /*
-         besides xq_start and xq_requestedRows now you have
+         besides xq_start and xq_requestedRows now you have:
          xq_target (string) that indicates who is the ultimate target of the message
          and xq_bypass (boolean defaults to false) that indicates if the server will be bypassed
          when answering a query. In such case (true), the query will be sent/broadcasted to the
          xq_target and is this(these) target(s) the responsible to answer the query.
+     
          About the xq_target formation we need to say that:
            xq_target is a string with this structure: [*] | ([!][uname|ip|id|uname|u|w]<:>[value])
            1. '*' the message is a broadcast to all the connected clients.
@@ -7895,6 +7896,18 @@
            5. 'id' the client with such 'id' will receive the message
            6. 'u' that indicates the global 'u' in the tripod (s, a, u) that represent a logged user
            7. 'w' that indicates the global 'w' variable meaning the 'group' to what the client belongs.
+     
+         Remember that single character variables belongs to YeAPF by default. Meanwhile, as paramenters
+         are encapsulated, you can use it even when not recommended.
+     
+         Anyway, you can define your own sensitive trigger or monitors or signals that will make
+         YeAPF to send the message to an specific target or group of targets.
+         In such case, all your triggers starts with '_' and are textual variables evaluated as trimmed
+         and insensitive case ones.
+         For example, you can define '_plate' as your trigger/monitor/signal/filter and
+         set a specific value on each application of the environment. The message will be delivered
+         only for those applications that has the searched value in the '_plate' published var.
+         In this example, xq_target will be '_plate:120x452'
        */
        that.yank = function(s, a, jsonParams, aCallbackFunction) {
          aCallbackFunction = aCallbackFunction || function() {};
@@ -9545,9 +9558,9 @@
  /* START yinterface.js */
      /*
          skel/MoSyncApp/LocalFiles/js/yloader.js
-         YeAPF 0.8.62-96 built on 2019-05-06 18:30 (-3 DST)
+         YeAPF 0.8.62-97 built on 2019-05-07 11:03 (-3 DST)
          Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-         2019-05-06 18:30:57 (-3 DST)
+         2019-05-07 11:03:04 (-3 DST)
      */
      
      var yInterfaceObj = function() {

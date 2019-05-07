@@ -1,14 +1,14 @@
 <?php
 /*
     includes/yeapf.locks.php
-    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+    YeAPF 0.8.62-97 built on 2019-05-07 11:03 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2019-05-07 10:42:30 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
-  global $CFG_LOCK_DIR, $isCLI, $LOCK_VERSION, $__GSem__, $__SMem__;
+  global $CFG_LOCK_DIR, $isCLI, $LOCK_VERSION, $__GSem__, $__SMem__,$cfgMainFolder;
 
   if( !function_exists('ftok') )
   {
@@ -52,8 +52,8 @@
   $LOCK_VERSION=-1;
 
   // programmer can chagne this behaviour via .config directory
-  if (file_exists('.config/lock_version'))
-    $LOCK_VERSION=join("",file('.config/lock_version'));
+  if (file_exists("$cfgMainFolder/.config/lock_version"))
+    $LOCK_VERSION=join("",file("$cfgMainFolder/.config/lock_version"));
 
   /*
    * LOCK_VERSION values
@@ -73,8 +73,8 @@
 
     $LOCK_VERSION=0;
 
-    if (is_dir('.config')) {
-      $auxF=fopen(".config/lock_version",'w');
+    if (is_dir("$cfgMainFolder/.config")) {
+      $auxF=fopen("$cfgMainFolder/.config/lock_version",'w');
       if ($auxF) {
         fwrite($auxF,intval($LOCK_VERSION));
         fclose($auxF);
@@ -101,7 +101,7 @@
     $__GSem__=sem_get(__keyToInt__("YeAPF-SharedMemorySemaphore"));
     if (LOCK_DEBUG) _dumpY(2,2,"sem_get(): '$__GSem__'");
     if ($__GSem__===false) {
-      file_put_contents(".config/lock_version", "0");
+      file_put_contents("$cfgMainFolder/.config/lock_version", "0");
       $LOCK_VERSION=0;
     }
   }

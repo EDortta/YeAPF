@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)
+    YeAPF 0.8.62-97 built on 2019-05-07 11:03 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-04-23 16:06:00 (-3 DST)
+    2019-05-07 10:56:48 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -446,9 +446,9 @@
 
   function db_createDBConfig()
   {
-    global $dbCSVFilename;
+    global $dbCSVFilename, $cfgMainFolder;
 
-    if (is_writable(".config")) {
+    if (is_writable("$cfgMainFolder/.config")) {
 
       _recordWastedTime("Creating cache copy of $dbCSVFilename");
       $dbKeys=array();
@@ -481,7 +481,7 @@
         $setupIni->skip();
       }
 
-      $fConfig=fopen(".config/db.ini","w");
+      $fConfig=fopen("$cfgMainFolder/.config/db.ini","w");
       if ($fConfig)  {
         fwrite($fConfig,"[db]\nactive=$dbActive\n");
 
@@ -495,12 +495,14 @@
         _recordWastedTime("Copy ready");
       }
     } else {
-      _die("'.config' folder is not writable");
+      _die("'$cfgMainFolder/.config' folder is not writable");
     }
   }
 
   function db_populateDBConfig($dbINI, $exceptionList)
   {
+    global $cfgMainFolder;
+
     $exceptionList=explode(',', $exceptionList);
     foreach($dbINI as $k=>$v) {
       if (!in_array($k, $exceptionList)) {
@@ -512,6 +514,21 @@
           }
         }
         $GLOBALS[$k]=unquote($v);
+      }
+    }
+
+    if (file_exists(".config/override.ini")) {
+      $override_ini = @file_get_contents("$cfgMainFolder/.config/override.ini");
+      $override = parse_ini_string($override_ini, false);
+      foreach ($override as $key => $value) {
+        $GLOBALS[$key]=unquote($value);
+      }
+    }
+    if (file_exists("$cfgMainFolder/.config/override.ini")) {
+      $override_ini = @file_get_contents("$cfgMainFolder/.config/override.ini");
+      $override = parse_ini_string($override_ini, false);
+      foreach ($override as $key => $value) {
+        $GLOBALS[$key]=unquote($value);
       }
     }
   }
@@ -585,12 +602,12 @@
 
         $cfgSegmentPrefix="UNDF";
 
-        $cache=file_exists(".config/db.ini")?filemtime(".config/db.ini"):0;
+        $cache=file_exists("$cfgMainFolder/.config/db.ini")?filemtime("$cfgMainFolder/.config/db.ini"):0;
         _recordWastedTime("...verifying dbconfig cache ($original over $cache)");
         if ($cache<$original) {
           db_createDBConfig();
         }
-        $dbINI=parse_ini_file('.config/db.ini', true);
+        $dbINI=parse_ini_file("$cfgMainFolder/.config/db.ini", true);
         if ($appRegistry=='')
           $appRegistry=$dbINI['db']['active'];
 
