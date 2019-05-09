@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.62-96 built on 2019-05-06 18:30 (-3 DST)
+    YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-05-02 10:14:18 (-3 DST)
+    2019-05-09 19:33:44 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -91,7 +91,7 @@
         unlock("api-usage-$s-$a");
       }
     }
-}
+  }
 
   function registerAPIUsageFinish() {
     global $s, $a, $__API_START_TS, $currentDBVersion, $cfgApiProfilerEnabled;
@@ -745,182 +745,6 @@
   }
 
 
-  /* functions to verify form content */
-  function strFilled($str)
-  {
-    return strlen(trim($str))>0;
-  }
-
-  function validEmail($email)
-  {
-    return filter_var($email, FILTER_VALIDATE_EMAIL);
-  }
-
-  global $_xq_formErrorSequence_;
-  $_xq_formErrorSequence_=0;
-
-  function setFieldError($msg, $varName='')
-  {
-    global $_xq_formErrorSequence_;
-    _requiredField($varName);
-    $_xq_formErrorSequence_++;
-    _recordError("$_xq_formErrorSequence_) $msg");
-    xq_context("formError/$varName", $msg);
-  }
-
-  function verifyFormValue($varName, $func, $msg, $setAsFormError=true)
-  {
-    $ret=true;
-    $functions=explode(';',$func);
-    foreach($functions as $func) {
-      if ($ret) {
-        if (function_exists($func)) {
-          if ($func($GLOBALS[$varName])==false) {
-            if ($setAsFormError)
-              setFieldError($msg, $varName);
-            else {
-              _requiredField($varName);
-              _recordError($msg,0);
-            }
-            $ret=false;
-          }
-        } else
-          _die("'$func' was not found as global function");
-      }
-    }
-    return $ret;
-  }
-
-
-  /*
-   * Functions to be used with Javascript Inter User Messages in
-   * the context of YeAPF applications
-   *
-   */
-
-  function qy_msgProc($aSourceUserId, $aMessage, $aWParam, $aLParam)
-  {
-    global $sysTimeStamp, $__messagesHandler;
-
-    $ret=array();
-
-    if ($aMessage=='') {
-      $ret['sourceUserId']=$aSourceUserId;
-      $ret['message']='systemTick';
-      $ret['wParam']=$sysTimeStamp;
-      $ret['lParam']=0;
-    } else {
-      $ret['sourceUserId']=$aSourceUserId;
-      $ret['message']=$aMessage;
-      $ret['wParam']=$aWParam;
-      $ret['lParam']=$aLParam;
-
-      foreach($__messagesHandler as $mh)
-        if (function_exists($mh))
-          $ret=$mh($aSourceUserId, $aMessage, $aWParam, $aLParam);
-    }
-
-    return $ret;
-  }
-
-  function qy_msg($a)
-  {
-    global $sysTimeStamp,
-           $userContext,
-           $u, $formID, $messagePeekerInterval,
-           $xq_return, $xq_regCount,
-           $targetUser, $message, $wParam, $lParam, $broadcastCondition;
-
-    if (!is_object($userContext)) {
-      $aux=debug_backtrace();
-      foreach($aux as $k=>$v) {
-        foreach($v as $k1 => $v1) {
-          echo "$k $k1 ";
-          if ($k1=='args') {
-            echo "(";
-            foreach($v1 as $k2 => $v2) {
-              if ($k2>0)
-              echo ',';
-              echo "'$v2'";
-            }
-            echo ")\n";
-          } else
-            echo " $v1";
-          echo "\n";
-        }
-      }
-      die("userContext not initialized");
-    }
-
-    $xq_regCount=0;
-    $xq_return='';
-
-    /*
-     * $formID vazio indica primeira solicita��o de lista
-     * de mensagens sendo requirida pelo cliente yeapf.js
-     */
-    if ($formID=='') {
-      $formID=md5('ym'.y_uniqid());
-      $userContext->RegisterFormID($messagePeekerInterval);
-    }
-
-    //$messages=xq_produceReturnLinesFromArray($xq_return_array,$xq_regCount,true);
-
-    // messages vindos do pr�prio usu�rio tem prioridade sobre os enviados pelo resto
-    // ent�o eles n�o entram no processamento natural da pilha
-
-    if ( ($a=='peekMessage') || ($targetUser==$u) )  {
-        $messageList = $userContext->PeekMessages();
-        $aSourceUserID=$u;
-        $aMessage=$message;
-        $aWParam=$wParam;
-        $aLParam=$lParam;
-        do {
-
-          _dumpY(16,0,"@ sending $aSourceUserID, $aMessage, $aWParam, $aLParam");
-
-          $xq_return_array = qy_msgProc($aSourceUserID, $aMessage, $aWParam, $aLParam);
-
-          if (count($xq_return_array)>0)
-            $xq_return.=xq_produceReturnLinesFromArray($xq_return_array, $xq_regCount, true, '', $xq_prefix, $xq_postfix);
-
-          $moreFeed=false;
-
-          $msg=array_shift($messageList);
-          if ($msg>'') {
-            $aSourceUserID=getNextValue($msg,';');
-            $aMessage=getNextValue($msg,';');
-            $aWParam=getNextValue($msg,';');
-            $aLParam=getNextValue($msg,';');
-            $moreFeed=($aMessage>'');
-          }
-
-        } while ($moreFeed);
-
-    } else if ($a=='postMessage') {
-      if ($targetUser=='*') {
-        $aux=unquote($broadcastCondition);
-        $varName=getNextValue($aux,'=');
-        $varValue=getNextValue($aux,'=');
-
-        $userContext->BroadcastMessage($varName, $varValue, $message, $wParam, $lParam);
-      } else
-        $userContext->PostMessage($targetUser, $message, $wParam, $lParam);
-    }
-
-  }
-
-  function addMessageHandler($mh)
-  {
-    global $__messagesHandler;
-
-    if ($mh!='qy_msgProc')
-      if (!in_array($mh,$__messagesHandler)) {
-        _dumpY(16,0,"registering '$mh' as message handler");
-        array_push($__messagesHandler,$mh);
-      }
-  }
-
   function produceRestOutput($jsonData)
   {
     global $callback, $callbackId, $scriptSequence, $userMsg, $_xq_context_, $ts;
@@ -1017,7 +841,189 @@
     return $script;
   }
 
-  function qyeapf($a) {
+
+  /* functions to verify form content */
+  function strFilled($str)
+  {
+    return strlen(trim($str))>0;
+  }
+
+  function validEmail($email)
+  {
+    return filter_var($email, FILTER_VALIDATE_EMAIL);
+  }
+
+  global $_xq_formErrorSequence_;
+  $_xq_formErrorSequence_=0;
+
+  function setFieldError($msg, $varName='')
+  {
+    global $_xq_formErrorSequence_;
+    _requiredField($varName);
+    $_xq_formErrorSequence_++;
+    _recordError("$_xq_formErrorSequence_) $msg");
+    xq_context("formError/$varName", $msg);
+  }
+
+  function verifyFormValue($varName, $func, $msg, $setAsFormError=true)
+  {
+    $ret=true;
+    $functions=explode(';',$func);
+    foreach($functions as $func) {
+      if ($ret) {
+        if (function_exists($func)) {
+          if ($func($GLOBALS[$varName])==false) {
+            if ($setAsFormError)
+              setFieldError($msg, $varName);
+            else {
+              _requiredField($varName);
+              _recordError($msg,0);
+            }
+            $ret=false;
+          }
+        } else
+          _die("'$func' was not found as global function");
+      }
+    }
+    return $ret;
+  }
+
+  /*
+   * Functions to be used with Javascript Inter User Messages in
+   * the context of YeAPF applications
+   *
+   */
+
+  function qy_msgProc($aSourceUserId, $aMessage, $aWParam, $aLParam)
+  {
+    global $sysTimeStamp, $__messagesHandler;
+
+    $ret=array();
+
+    if ($aMessage=='') {
+      $ret['sourceUserId']=$aSourceUserId;
+      $ret['message']='systemTick';
+      $ret['wParam']=$sysTimeStamp;
+      $ret['lParam']=0;
+    } else {
+      $ret['sourceUserId']=$aSourceUserId;
+      $ret['message']=$aMessage;
+      $ret['wParam']=$aWParam;
+      $ret['lParam']=$aLParam;
+
+      foreach($__messagesHandler as $mh)
+        if (function_exists($mh))
+          $ret=$mh($aSourceUserId, $aMessage, $aWParam, $aLParam);
+    }
+
+    return $ret;
+  }
+
+  function em_y_msg($a)
+  {
+    global $sysTimeStamp,
+           $userContext,
+           $u, $formID, $messagePeekerInterval,
+           $xq_return, $xq_regCount,
+           $targetUser, $message, $wParam, $lParam, $broadcastCondition;
+
+    $ret = array();
+
+    if (!is_object($userContext)) {
+      _die("userContext not initialized");
+    }
+
+    $xq_regCount=0;
+    $xq_return='';
+
+    /*
+       $formID empty indicates first request of list of messages 
+       being required by client yeapf.js
+     */
+    if ($formID=='') {
+      $formID=md5('ym'.y_uniqid());
+      $userContext->RegisterFormID($messagePeekerInterval);
+    }
+
+    /*
+    $messages=xq_produceReturnLinesFromArray($xq_return_array,$xq_regCount,true);
+
+    messages comming from the current user has priority over those sent by the others
+    so they do not enter into natural queue processing
+    */
+
+    if ( ($a=='peekMessage') || ($targetUser==$u) )  {
+        $messageList = $userContext->PeekMessages();
+        $aSourceUserID=$u;
+        $aMessage=$message;
+        $aWParam=$wParam;
+        $aLParam=$lParam;
+        do {
+
+          _dumpY(16,0,"@ sending $aSourceUserID, $aMessage, $aWParam, $aLParam");
+
+          $ret = qy_msgProc($aSourceUserID, $aMessage, $aWParam, $aLParam);
+
+          $moreFeed=false;
+
+          $msg=array_shift($messageList);
+          if ($msg>'') {
+            $aSourceUserID=getNextValue($msg,';');
+            $aMessage=getNextValue($msg,';');
+            $aWParam=getNextValue($msg,';');
+            $aLParam=getNextValue($msg,';');
+            $moreFeed=($aMessage>'');
+          }
+
+        } while ($moreFeed);
+
+    } else if ($a=='postMessage') {
+      if ($targetUser=='*') {
+        $aux=unquote($broadcastCondition);
+        $varName=getNextValue($aux,'=');
+        $varValue=getNextValue($aux,'=');
+
+        $userContext->BroadcastMessage($varName, $varValue, $message, $wParam, $lParam);
+      } else
+        $userContext->PostMessage($targetUser, $message, $wParam, $lParam);
+    }
+
+    return $ret;
+
+  }
+
+  function qy_msg($a) {
+    global $xq_prefix, $xq_postfix;
+    xq_produceReturnLines(em_y_msg($a), true, $countLimit, $xq_prefix, $xq_postfix);
+  }
+
+  function wy_msg($a) {
+    $jsonRet = json_encode(em_y_msg($a));
+    return $jsonRet;
+  }
+
+  function ry_msg($a) {
+    $jsonRet = wy_msg($a);
+    echo produceRestOutput($jsonRet);
+  }
+
+
+  function addMessageHandler($mh)
+  {
+    global $__messagesHandler;
+
+    if ($mh!='qy_msgProc')
+      if (!in_array($mh,$__messagesHandler)) {
+        _dumpY(16,0,"registering '$mh' as message handler");
+        array_push($__messagesHandler,$mh);
+      }
+  }
+
+  function em_yeapf($a, $values=null) {
+    global $userContext, $sysDate, $u,
+           $userMsg, $xq_start, $xq_requestedRows,
+           $devSession,
+           $callback, $cfgMainFolder, $cfgNodePrefix, $cfgClientConfig, $server_IP;
 
     extract(xq_extractValuesFromQuery());
 
@@ -1030,7 +1036,6 @@
       $ret['udate'] = date("Y-m-d")."T".date("H:i:s");
       $ret['ip'] = getCurrentIp();
       $ret['pingCount'] = intval($pingCount)+1;
-
     } else if ($a=='serverTime') {
       $ret['serverTime'] = date('Y-m-d H:i:s');
 
@@ -1045,40 +1050,17 @@
         $ret['result']=$r?'true':'false';
       }
     }
-    xq_produceReturnLines($ret, true, $countLimit);
+
+    return $ret;
+
+  }
+
+  function qyeapf($a) {
+    xq_produceReturnLines(em_yeapf($a), true, $countLimit);
   }
 
   function wyeapf($a) {
-    global $callback, $cfgMainFolder, $cfgNodePrefix, $cfgClientConfig, $server_IP;
-    extract(xq_extractValuesFromQuery());
-
-    $ret=array();
-
-    if ($a=='ping') {
-      $ret['serverTime'] = date('U');
-      $ret['offset'] = date('Z');
-      $ret['timezone'] = date('e');
-      $ret['daylight'] = date('I')==1?'Y':'N';
-      $ret['udate'] = date("Y-m-d")."T".date("H:i:s");
-      $ret['ip'] = getCurrentIp();
-      $ret['pingCount'] = intval($pingCount)+1;
-
-    } else if ($a=='serverTime') {
-      $ret['serverTime'] = date('Y-m-d H:i:s');
-
-    } else if ($a=='nodeKeepAlive') {
-      $ret=yNode::nodeKeepAlive();
-
-    } else if($a=='nodeCheckSeq') {
-      $r=yNode::requestNodeSequenceVerification();
-      if ($r==-1) {
-        $ret['result']='NotTested';
-      } else {
-        $ret['result']=$r?'true':'false';
-      }
-    }
-
-    $jsonRet = json_encode($ret);
+    $jsonRet = json_encode(em_yeapf($a));
     return $jsonRet;
   }
 
@@ -1131,6 +1113,5 @@
   }
 
   addEventHandler('yeapfAppEvents');
-
   _recordWastedTime("yeapf.application.php Carregado");
 ?>

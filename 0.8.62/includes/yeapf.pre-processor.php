@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.pre-processor.php
-    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+    YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-12-12 23:28:44 (-3 DST)
+    2019-05-09 18:37:14 (-3 DST)
    */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -17,7 +17,8 @@
   {
     global $ydb_conn, $ydb_connAcesso, $resultado,
            $rowColors, $curRowColor, $curForNdx,
-           $userFunctions, $userContext,
+           $userFunctions,
+           $userContext,
            $cont,$forCounter,
            $searchPath,
 
@@ -1821,6 +1822,7 @@
           $n=$i+largoToken($s,$i);
           $retorno = unquote(pegaValor($s, $n, $tokenType));
           $direitos = intval(analisarString(unquote(pegaValor($s,$n, $tokenType)), $pegarDadosDaTabela, $nomeTabela, $campoChave, $valorChave, $valores));
+
           if ($userContext->enoughRights($direitos))
             $valor=analisarString($retorno, $pegarDadosDaTabela, $nomeTabela, $campoChave, $valorChave, $valores);
           else

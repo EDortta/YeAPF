@@ -1,8 +1,8 @@
 /********************************************************************
  * app-src/js/ycomm-websocket.js
- * YeAPF 0.8.62-97 built on 2019-05-07 11:03 (-3 DST)
+ * YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
  * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
- * 2019-05-07 09:29:55 (-3 DST)
+ * 2019-05-09 10:47:54 (-3 DST)
  ********************************************************************/
 
 var ycommWebSocketClientObj = function(webSocketServerURL, u, deviceId) {
@@ -175,6 +175,17 @@ var ycommWebSocketClientObj = function(webSocketServerURL, u, deviceId) {
     set a specific value on each application of the environment. The message will be delivered
     only for those applications that has the searched value in the '_plate' published var.
     In this example, xq_target will be '_plate:120x452'
+    In order to achive that, you can send a message to underlying yeapf message subsystem
+    declaring your intention to listen for a monitor/signal/trigger/filter or whatever
+    you would like to name it as this:
+      s=y_msg&a=setTrigger&triggerName=_plate
+    or more specifically for a value (that is more useful)
+      s=y_msg&a=setTrigger&triggerName=_plate&triggerValue=120x452
+
+    So, in that case, you will receive all messages that are targeted to _plate:120x452
+
+    You can unset a trigger too:
+      s=y_msg&a=unsetTrigger&triggerName=_plate
   */
   that.yank = function(s, a, jsonParams, aCallbackFunction) {
     aCallbackFunction = aCallbackFunction || function() {};

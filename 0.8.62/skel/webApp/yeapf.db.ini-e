@@ -19,6 +19,8 @@ unique_id_seed=
 
 cfgHtPasswdRequired=no
 cfgHttpsRequired=no
+# by default, an application is a not-a-node-folder
+cfgNotANodeFolder=yes
 
 dbType=
 dbServer=
@@ -70,4 +72,4 @@ showSQLcommands=
 SQLdebugLevel=0
 SQLDieOnError=1
 
-x58e1d9ca63ef85abef352d3306a6fac3 = 5356596059566362623237433535
+x58e1d9ca63ef85abef352d3306a6fac3 = 5356596059576157634033373537

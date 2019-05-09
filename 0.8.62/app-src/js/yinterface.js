@@ -1,8 +1,8 @@
 /*
     app-src/js/yinterface.js
-    YeAPF 0.8.62-81 built on 2019-05-01 13:06 (-3 DST)
+    YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-04-29 11:17:53 (-3 DST)
+    2019-05-07 11:27:51 (-3 DST)
 */
 
 var yInterfaceObj = function() {
@@ -482,7 +482,7 @@ var yInterfaceObj = function() {
         function(s, e, d) {
           if (200 == s) {
             if ((d) && (d[0])) {
-              console.log(formId+" arrivou ");
+              console.log(formId+" chegou ");
               if ("undefined" == typeof that._forms_cache)
                 that._forms_cache = [];
               that._forms_cache[subject + '.' + formId] = d[0];

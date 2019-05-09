@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.userContext.php
-    YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
+    YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-04-10 19:59:02 (-3 DST)
+    2019-05-09 19:33:15 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -13,11 +13,14 @@
    * and call createUserContext
    * At use, create an instance and call isValidUser()
    *
-   * In order ti achive better performance, place lock files
+   * In order to achive better performance, place lock files
    * on a filesystem that handles lots of small files efficiently
    *
    * It works well on Linux and Windows servers
    */
+
+  global $xUserContextList;
+  $xUserContextList = array();
 
   class xUserContext
   {
@@ -27,21 +30,39 @@
 
     function __construct($u=0, $pseudoValidUser=null)
     {
-      global $yeapfConfig;
+      global $yeapfConfig, $cfgMainFolder, $xUserContextList;
       $this->userContext=array();
       $this->u=$u;
       $this->validUser=$pseudoValidUser;
+      /* 20190509 OBSOLETE
       if (($yeapfConfig) && ($yeapfConfig['cfgCurrentFolder']) && ($yeapfConfig['cfgCurrentFolder']>''))
         $yeapBase=$yeapfConfig['cfgCurrentFolder'].'/';
       else
-        $yeapBase='';
+        $yeapBase=getcwd();
       $this->contextPath=$yeapBase.$this->contextPath;
+      */
+
+      $this->contextPath = $cfgMainFolder.'/.messages';
+      if (!is_dir($this->contextPath)) {
+        $created=@mkdir($this->contextPath, 0764, true);
+        if (!$created) 
+          _die("Was impossible to create '".$this->contextPath."' folder");
+      }
+
       $this->setTimeTraking();
       _dumpY(8,0,"uc:  yeapf.context ($u) = ".$this->contextPath);
+
+      $xUserContextList[$u]=$this;
+    }
+
+    function destroy() {
+      if (isset($xUserContextList[$u]))
+        unset($xUserContextList[$u]);
     }
 
     function __destruct()
     {
+      $this->destroy();
       // $this->_commit();
     }
 
@@ -247,7 +268,7 @@
         $formsDead=array();
         foreach($formList as $kFormList => $aForm) {
           $aFormID=getNextValue($aForm);
-          $aMessagePeekerInterval=getNextValue($aForm);
+          $aMessagePeekerInterval=intval(getNextValue($aForm));
           $aLastTimeAlive=getNextValue($aForm);
           $aDeadTime = $formTimeLimit - $aLastTimeAlive;
           if ($aDeadTime>0) {
@@ -321,7 +342,7 @@
       /*
        * PeekMessages
        * It gets the complete list of messages ready to be processed by the client
-       * There is not a "PeekMessage()" function
+       * There is not a "PeekMessage()" (in singular) function
        */
     {
       global $formID;
@@ -975,299 +996,16 @@
       }
     }
 
-    function _doMenuFunctions($sql)
-    {
-      if (!is_dir('scripts'))
-        mkdir('scripts');
-      if (is_dir('scripts')) {
-        fazerSQL($sql);
+  }
 
-        $dateWaterMark='## '.date('Y-m-d H:i');
+  /*
+  as there are some functions that relies on $userContext
+  and we're introducing multi-user backend with webSocket server,
+  this function helps switching the userContext to the indicated
+  */
+  function switchUserContext($u) {
+    global $xUserContextList, $userContext;
 
-        $updateLines=file("scripts/update.sql");
-        $n=count($updateLines);
-        $dateWMPresent=false;
-        while (($n>0) && (!$dateWMPresent)) {
-          if (substr($updateLines[$n],0,16)==substr($dateWaterMark,0,16))
-            $dateWMPresent=true;
-          $n--;
-        }
-
-        $f=fopen("scripts/update.sql",'a');
-        if (!$dateWMPresent)
-          fwrite($f,"$dateWaterMark\n");
-        fwrite($f, "$sql;\n");
-        fclose($f);
-      } else
-        die("<div class=error>There is no 'scripts' directory and it cannot be created.<br>Create 'scripts' dir with enough rights and try again.</div>");
-    }
-
-    function menuFunctions()
-    {
-      global $_Ys_, $a, $newS, $newAttr, $menuParent, $newLabel, $newAncestor, $s, $yMenuRoot,
-             $description, $sysDate, $lastCommands, $currentS, $yeapfConfig,
-             $_bit_, $_menuID_;
-
-      $res=true;
-
-      if ($_Ys_=='createSubMenu') {
-        $res=false;
-        $cc=valorSQL("select count(*) from is_menu where s='$newS'");
-        if ($cc==0) {
-          $ancestor=valorSQL("select id, attr from is_menu where s='$menuParent'");
-          if ($ancestor[0]=='') {
-            $ancestorID=valorSQL("select min(ancestor) from is_menu");
-            $ancestorAttr=valorSQL("select min(attr) from is_menu where ancestor='$ancestorID'");
-          } else {
-            $ancestorID=intval($ancestor[0]);
-            $ancestorAttr=intval($ancestor[1]);
-          }
-          if (intval($newAttr)>0)
-            $ancestorAttr |= $newAttr;
-          $order=intval(valorSQL("select max(o) from is_menu where ancestor='$ancestorID'"))+1;
-          $sql="insert into is_menu (s, label, ancestor, attr, o) values ('$newS', '$newLabel', $ancestorID, $ancestorAttr, $order)";
-          // die($sql);
-
-          $this->_doMenuFunctions($sql);
-
-          echo "<script>parent.menuFrame.location.reload();</script><b><ul>$sql</ul></b>";
-        }
-      } else if ($_Ys_=='modifyMenuEntry') {
-        $res=false;
-        if (($newAncestor=='') || ($newAncestor=='/')) {
-          // a pergunta parece tola, mas se o yMenuRoot estiver mal definido, o menu ficaria pendurado do nada
-          // deste jeito, se estiver errado, o menu vi continuar exatamente onde está
-          // ah, sim, vai ter que pensar um pouco mais para entender, mas continue nadando. vc chega lá
-          $newAncestorID=intval(db_sql("select ID from is_menu where ID=$yMenuRoot"));
-          if ($newAncestorID!=$yMenuRoot) {
-            _recordError("A 'System' tag was created under '$yMenuRoot' ID");
-            db_sql("insert into is_menu(id, label, attr) value ('$yMenuRoot', 'System', 65535)");
-            $newAncestorID=intval(db_sql("select ID from is_menu where ID=$yMenuRoot"));
-          }
-        } else
-          $newAncestorID=intval(db_sql("select ID from is_menu where s='$newAncestor'"));
-
-        if (intval($newAttr)==0)
-          $newAttr=db_sql("select attr from is_menu where s='$currentS'");
-
-        if ($newAncestorID!=0)
-          $sql="update is_menu set s='$newS', label='$newLabel', ancestor='$newAncestorID', attr=$newAttr where s='$currentS'";
-        else
-          $sql="update is_menu set s='$newS', label='$newLabel', attr=$newAttr where s='$currentS'";
-        $this->_doMenuFunctions($sql);
-        echo "<script>parent.menuFrame.location.reload();</script>";
-
-      } else if ($_Ys_=='deleteMenuEntry') {
-        $res=false;
-        $_ancestor=valorSQL("select ancestor from is_menu where s='$s'");
-        $_id=valorSQL("select id from is_menu where s='$s'");
-
-        $this->_doMenuFunctions("update is_menu set ancestor=$_ancestor where ancestor='$_id'");
-        $this->_doMenuFunctions("delete from is_menu where s='$s'");
-
-        echo "<script>parent.menuFrame.location.reload();</script>";
-
-      } else if ($_Ys_=='setMenuRequiredRight') {
-        $currentRequiredRight=intval(db_sql("select rights from is_menu where id=".intval($_menuID_)));
-        $_bit_=intval($_bit_);
-        $_and_=$currentRequiredRight & $_bit_;
-        _dumpY(8,0,"currentRequiredRight and _bit_ = ".$_and_);
-        if (($_and_)>0)
-          $rights=$currentRequiredRight & (~$_bit_);
-        else
-          $rights=$currentRequiredRight | $_bit_;
-        _dumpY(8,0,"currentRight: $currentRequiredRight | touchedBit: $_bit_ = rights $rights");
-        $sql="update is_menu set rights=$rights where id=".intval($_menuID_);
-        $this->_doMenuFunctions($sql);
-      } else if ($_Ys_=='createSkeletonImplementation') {
-        $skeletonPath = dirname($yeapfConfig['yeapfPath']).'/skel/webApp';
-        $slotFileName = $yeapfConfig['cfgCurrentFolder']."/$s.php";
-        if (touch($slotFileName)) {
-          $f=fopen($slotFileName,'w');
-          if ($f) {
-            $skeleton = _file("$skeletonPath/slotEmptyImplementation.php");
-            fwrite($f, $skeleton);
-            fclose($f);
-            chmod($slotFileName,0777);
-          } else
-            die("Impossível escrever em $slotFileName");
-        } else
-          die("Direitos insuficientes para criar $slotFileName");
-
-      } else if ($_Ys_=='recordDocumentation') {
-        $cc=db_sql("select count(*) from is_updates where description='$description' and s='$s'");
-        if ($cc==0) {
-          $_id=md5('YeAPF'.y_uniqid());
-          $description=escapeString($description);
-          $sql="insert into is_updates(id, realization, s, description) values ('$_id', '$sysDate', '$s','$description')";
-          $this->_doMenuFunctions($sql);
-        }
-      }
-
-      return $res;
-    }
-
-    /*
-     * menuFooter()
-     * Cria um pequeno menu de ajuda ao desenvolvimento
-     * Só aparece se ele estiver rodando no '127.0.0.1' ou '::1' ou
-     * se o IP do servidor coincidir com a global cfgDebugIP.
-     * Para aparecer o menu para criação de menu de entrada e de implementações
-     * deve a bandeira '$cfgMainFolder/flags/flag.develop' estar criada (mesmo que zerada)
-     */
-
-    function menuFooter()
-    {
-      global $s, $_Ys_, $u, $aBody, $isTablet, $cfgDebugIP, $yImplementedAction, $user_IP, $server_IP, $cfgMainFolder;
-
-      // echo "<hr>isTablet: ".!$isTablet."<br>ServerIP: $server_IP<br>UserIP: '$user_IP'<br>DebugIP: '$cfgDebugIP'";
-      if ((false) &&  ((!$isTablet) && (($server_IP=="::1") || ($server_IP=="127.0.0.1") || ($user_IP==$cfgDebugIP)) && ($_Ys_!='createSubMenu'))) {
-        $myself=basename($_MYSELF_);
-        echo "<style>
-          #_ydbg_container {margin-top:128px; font-size: 12px; position: fixed; bottom: 0px; background-color: #E5E5E5; border: 1px solid #7F7F7F; border-radius: 3px; padding: 4px; font-size: 10px;opacity: 0.6;}
-          #_ydbg_container td {font-size:14px }
-        </style>";
-        echo "<div id='_ydbg_container'>";
-        echo "<span id='_ydbg_container_relocator' style='color:#900; font-weight:800'><B>@</B></span>";
-        echo "<span id='_ydbg_container_closer' style='color:#900; font-weight:800'><B>X</B></span>";
-        if (file_exists("$cfgMainFolder/flags/flag.develop")) {
-          echo "  <table><tr><td valign=top><b>Criação</b>";
-          echo "  <form action='$myself' method=post>";
-          echo "    <small>Criação rápida de submenu sob <em><u>$s</u></em><br>";
-          echo "    Label: <input type=text name=newLabel id=newLabel size=20><br>";
-          echo "    Subject: <input type=text name=newS id=newS size=20><br>";
-          echo "    attrMask: <input type=text name=newAttr id=newAttr size=4>";
-          echo "    <input type=hidden name='menuParent' value='$s'>";
-          echo "    <input type=hidden name='_Ys_' value='createSubMenu'>";
-          echo "    <input type=hidden name='u' value='$u'>";
-          echo "    <input type=hidden name='s' value='$s'>";
-          echo "    <input type=submit name='createSubMenu' value='Ok'>";
-          echo "    </small>";
-          echo "  </form><div style='font-size:8px'>md5($s.)='".md5("$s.")."'<br>Para appFolderName.def</div></td><td valign=top><b>Edição</b>";
-          if (($_Ys_!='modifyMenuEntry') && (db_tableExists('is_menu'))) {
-            $menuData=valorSQL("select label, ancestor, rights, ID, attr from is_menu where s='$s'");
-            $label=$menuData[0];
-            $ancestor=intval($menuData[1]);
-            $rights=intval($menuData[2]);
-            $menuID=$menuData[3];
-            $attr=$menuData[4];
-            $ancestorS=valorSQL("select s from is_menu where id='$ancestor'");
-            echo "  <form action='$myself' method=post style='border: 1px solid #4D4D4D'>";
-            echo "    <small>Modificação de entrada de menu<br>";
-            echo "    Label: <input type=text name=newLabel id=newLabel size=20 value='$label'><br>";
-            echo "    Subject: <input type=text name=newS id=newS size=20 value='$s'><br>";
-            echo "    Parent Subject: <input type=text name=newAncestor id=newAncestor size=20 value='$ancestorS'><br>";
-            echo "    <input type=hidden name='_Ys_' value='modifyMenuEntry'>";
-            echo "    <input type=hidden name='currentS' value='$s'>";
-            echo "    <input type=hidden name='u' value='$u'>";
-            echo "    <input type=hidden name='s' value='$s'>";
-            echo "    attrMask: <input type=text name=newAttr id=newAttr size=4 value='$attr'> <input type=submit name='createSubMenu' value='Ok'>";
-            echo "    </small>";
-            echo "  </form>";
-          }
-          echo "  </td>";
-          echo "  <td valign=top><b>Documentação</b><br>";
-          echo "  <form action='$myself' method=post>";
-          echo "    <small>Descreva o realizado em termos atemporais<br>";
-          echo "    <textarea name=description cols=60 rows=4></textarea><br>";
-          echo "    <input type=hidden name='_Ys_' value='recordDocumentation'>";
-          echo "    <input type=hidden name='currentS' value='$s'>";
-          echo "    <input type=hidden name='u' value='$u'>";
-          echo "    <input type=hidden name='s' value='$s'>";
-          echo "    <input type=submit name='recordDocumentation' value='Ok'></small>";
-          echo "  </form></td>";
-          echo "  </tr>";
-          echo "  <tr><td colspan=3>";
-          if (db_tableExists('is_perfil_usuarios')) {
-            $qq=db_query("select bit, 0 as bitmask, etiqueta from is_perfil_usuarios");
-            while ($dd=db_fetch_array($qq)) {
-              $m_bit=$dd[0];
-              $m_bitValue=pow(2,$dd[0]);   // $dd[1]
-              $m_etiqueta=$dd[2];
-              $_and_=$m_bitValue & $rights;
-              if ($_and_>0) {
-                $c_bit='#005800';
-              } else {
-                $c_bit='#F95D5D';
-              }
-              echo "<div style='width: 120px; float: left; font-weight: 800'>";
-              echo "<a href='?s=$s&u=$u&_Ys_=setMenuRequiredRight&_bit_=$m_bitValue&_menuID_=$menuID' style='color: $c_bit;'>";
-              if ($m_bit<4)
-                echo "<em>$m_etiqueta</em>";
-              else
-                echo "$m_etiqueta";
-              echo "</a>";
-              echo "</div>\n";
-            }
-            echo "  </td></tr>\n";
-            echo "  <tr><td colspan=3>";
-          }
-
-          if (db_tableExists('is_updates')) {
-            $qq=db_query("select realization, description from is_updates where s='$s' order by realization desc",0,8);
-            while ($dd=db_fetch_array($qq)) {
-              echo "\n<div style='margin-bottom: 8px'>";
-              echo "<b>".dataFormatada($dd[0]).'&nbsp;'.horaFormatada($dd[0]).': '."</b><div style=padding-left:12px>";
-              echo nl2br($dd[1]);
-              echo "</div>\n</div>\n";
-            }
-            echo "<hr>";
-            echo "  </td></tr>";
-            echo "</table>";
-          }
-          if (!$yImplementedAction) {
-            echo "  <div style='background-color: #52A1D4; border-color: #3A84AB; border-width: 2px; border-style: solid; font-size:1.1em; margin: 8px; padding: 8px'>
-              <b>Não há implementação para '$s'</b><br>&nbsp;
-              Deseja criar um script esqueleto para este slot?
-              <a href='?_Ys_=createSkeletonImplementation&u=$u&s=$s'>Sim!</a>
-            </div>";
-          }
-          echo "  <big><a href='?_Ys_=deleteMenuEntry&u=$u&s=$s'>Eliminar <B>$s</B> de Menú</a></big><br>";
-        }
-        echo "  aBody: $aBody | s: ".isset($s)?$s:''." | a: ".isset($a)?$a:''."<br>";
-        echo "</div>";
-
-        echo "\n<script>
-          document.body.style.height=parseInt(document.body.scrollHeight)+250+'px';
-          if (typeof y$ == 'function') {
-            y$('_ydbg_container_relocator').onmouseover=function() {
-              if (y$('_ydbg_container').style.right) {
-                y$('_ydbg_container').style.right='';
-                y$('_ydbg_container').style.left='0px';
-              } else {
-                y$('_ydbg_container').style.right='0px';
-                y$('_ydbg_container').style.left='';
-              }
-            };
-            y$('_ydbg_container_closer').onclick=function() {
-              y$('_ydbg_container_closer').parentNode.style.display='none';
-            }
-          }
-          </script>\n";
-
-        if (file_exists('flag.dbgJS')) {
-          echo "<style>
-                  #debug {
-                    border-top-style: solid;
-                    border-top-width: 1px;
-                    border-top-color:#cc0000;
-                    background-color: #E5E5E5;
-                    display: block;
-                    z-index:100;
-                    position: absolute;
-                  }
-                </style>
-
-                <div id=debug onmouseover=\"y$('debug').setOpacity(.1);\" onmouseout=\"y$('debug').setOpacity(.8);\">
-                </div>
-
-                <script>
-                  y$('debug').setOpacity(.8);
-                  y$('debug').style.left=clientWidth-250;
-                </script>";
-        }
-      }
-    }
-
+    $userContext=$xUserContextList[$u];
   }
 ?>

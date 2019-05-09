@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.dataset.php
-    YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+    YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2019-05-09 18:36:37 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -214,7 +214,7 @@
 
 
   /*
-   * There must to exists only one dataset per webApp/session
+   * There must exists only one dataset per webApp/session
    * To achive that, you can modify your app frameset as this:
 
       <frameset rows="30,*,0" frameborder=no border=0>
@@ -226,7 +226,7 @@
    */
   function datasetEvents(&$s, $a)
   {
-    global $userContext, $withoutHeader,
+    global $withoutHeader,
            $withoutBody, $isDataset, $isMessageProcessor, $currentYeapfStage,
            $sqlID, $dsName, $purgeCache,
            $recordBlockStart, $recordBlockSize,
@@ -371,10 +371,13 @@
 
   }
 
-  function notifyDatasetClients($dsName, $aVerb, $aMessage='')
+  function notifyDatasetClients($dsName, $aVerb, $aMessage='', $aContext=null)
   {
     global $userContext;
-    $userContext->BroadcastMessage('','*',$aVerb, $dsName, $aMessage);
+    if ($aContext==null)
+      $aContext=$userContext;
+
+    $aContext->BroadcastMessage('','*',$aVerb, $dsName, $aMessage);
   }
 
   addEventHandler('datasetEvents');

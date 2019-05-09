@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
+    YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-04-11 17:28:40 (-3 DST)
+    2019-05-09 18:30:39 (-3 DST)
    */
 
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -572,7 +572,7 @@
   }
 
   function em__sse($a, $values=null) {
-    global $userContext, $sysDate, $u,
+    global $sysDate, $u,
            $userMsg, $xq_start, $xq_requestedRows,
            $__sse_ret,
            $cfgMainFolder;

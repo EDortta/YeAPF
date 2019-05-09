@@ -1,6 +1,6 @@
 /*********************************************
   * skel/webApp/templates/bs4-backup/js/yloader.js
-  * YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)
+  * YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
   * 2018-08-27 06:24:02 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.62-18 built on 2019-04-04 23:38 (-3 DST)");
+ console.log("YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com

@@ -1,8 +1,8 @@
 /*********************************************
   * skel/workbench/www/js/yloader.js
-  * YeAPF 0.8.62-97 built on 2019-05-07 11:03 (-3 DST)
+  * YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2019-05-07 11:03:04 (-3 DST)
+  * 2019-05-09 19:34:56 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.62-97 built on 2019-05-07 11:03 (-3 DST)");
+ console.log("YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -7908,6 +7908,17 @@
          set a specific value on each application of the environment. The message will be delivered
          only for those applications that has the searched value in the '_plate' published var.
          In this example, xq_target will be '_plate:120x452'
+         In order to achive that, you can send a message to underlying yeapf message subsystem
+         declaring your intention to listen for a monitor/signal/trigger/filter or whatever
+         you would like to name it as this:
+           s=y_msg&a=setTrigger&triggerName=_plate
+         or more specifically for a value (that is more useful)
+           s=y_msg&a=setTrigger&triggerName=_plate&triggerValue=120x452
+     
+         So, in that case, you will receive all messages that are targeted to _plate:120x452
+     
+         You can unset a trigger too:
+           s=y_msg&a=unsetTrigger&triggerName=_plate
        */
        that.yank = function(s, a, jsonParams, aCallbackFunction) {
          aCallbackFunction = aCallbackFunction || function() {};
@@ -9558,9 +9569,9 @@
  /* START yinterface.js */
      /*
          skel/workbench/www/js/yloader.js
-         YeAPF 0.8.62-97 built on 2019-05-07 11:03 (-3 DST)
+         YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
          Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-         2019-05-07 11:03:04 (-3 DST)
+         2019-05-09 19:34:56 (-3 DST)
      */
      
      var yInterfaceObj = function() {
@@ -10040,7 +10051,7 @@
              function(s, e, d) {
                if (200 == s) {
                  if ((d) && (d[0])) {
-                   console.log(formId+" arrivou ");
+                   console.log(formId+" chegou ");
                    if ("undefined" == typeof that._forms_cache)
                      that._forms_cache = [];
                    that._forms_cache[subject + '.' + formId] = d[0];

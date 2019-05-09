@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webSocket/server.php
-    YeAPF 0.8.62-96 built on 2019-05-06 18:30 (-3 DST)
+    YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-05-06 12:10:56 (-3 DST)
+    2019-05-09 10:47:54 (-3 DST)
 
     skel / webSocket / server.php
     This file cannot be modified within skel/webSocket
@@ -48,7 +48,7 @@
 
   }
 
-  class echoServer extends WebSocketServer
+  class basicServer extends WebSocketServer
   {
 
     public function __construct($addr, $port, $bufferLength)
@@ -210,7 +210,7 @@
     }
   }
 
-  $echo = new echoServer("$webSocketsAddress", "$webSocketsPort", 10240);
+  $echo = new basicServer("$webSocketsAddress", "$webSocketsPort", 10240);
 
   try {
     $echo->run();

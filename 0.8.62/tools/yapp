@@ -2,7 +2,7 @@
 <?php
   /*
   tools/yapp
-  YeAPF 0.8.62-67 built on 2019-04-12 19:01 (-3 DST)
+  YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
   Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
   2019-04-12 10:23:47 (-3 DST)
   */
@@ -414,7 +414,7 @@
     }
 
     /* save application tools environment */
-    $yeapfAppIni = "[app]\nappType=$appType\ntemplate=$template\nfromSample=$fromSample\nfolder=" . getcwd() . "\ndate=" . date("Y-m-dTH:i:s") . "\nyeapfVersion=0.8.62-67\n";
+    $yeapfAppIni = "[app]\nappType=$appType\ntemplate=$template\nfromSample=$fromSample\nfolder=" . getcwd() . "\ndate=" . date("Y-m-dTH:i:s") . "\nyeapfVersion=0.8.62-100\n";
     if (!file_put_contents("$yeapfAppIniFilename", $yeapfAppIni)) {
       echo "\nWARNING!\n\tWas not possible to write '$yeapfAppIniFilename'\n";
     }
@@ -430,7 +430,7 @@
             $cfgURL = "http://localhost/" . $yeapfConfig['myself'] . "/configure.php";
             echo "Calling '$cfgURL' ...\n";
             file_get_contents($cfgURL);
-            echo "Ok\nThis folder was updated to YeAPF v0.8.62-67\n";
+            echo "Ok\nThis folder was updated to YeAPF v0.8.62-100\n";
           }
           else {
             echo "Remember to call 'configure.php' from your navigator\n";
