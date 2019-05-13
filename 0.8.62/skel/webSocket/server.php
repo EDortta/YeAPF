@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webSocket/server.php
-    YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
+    YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-05-09 10:47:54 (-3 DST)
+    2019-05-13 17:50:22 (-3 DST)
 
     skel / webSocket / server.php
     This file cannot be modified within skel/webSocket
@@ -56,9 +56,33 @@
       echo "Opening server at $addr:$port...\n";
       parent::__construct($addr, $port, $bufferLength);
       $this->userClass = "_Users";
+      $this->locked=false;
     }
 
     //protected $maxBufferSize = 1048576; //1MB... overkill for an echo server, but potentially plausible for other applications.
+
+    protected function tick() {
+      if (!$this->locked) {
+        $this->locked=true;
+        yeapfStage("webSocketTickStart", null, $this);
+        try {
+          foreach ($this->users as $auxUser) {
+            if (!$auxUser->hasSentClose) {
+              yeapfStage("webSocketClientTick", $auxUser, $this);
+            }
+          }
+        } finally {
+          $this->locked=false;
+        }
+        yeapfStage("webSocketTickEnd", null, $this);
+      }
+
+    }
+
+    /* This "unprotected" send allows to send a message from the application */
+    public function u_send($user, $message) {
+      $this->send($user, $message);
+    }
 
     protected function process($user, $jMessage)
     {
@@ -69,6 +93,7 @@
         The target parameter (xq_target) if present and set to '*', makes the result of the query be propagated throught all the clients.
         If (xq_target) is present and differs from '*' can begin with 'uname:', 'ip:', 'id:' and 'u:' followed by a correct value determining the target for which the query result will be sent. It target can be negated if starts with '!'
       */
+      global $userContext;
       if (mb_substr($jMessage, 0, 1)=="{") {
         $message=@json_decode($jMessage, true, 512, JSON_OBJECT_AS_ARRAY);
         if (is_array($message)) {
@@ -76,6 +101,8 @@
             if (isset($message['u'])) {
               /* first time 'u' appears it will build userContext */
               if (!isset($user->userContext)) {
+                /* MISSED: Verify if 'u' value is unique in context */
+                $user->u = $message['u'];
                 yeapfStage("beforeAuthentication");
                 $user->userContext=new xUserContext($message['u'], true);
 
@@ -95,23 +122,34 @@
             }
 
             yeapfStage("beforeImplementation");
-            $__impt0=decimalMicrotime();
-            list($implemented, $impReturn) = implementation($message['s'], $message['a'], 'w', false, $message);
-            $__impt1=decimalMicrotime();
-            $__impT=$__impt1-$__impt0;
-            _recordWastedTime("Time wasted in user implementation of ".$message['s'].".".$message['a'].": $__impT ($__impt1 - $__impt0)");
+            if (mb_strtolower($message["xq_bypass"])=="no") {
+              $__impt0=decimalMicrotime();
+              list($implemented, $impReturn) = implementation($message['s'],
+                                                              $message['a'],
+                                                              'w',
+                                                              false,
+                                                              $message,
+                                                              $this);
+              $__impt1=decimalMicrotime();
+              $__impT=$__impt1-$__impt0;
+              _recordWastedTime("Time wasted in user implementation of ".$message['s'].".".$message['a'].": $__impT ($__impt1 - $__impt0)");
+            }
             yeapfStage("afterImplementation");
 
             if (!$implemented) {
               $impReturn="{}";
             }
 
+            /*
             $result = array(
               "callbackId"=>$message["callbackId"],
               "dataContext"=>$GLOBALS['_xq_context_'],
               "parameters"=>$message,
               "data"=> json_decode($impReturn, true, 512, JSON_BIGINT_AS_STRING)
             );
+            */
+            $result=produceWebSocketMessage($message, $impReturn);
+
             unset($result["parameters"]["callbackId"]);
             unset($result["parameters"]["fieldName"]);
             unset($result["parameters"]["fieldValue"]);
@@ -155,6 +193,24 @@
                     if ($target[0] == 'w') {
                       $canSend = ($target[1]>'') && ($auxUser->w == $target[1]);
                     }
+                    /* Almost at the end, if still not canSend, then review the triggers */
+                    if (!$canSend) {
+                      /* triggers start with '_' */
+                      if (substr($target[0],0,1)=="_") {
+                        switchUserContext($auxUser->u);
+                        $userVariables=$userContext->loadUserVars('*', false);
+                        if (isset($userVariables[$target[0]])) {
+                          /* the client can send a set of possible values splitted by comma */
+                          $triggerValueList = explode(',', $target[1]);
+                          foreach($triggerValueList as $triggerValue) {
+                            $canSend = $userVariables[$target[0]] == $triggerValue;
+                            if ($canSend)
+                              break;
+                          }
+                        }
+                      }
+                    }
+                    /* FINALLY, negate the result if is requested to do that */
                     if ($negate)
                       $canSend=!$canSend;
                   }
@@ -199,7 +255,11 @@
         print_r($userObj);
       }
       echo "\n";
-
+      $retMessage = yeapfStage("webSocketClientConnected", $user, $this);
+      if (null != $retMessage) {
+        $result=json_encode($retMessage);
+        $this->send($user, "$result");
+      }
     }
 
     protected function closed($user)
@@ -207,14 +267,19 @@
       // Do nothing: This is where cleanup would go, in case the user had any sort of
       // open files or other objects associated with them.  This runs after the socket
       // has been closed, so there is no need to clean up the socket itself here.
+      yeapfStage("webSocketClientDisconnected", $user, $this);
     }
   }
 
-  $echo = new basicServer("$webSocketsAddress", "$webSocketsPort", 10240);
+  $theServer = new basicServer("$webSocketsAddress", "$webSocketsPort", 10240);
 
   try {
-    $echo->run();
+    yeapfStage("webSocketServerStarted", null, $theServer);
+    $theServer->run();
+    yeapfStage("webSocketServerCompleted", null, null);
   } catch (Exception $e) {
-    $echo->stdout($e->getMessage());
+    yeapfStage("webSocketServerHalted", $e, null);
+    $theServer->stdout($e->getMessage());
   }
+  yeapfStage("webSocketServerClosed", null, null);
 ?>

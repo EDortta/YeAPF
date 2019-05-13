@@ -1,8 +1,8 @@
 /********************************************************************
  * app-src/js/ycomm-websocket.js
- * YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
+ * YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)
  * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
- * 2019-05-09 10:47:54 (-3 DST)
+ * 2019-05-13 17:02:10 (-3 DST)
  ********************************************************************/
 
 var ycommWebSocketClientObj = function(webSocketServerURL, u, deviceId) {
@@ -70,19 +70,24 @@ var ycommWebSocketClientObj = function(webSocketServerURL, u, deviceId) {
         try {
           var result=JSON.parse(msg.data);
           if (result.callbackId) {
-            if ("undefined" != rootSystem[result.callbackId])
+            if ("undefined" != rootSystem[result.callbackId]) {
               rootSystem[result.callbackId](200, result.error, result.data, result.userMsg, result.dataContext, result.geometry);
-            else {
-              var subjectEvent = ((result.parameters || []) ["s"] || "unknown");
-              var singleEvent =  ((result.parameters || []) ["s"] || "unknown")+"."+((result.parameters || []) ["a"] || "unknown") ;
-              if ("function" == typeof __eventHandler[subjectEvent]) {
-                __eventHandler[subjectEvent] ((result.parameters || []) ["a"], result);
-              }
-              if ("function" == typeof __eventHandler[singleEvent]) {
-                __eventHandler[singleEvent] (result);
-              }
             }
           }
+
+          var subjectEvent = ((result.parameters || []) ["s"] || "unknown");
+          var singleEvent =  ((result.parameters || []) ["s"] || "unknown")+"."+((result.parameters || []) ["a"] || "unknown") ;
+          if ("function" == typeof __eventHandler[subjectEvent]) {
+            __eventHandler[subjectEvent] ((result.parameters || []) ["a"], result);
+          }
+          if ("function" == typeof __eventHandler[singleEvent]) {
+            __eventHandler[singleEvent] (result);
+          }
+
+          if ("function" == typeof that.onmessage) {
+            that.onmessage(msg);
+          }
+
         } catch(e) {
 
         }
@@ -120,7 +125,7 @@ var ycommWebSocketClientObj = function(webSocketServerURL, u, deviceId) {
 
   that.reconnect = function() {
     that.quit();
-    configureSocket();
+    setTimeout(configureSocket, 1500);
   };
 
   var rootSystem = window || self;
@@ -129,7 +134,7 @@ var ycommWebSocketClientObj = function(webSocketServerURL, u, deviceId) {
   var _cleanUp = function (callbackFunctionName) {
     console.log("deleting "+callbackFunctionName);
     delete rootSystem[callbackFunctionName];
-  }
+  };
 
   that.setEventHandler = function(handlerFunction, s, a) {
     if ("string" == typeof s) {
@@ -201,7 +206,9 @@ var ycommWebSocketClientObj = function(webSocketServerURL, u, deviceId) {
       _cleanUp(callbackFunctionName);
     };
 
-    jsonParams['xq_bypass']=jsonParams['xq_bypass']?true:false;
+    jsonParams['xq_bypass'] = ("boolean" == typeof jsonParams['xq_bypass'])?jsonParams['xq_bypass']:false;
+    jsonParams['xq_bypass'] = (jsonParams['xq_bypass'] === true) ||
+                              (jsonParams['xq_bypass'] || "NO").toUpperCase() == "YES";
 
     var jsonAsParams = ycomm.urlJsonAsParams(jsonParams);
     var fieldName = jsonAsParams[0];
@@ -224,7 +231,7 @@ var ycommWebSocketClientObj = function(webSocketServerURL, u, deviceId) {
       host = webSocketServerURL;
       _deviceId = deviceId || guid();
 
-      configureSocket();
+      setTimeout(configureSocket, 1500);
 
       return that;
     } else {

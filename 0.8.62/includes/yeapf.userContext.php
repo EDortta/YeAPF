@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.userContext.php
-    YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
+    YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-05-09 19:33:15 (-3 DST)
+    2019-05-10 16:31:19 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -244,7 +244,6 @@
        *   6) Unlock the message stack
        */
     {
-      global $formID;
 
       $ret=0;
 
@@ -345,22 +344,21 @@
        * There is not a "PeekMessage()" (in singular) function
        */
     {
-      global $formID;
 
       $ret=array();
 
       // It only reads the message stack if and only if exists an 'formID'
       // This avoid the script to send messages to itself and not be readed later by another form
-      if ($formID>'') {
+      if ($this->formID>'') {
 
         $fBase="$this->contextPath/user.".$this->u;
 
-        $fStack="$fBase.msgStack.$formID";
-        $fCounter="$fBase.msgCounter.$formID";
+        $fStack="$fBase.msgStack.$this->formID";
+        $fCounter="$fBase.msgCounter.$this->formID";
         $fFlag="user.$this->u.msgFlag";
         $lFlag="user.$aTargetUser.formListFlag";
 
-        _dumpY(8,1,"\n\tformID: $formID\n\tstack: $fStack\n\tcounter: $fCounter\n\t$fFlag");
+        _dumpY(8,1,"\n\tformID: $this->formID\n\tstack: $fStack\n\tcounter: $fCounter\n\t$fFlag");
 
         $fList="$fBase.formList";
         if (lock($lFlag)) {
@@ -406,26 +404,26 @@
 
     function RegisterFormID($messagePeekerInterval)
     {
-      global $formID;
 
       $fBase="$this->contextPath/user.".$this->u;
       $fList="$fBase.formList";
 
       $lFlag="user.$this->u.formListFlag";
       if (lock($lFlag)) {
-        _dumpY(8,0,"Registering form '$formID'");
+        _dumpY(8,0,"Registering form '".$this->formID."'");
 
         $formList = trim(join("\n",file($fList)));
         _dumpY(8,2,"formList '$formList'");
         if ($formList>'')
           $formList.="\n";
-        $formList.=$formID.','.$messagePeekerInterval.','.date('U');
+        $formList.=$this->formID.','.$messagePeekerInterval.','.date('U');
 
         $this->__saveFormList($fBase, $formList);
 
         unlock($lFlag);
-      } else
-        $formID='';
+      } else {
+        $this->formID='';
+      }
     }
 
     function createUserContext($userGID,
@@ -935,6 +933,15 @@
       }
       _dumpY(8,0,"userVars ready");
       return $ret;
+    }
+
+    function addUserValue($varName, $value)
+    {
+
+      _dumpY(8,0,"uc:  saving user var '$varName' as '$value' on $this->u");
+      $this->userContext['vars'][$varName]=$value;
+
+      $this->_commit();
     }
 
     function addUserVars($varNames)

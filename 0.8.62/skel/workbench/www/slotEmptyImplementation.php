@@ -4,9 +4,9 @@
  *      slotEmptyImplementation.php
  *      This file is part of YeAPF
  *      (Yet Another PHP Framework)
- *      YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
+ *      YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)
  *      Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
- *      2019-05-09 19:34:56 (-3 DST)
+ *      2019-05-13 19:02:29 (-3 DST)
  *
  *
  *      The MIT License (MIT)
@@ -33,7 +33,7 @@
  */
 
 
-  function em_#(s)($a, $values=null) {
+  function em_#(s)($a, $values=null, $scaffolding=null) {
     global $userContext, $sysDate, $u,
            $userMsg, $xq_start, $xq_requestedRows,
            $devSession, $cfgMainFolder;
@@ -138,7 +138,7 @@
    * xq_produceReturnLines() can produce results using columns names or not and it
    * can limit the result set length
    */
-  function q#(s)($a, $values=null)
+  function q#(s)($a, $values=null, $scaffolding=null)
   {
     /* as in 0.8.60 you dont't need these here, but, they're still present
 
@@ -158,7 +158,7 @@
 
   }
 
-  function g#(s)($a, $values=null)
+  function g#(s)($a, $values=null, $scaffolding=null)
   {
     global $userContext, $sysDate, $u;
 
@@ -187,7 +187,7 @@
    * The result is a JSON formatted as string.
    */
 
-  function w#(s)($a, $values=null)
+  function w#(s)($a, $values=null, $scaffolding=null)
   {
     /* call em_#(s) to process the event */
     $ret = em_#(s)($a, $values);
@@ -202,13 +202,13 @@
    * If the callback function does not exists on
    * client side, no error happens but a console.log is triggered
    */
-  function r#(s)($a, $values=null)
+  function r#(s)($a, $values=null, $scaffolding=null)
   {
     $jsonRet=w#(s)($a, $values);
     echo produceRestOutput($jsonRet);
   }
 
-  function soap_#(s)($a, $values=null)
+  function soap_#(s)($a, $values=null, $scaffolding=null)
   {
     return em_#(s)($a, $values);
   }
@@ -220,7 +220,7 @@
    *          OR
    *          /usr/bin/php yeapf_ticker.php
    */
-  function t#(s)($a, $values=null)
+  function t#(s)($a, $values=null, $scaffolding=null)
   {
     global $sysDate, $ytasker, $xq_start;
 
@@ -262,7 +262,7 @@
   /*
    * f#(s) is used at server side when YeAPF is mounting a dynamic page
    */
-  function f#(s)($a, $values=null)
+  function f#(s)($a, $values=null, $scaffolding=null)
   {
     global $userContext, $sysDate, $u,
            $aBody;
@@ -306,29 +306,78 @@
      */
   }
 
-  function e#(s)(&$s, &$a, $values=null)
+  function e#(s)(&$s, &$a, $values=null, $scaffolding=null)
   {
+    $ret=0;
+    /* if (ret & 2 == 2) then, all the event handler chain will be halted */
+
     if ($s=='#(s)') {
       switch($a)
       {
-        case 'afterDBConnect':
-          break;
-        case 'afterLogon':
-          break;
-        case 'afterAuthentication':
-          break;
-        case 'afterWrongAuthentication':
-          break;
-        case 'beforeImplementation':
-          break;
-        case 'afterImplementation':
-          break;
-        case 'beforeOutput':
-          break;
-        case 'afterOutput':
+        case 'sample01':
           break;
       }
     }
+
+    /* YeAPF stages can be hacked here */
+
+    if ($s=='yeapf') {
+      switch($a) {
+        case 'afterDBConnect':
+          /* The Application has been connected to the database */
+          break;
+        case 'afterLogon':
+          /* The user has done login */
+          break;
+        case 'afterAuthentication':
+          /* The user is well authenticated (as it is logged) and can cotninue */
+          break;
+        case 'afterWrongAuthentication':
+          /* Something were wrong with user authentication (stolen u?) */
+          break;
+        case 'webSocketServerStarted':
+          /* The websocket server has been started and is starting to run */
+          break;
+        case 'webSocketClientConnected':
+          /* A new client is connected via webSocket */
+          break;
+        case 'webSocketTickStart':
+          /* A tick event has been triggered in the server */
+          break;
+        case 'webSocketClientTick':
+          /* the server is ticking the client */
+          break;
+        case 'webSocketTickEnd':
+          /* a tick event has ended in the server */
+          break;
+        case 'beforeImplementation':
+          /* The implementation of the event is ready to be called */
+          break;
+        case 'afterImplementation':
+          /* The implementation of the event has been called */
+          break;
+        case 'webSocketClientDisconnected':
+          /* A client has been disconnected via webSocket */
+          break;
+        case 'webSocketServerCompleted':
+          /* The webSocket has finished gracefully */
+          break;
+        case 'webSocketServerHalted':
+          /* The webSocket has finished improperly */
+          break;
+        case 'webSocketServerClosed':
+          /* The webSocket has been closed */
+          break;
+        case 'beforeOutput':
+          /* The output is ready to be sent */
+          break;
+        case 'afterOutput':
+          /* The output has been sent */
+          break;
+      }
+    }
+
+    return $ret;
   }
 
 

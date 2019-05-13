@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.eventHandler.php
-    YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
+    YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-05-30 11:21:05 (-3 DST)
+    2019-05-13 11:24:39 (-3 DST)
 */
 
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -17,10 +17,11 @@
       array_push($__eventHandler,$eh);
   }
 
-  function doEventHandler($aS='', $aA='')
+  function doEventHandler($aS='', $aA='', $aValues=null, $aScaffolding=null)
   {
     global $lastImplementation, $__eventHandler, $s, $a, $flgCanContinueWorking;
 
+    $ret=null;
     $cEvents=0;
     $auxS=($aS > '')? $aS: $s;
     $auxA=($aA > '')? $aA: $a;
@@ -35,7 +36,7 @@
             _recordWastedTime("Preparing to call $eh($auxS, $auxA)");
             $__impt0=decimalMicrotime();
             //$ret=call_user_func($eh, $auxS, $auxA);
-            $ret=$eh($auxS, $auxA);
+            $ret=$eh($auxS, $auxA, $aValues, $aScaffolding);
             _dumpY(1,2,"$eh('$auxS', '$auxA') returns $ret");
             $__impt0=decimalMicrotime()-$__impt0;
             _recordWastedTime("Time wasted calling $eh($a): $__impt0");

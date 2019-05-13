@@ -1,9 +1,9 @@
 <?php
 /*
     tools/yclilib.php
-    YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
+    YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-04-12 10:16:40 (-3 DST)
+    2019-05-10 17:01:18 (-3 DST)
 */
 
   $PHPVer = phpversion();
@@ -18,8 +18,9 @@
     $files = glob("$sourcePath/$pattern");
     foreach($files as $fileName) {
       $bName = basename($fileName);
-      echo str_replace("//", "/", "    +-- $target/$bName                                  \r");
-      if (in_array($bName, $specialFiles)) {
+      $payAttention=(in_array($bName, $specialFiles))?" *PA":"";
+      echo str_replace("//", "/", "    +-- $target/$bName  $payAttention                                  \r");
+      if ((!$toForce) && (in_array($bName, $specialFiles))) {
         echo "X\n";
       } else {
         if (is_dir("$sourcePath/$bName")) {
@@ -33,6 +34,7 @@
             echo "\nCreating '$target'\n";
             mkdir($target, 0777, true);
           }
+
           if (file_exists("$target/$bName")) {
             $t1=filemtime("$sourcePath/$bName");
             $t2=filemtime("$target/$bName");

@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
+    YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-05-09 19:33:44 (-3 DST)
+    2019-05-13 10:48:18 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -464,7 +464,8 @@
 
   function xq_produceContext($callBackFunction, $xmlRowsData, $cRegs, $userMsg=null, $firstRow=null, $requestedRows=null, $sqlID='',$progressBarID='', $navigatorID='',$formFile='')
   {
-    global $formID, $targetTableID, $_xq_context_, $lastAction, $lastError, $_requiredFields, $xq_start, $xq_requestedRows;
+    global $targetTableID, $_xq_context_, $lastAction, $lastError, $_requiredFields, 
+           $xq_start, $xq_requestedRows, $userContext;
 
     if ($firstRow == null)
       $firstRow = intval($xq_start);
@@ -472,7 +473,7 @@
       $requestedRows = intval($xq_requestedRows);
 
     xq_context('navScript', $formFile, false);
-    xq_context('formID', $formID, false);
+    xq_context('formID', $userContext->formID, false);
     xq_context('targetTableID', $targetTableID, false);
     xq_context('navigatorID', $navigatorID, false);
     xq_context('progressBarID', $progressBarID, false);
@@ -841,6 +842,15 @@
     return $script;
   }
 
+  function produceWebSocketMessage($parameters, $jData) {
+    $result = array(
+      "callbackId"=>$parameters["callbackId"],
+      "dataContext"=>$GLOBALS['_xq_context_'],
+      "parameters"=>$parameters,
+      "data"=> json_decode($jData, true, 512, JSON_BIGINT_AS_STRING)
+    );
+    return $result;
+  }
 
   /* functions to verify form content */
   function strFilled($str)
@@ -923,7 +933,7 @@
   {
     global $sysTimeStamp,
            $userContext,
-           $u, $formID, $messagePeekerInterval,
+           $u, $messagePeekerInterval,
            $xq_return, $xq_regCount,
            $targetUser, $message, $wParam, $lParam, $broadcastCondition;
 
@@ -937,11 +947,11 @@
     $xq_return='';
 
     /*
-       $formID empty indicates first request of list of messages 
+       an empty formID indicates first request of list of messages 
        being required by client yeapf.js
      */
-    if ($formID=='') {
-      $formID=md5('ym'.y_uniqid());
+    if ($userContext->formID=='') {
+      $userContext->formID=md5('ym'.y_uniqid());
       $userContext->RegisterFormID($messagePeekerInterval);
     }
 
@@ -962,7 +972,8 @@
 
           _dumpY(16,0,"@ sending $aSourceUserID, $aMessage, $aWParam, $aLParam");
 
-          $ret = qy_msgProc($aSourceUserID, $aMessage, $aWParam, $aLParam);
+          $auxRet = qy_msgProc($aSourceUserID, $aMessage, $aWParam, $aLParam);
+          $ret[]=$auxRet;
 
           $moreFeed=false;
 
@@ -984,8 +995,26 @@
         $varValue=getNextValue($aux,'=');
 
         $userContext->BroadcastMessage($varName, $varValue, $message, $wParam, $lParam);
-      } else
+      } else {
         $userContext->PostMessage($targetUser, $message, $wParam, $lParam);
+      }
+
+    } else if ($a=="setTrigger") {
+      if (isset($GLOBALS['triggerName'])) {
+        $triggerName=trim($GLOBALS['triggerName']);
+        if (substr($triggerName,0,1)=="_") {
+          $triggerValue=$GLOBALS['triggerValue'] || '';
+          $userContext->addUserValue($triggerName, $triggerValue);
+        }
+      }
+
+    } else if ($a=="unsetTrigger") {
+      if (isset($GLOBALS['triggerName'])) {
+        $triggerName=trim($GLOBALS['triggerName']);
+        if (substr($triggerName,0,1)=="_") {
+          $userContext->delUserVars($triggerName);
+        }
+      }
     }
 
     return $ret;

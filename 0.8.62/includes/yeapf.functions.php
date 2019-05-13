@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
+    YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-05-07 10:56:53 (-3 DST)
+    2019-05-13 11:15:04 (-3 DST)
    */
 
   /*
@@ -402,7 +402,7 @@
   $__EventBuffer=array();
   $__EventBufferFilled=false;
 
-  function yeapfStage($functionName = '')
+  function yeapfStage($functionName = '', $values=null, $scaffolding=null)
   {
     global $s, $a, $currentYeapfStage,
            /* @OBSOLETE 20170111
@@ -427,19 +427,19 @@
     $currentYeapfStage=$functionName;
 
     if ($fe)
-      $functionName($s, $a);
+      $functionName($s, $a, $values, $scaffolding);
     _dumpY(1,1,"YEAPF STAGE: $functionName    eventHandler ");
     if (function_exists('doEventHandler')) {
       if ($__EventBufferFilled) {
         for ($i=0; $i<count($__EventBuffer); $i++) {
           _dumpY(1,1,"YeAPF STAGE: $functionName     ".$__EventBuffer[$i][0]);
-          doEventHandler($__EventBuffer[$i][0],$__EventBuffer[$i][1]);
+          doEventHandler($__EventBuffer[$i][0],$__EventBuffer[$i][1], $values, $scaffolding);
         }
         $__EventBufferFilled = false;
         $__EventBuffer = array();
       }
       _dumpY(1,1,"calling 'yeapf'.'$functionName' event handler");
-      doEventHandler('yeapf', $functionName);
+      doEventHandler('yeapf', $functionName, $values, $scaffolding);
     } else {
       $__EventBufferFilled = true;
       $__EventBuffer[] = array('yeapf', $functionName);
@@ -1820,11 +1820,12 @@
 
   if (file_exists("$cfgMainFolder/flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." ".__LINE__." 0.8.62 ".": function block #2\n",3,"$cfgCurrentFolder/logs/yeapf.loader.log");
 
-  function implementation($s, $a='', $prefix='f', $onlyTest=false, $parameters=null)
+  function implementation($s, $a='', $prefix='f', $onlyTest=false, 
+                          $parameters=null, $scaffolding=null)
   {
     global $lastImplementation, $flgCanContinueWorking, $devSession;
 
-    xq_context('YeAPF',       'YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)');
+    xq_context('YeAPF',       'YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)');
     xq_context('devSession',  $devSession);
     xq_context('ts1',         date('U'));
 
@@ -1909,7 +1910,7 @@
             if (!$onlyTest) {
               _recordWastedTime("Preparing to call $func($a)");
               $__impt0=decimalMicrotime();
-              $ret=call_user_func($func, $a, $parameters);
+              $ret=call_user_func($func, $a, $parameters, $scaffolding);
               _dumpY(1,0,"$func($a) returns $ret");
               $__impt0=decimalMicrotime()-$__impt0;
               _recordWastedTime("Time wasted calling $func($a): $__impt0");

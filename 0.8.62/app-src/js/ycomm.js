@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm.js
- * YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
+ * YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)
  * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-07-04 05:37:02 (-3 DST)
+ * 2019-05-10 16:44:58 (-3 DST)
  * First Version (C) 2010 - esteban daniel dortta - dortta@yahoo.com
 **********************************************/
 //# sourceURL=app-src/js/ycomm.js
@@ -133,7 +133,11 @@
           }
 
           fieldName += jNdx;
-          auxFieldValue = maskHTML(that.xq_urlEncode(jsonParams[jNdx], false));
+          auxFieldValue = jsonParams[jNdx];
+          if ("boolean"==typeof auxFieldValue) {
+            auxFieldValue=auxFieldValue?"YES":"NO";
+          }
+          auxFieldValue = maskHTML(that.xq_urlEncode(auxFieldValue, false));
           fieldValue += auxFieldValue;
         }
       }
