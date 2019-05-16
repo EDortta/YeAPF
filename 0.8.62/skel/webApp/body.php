@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/body.php
-    YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
+    YeAPF 0.8.62-162 built on 2019-05-16 10:57 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2018-06-01 09:31:47 (-3 DST)
+    2019-05-14 10:19:52 (-3 DST)
 
     skel/webApp / body.php
     This file cannot be modified within skel/webApp
@@ -62,7 +62,12 @@
 
       yeapfStage("afterAuthentication");
 
+      /*
+      @OBSOLETO 201905141019
       if ($userContext->menuFunctions()) {
+      */
+
+      if (true) {
         if ((isset($m)) && ($m>0))
           $userContext->addUserVars('m');
 

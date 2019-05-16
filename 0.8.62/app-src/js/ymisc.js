@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
+ * YeAPF 0.8.62-162 built on 2019-05-16 10:57 (-3 DST)
  * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
- * 2019-04-23 10:56:30 (-3 DST)
+ * 2019-05-15 10:01:59 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -885,7 +885,7 @@ String.prototype.extenso = function(c) {
       if (!(i = v[a] * 1)) continue;
       i % 100 < 20 && (t += ex[0][i % 100]) ||
         i % 100 + 1 && (t += ex[1][(i % 100 / 10 >> 0) - 1] + (i % 10 ? e + ex[0][i % 10] : ""));
-      s.push((i < 100 ? t : !(i % 100) ? ex[2][i == 100 ? 0 : i / 100 >> 0] : (ex[2][i / 100 >> 0] + e + t)) +
+      s.push((i < 100 ? t : (!(i % 100)) ? ex[2][i == 100 ? 0 : i / 100 >> 0] : (ex[2][i / 100 >> 0] + e + t)) +
         ((t = l - a - 2) > -1 ? " " + (i > 1 && t > 0 ? ex[3][t].replace("ão", "ões") : ex[3][t]) : ""));
     }
     a = ((sl = s.length) > 1 ? (a = s.pop(), s.join(" ") + e + a) : s.join("") || ((!j && (n[j + 1] * 1 > 0) || r.length) ? "" : ex[0][0]));
@@ -933,8 +933,8 @@ if (!String.prototype.isCNS) {
       ret = (s % 11) == 0;
     }
     return ret;
-  }
-};
+  };
+}
 
 if (!String.prototype.isCPF) {
   //+ Carlos R. L. Rodrigues
@@ -1006,15 +1006,15 @@ if (!String.prototype.isCPF) {
 
   String.prototype.asCPF = function() {
     return this.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/g, "\$1.\$2.\$3\-\$4");
-  }
+  };
 
   String.prototype.asCNPJ = function() {
     return this.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/g, "\$1.\$2.\$3\/\$4\-\$5");
-  }
+  };
 
   String.prototype.asCEP = function() {
     return this.replace(/(\d{2})(\d{3})(\d{3})/g, "\$1\$2-\$3");
-  }
+  };
 
   String.prototype.asPhone = function(agruparDeTresEmTres) {
     agruparDeTresEmTres = agruparDeTresEmTres || false;
@@ -1044,7 +1044,7 @@ if (!String.prototype.isCPF) {
       else
         return number.replace(/(\d{2})(\d{2})(\d{1})(\d{4})(\d{4})/g, "+$1 (\$2) \$3 \$4-\$5");
     }
-  }
+  };
 
   String.prototype.asRG = function() {
     var number = "" + this.replace(/[^a-zA-Z0-9]+/g, "");
@@ -1052,7 +1052,7 @@ if (!String.prototype.isCPF) {
       return number.replace(/(\w{1})(\d{4})(\d{2})(\d{1})$/, "$1.$2.$3-$4");
     else
       return number.replace(/(\d{2})(\d{3})(\d{3})(\d{1})$/, "$1.$2.$3-$4");
-  }
+  };
 }
 
 if (!String.prototype.isCNH) {
@@ -1089,7 +1089,7 @@ if (!String.prototype.isCNH) {
       dig_enc = "" + d1 + "" + d2;
       return (dig_enc == dig_forn);
     }
-  }
+  };
 }
 
 if (!String.prototype.isCreditCard) {
@@ -1111,7 +1111,7 @@ if (!String.prototype.isCreditCard) {
       sum += digit;
     }
     return (auxCartao.length>0) && (sum % 10 === 0);
-  }
+  };
 }
 
 if (!String.prototype.isEmail) {
@@ -1208,16 +1208,16 @@ if (!Array.prototype.indexOf) {
 
 var forceStringValue = function(aObjArr, aIndex) {
   return ((aObjArr[aIndex] || "") + "").unquote();
-}
+};
 
 array_intersect = function(a, b) {
   var t = b;
   if (b.length > a.length) { b = a;
-    a = t };
+    a = t; }
   return a.filter(function(e) {
     if (b.indexOf(e) !== -1) return true;
   });
-}
+};
 
 
 /* as the array keys could be used with data coming from
@@ -1283,7 +1283,7 @@ if (typeof Date.prototype.getFirstDayOfWeek == 'undefined') {
       date.setHours(0, 0, 0, 0);
     }
     return date;
-  }
+  };
 }
 
 if (typeof Date.prototype.monthFirstDOW == 'undefined') {
@@ -1485,12 +1485,12 @@ var extractDateValues = function(aStrDate, aFormat, aDateMap) {
     aFormat = 'yyyy-mm-ddThh:mm:ss';
   if (aStrDate === '') {
     ret = [];
-    ret['y'] = '';
-    ret['d'] = '';
-    ret['m'] = '';
-    ret['H'] = '';
-    ret['M'] = '';
-    ret['S'] = '';
+    ret.y = '';
+    ret.d = '';
+    ret.m = '';
+    ret.H = '';
+    ret.M = '';
+    ret.S = '';
     return ret;
   }
 
@@ -1517,18 +1517,28 @@ var extractDateValues = function(aStrDate, aFormat, aDateMap) {
      * from the user */
     var sortedInfo = aDateMap.elems;
     sortedInfo.sort(function(a, b) {
-      if (a[0] === b[0])
-        return 0;
-      else if ((a[0] < b[0]) || (b[0] === null))
+      if (b[0]==null)
         return -1;
-      else if ((a[0] > b[0]) || (a[0] === null))
-        return 1;
+      else {
+        if (a[0]==null)
+          return 1;
+        else {
+          if (a[0] === b[0])
+            return 0;
+          else if (a[0] < b[0])
+            return -1;
+          else if (a[0] > b[0])
+            return 1;
+        }
+      }
     });
     /* we extract the date elements */
-    var auxDateInfo = parseDate();
-    for (i = 0; i < sortedInfo.length && i < (auxDateInfo || []).length; i++)
+    var auxDateInfo = parseDate(), total=1;
+    for (i = 0; i < sortedInfo.length && i < (auxDateInfo || []).length; i++) {
       sortedInfo[i][1] = auxDateInfo[i];
-    if (sortedInfo[0][1] * sortedInfo[1][1] * sortedInfo[2][1] > 0)
+      total*=sortedInfo[i][1];
+    }
+    if (total > 0)
       ret = getReturn(sortedInfo);
     else {
       ret = null;
@@ -1538,7 +1548,7 @@ var extractDateValues = function(aStrDate, aFormat, aDateMap) {
 };
 
 var array2date = function(aDate) {
-  return pad(aDate['d'], 2) + '-' + pad(aDate['m'], 2) + '-' + aDate['y'];
+  return pad(aDate.d, 2) + '-' + pad(aDate.m, 2) + '-' + aDate.y;
 };
 
 /* hh:mm (string) -> minutes (integer) */
@@ -1589,7 +1599,7 @@ Date.prototype.getWeekNumber = function() {
   var dayNum = d.getUTCDay() || 7;
   d.setUTCDate(d.getUTCDate() + 4 - dayNum);
   var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7)
+  return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
 };
 
 /* http://stackoverflow.com/questions/11887934/how-to-check-if-the-dst-daylight-saving-time-is-in-effect-and-if-it-is-whats */
@@ -1597,11 +1607,11 @@ Date.prototype.stdTimezoneOffset = function() {
   var jan = new Date(this.getFullYear(), 0, 1);
   var jul = new Date(this.getFullYear(), 6, 1);
   return Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
-}
+};
 
 Date.prototype.dst = function() {
   return this.getTimezoneOffset() < this.stdTimezoneOffset();
-}
+};
 
 function TimezoneDetect() {
   /*
@@ -1686,7 +1696,7 @@ function FDate2UDate(a) {
 /* ISO8601 -> javascript date object */
 function UDate2JSDate(aUDate) {
   var aDate = extractDateValues(aUDate, 'yyyymmddHHMMSS');
-  var d = new Date(aDate['y'], aDate['m'] - 1, aDate['d'], aDate['H'], aDate['M'], aDate['S']);
+  var d = new Date(aDate.y, aDate.m - 1, aDate.d, aDate.H, aDate.M, aDate.S);
 
   return d;
 }
@@ -1733,7 +1743,7 @@ function IBDate2Date(aIBDate) {
   var ret = '';
   var aDate = extractDateValues(aIBDate, 'mmddyyyyHHMMSS');
   if (aDate)
-    ret = aDate['d'] + '-' + aDate['m'] + '-' + aDate['y'];
+    ret = aDate.d + '-' + aDate.m + '-' + aDate.y;
   return ret;
 }
 
@@ -1742,7 +1752,7 @@ function date2IBDate(aFDate) {
   var ret = '';
   var aDate = extractDateValues(aFDate, 'ddmmyyyyHHMMSS');
   if (aDate)
-    ret = pad(aDate['m'], 2) + '-' + pad(aDate['d'], 2) + '-' + aDate['y'];
+    ret = pad(aDate.m, 2) + '-' + pad(aDate.d, 2) + '-' + aDate.y;
   return ret;
 }
 
@@ -1751,7 +1761,7 @@ function date2UDate(aFDate) {
   var ret = '';
   var aDate = extractDateValues(aFDate, 'ddmmyyyyHHMMSS');
   if (aDate)
-    ret = pad(aDate['y'], 4) + '-' + pad(aDate['m'], 2) + '-' + pad(aDate['d'], 2);
+    ret = pad(aDate.y, 4) + '-' + pad(aDate.m, 2) + '-' + pad(aDate.d, 2);
   return ret;
 }
 
@@ -1769,11 +1779,11 @@ function timestamp2IBDate(a) {
 
 var dateTransform = function(aStrDate, srcFormat, destFormat) {
   if (aStrDate) {
+    var ret = destFormat;
     var tmpDate = extractDateValues(aStrDate, srcFormat);
     if (tmpDate) {
       var auxMap = {};
       var emptyDate = extractDateValues("111111111111", destFormat, auxMap);
-      var ret = destFormat;
 
       for (var i = 0; i < auxMap.elems.length; i++) {
         /* e is a shortcut to the array map */
@@ -1819,6 +1829,19 @@ var isValidDate = function(aFrenchDate) {
   }
 
   return ok;
+};
+
+var isValidTime = function(aTime) {
+  var ret=false;
+  var aux=(aTime || "").match(/^\d{1,2}:\d{1,2}(:\d{1,2}){0,1}$/) || [];
+  if (aux.length>0) {
+    aux = aux[0].split(":");
+    while (aux.length < 3) {
+      aux[aux.length]="00";
+    }
+    ret=(aux[0]>=0) && (aux[0]<=23) && (aux[1]>=0) && (aux[1]<=59) && (aux[2]>=0) && (aux[2]<=59);
+  }
+  return ret;
 };
 
 var dateInRange = function(aFrenchDate, aFrenchMinDate, aFrenchMaxDate) {
@@ -1942,7 +1965,7 @@ function maskHTML(auxLine) {
 
 function trim(str) {
   if (typeof str == "string")
-    return str.replace(/^\s+|\s+$/g, "")
+    return str.replace(/^\s+|\s+$/g, "");
   else
     return "";
 }
@@ -1950,7 +1973,7 @@ function trim(str) {
 if (!String.prototype.trim) {
   String.prototype.trim = function() {
     return this.replace(/^\s+|\s+$/g, "");
-  }
+  };
 }
 
 function unparentesis(v) {
@@ -2306,7 +2329,7 @@ var hsmColorBase = function() {
   };
 
   return that;
-}
+};
 
 var hsmColor = hsmColorBase();
 
@@ -2409,7 +2432,7 @@ var xml2array = function(xmlDoc, attribute_inside) {
                       if (attribute_inside) {
                         temp_arr = arr[lastKey];
                         arr[lastKey] = {};
-                        arr[lastKey]['value'] = temp_arr;
+                        arr[lastKey].value = temp_arr;
                         arr[lastKey]['attribute_' + nname] = xmlDoc.childNodes[i].attributes[j].nodeValue;
                       } else {
                         /* Value in the tag and Attribute otside the tag(in parent) */
@@ -2610,7 +2633,7 @@ function replaceDiacritics(str) {
   });
 
   return str;
-};
+}
 
 /*=====================================================================
  * http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
@@ -2626,7 +2649,7 @@ var generateUUID = function() {
     return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
   });
   return uuid;
-}
+};
 
 function guid() {
   function s4() {
@@ -2657,7 +2680,7 @@ function newIdentifier() {
       ret += '-';
   }
   return ret;
-};
+}
 
 var generateSmallSessionUniqueId = (function() {
   var nextIndex = [0, 0, 0];
@@ -2681,7 +2704,7 @@ var generateSmallSessionUniqueId = (function() {
     }
     nextIndex = [a, b, c];
     return id;
-  }
+  };
 }());
 
 var md5 = function(str) {
@@ -2913,7 +2936,7 @@ if ((typeof window == 'object') && (typeof _onLoadMethods == 'undefined')) {
           aFunc();
         else
           setTimeout(waitStartupStage1, 150);
-      }
+      };
       waitStartupStage1();
     } else {
       if (_startupStage_==1)
@@ -2935,7 +2958,7 @@ if ((typeof window == 'object') && (typeof _onLoadMethods == 'undefined')) {
         if (_onLoadMethods[i] !== undefined)
           _onLoadMethods[i]();
     _startupStage_=1;
-  }
+  };
 
   if (typeof cordova == 'object') {
     document.addEventListener(
@@ -3002,6 +3025,6 @@ if ((typeof window == 'object') && (typeof _onLoadMethods == 'undefined')) {
       }
     }
 
-  }
+  };
 
 }

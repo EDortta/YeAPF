@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
+ * YeAPF 0.8.62-162 built on 2019-05-16 10:57 (-3 DST)
  * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
- * 2018-10-05 11:07:37 (-3 DST)
+ * 2019-05-16 10:54:33 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -419,6 +419,23 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
 
     } else if (aElement.nodeName == 'LISTBOX') {
       var oListBox = aElement;
+      if (first_time) {
+        if (typeof(aLineSpec.columns || aLineSpec.rows || aLineSpec.html) == "undefined") {
+          ycomm.dom._elem_templates[aElementID] = {};
+          if (oListBox.options.length > 0) {
+            ycomm.dom._elem_templates[aElementID].rows = [];
+            for (i = 0; i < oListBox.options.length; i++)
+              ycomm.dom._elem_templates[aElementID].rows[i] = trim(oListBox.options[i].innerHTML + "").replace(/\ \s+/g, '');
+          }
+        } else {
+          ycomm.dom._elem_templates[aElementID] = {};
+          ycomm.dom._elem_templates[aElementID].columns = aLineSpec.columns;
+          ycomm.dom._elem_templates[aElementID].rows = aLineSpec.rows;
+          ycomm.dom._elem_templates[aElementID].html = aLineSpec.html;
+        }
+      }
+      mergeObject(ycomm.dom._elem_templates[aElementID], aLineSpec, true);
+
       if (aFlags.deleteRows) {
         while (oListBox.childElementCount > 0)
           oListBox.childNodes[0].remove();
@@ -478,6 +495,22 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
 
 
     } else if ((aElement.nodeName == 'SELECT') || (aElement.nodeName == 'DATALIST')) {
+      if (first_time) {
+        if (typeof(aLineSpec.columns || aLineSpec.rows || aLineSpec.html) == "undefined") {
+          ycomm.dom._elem_templates[aElementID] = {};
+          if (aElement.children.length > 0) {
+            ycomm.dom._elem_templates[aElementID].rows = [];
+            for (i = 0; i < aElement.children.length; i++)
+              ycomm.dom._elem_templates[aElementID].rows[i] = trim(aElement.children[i].innerHTML + "").replace(/\ \s+/g, '');
+          }
+        } else {
+          ycomm.dom._elem_templates[aElementID] = {};
+          ycomm.dom._elem_templates[aElementID].columns = aLineSpec.columns;
+          ycomm.dom._elem_templates[aElementID].rows = aLineSpec.rows;
+          ycomm.dom._elem_templates[aElementID].html = aLineSpec.html;
+        }
+      }
+      mergeObject(ycomm.dom._elem_templates[aElementID], aLineSpec, true);
 
       /* Clean options */
       if (aFlags.deleteRows) {
@@ -576,7 +609,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
             ret = ret || (classes.indexOf(name) >= 0);
         }
         return ret;
-      }
+      };
 
       if (aFlags.deleteRows)
         aElements = this.cleanForm(aElementID);

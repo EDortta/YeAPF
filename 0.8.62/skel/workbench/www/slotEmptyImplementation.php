@@ -4,9 +4,9 @@
  *      slotEmptyImplementation.php
  *      This file is part of YeAPF
  *      (Yet Another PHP Framework)
- *      YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)
+ *      YeAPF 0.8.62-162 built on 2019-05-16 10:57 (-3 DST)
  *      Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
- *      2019-05-13 19:02:29 (-3 DST)
+ *      2019-05-16 10:57:29 (-3 DST)
  *
  *
  *      The MIT License (MIT)
@@ -152,7 +152,7 @@
     $useColNames=true;
 
     /* call em_#(s) to process the event */
-    $ret = em_#(s)($a, $values);
+    $ret = em_#(s)($a, $values, $scaffolding);
 
     xq_produceReturnLines($ret, $useColNames, $xq_requestedRows);
 
@@ -190,7 +190,7 @@
   function w#(s)($a, $values=null, $scaffolding=null)
   {
     /* call em_#(s) to process the event */
-    $ret = em_#(s)($a, $values);
+    $ret = em_#(s)($a, $values, $scaffolding);
 
     return jr_produceReturnLines($ret);
   }
@@ -204,7 +204,7 @@
    */
   function r#(s)($a, $values=null, $scaffolding=null)
   {
-    $jsonRet=w#(s)($a, $values);
+    $jsonRet=w#(s)($a, $values, $scaffolding);
     echo produceRestOutput($jsonRet);
   }
 

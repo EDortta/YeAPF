@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webSocket/server.php
-    YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)
+    YeAPF 0.8.62-162 built on 2019-05-16 10:57 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-05-13 17:50:22 (-3 DST)
+    2019-05-16 09:33:30 (-3 DST)
 
     skel / webSocket / server.php
     This file cannot be modified within skel/webSocket
@@ -84,6 +84,100 @@
       $this->send($user, $message);
     }
 
+    public function u_broadcast($target, $user, $result) {
+      if (isset($user))
+        $this->send($user, "$result");
+
+      if (isset($target)) {
+        foreach ($this->users as $auxUser) {
+          if (!$auxUser->hasSentClose) {
+            $canSend = false;
+            if ($target=='*')
+              $canSend=true;
+            else {
+              $target=explode(":", $target);
+              if (!isset($target[1]))
+                $target[1]='';
+              $negate=@mb_substr($target[1], 0, 1);
+              if ($negate == '!') {
+                $negate=true;
+                $target[1]=@mb_substr($target[1], 1);
+              } else {
+                $negate=false;
+              }
+
+              if ($target[0] == 'uname') {
+                $canSend = ($target[1]>'') && ($auxUser->uname == $target[1]);
+              }
+              if ($target[0] == 'ip') {
+                $canSend = ($target[1]>'') && ($auxUser->ip == $target[1]);
+              }
+              if ($target[0] == 'id') {
+                $canSend = ($target[1]>'') && ($auxUser->id == $target[1]);
+              }
+              if ($target[0] == 'u') {
+                $canSend = ($target[1]>'') && ($auxUser->u == $target[1]);
+              }
+              if ($target[0] == 'w') {
+                $canSend = ($target[1]>'') && ($auxUser->w == $target[1]);
+              }
+              /* Almost at the end, if still not canSend, then review the triggers */
+              if (!$canSend) {
+                /* triggers start with '_' */
+                if (substr($target[0],0,1)=="_") {
+                  switchUserContext($auxUser->u);
+                  $userVariables=$userContext->loadUserVars('*', false);
+                  if (isset($userVariables[$target[0]])) {
+                    /* the client can send a set of possible values splitted by comma */
+                    $triggerValueList = explode(',', $target[1]);
+                    foreach($triggerValueList as $triggerValue) {
+                      $canSend = $userVariables[$target[0]] == $triggerValue;
+                      if ($canSend)
+                        break;
+                    }
+                  }
+                }
+              }
+              /* FINALLY, negate the result if is requested to do that */
+              if ($negate)
+                $canSend=!$canSend;
+            }
+
+            if (isset($user)) {
+              $canSend = ($canSend && ($auxUser->id != $user->id));
+            }
+
+            if ($canSend) {
+              $this->send($auxUser, "$result");
+            }
+          }
+        }
+      }
+
+    }
+
+    public function userByU($u) {
+      $ret = null;
+      foreach ($this->users as $auxUser) {
+        if (!$auxUser->hasSentClose) {
+          if ($auxUser->u == $u)
+            $ret=$auxUser;
+        }
+      }
+      return $ret;
+    }
+
+    public function userByUName($uname) {
+      $ret = null;
+      foreach ($this->users as $auxUser) {
+        if (!$auxUser->hasSentClose) {
+          if ($auxUser->uname == $uname)
+            $ret=$auxUser;
+        }
+      }
+      return $ret;
+    }
+
     protected function process($user, $jMessage)
     {
       /*
@@ -122,6 +216,22 @@
             }
 
             yeapfStage("beforeImplementation");
+
+            if (!isset($message["xq_bypass"])) {
+              $GLOBALS["_REQUEST2"]=$message;
+              $auxMessage = xq_extractValuesFromQuery(false, "xq_", "");
+              foreach($auxMessage as $k=>$v) {
+                if (!in_array("$k", array("fieldName", "fieldValue", "callbackId")))
+                  $message["xq_$k"]=$v;
+              }
+            }
+
+            if (!isset($message["xq_bypass"])) {
+              $message["xq_bypass"]="undefined";
+            }
+
+            $implemented=false;
+
             if (mb_strtolower($message["xq_bypass"])=="no") {
               $__impt0=decimalMicrotime();
               list($implemented, $impReturn) = implementation($message['s'],
@@ -156,86 +266,24 @@
 
             $result = json_encode($result);
 
-            $this->send($user, "$result");
+            $this->u_broadcast($message['xq_target'], $user, $result);
 
-            /* (xq_target) parameters means 'target' */
-            if (isset($message['xq_target'])) {
-              $target=$message['xq_target'];
-              foreach ($this->users as $auxUser) {
-                if (!$auxUser->hasSentClose) {
-                  $canSend = false;
-                  if ($target=='*')
-                    $canSend=true;
-                  else {
-                    $target=explode(":", $target);
-                    if (!isset($target[1]))
-                      $target[1]='';
-                    $negate=@mb_substr($target[1], 0, 1);
-                    if ($negate == '!') {
-                      $negate=true;
-                      $target[1]=@mb_substr($target[1], 1);
-                    } else {
-                      $negate=false;
-                    }
-
-                    if ($target[0] == 'uname') {
-                      $canSend = ($target[1]>'') && ($auxUser->uname == $target[1]);
-                    }
-                    if ($target[0] == 'ip') {
-                      $canSend = ($target[1]>'') && ($auxUser->ip == $target[1]);
-                    }
-                    if ($target[0] == 'id') {
-                      $canSend = ($target[1]>'') && ($auxUser->id == $target[1]);
-                    }
-                    if ($target[0] == 'u') {
-                      $canSend = ($target[1]>'') && ($auxUser->u == $target[1]);
-                    }
-                    if ($target[0] == 'w') {
-                      $canSend = ($target[1]>'') && ($auxUser->w == $target[1]);
-                    }
-                    /* Almost at the end, if still not canSend, then review the triggers */
-                    if (!$canSend) {
-                      /* triggers start with '_' */
-                      if (substr($target[0],0,1)=="_") {
-                        switchUserContext($auxUser->u);
-                        $userVariables=$userContext->loadUserVars('*', false);
-                        if (isset($userVariables[$target[0]])) {
-                          /* the client can send a set of possible values splitted by comma */
-                          $triggerValueList = explode(',', $target[1]);
-                          foreach($triggerValueList as $triggerValue) {
-                            $canSend = $userVariables[$target[0]] == $triggerValue;
-                            if ($canSend)
-                              break;
-                          }
-                        }
-                      }
-                    }
-                    /* FINALLY, negate the result if is requested to do that */
-                    if ($negate)
-                      $canSend=!$canSend;
-                  }
-
-                  $canSend = ($canSend && ($auxUser->id != $user->id));
-
-                  if ($canSend) {
-                    $this->send($auxUser, "$impReturn");
-                  }
-                }
-              }
-            }
           }
         }
-      }
-      /*
-      if (mb_substr($message, 0, 4)=="msg:") {
-        foreach ($this->users as $auxUser) {
-          if (($auxUser->id != $user->id) && (!$auxUser->hasSentClose))
-            $this->send($auxUser, $user->uname." >> ".mb_substr($message,4));
+      } else {
+        $jMessage=explode(":", $jMessage);
+        if ($jMessage[0]=="uname") {
+          $user->uname = $jMessage[1];
+          $params = array(
+            "callbackId"=>null,
+            "s"=>"y_msg",
+            "a"=>"UNameRegistration"
+          );
+          $data=array("uname"=>$user->uname);
+          $ret = json_encode(produceWebSocketMessage($params, $data));
+          $this->u_broadcast("*", $user, $ret);
         }
-      } else if (mb_substr($message, 0,6)=="uname:") {
-        $user->uname=mb_substr($message, 6);
       }
-      */
     }
 
     protected function connected($user)
@@ -244,21 +292,35 @@
       // However, if we did care about the users, we would probably have a cookie to
       // parse at this step, would be looking them up in permanent storage, etc.
       echo "Client list:\n";
+      $firstLine=true;
+      $clientList = array();
       foreach ($this->users as $auxUser) {
         $userObj=array();
         $userObj["id"]=$auxUser->id;
         $userObj["uname"]=@$auxUser->uname;
-        $userObj["socket"]=$auxUser->socket;
-        $userObj["hasSentClose"]=$auxUser->hasSentClose;
         $userObj["ip"]=$auxUser->ip;
         $userObj["requestedResource"]=$auxUser->requestedResource;
-        print_r($userObj);
+        if ($firstLine) {
+          foreach($userObj as $key =>$value) {
+            echo str_pad("$key", 40, " ", STR_PAD_RIGHT);
+          }
+          echo "\n";
+        }
+        foreach ($userObj as $key => $value) {
+          echo str_pad("$value", 40, " ", STR_PAD_RIGHT);
+        }
+        echo "\n";
+        $firstLine=false;
+        if ($userObj['uname']>"") {
+          $clientList[]=$userObj['uname'];
+        }
       }
       echo "\n";
       $retMessage = yeapfStage("webSocketClientConnected", $user, $this);
       if (null != $retMessage) {
+        $retMessage['data']['client_count']=count($clientList);
         $result=json_encode($retMessage);
-        $this->send($user, "$result");
+        $this->u_broadcast("*", $user, $result);
       }
     }
 
@@ -268,6 +330,15 @@
       // open files or other objects associated with them.  This runs after the socket
       // has been closed, so there is no need to clean up the socket itself here.
       yeapfStage("webSocketClientDisconnected", $user, $this);
+
+      $params = array(
+        "callbackId"=>null,
+        "s"=>"y_msg",
+        "a"=>"UNameResignation"
+      );
+      $data=array("uname"=>$user->uname);
+      $ret = json_encode(produceWebSocketMessage($params, $data));
+      $this->u_broadcast("!id:".$user->id, null, $ret);
     }
   }
 

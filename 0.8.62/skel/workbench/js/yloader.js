@@ -1,8 +1,8 @@
 /*********************************************
   * skel/workbench/js/yloader.js
-  * YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)
+  * YeAPF 0.8.62-162 built on 2019-05-16 10:57 (-3 DST)
   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2019-05-13 19:02:29 (-3 DST)
+  * 2019-05-16 10:57:29 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)");
+ console.log("YeAPF 0.8.62-162 built on 2019-05-16 10:57 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -1185,7 +1185,7 @@
            if (!(i = v[a] * 1)) continue;
            i % 100 < 20 && (t += ex[0][i % 100]) ||
              i % 100 + 1 && (t += ex[1][(i % 100 / 10 >> 0) - 1] + (i % 10 ? e + ex[0][i % 10] : ""));
-           s.push((i < 100 ? t : !(i % 100) ? ex[2][i == 100 ? 0 : i / 100 >> 0] : (ex[2][i / 100 >> 0] + e + t)) +
+           s.push((i < 100 ? t : (!(i % 100)) ? ex[2][i == 100 ? 0 : i / 100 >> 0] : (ex[2][i / 100 >> 0] + e + t)) +
              ((t = l - a - 2) > -1 ? " " + (i > 1 && t > 0 ? ex[3][t].replace("Ã£o", "Ãµes") : ex[3][t]) : ""));
          }
          a = ((sl = s.length) > 1 ? (a = s.pop(), s.join(" ") + e + a) : s.join("") || ((!j && (n[j + 1] * 1 > 0) || r.length) ? "" : ex[0][0]));
@@ -1233,8 +1233,8 @@
            ret = (s % 11) == 0;
          }
          return ret;
-       }
-     };
+       };
+     }
      
      if (!String.prototype.isCPF) {
        //+ Carlos R. L. Rodrigues
@@ -1306,15 +1306,15 @@
      
        String.prototype.asCPF = function() {
          return this.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/g, "\$1.\$2.\$3\-\$4");
-       }
+       };
      
        String.prototype.asCNPJ = function() {
          return this.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/g, "\$1.\$2.\$3\/\$4\-\$5");
-       }
+       };
      
        String.prototype.asCEP = function() {
          return this.replace(/(\d{2})(\d{3})(\d{3})/g, "\$1\$2-\$3");
-       }
+       };
      
        String.prototype.asPhone = function(agruparDeTresEmTres) {
          agruparDeTresEmTres = agruparDeTresEmTres || false;
@@ -1344,7 +1344,7 @@
            else
              return number.replace(/(\d{2})(\d{2})(\d{1})(\d{4})(\d{4})/g, "+$1 (\$2) \$3 \$4-\$5");
          }
-       }
+       };
      
        String.prototype.asRG = function() {
          var number = "" + this.replace(/[^a-zA-Z0-9]+/g, "");
@@ -1352,7 +1352,7 @@
            return number.replace(/(\w{1})(\d{4})(\d{2})(\d{1})$/, "$1.$2.$3-$4");
          else
            return number.replace(/(\d{2})(\d{3})(\d{3})(\d{1})$/, "$1.$2.$3-$4");
-       }
+       };
      }
      
      if (!String.prototype.isCNH) {
@@ -1389,7 +1389,7 @@
            dig_enc = "" + d1 + "" + d2;
            return (dig_enc == dig_forn);
          }
-       }
+       };
      }
      
      if (!String.prototype.isCreditCard) {
@@ -1411,7 +1411,7 @@
            sum += digit;
          }
          return (auxCartao.length>0) && (sum % 10 === 0);
-       }
+       };
      }
      
      if (!String.prototype.isEmail) {
@@ -1508,16 +1508,16 @@
      
      var forceStringValue = function(aObjArr, aIndex) {
        return ((aObjArr[aIndex] || "") + "").unquote();
-     }
+     };
      
      array_intersect = function(a, b) {
        var t = b;
        if (b.length > a.length) { b = a;
-         a = t };
+         a = t; }
        return a.filter(function(e) {
          if (b.indexOf(e) !== -1) return true;
        });
-     }
+     };
      
      
      /* as the array keys could be used with data coming from
@@ -1583,7 +1583,7 @@
            date.setHours(0, 0, 0, 0);
          }
          return date;
-       }
+       };
      }
      
      if (typeof Date.prototype.monthFirstDOW == 'undefined') {
@@ -1785,12 +1785,12 @@
          aFormat = 'yyyy-mm-ddThh:mm:ss';
        if (aStrDate === '') {
          ret = [];
-         ret['y'] = '';
-         ret['d'] = '';
-         ret['m'] = '';
-         ret['H'] = '';
-         ret['M'] = '';
-         ret['S'] = '';
+         ret.y = '';
+         ret.d = '';
+         ret.m = '';
+         ret.H = '';
+         ret.M = '';
+         ret.S = '';
          return ret;
        }
      
@@ -1817,18 +1817,28 @@
           * from the user */
          var sortedInfo = aDateMap.elems;
          sortedInfo.sort(function(a, b) {
-           if (a[0] === b[0])
-             return 0;
-           else if ((a[0] < b[0]) || (b[0] === null))
+           if (b[0]==null)
              return -1;
-           else if ((a[0] > b[0]) || (a[0] === null))
-             return 1;
+           else {
+             if (a[0]==null)
+               return 1;
+             else {
+               if (a[0] === b[0])
+                 return 0;
+               else if (a[0] < b[0])
+                 return -1;
+               else if (a[0] > b[0])
+                 return 1;
+             }
+           }
          });
          /* we extract the date elements */
-         var auxDateInfo = parseDate();
-         for (i = 0; i < sortedInfo.length && i < (auxDateInfo || []).length; i++)
+         var auxDateInfo = parseDate(), total=1;
+         for (i = 0; i < sortedInfo.length && i < (auxDateInfo || []).length; i++) {
            sortedInfo[i][1] = auxDateInfo[i];
-         if (sortedInfo[0][1] * sortedInfo[1][1] * sortedInfo[2][1] > 0)
+           total*=sortedInfo[i][1];
+         }
+         if (total > 0)
            ret = getReturn(sortedInfo);
          else {
            ret = null;
@@ -1838,7 +1848,7 @@
      };
      
      var array2date = function(aDate) {
-       return pad(aDate['d'], 2) + '-' + pad(aDate['m'], 2) + '-' + aDate['y'];
+       return pad(aDate.d, 2) + '-' + pad(aDate.m, 2) + '-' + aDate.y;
      };
      
      /* hh:mm (string) -> minutes (integer) */
@@ -1889,7 +1899,7 @@
        var dayNum = d.getUTCDay() || 7;
        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
        var yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
-       return Math.ceil((((d - yearStart) / 86400000) + 1) / 7)
+       return Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
      };
      
      /* http://stackoverflow.com/questions/11887934/how-to-check-if-the-dst-daylight-saving-time-is-in-effect-and-if-it-is-whats */
@@ -1897,11 +1907,11 @@
        var jan = new Date(this.getFullYear(), 0, 1);
        var jul = new Date(this.getFullYear(), 6, 1);
        return Math.max(jan.getTimezoneOffset(), jul.getTimezoneOffset());
-     }
+     };
      
      Date.prototype.dst = function() {
        return this.getTimezoneOffset() < this.stdTimezoneOffset();
-     }
+     };
      
      function TimezoneDetect() {
        /*
@@ -1986,7 +1996,7 @@
      /* ISO8601 -> javascript date object */
      function UDate2JSDate(aUDate) {
        var aDate = extractDateValues(aUDate, 'yyyymmddHHMMSS');
-       var d = new Date(aDate['y'], aDate['m'] - 1, aDate['d'], aDate['H'], aDate['M'], aDate['S']);
+       var d = new Date(aDate.y, aDate.m - 1, aDate.d, aDate.H, aDate.M, aDate.S);
      
        return d;
      }
@@ -2033,7 +2043,7 @@
        var ret = '';
        var aDate = extractDateValues(aIBDate, 'mmddyyyyHHMMSS');
        if (aDate)
-         ret = aDate['d'] + '-' + aDate['m'] + '-' + aDate['y'];
+         ret = aDate.d + '-' + aDate.m + '-' + aDate.y;
        return ret;
      }
      
@@ -2042,7 +2052,7 @@
        var ret = '';
        var aDate = extractDateValues(aFDate, 'ddmmyyyyHHMMSS');
        if (aDate)
-         ret = pad(aDate['m'], 2) + '-' + pad(aDate['d'], 2) + '-' + aDate['y'];
+         ret = pad(aDate.m, 2) + '-' + pad(aDate.d, 2) + '-' + aDate.y;
        return ret;
      }
      
@@ -2051,7 +2061,7 @@
        var ret = '';
        var aDate = extractDateValues(aFDate, 'ddmmyyyyHHMMSS');
        if (aDate)
-         ret = pad(aDate['y'], 4) + '-' + pad(aDate['m'], 2) + '-' + pad(aDate['d'], 2);
+         ret = pad(aDate.y, 4) + '-' + pad(aDate.m, 2) + '-' + pad(aDate.d, 2);
        return ret;
      }
      
@@ -2069,11 +2079,11 @@
      
      var dateTransform = function(aStrDate, srcFormat, destFormat) {
        if (aStrDate) {
+         var ret = destFormat;
          var tmpDate = extractDateValues(aStrDate, srcFormat);
          if (tmpDate) {
            var auxMap = {};
            var emptyDate = extractDateValues("111111111111", destFormat, auxMap);
-           var ret = destFormat;
      
            for (var i = 0; i < auxMap.elems.length; i++) {
              /* e is a shortcut to the array map */
@@ -2119,6 +2129,19 @@
        }
      
        return ok;
+     };
+     
+     var isValidTime = function(aTime) {
+       var ret=false;
+       var aux=(aTime || "").match(/^\d{1,2}:\d{1,2}(:\d{1,2}){0,1}$/) || [];
+       if (aux.length>0) {
+         aux = aux[0].split(":");
+         while (aux.length < 3) {
+           aux[aux.length]="00";
+         }
+         ret=(aux[0]>=0) && (aux[0]<=23) && (aux[1]>=0) && (aux[1]<=59) && (aux[2]>=0) && (aux[2]<=59);
+       }
+       return ret;
      };
      
      var dateInRange = function(aFrenchDate, aFrenchMinDate, aFrenchMaxDate) {
@@ -2242,7 +2265,7 @@
      
      function trim(str) {
        if (typeof str == "string")
-         return str.replace(/^\s+|\s+$/g, "")
+         return str.replace(/^\s+|\s+$/g, "");
        else
          return "";
      }
@@ -2250,7 +2273,7 @@
      if (!String.prototype.trim) {
        String.prototype.trim = function() {
          return this.replace(/^\s+|\s+$/g, "");
-       }
+       };
      }
      
      function unparentesis(v) {
@@ -2606,7 +2629,7 @@
        };
      
        return that;
-     }
+     };
      
      var hsmColor = hsmColorBase();
      
@@ -2709,7 +2732,7 @@
                            if (attribute_inside) {
                              temp_arr = arr[lastKey];
                              arr[lastKey] = {};
-                             arr[lastKey]['value'] = temp_arr;
+                             arr[lastKey].value = temp_arr;
                              arr[lastKey]['attribute_' + nname] = xmlDoc.childNodes[i].attributes[j].nodeValue;
                            } else {
                              /* Value in the tag and Attribute otside the tag(in parent) */
@@ -2910,7 +2933,7 @@
        });
      
        return str;
-     };
+     }
      
      /*=====================================================================
       * http://stackoverflow.com/questions/105034/create-guid-uuid-in-javascript
@@ -2926,7 +2949,7 @@
          return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
        });
        return uuid;
-     }
+     };
      
      function guid() {
        function s4() {
@@ -2957,7 +2980,7 @@
            ret += '-';
        }
        return ret;
-     };
+     }
      
      var generateSmallSessionUniqueId = (function() {
        var nextIndex = [0, 0, 0];
@@ -2981,7 +3004,7 @@
          }
          nextIndex = [a, b, c];
          return id;
-       }
+       };
      }());
      
      var md5 = function(str) {
@@ -3213,7 +3236,7 @@
                aFunc();
              else
                setTimeout(waitStartupStage1, 150);
-           }
+           };
            waitStartupStage1();
          } else {
            if (_startupStage_==1)
@@ -3235,7 +3258,7 @@
              if (_onLoadMethods[i] !== undefined)
                _onLoadMethods[i]();
          _startupStage_=1;
-       }
+       };
      
        if (typeof cordova == 'object') {
          document.addEventListener(
@@ -3302,7 +3325,7 @@
            }
          }
      
-       }
+       };
      
      }
      
@@ -6122,6 +6145,23 @@
      
          } else if (aElement.nodeName == 'LISTBOX') {
            var oListBox = aElement;
+           if (first_time) {
+             if (typeof(aLineSpec.columns || aLineSpec.rows || aLineSpec.html) == "undefined") {
+               ycomm.dom._elem_templates[aElementID] = {};
+               if (oListBox.options.length > 0) {
+                 ycomm.dom._elem_templates[aElementID].rows = [];
+                 for (i = 0; i < oListBox.options.length; i++)
+                   ycomm.dom._elem_templates[aElementID].rows[i] = trim(oListBox.options[i].innerHTML + "").replace(/\ \s+/g, '');
+               }
+             } else {
+               ycomm.dom._elem_templates[aElementID] = {};
+               ycomm.dom._elem_templates[aElementID].columns = aLineSpec.columns;
+               ycomm.dom._elem_templates[aElementID].rows = aLineSpec.rows;
+               ycomm.dom._elem_templates[aElementID].html = aLineSpec.html;
+             }
+           }
+           mergeObject(ycomm.dom._elem_templates[aElementID], aLineSpec, true);
+     
            if (aFlags.deleteRows) {
              while (oListBox.childElementCount > 0)
                oListBox.childNodes[0].remove();
@@ -6181,6 +6221,22 @@
      
      
          } else if ((aElement.nodeName == 'SELECT') || (aElement.nodeName == 'DATALIST')) {
+           if (first_time) {
+             if (typeof(aLineSpec.columns || aLineSpec.rows || aLineSpec.html) == "undefined") {
+               ycomm.dom._elem_templates[aElementID] = {};
+               if (aElement.children.length > 0) {
+                 ycomm.dom._elem_templates[aElementID].rows = [];
+                 for (i = 0; i < aElement.children.length; i++)
+                   ycomm.dom._elem_templates[aElementID].rows[i] = trim(aElement.children[i].innerHTML + "").replace(/\ \s+/g, '');
+               }
+             } else {
+               ycomm.dom._elem_templates[aElementID] = {};
+               ycomm.dom._elem_templates[aElementID].columns = aLineSpec.columns;
+               ycomm.dom._elem_templates[aElementID].rows = aLineSpec.rows;
+               ycomm.dom._elem_templates[aElementID].html = aLineSpec.html;
+             }
+           }
+           mergeObject(ycomm.dom._elem_templates[aElementID], aLineSpec, true);
      
            /* Clean options */
            if (aFlags.deleteRows) {
@@ -6279,7 +6335,7 @@
                  ret = ret || (classes.indexOf(name) >= 0);
              }
              return ret;
-           }
+           };
      
            if (aFlags.deleteRows)
              aElements = this.cleanForm(aElementID);
@@ -7742,7 +7798,7 @@
      /********************************************************************
       ********************************************************************/
      
-     var ycommWebSocketClientObj = function(webSocketServerURL, u, deviceId) {
+     var ycommWebSocketClientObj = function(webSocketServerURL, uname, deviceId) {
        /* just in case you forget to use webSocketServerURL */
        var dummy = {
          yank: function(s, a, limits, aCallbackFunction) {
@@ -7755,13 +7811,15 @@
        };
      
        /* implementation */
-       var that = {};
-       var uname = u || guid(),
+       var that = {},
          socket, heartbeatGuardian;
+       var localU = (typeof window.u == 'undefined') ? null : u;
        var host = null;
        var functionNameSeed = "F" + (guid().replace(/-/g, '').toLowerCase().substr(8, 12)) + "_";
        var functionCounter = 1000;
        var __eventHandler = [];
+     
+       uname = uname || localU || guid();
      
        /* private functions */
        var formatDate = function(date) {
@@ -7803,31 +7861,50 @@
            };
            /* ON MESSAGE */
            socket.onmessage = function(msg) {
-             log("<b>" + msg.data + '</b>');
-             try {
-               var result=JSON.parse(msg.data);
-               if (result.callbackId) {
-                 if ("undefined" != rootSystem[result.callbackId]) {
-                   rootSystem[result.callbackId](200, result.error, result.data, result.userMsg, result.dataContext, result.geometry);
+             var unattended = true;
+             if (msg.data) {
+               try {
+                 var data;
+                 if ("string" == typeof msg.data)
+                   data = JSON.parse(msg.data);
+                 else
+                   data = msg.data;
+     
+                 if (data.callbackId) {
+                   if ("undefined" != typeof rootSystem[data.callbackId]) {
+                     rootSystem[data.callbackId](200, data.error, data.data, data.userMsg, data.dataContext, data.geometry);
+                   }
                  }
+     
+                 var subjectEvent = ((data.parameters || [])["s"] || "unknown");
+                 var singleEvent = ((data.parameters || [])["s"] || "unknown") + "." + ((data.parameters || [])["a"] || "unknown");
+                 console.log(subjectEvent, " or ", singleEvent);
+                 if ("function" == typeof __eventHandler[subjectEvent]) {
+                   __eventHandler[subjectEvent]((data.parameters || [])["a"], data.data);
+                   unattended = false;
+                 }
+                 if ("function" == typeof __eventHandler[singleEvent]) {
+                   __eventHandler[singleEvent](data.data);
+                   unattended = false;
+                 }
+     
+                 if ("function" == typeof that.onmessage) {
+                   that.onmessage(data.data);
+                   unattended = false;
+                 }
+     
+               } catch (e) {
+                 console.error("Error processing message: " + msg.data);
                }
      
-               var subjectEvent = ((result.parameters || []) ["s"] || "unknown");
-               var singleEvent =  ((result.parameters || []) ["s"] || "unknown")+"."+((result.parameters || []) ["a"] || "unknown") ;
-               if ("function" == typeof __eventHandler[subjectEvent]) {
-                 __eventHandler[subjectEvent] ((result.parameters || []) ["a"], result);
-               }
-               if ("function" == typeof __eventHandler[singleEvent]) {
-                 __eventHandler[singleEvent] (result);
-               }
-     
+             } else {
                if ("function" == typeof that.onmessage) {
                  that.onmessage(msg);
+                 unattended = false;
                }
-     
-             } catch(e) {
-     
              }
+             if (unattended)
+               log("UNATTENDED MESSAGE: " + msg.data);
      
            };
            /* ON CLOSE */
@@ -7868,8 +7945,8 @@
        var rootSystem = window || self;
      
        /* garbage collector */
-       var _cleanUp = function (callbackFunctionName) {
-         console.log("deleting "+callbackFunctionName);
+       var _cleanUp = function(callbackFunctionName) {
+         console.log("deleting " + callbackFunctionName);
          delete rootSystem[callbackFunctionName];
        };
      
@@ -7877,14 +7954,14 @@
          if ("string" == typeof s) {
            if ("string" == typeof a) {
              if ("undefined" == typeof handlerFunction)
-               delete __eventHandler[s+"."+a];
+               delete __eventHandler[s + "." + a];
              else
-               __eventHandler[s+"."+a]=handlerFunction;
+               __eventHandler[s + "." + a] = handlerFunction;
            } else {
              if ("undefined" == typeof handlerFunction)
                delete __eventHandler[s];
              else
-               __eventHandler[s]=handlerFunction;
+               __eventHandler[s] = handlerFunction;
            }
          }
        };
@@ -7931,6 +8008,7 @@
        */
        that.yank = function(s, a, jsonParams, aCallbackFunction) {
          aCallbackFunction = aCallbackFunction || function() {};
+         jsonParams = jsonParams || {};
      
          var mySequence = ++functionCounter;
          var callbackFunctionName = functionNameSeed + mySequence;
@@ -7943,9 +8021,9 @@
            _cleanUp(callbackFunctionName);
          };
      
-         jsonParams['xq_bypass'] = ("boolean" == typeof jsonParams['xq_bypass'])?jsonParams['xq_bypass']:false;
+         jsonParams['xq_bypass'] = ("boolean" == typeof jsonParams['xq_bypass']) ? jsonParams['xq_bypass'] : false;
          jsonParams['xq_bypass'] = (jsonParams['xq_bypass'] === true) ||
-                                   (jsonParams['xq_bypass'] || "NO").toUpperCase() == "YES";
+           (jsonParams['xq_bypass'] || "NO").toUpperCase() == "YES";
      
          var jsonAsParams = ycomm.urlJsonAsParams(jsonParams);
          var fieldName = jsonAsParams[0];
@@ -7953,12 +8031,21 @@
          var yeapf_message = {
            "s": s,
            "a": a,
+           "u": localU,
+           "uname": uname,
            "fieldName": fieldName,
            "fieldValue": fieldValue,
            "callbackId": callbackFunctionName
          };
          socket.send(JSON.stringify(yeapf_message));
-         setTimeout(function() { _cleanUp(callbackFunctionName);}, 15000);
+         setTimeout(function() { _cleanUp(callbackFunctionName); }, 15000);
+       };
+     
+       var _cleanup = function(event) {
+         // event.preventDefault();
+         socket.onclose=function() {};
+         socket.close();
+         // event.returnValue = '';
        };
      
        /* private initializer */
@@ -7970,6 +8057,10 @@
      
            setTimeout(configureSocket, 1500);
      
+           if ("function" == typeof rootSystem.addEventListener) {
+             rootSystem.addEventListener('unload', _cleanup);
+           }
+     
            return that;
          } else {
            console.alert("You need to indicate the webService URL in order to use ycommWebSocketClientObj()");
@@ -7979,7 +8070,6 @@
      
        return _initialize();
      };
-     
  /* END ycomm-websocket.js */
  _dump("ycomm-websocket");
  /* START ycalendar.js */
@@ -9580,9 +9670,9 @@
  /* START yinterface.js */
      /*
          skel/workbench/js/yloader.js
-         YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)
+         YeAPF 0.8.62-162 built on 2019-05-16 10:57 (-3 DST)
          Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-         2019-05-13 19:02:29 (-3 DST)
+         2019-05-16 10:57:29 (-3 DST)
      */
      
      var yInterfaceObj = function() {
@@ -10989,6 +11079,16 @@
            }
      
            if ("undefined" != typeof InputMask) {
+             new InputMask().Initialize(document.querySelectorAll(".masked-year-field"),
+             {
+               mask: InputMaskDefaultMask.DateMonthYear,
+               placeHolder: "yyyy"
+             });
+             new InputMask().Initialize(document.querySelectorAll(".masked-month-year-field"),
+             {
+               mask: InputMaskDefaultMask.DateMonthYear,
+               placeHolder: "mm/yyyy"
+             });
              new InputMask().Initialize(document.querySelectorAll(".masked-date-field"),
              {
                mask: InputMaskDefaultMask.Date,
@@ -11000,6 +11100,8 @@
                placeHolder: "hh:mm"
              });
      
+           } else {
+             console.warn("InputMask not found (https://www.cssscript.com/lightweight-pure-javascript-input-mask/)");
            }
      
          };

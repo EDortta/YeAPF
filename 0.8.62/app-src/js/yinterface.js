@@ -1,8 +1,8 @@
 /*
     app-src/js/yinterface.js
-    YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
+    YeAPF 0.8.62-162 built on 2019-05-16 10:57 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-05-07 11:27:51 (-3 DST)
+    2019-05-14 10:44:25 (-3 DST)
 */
 
 var yInterfaceObj = function() {
@@ -1409,6 +1409,16 @@ var yInterfaceObj = function() {
       }
 
       if ("undefined" != typeof InputMask) {
+        new InputMask().Initialize(document.querySelectorAll(".masked-year-field"),
+        {
+          mask: InputMaskDefaultMask.DateMonthYear,
+          placeHolder: "yyyy"
+        });
+        new InputMask().Initialize(document.querySelectorAll(".masked-month-year-field"),
+        {
+          mask: InputMaskDefaultMask.DateMonthYear,
+          placeHolder: "mm/yyyy"
+        });
         new InputMask().Initialize(document.querySelectorAll(".masked-date-field"),
         {
           mask: InputMaskDefaultMask.Date,
@@ -1420,6 +1430,8 @@ var yInterfaceObj = function() {
           placeHolder: "hh:mm"
         });
 
+      } else {
+        console.warn("InputMask not found (https://www.cssscript.com/lightweight-pure-javascript-input-mask/)");
       }
 
     };

@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.application.php
-    YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)
+    YeAPF 0.8.62-162 built on 2019-05-16 10:57 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-05-13 10:48:18 (-3 DST)
+    2019-05-16 09:33:30 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -846,9 +846,15 @@
     $result = array(
       "callbackId"=>$parameters["callbackId"],
       "dataContext"=>$GLOBALS['_xq_context_'],
-      "parameters"=>$parameters,
-      "data"=> json_decode($jData, true, 512, JSON_BIGINT_AS_STRING)
+      "parameters"=>$parameters
     );
+
+    if (is_string($jData)) {
+      $result["data"] = json_decode($jData, true, 512, JSON_BIGINT_AS_STRING);
+    } else {
+      if (is_array($jData))
+        $result["data"] = $jData;
+    }
     return $result;
   }
 
@@ -929,7 +935,7 @@
     return $ret;
   }
 
-  function em_y_msg($a)
+  function em_y_msg($a, $context, $scaffolding)
   {
     global $sysTimeStamp,
            $userContext,
