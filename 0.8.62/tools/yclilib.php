@@ -1,9 +1,9 @@
 <?php
 /*
     tools/yclilib.php
-    YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)
+    YeAPF 0.8.62-203 built on 2019-05-23 09:15 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-05-10 17:01:18 (-3 DST)
+    2019-05-18 16:21:20 (-3 DST)
 */
 
   $PHPVer = phpversion();
@@ -63,7 +63,7 @@
     else
       $updateSequence=0;
     $aVer[2]=$aux[0];
-    $ret=$ver[0]*1000 + $ver[1]*100 + $ver[2];
+    $ret=$ver[0]*1000 + $ver[1]*100 + intval($ver[2])*1;
     return $ret;
   }
 

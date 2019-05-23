@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.62-162 built on 2019-05-16 10:57 (-3 DST)
+ * YeAPF 0.8.62-203 built on 2019-05-23 09:15 (-3 DST)
  * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
- * 2019-05-16 10:54:33 (-3 DST)
+ * 2019-05-17 12:26:25 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -80,7 +80,7 @@ ycomm.dom.getInplaceData = function(aElement) {
  *             onReady(aElementID)
  * aFlags - JSON
  *          deleteRows  (true by default)
- *          paintRows   (false by default) 
+ *          paintRows   (false by default)
  *          insertAtTop (applies to TR. false by default)
  *          unlearn      (undefined by default)
  */
@@ -105,7 +105,8 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
     rowIdOffset = 0,
     first_time = typeof ycomm.dom._elem_templates[aElementID] == "undefined";
 
-  idFieldName = aLineSpec.idFieldName || 'id';
+  idFieldName = aLineSpec.idFieldName || aElement.getAttribute("data-id-fieldname") || 'id';
+  aElement.setAttribute("data-id-fieldname", idFieldName);
   if (typeof aFlags.unlearn == "boolean")
     first_time = aFlags.unlearn;
 
@@ -498,10 +499,14 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
       if (first_time) {
         if (typeof(aLineSpec.columns || aLineSpec.rows || aLineSpec.html) == "undefined") {
           ycomm.dom._elem_templates[aElementID] = {};
-          if (aElement.children.length > 0) {
+          if (aElement.options.length > 1) {
             ycomm.dom._elem_templates[aElementID].rows = [];
-            for (i = 0; i < aElement.children.length; i++)
-              ycomm.dom._elem_templates[aElementID].rows[i] = trim(aElement.children[i].innerHTML + "").replace(/\ \s+/g, '');
+            for (i = 0; i < aElement.options.length; i++)
+              ycomm.dom._elem_templates[aElementID].rows[i] = trim(aElement.options[i].innerHTML + "").replace(/\ \s+/g, '');
+          } else {
+            if (aElement.options.length==1) {
+              ycomm.dom._elem_templates[aElementID].html = trim(aElement.options[0].outerHTML + "").replace(/\ \s+/g, '');
+            }
           }
         } else {
           ycomm.dom._elem_templates[aElementID] = {};
@@ -533,20 +538,9 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
           }
 
           auxHTML = '';
-          if (typeof aLineSpec.columns == 'undefined') {
-            if (typeof xDataItem == 'string') {
-              _dumpy(2, 1, "ERRO: yeapf-dom.js - string cell not implemented");
-            } else {
-              for (colName in xDataItem) {
-                if ((xDataItem.hasOwnProperty(colName)) &&
-                  (colName != idFieldName) &&
-                  (colName != 'rowid') &&
-                  (colName != '_elementid_')) {
-                  auxHTML = auxHTML + (xDataItem[colName] || '');
-                }
-              }
-            }
-          } else {
+          if (typeof aLineSpec.html !== 'undefined') {
+            auxHTML=yAnalise(aLineSpec.html, xDataItem);
+          } else if (typeof aLineSpec.columns != 'undefined') {
             var sep = aLineSpec.sep || '';
             if (isArray(aLineSpec.columns)) {
               for (c = 0; c < aLineSpec.columns.length; c++) {
@@ -564,6 +558,15 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
                 }
               }
             }
+          } else {
+            for (colName in xDataItem) {
+              if ((xDataItem.hasOwnProperty(colName)) &&
+                (colName != idFieldName) &&
+                (colName != 'rowid') &&
+                (colName != '_elementid_')) {
+                auxHTML = auxHTML + (xDataItem[colName] || '');
+              }
+            }
           }
 
           var opt = document.createElement('option');
@@ -574,13 +577,16 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
               opt.value = xDataItem[idFieldName];
             }
           }
-          opt.innerHTML = auxHTML;
+          if (typeof aLineSpec.html == 'undefined')
+            opt.innerHTML = auxHTML;
           opt.id = aElementID + '_' + cNdx;
           saveInplaceData(opt, xDataItem);
 
           if (typeof aLineSpec.onNewItem == 'function')
             aLineSpec.onNewItem(aElementID, opt, xDataItem);
           aElement.appendChild(opt);
+          if (typeof aLineSpec.html !== 'undefined')
+            opt.outerHTML = auxHTML;
           cNdx++;
         }
       }
@@ -1242,8 +1248,11 @@ ycomm.dom.getFormElements = function(aFormId, aLineSpec, aOnReady) {
             case "select-one":
             case "select-multi":
               fieldValue = aElements[i].selectedIndex;
-              if (aElements[i].options[fieldValue])
-                fieldValue = aElements[i].options[fieldValue].value;
+              if (aElements[i].options[fieldValue]) {
+                var aux_idFieldName = aElements[i].parentNode.getAttribute("data-id-fieldname") || "id";
+                fieldValue = aElements[i].options[fieldValue].getAttribute(aux_idFieldName) || aElements[i].options[fieldValue].value;
+                delete aux_idFieldName;
+              }
               break;
 
             case "file":

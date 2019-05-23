@@ -1,0 +1,227 @@
+#!/usr/bin/php
+<?php
+/*
+    tools/distributionBuilder/ydocview-backup
+    YeAPF 0.8.62-203 built on 2019-05-23 09:15 (-3 DST)
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+    2019-05-18 10:28:55 (-3 DST)
+*/
+
+  if (!function_exists("objet2array")) {
+    function object2array($object) { return @json_decode(@json_encode($object),1); }
+  }
+
+  global $outputFiles, $ofNdx, $aSequence, $aMap;
+  $ofNdx=-1;
+  $aSequence=-1;
+  $aMap=array();
+  $outputFiles=array();
+
+  function writeHTMLHeader($margin, $title) {
+    global $outputFiles, $ofNdx;
+    $base = str_repeat("../", $margin);
+    $htmlText ="<!DOCTYPE html>
+                <html lang='en'>
+                  <head>
+                    <meta charset='utf-8' />
+                    <meta http-equiv='x-ua-compatible' content='ie=edge' />
+                    <meta name='viewport' content='width=device-width, initial-scale=1' />
+
+                    <title>$title</title>
+
+                    <link rel='stylesheet' href='css/main.css' />
+                    <link rel='icon' href='images/favicon.png' />
+                  </head>
+
+                  <body>";
+    file_put_contents($outputFiles[$ofNdx], $htmlText, FILE_APPEND);
+  }
+
+  function writeHTMLFooter() {
+    global $outputFiles, $ofNdx;
+    $base = str_repeat("../", $margin);
+    $htmlText ="<hr><small>YeAPF documenter</small></body></html>";
+    file_put_contents($outputFiles[$ofNdx], $htmlText, FILE_APPEND);
+  }
+
+  function writeHTMLInfo($htmlText)
+  {
+    global $baseToExport, $toExport, $outputFiles, $ofNdx, $aMap, $aSequence;
+
+    if ($toExport) {
+      $htmlText=trim($htmlText);
+      if ($htmlText>'') {
+        $aSequence++;
+        $aName=md5($aSequence);
+        $targetFileName=substr($outputFiles[$ofNdx], strlen($baseToExport)+1);
+        if (!isset($aMap[$targetFileName]))
+          $aMap[$targetFileName] = array();
+        $aMap[$targetFileName][$htmlText]=$targetFileName."#$aName";
+        $htmlText="<div class='section'><div class='row'><div class='col-md-12'><a name='$aName'></a><h3>$htmlText</h3></div><div class='col-md-12'>doc...</div></div></div>";
+        file_put_contents($outputFiles[$ofNdx], $htmlText, FILE_APPEND);
+      }
+    }
+  }
+
+  function showXdbInfo($margin, $xml, $type='file')
+  {
+    global $baseToExport, $toExport, $outputFiles, $ofNdx, $toDestroy;
+
+    $oldOfNdx=$ofNdx;
+
+    $textReturn="";
+    if (isset($xml)) {
+      writeHTMLHeader($margin);
+      $xml=object2array($xml);
+      $marginStr=str_repeat(" ",$margin*2);
+      foreach($xml as $info => $detail) {
+        if ($type=='file') {
+          if (isset($detail['folder'])) {
+            $textReturn.=urldecode($marginStr."$info at ".$detail['folder']."\n");
+            if ($toExport) {
+              $auxOutFolder=urldecode("$baseToExport/".$detail['folder']);
+              if (!file_exists($auxOutFolder))
+                mkdir($auxOutFolder, 0755, true);
+              $ofNdx++;
+              $outputFiles[$ofNdx]="$auxOutFolder/$info.html";
+              if ($toExport) {
+                if (file_exists($outputFiles[$ofNdx])) {
+                  if ($toDestroy) {
+                    if (!unlink($outputFiles[$ofNdx]))
+                      die("'".$outputFiles[$ofNdx]."' cannot be deleted");
+                  } else
+                    die("'".$outputFiles[$ofNdx]."' already exists. Use '-d' to destroy\n");
+                }
+              }
+            }
+          }
+        } else if ($type=='func') {
+          if (!is_numeric($info)) {
+			if (isset($detail['name']))
+			  $detailName=$detail['name'];
+			 else
+			   $detailName="";
+            $funcDeclaration=urldecode($marginStr."function ".$detailName." (");
+            $pCount=0;
+            if (isset($detail['parameters'])) {
+              foreach($detail['parameters'] as $paramName=>$dummy) {
+                if ($pCount++>0)
+                  $funcDeclaration.=", ";
+                $funcDeclaration.=$paramName;
+              }
+            }
+            $funcDeclaration.=")\n";
+            writeHTMLInfo($funcDeclaration);
+            $textReturn.=$funcDeclaration;
+
+          }
+        } else if ($type=='class') {
+          if (!is_numeric($info)) {
+            $textReturn.=urldecode($marginStr."class $info\n");
+            writeHTMLInfo("class $info");
+          }
+
+        } else if ($type=='inner') {
+          $textReturn.="*";
+        }
+        $insideInfo=viewInside($margin, $detail);
+        $textReturn.=$insideInfo;
+      }
+    }
+    $ofNdx=$oldOfNdx;
+    return $textReturn;
+  }
+
+  function viewInside($margin, $detail )
+  {
+    $textReturn="";
+    $marginStr=str_repeat(" ",$margin*2);
+    if (isset($detail['inner'])) {
+      $textReturn.=viewInside($margin+1, $detail['inner']);
+    }
+    if (isset($detail['classes'])) {
+      $textReturn.=showXdbInfo($margin+1, $detail['classes'],'class');
+    }
+    if (isset($detail['functions'])) {
+      $textReturn.=showXdbInfo($margin+1, $detail['functions'],'func');
+    }
+    return $textReturn;
+  }
+
+  $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
+  $cmRequired=false;
+  if (file_exists("$mydir/yclilib.php"))
+    $cmLocation = "$mydir/yclilib.php";
+  else
+    $cmLocation = "$mydir/../yclilib.php";
+
+  (@include_once "$cmLocation") or die("yclilib.php not found\n");
+
+  $cwd=getcwd();
+  $args = new ArgumentsProcessor(false);
+  $myself=basename($argv[0]);
+  $filename=$args->getSrc(0);
+  $toHelp=$args->argValue('help;h',__FALSE__)==__TRUE__;
+  $toDestroy=$args->argValue('destroy;d',__FALSE__)==__TRUE__;
+  $quiet=$args->argValue('quiet;q',__FALSE__)==__TRUE__;
+  $baseToExport=$args->getSrc(1);
+  $toExport=trim($baseToExport)>'';
+
+  echo "YeAPF 0.8.62 $myself\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n";
+  if (($toHelp) || (trim($filename)=='')) {
+    die("usage:\n\t$myself <filename> [output-folder] [--destroy] [--quiet]\n\t\tfilename\tis a .xdb created by ydocbuilder\n\t\toutput-folder\tis used to write html files\n\t\t--destroy\tclean the output-folder (delete all html files in folder)\n");
+  }
+
+  if (file_exists($filename)) {
+    $xml = simplexml_load_file($filename);
+    if ($toExport) {
+      if (is_dir($baseToExport)) {
+        if (file_exists("$baseToExport/$filename.html")){
+          if ($toDestroy) {
+            if (!unlink("$baseToExport/$filename.html"))
+              die("\nimpossible to delete '$baseToExport/$filename.html'\n");
+          } else
+            die("\n'$baseToExport/$filename.html' already exists. You can use '-d' parameter to destroy it\n");
+        }
+      } else
+        if (!mkdir($baseToExport))
+          die("\nimpossible to create '$baseToExport'\n");
+    }
+    
+    $xdbInfo=showXdbInfo(0, $xml);
+    if (!$quiet)
+      echo $xdbInfo;
+    $docMap ="<!DOCTYPE html>
+              <html lang='en'>
+                <head>
+                  <meta charset='utf-8' />
+                  <meta http-equiv='x-ua-compatible' content='ie=edge' />
+                  <meta name='viewport' content='width=device-width, initial-scale=1' />
+
+                  <title>".basename($filename)."</title>
+
+                  <link rel='stylesheet' href='css/noormalize.css' />
+                  <link rel='stylesheet' href='css/milligram.css' />
+                  <link rel='stylesheet' href='css/roboto.css' />
+                  <link rel='stylesheet' href='css/font-awesome.css' />
+                  <link rel='icon' href='images/favicon.png' />
+                </head>
+
+                <body><h1>YeAPF Documenter</h1><h3>YeAPF 0.8.62</h3><strong>Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com</strong>";
+
+    ksort($aMap);
+
+    foreach($aMap as $fileName => $elements) {
+      $fileName=str_replace(".html", "", $fileName);
+      $docMap.="\n\n<h2>$fileName</h2>\n";
+      $docMap.="<ul>";
+      foreach ($elements as $elemName => $aHref)
+        $docMap.="\t<li><a href='$aHref'>$elemName</a></li>\n";
+      $docMap.="</ul>";
+    }
+    $docMap.="</body></html>";
+    file_put_contents("$baseToExport/".basename($filename).".html", $docMap);
+
+  } else
+    die("\nfile '$filename' not found\n");
+?>

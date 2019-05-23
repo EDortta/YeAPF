@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)
+    YeAPF 0.8.62-203 built on 2019-05-23 09:15 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-05-13 11:15:04 (-3 DST)
+    2019-05-18 16:21:06 (-3 DST)
    */
 
   /*
@@ -143,7 +143,7 @@
 
   $PHPVer = phpversion();
   $PHPVersion = explode('.', $PHPVer);
-  $PHPVersion = $PHPVersion[0]*10000 + $PHPVersion[1]*100+$PHPVersion[2];
+  $PHPVersion = $PHPVersion[0]*10000 + $PHPVersion[1]*100 + intval($PHPVersion[2])*1;
   unset($PHPVer);
 
   if (file_exists("$cfgCurrentFolder/logs/wastedTime.log"))
@@ -1825,7 +1825,7 @@
   {
     global $lastImplementation, $flgCanContinueWorking, $devSession;
 
-    xq_context('YeAPF',       'YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)');
+    xq_context('YeAPF',       'YeAPF 0.8.62-203 built on 2019-05-23 09:15 (-3 DST)');
     xq_context('devSession',  $devSession);
     xq_context('ts1',         date('U'));
 
