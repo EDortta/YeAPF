@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.62-203 built on 2019-05-23 09:15 (-3 DST)
+    YeAPF 0.8.62-206 built on 2019-05-28 16:06 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-05-18 16:21:06 (-3 DST)
+    2019-05-24 09:40:39 (-3 DST)
    */
 
   /*
@@ -768,14 +768,20 @@
           error_log("Loading $libName ... ",3,"$cfgCurrentFolder/logs/yeapf.loader.log");
           $t1=decimalMicrotime();
         }
-        $loadOk=@include_once "$libName";
-        if ($recordLoaderWastedTime)
-          _recordWastedTime(basename($libName)." lib_ready");
-        if (!$loadOk)
-          _yLoaderDie(false, "Fatal error trying to load $libName");
-        if (file_exists("$cfgMainFolder/flags/flag.dbgphp")) {
-          $t2=decimalMicrotime()-$t1;
-          error_log("    wasted time: $t2\n",3,"$cfgCurrentFolder/logs/yeapf.loader.log");
+        try {
+          if ($recordLoaderWastedTime)
+            _recordWastedTime("Loading $libName ...");
+          $loadOk=@include_once "$libName";
+          if ($recordLoaderWastedTime)
+            _recordWastedTime(basename($libName)." lib_ready");
+          if (!$loadOk)
+            _yLoaderDie(false, "Fatal error trying to load $libName");
+          if (file_exists("$cfgMainFolder/flags/flag.dbgphp")) {
+            $t2=decimalMicrotime()-$t1;
+            error_log("    wasted time: $t2\n",3,"$cfgCurrentFolder/logs/yeapf.loader.log");
+          }          
+        } catch(Exception $e) {
+            _yLoaderDie(false, "Fatal error trying to load $libName: ".$e->getMessage());          
         }
       }
     }
@@ -1825,7 +1831,7 @@
   {
     global $lastImplementation, $flgCanContinueWorking, $devSession;
 
-    xq_context('YeAPF',       'YeAPF 0.8.62-203 built on 2019-05-23 09:15 (-3 DST)');
+    xq_context('YeAPF',       'YeAPF 0.8.62-206 built on 2019-05-28 16:06 (-3 DST)');
     xq_context('devSession',  $devSession);
     xq_context('ts1',         date('U'));
 

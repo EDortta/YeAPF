@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.userContext.php
-    YeAPF 0.8.62-162 built on 2019-05-16 10:57 (-3 DST)
+    YeAPF 0.8.62-206 built on 2019-05-28 16:06 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-05-14 10:24:49 (-3 DST)
+    2019-05-24 09:34:55 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -546,11 +546,15 @@
             case 'CHARACTER VARYING':
               if (function_exists($usrPasswordAlgorithm))
                 $guid=$usrPasswordAlgorithm(md5('USER_SECURITY'.y_uniqid()));
-              else
+              else {
+                _recordWastedTime("Throwing an exception "+__FILE__+":"+__LINE__);
                 throw new Exception("userPasswordAlgorithm '$usrPasswordAlgorithm' is not a recognized function");
+              }
               break;
-            default:
+            default: {
+              _recordWastedTime("Throwing an exception "+__FILE__+":"+__LINE__);
               throw new Exception("$usrTableName.$usrSessionIDField is of type '$usrSessionIDFieldType' which is not usable by userContext");
+            }
           }
           $stage++;
 

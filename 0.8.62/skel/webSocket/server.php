@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webSocket/server.php
-    YeAPF 0.8.62-162 built on 2019-05-16 10:57 (-3 DST)
+    YeAPF 0.8.62-206 built on 2019-05-28 16:06 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-05-16 09:33:30 (-3 DST)
+    2019-05-24 18:41:23 (-3 DST)
 
     skel / webSocket / server.php
     This file cannot be modified within skel/webSocket
@@ -85,6 +85,7 @@
     }
 
     public function u_broadcast($target, $user, $result) {
+      echo "Broadcasting to '$target' \n";
       if (isset($user))
         $this->send($user, "$result");
 
@@ -221,8 +222,12 @@
               $GLOBALS["_REQUEST2"]=$message;
               $auxMessage = xq_extractValuesFromQuery(false, "xq_", "");
               foreach($auxMessage as $k=>$v) {
-                if (!in_array("$k", array("fieldName", "fieldValue", "callbackId")))
-                  $message["xq_$k"]=$v;
+                if (!in_array("$k", array("fieldName", "fieldValue", "callbackId"))) {
+                  if (in_array("$k", array("data"))) 
+                    $message["$k"]=$v;
+                  else
+                    $message["xq_$k"]=$v;
+                }
               }
             }
 
@@ -247,7 +252,7 @@
             yeapfStage("afterImplementation");
 
             if (!$implemented) {
-              $impReturn="{}";
+              $impReturn=json_encode(isset($message['data'])?$message['data']:"");
             }
 
             /*

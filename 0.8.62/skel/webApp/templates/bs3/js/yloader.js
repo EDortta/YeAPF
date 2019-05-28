@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/templates/bs3/js/yloader.js
-  * YeAPF 0.8.62-203 built on 2019-05-23 09:15 (-3 DST)
+  * YeAPF 0.8.62-206 built on 2019-05-28 16:06 (-3 DST)
   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2019-05-23 09:15:20 (-3 DST)
+  * 2019-05-28 16:06:00 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.62-203 built on 2019-05-23 09:15 (-3 DST)");
+ console.log("YeAPF 0.8.62-206 built on 2019-05-28 16:06 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -5015,6 +5015,10 @@
                auxFieldValue = jsonParams[jNdx];
                if ("boolean"==typeof auxFieldValue) {
                  auxFieldValue=auxFieldValue?"YES":"NO";
+               } else {
+                 if ("object"==typeof auxFieldValue) {
+                   auxFieldValue=JSON.stringify(auxFieldValue);
+                 }
                }
                auxFieldValue = maskHTML(that.xq_urlEncode(auxFieldValue, false));
                fieldValue += auxFieldValue;
@@ -9679,9 +9683,9 @@
  /* START yinterface.js */
      /*
          skel/webApp/templates/bs3/js/yloader.js
-         YeAPF 0.8.62-203 built on 2019-05-23 09:15 (-3 DST)
+         YeAPF 0.8.62-206 built on 2019-05-28 16:06 (-3 DST)
          Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-         2019-05-23 09:15:20 (-3 DST)
+         2019-05-28 16:06:00 (-3 DST)
      */
      
      var yInterfaceObj = function() {
