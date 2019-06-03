@@ -2,9 +2,9 @@
 <?php
   /*
   tools/yapp
-  YeAPF 0.8.62-123 built on 2019-05-13 19:02 (-3 DST)
+  YeAPF 0.8.62-214 built on 2019-06-03 17:33 (-3 DST)
   Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-  2019-05-10 17:02:09 (-3 DST)
+  2019-05-29 11:42:10 (-3 DST)
   */
   $mydir = dirname($_SERVER['SCRIPT_FILENAME']);
   $cmRequired = false;
@@ -87,29 +87,32 @@
   }
 
   function substFileMacros($aFolder) {
-    global $yappContext;
+    global $yappContext, $appFolder;
 
-    echo " (subst) $aFolder\n";
-    if ((mb_substr($aFolder, mb_strlen($aFolder)-1,1))!="*")
-      $folder=$aFolder."/*";
-    else
-      $folder=$aFolder;
+    $privateFolders = array("deathLogs", "logs", "lib");
+    if (!in_array(basename($aFolder), $privateFolders)) {
+      echo " (subst) ".substr($aFolder,strlen($appFolder)+1)."\n";
+      if ((mb_substr($aFolder, mb_strlen($aFolder)-1,1))!="*")
+        $folder=$aFolder."/*";
+      else
+        $folder=$aFolder;
 
-    $files=glob("$folder");
-    foreach($files as $fileName) {
-      echo " (subst) $fileName\n";
-      if (!(($fileName=='.') || ($fileName=='..'))) {
-        if (is_dir("$fileName")) {
-          substFileMacros("$fileName");
-        } else {
+      $files=glob("$folder");
+      foreach($files as $fileName) {
+        echo " (subst) ".substr($fileName, strlen($appFolder)+1)."\n";
+        if (!(($fileName=='.') || ($fileName=='..'))) {
+          if (is_dir("$fileName")) {
+            substFileMacros("$fileName");
+          } else {
 
-          $tempFile = file_get_contents("$fileName");
-          foreach($yappContext as $yKey => $yValue) {
-            $tempFile = preg_replace("/\%\($yKey\)/", "$yValue", $tempFile);
+            $tempFile = file_get_contents("$fileName");
+            foreach($yappContext as $yKey => $yValue) {
+              $tempFile = preg_replace("/\%\($yKey\)/", "$yValue", $tempFile);
+            }
+            file_put_contents("$fileName", $tempFile);
           }
-          file_put_contents("$fileName", $tempFile);
         }
-      }
+      }    
     }
   }
 
@@ -414,7 +417,7 @@
     }
 
     /* save application tools environment */
-    $yeapfAppIni = "[app]\nappType=$appType\ntemplate=$template\nfromSample=$fromSample\nfolder=" . getcwd() . "\ndate=" . date("Y-m-dTH:i:s") . "\nyeapfVersion=0.8.62-123\n";
+    $yeapfAppIni = "[app]\nappType=$appType\ntemplate=$template\nfromSample=$fromSample\nfolder=" . getcwd() . "\ndate=" . date("Y-m-dTH:i:s") . "\nyeapfVersion=0.8.62-214\n";
     if (!file_put_contents("$yeapfAppIniFilename", $yeapfAppIni)) {
       echo "\nWARNING!\n\tWas not possible to write '$yeapfAppIniFilename'\n";
     }
@@ -431,7 +434,7 @@
             $cfgURL = "http://localhost/" . $yeapfConfig['myself'] . "/configure.php";
             echo "Calling '$cfgURL' ...\n";
             file_get_contents($cfgURL);
-            echo "Ok\nThis folder was updated to YeAPF v0.8.62-123\n";
+            echo "Ok\nThis folder was updated to YeAPF v0.8.62-214\n";
           }
           else {
             echo "Remember to call 'configure.php' from your navigator\n";

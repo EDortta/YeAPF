@@ -1,9 +1,9 @@
 <?php
   /*
     tools/spread-js.php
-    YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST)
+    YeAPF 0.8.62-214 built on 2019-06-03 17:33 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-03-20 10:11:09 (-3 DST)
+    2019-06-03 17:31:38 (-3 DST)
 
     This script will distribute monolite version of yloader.js
     among different application skeletons
@@ -36,7 +36,7 @@
       grantDirectory($tgtFolder);
       $auxFile = _file($srcFileName);
       if ($addHeader) {
-        $auxFile = "/* YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST) Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
+        $auxFile = "/* YeAPF 0.8.62-214 built on 2019-06-03 17:33 (-3 DST) Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
       }
       $tgtFileName=basename($srcFileName);
       if (file_put_contents("$tgtFolder/$tgtFileName", $auxFile))
@@ -100,7 +100,7 @@
   if (file_exists($minJS)) {
     echo "Minified version source: $minJS\n";
     $yeapf_minJS = join("", file($minJS));
-    $yeapf_minJS = "/* YeAPF 0.8.62-100 built on 2019-05-09 19:34 (-3 DST) Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
+    $yeapf_minJS = "/* YeAPF 0.8.62-214 built on 2019-06-03 17:33 (-3 DST) Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
   }
 
   grantDirectory("skel/chromeApp/js");
@@ -109,6 +109,7 @@
   grantDirectory("skel/webApp/js");
   grantDirectory("skel/webApp/templates/bs3/js");
   grantDirectory("skel/webApp/templates/bs4/js");
+  grantDirectory("skel/webApp/templates/milligram-1.3/js");
   grantDirectory("skel/webSocket");
   grantDirectory("skel/service");
   grantDirectory("skel/cli");
@@ -154,6 +155,7 @@
   $phpServiceSkeletonTargetFolders = array("skel/service",
                                            "skel/webApp/templates/bs3",
                                            "skel/webApp/templates/bs4",
+                                           "skel/webApp/templates/milligram-1.3",
                                            "samples/key-admin");
   echo "Service, Templates skeletons and Samples folder\n";
   foreach($phpServiceSkeleton as $script) {
@@ -196,6 +198,8 @@
     "skel/webApp/templates/bs3/js/yloader.min.js",
     "skel/webApp/templates/bs4/js/yloader.js",
     "skel/webApp/templates/bs4/js/yloader.min.js",
+    "skel/webApp/templates/milligram-1.3/js/yloader.js",
+    "skel/webApp/templates/milligram-1.3/js/yloader.min.js",
     "skel/MoSyncApp/LocalFiles/js/yloader.js",
     "skel/MoSyncApp/LocalFiles/js/yloader.min.js",
     "skel/chromeApp/js/yloader.js",

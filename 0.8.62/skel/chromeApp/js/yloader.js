@@ -1,8 +1,8 @@
 /*********************************************
   * skel/chromeApp/js/yloader.js
-  * YeAPF 0.8.62-206 built on 2019-05-28 16:06 (-3 DST)
+  * YeAPF 0.8.62-214 built on 2019-06-03 17:33 (-3 DST)
   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-  * 2019-05-28 16:06:00 (-3 DST)
+  * 2019-06-03 17:33:26 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.62-206 built on 2019-05-28 16:06 (-3 DST)");
+ console.log("YeAPF 0.8.62-214 built on 2019-06-03 17:33 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -9683,9 +9683,9 @@
  /* START yinterface.js */
      /*
          skel/chromeApp/js/yloader.js
-         YeAPF 0.8.62-206 built on 2019-05-28 16:06 (-3 DST)
+         YeAPF 0.8.62-214 built on 2019-06-03 17:33 (-3 DST)
          Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-         2019-05-28 16:06:00 (-3 DST)
+         2019-06-03 17:33:26 (-3 DST)
      */
      
      var yInterfaceObj = function() {
