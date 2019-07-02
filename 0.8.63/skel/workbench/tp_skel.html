@@ -1,0 +1,115 @@
+<html><head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="css/bootstrap-switch.css" rel="stylesheet">
+    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="css/bootstrap.css" rel="stylesheet" type="text/css">
+    <link href="css/bootstrap-theme.css" rel="stylesheet" type="text/css">
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/bootbox.min.js"></script>
+    <script src="js/bootstrap-switch.js"></script>
+    <script src="js/bootbox.min.js"></script>
+    <script charset="utf-8" src="js/yloader.js"></script>
+    %(styles)
+  </head><body>
+    <div class="navbar navbar-default navbar-static-top main-menu navbar-inverse">
+      <div class="container">
+        <div class="navbar-form navbar-left" role="search" method="get">
+          <div class="form-group">
+            <a href="../index.php" class="btn btn-default"><i class="fa fa-arrow-left"></i>Voltar</a>
+            <a class="btn btn-warning" id="tp_btnDeletePage"><i class="fa fa-close"></i>Eliminar</a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal fade" id="tp_modal_container_confirm_deletion" role="dialog" aria-labelledby="tp_confirm_deletion" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+              <i class="fa fa-close"></i>
+            </button>
+            <h4 class="modal-title" id="tp_confirm_deletion">Eliminar a p&aacute;gina</h4>
+          </div>
+          <div class="modal-body">Tem certeza que deseja eliminar esta p&aacute;gina?</div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">N&atilde;o</button>
+            <button type="button" class="btn btn-danger" id="tp_btnDeletePageConfirmation">Sim, desejo eliminar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <div class="tnContainer">
+      <!-- CUT START [DATA PRIOR TO THIS POINT WILL NOT BE PRESERVED] -->
+      <div class="section tnTab" id="vw_#(newPageName)">
+        <!-- YOUR PAGE STARTS HERE -->
+        <!-- This is not the correct place to put these files (css and js), just
+        a reminder. So put these files in correct place when in production -->
+        <link href="css/#(newPageName).css" rel="stylesheet" type="text/css">
+        <script charset="utf-8" src="js/#(newPageName).js"></script>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12">
+              <h1>#(newPageName)</h1>
+              <p>Substitua esta div com o seu conte&uacute;do
+                <br>O
+                <b>workbench</b>&nbsp;extrair&aacute; a sec&ccedil;&atilde;o identificada como uma DIV com classe
+                SECTION.
+                <br>
+              </p>
+              <p contenteditable="true">A ideia &eacute; poder editar este arquivo (i_#(newPageName).html) com o Pingendo outro editor BS3 ou o seu editor de textos preferido.<br>Uma vez feito isso, voc&ecirc; pode incorporar a p&aacute;gina no seu aplicativo utilizando
+                o
+                <b>workbench.</b></p>
+              <p>Repare que o
+                <b>workbench</b>&nbsp;j&aacute; criou
+                <i style="font-weight: bold;">#(newPageName).php</i>&nbsp;assim como
+                <i style="font-weight: bold;">css/#(newPageName).css</i>&nbsp;e tamb&eacute;m
+                <b>
+                  <i>js/#(newPageName).js</i>
+                </b>
+              </p>
+              <p>Ao extrair esta p&aacute;gina, o
+                <b>
+                  <i>workbench</i>
+                </b>colocar&aacute; esses arquivos na pasta
+                <b>production</b> e no <b><i>#(newPageName).zip</i></b>.</p>
+            </div>
+          </div>
+        </div>
+        <!-- YOUR PAGE ENDS HERE -->
+      </div>
+      <!-- CUT END [DATA BEYOND THIS POINT WILL NOT BE PRESERVED] -->
+    </div>
+
+    %(scripts)
+
+    
+    <script>
+      /* help to debug YeAPF requests */
+        ycomm.defaultMethod = "GET";
+    </script>
+    <script>
+      var _tp_deletePageOpenDialog = function() {
+          $("#tp_modal_container_confirm_deletion").modal()
+        };
+
+        var _tp_deletePageAction = function() {
+          window.location = "../index.php?dBody=#(newPageName)";
+        };
+
+        addOnLoadManager(
+
+          function() {
+            mTabNav.showTab("vw_#(newPageName)");
+            console.log("Please, use http://www.cleancss.com/html-beautify/ in order to check source integrity");
+            addEvent("tp_btnDeletePage", "click", _tp_deletePageOpenDialog);
+            addEvent("tp_btnDeletePageConfirmation", "click", _tp_deletePageAction);
+          }
+        );
+    </script>
+
+
+</body></html>

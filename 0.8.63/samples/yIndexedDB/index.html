@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>yIndexedDB Sample</title>
+  <link href="css/bootstrap.min.css?k=0" rel="stylesheet">
+  <link href="css/style.css?k=0" rel="stylesheet">
+</head>
+
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-md-4">
+        <form role="form" id="frmUser">
+          <div class="form-group">
+            <label for="email">
+              e-mail
+            </label>
+            <input type="text" class="form-control" id="email">
+          </div>
+          <div class="form-group">
+            <label for="name">
+              Nome do Usu&aacute;rio
+            </label>
+            <input type="text" class="form-control" id="name">
+          </div>
+          <input type="hidden" id="_id">
+          <button type="button" class="btn btn-default" id="btnSalvarUsuario">
+            Save
+          </button>
+        </form>
+      </div>
+      <div class="col-md-8">
+        <table class="table" id="tblLista">
+          <thead>
+            <tr>
+              <th>email</th>
+              <th>Name</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="td-%(_id)"><a href="#" class="btn-edit-email" data-id='%(_id)'>&nbsp;%(email)&nbsp;</a></td>
+              <td>%(name)</td>
+              <td><button type="button" class="btn btn-warning btn-remove-email" data-id='%(_id)' ><i class="glyphicon glyphicon-remove-sign"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <script src="js/jquery.min.js?v=1"></script>
+  <script src="js/bootstrap.min.js?v=1"></script>
+  <script src="js/yloader.min.js?v=1"></script>
+  <script src="js/ystorage.min.js?v=1"></script>
+  <script src="js/script.js?v=1"></script>
+</body>
+
+</html>

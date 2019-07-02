@@ -1,0 +1,2 @@
+20190629082622 137.137 (77.4770):yeapf.functions.php at 759 -> yeapf.functions.php at 573:_yLoaderDie() says: 2019-06-29 08:26:22 Fatal Error: Error loading 'nuSOAP/nusoap.php' File not found. path:
+	/mnt/main/home/esteban/work/www/YeAPF/includes  OutputType: 0

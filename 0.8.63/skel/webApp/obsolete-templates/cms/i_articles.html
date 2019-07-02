@@ -1,0 +1,30 @@
+#sql("select * from noticias where id='#(id)'")
+<div>
+  &#32;
+</div>
+<div class="holder_content">
+  <section>
+    <article>
+      <div>
+        <h1>#(titulo)</h1>
+        <h5><span style='border-bottom: dotted 1px #BFBFBF'>#date(data) #condLabel(' - ',#(fonte))</span></h5>
+        <h2><b>#(subtitulo)</b></h2>
+        <span style='margin-left:48px'><small><em>#nl2br(resumo)</em></small></span>
+        <br /><br />
+      </div>
+      <div>
+        #normalize(#(texto))
+      </div>
+    </article>
+  </section>
+  <div class=articleIndex>
+    #if(#(pai)>'',{
+      <span class=indexItem><a href='?s=articles&id=#(pai)'>Pág.Inicial</a></span>
+    })
+    #set(pagSeq,1)
+    #for("select id as idPagina from noticias where pai='#(id)' or pai='#(pai)'")
+      <span class=#if(#(id)==#(idPagina),{itemChosed},{indexItem})><a href='?s=articles&id=#(idPagina)'>#(pagSeq)</a></span>
+      #add(pagSeq,1)
+    #next
+  </div>
+</div>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang='pt-br'>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pure and YeAPF sample</title>
+    <link rel="stylesheet" href="css/pure-min.css">
+    <link href="css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!--[if lte IE 8]>
+      <link rel="stylesheet" href="css/marketing-old-ie.css">
+      <link rel="stylesheet" href="grid-old-ie.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+      <link rel="stylesheet" href="css/grid.css">
+      <link rel="stylesheet" href="css/marketing.css">
+    <!--<![endif]-->
+
+    <link rel="stylesheet" href="css/sample.css">
+    <script src="js/yloader.min.js"></script>
+  </head>
+  <body class="pure-skin-blue">
+    <div class="header">
+      <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
+        <a class="pure-menu-heading" href="">Exemplo</a>
+        <ul class="pure-menu-list">
+          <li class="pure-menu-item"><a href="#" class="pure-menu-link cl-actions" id="clientes_op">Clientes</a></li>
+          <li class="pure-menu-item"><a href="#" class="pure-menu-link cl-actions" id="ordens_op">Ordens</a></li>
+          <li class="pure-menu-item"><a href="#" class="pure-menu-link cl-actions" id="usuarios_op">Usu&aacute;rios</a></li>
+          <li class="pure-menu-item"><a href="#" class="pure-menu-link cl-actions" id="conta_op">Conta</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <!--
+        pay attention to tnContainer class here
+        a tnContainer can have a set of tnTab
+        tnTab can have more tnContainers leading to a nested model
+    -->
+    <div class="tnContainer">
+      <div class="content-wrapper tnTab">
+        <div class="content">
+          <h2 class="content-head">
+            Obrigado!
+          </h2>
+          <div class="content-body">
+            Este &eacute; apenas um pequeno sistema de exemplo
+            integrando <a href="http://purecss.io">Pure.css</a> e <a href="http://yeapf.com">YeAPF</a>.
+            <br>Qualquer vers&atilde;o da serie 0.8.x do YeAPF deve poder ser utilizada aqui,
+            mas estamos usando especificamente a 0.8.47<br>
+            <p>Bom divertimento!</p>
+            <p>Esteban D.Dortta</p>
+          </div>
+        </div>
+      </div>
+
+      <!--
+        this section need an 'id' and must be a 'tnTab' class div
+        this tnTab belongs to the tnContainer immediatly on top to it
+      -->
+      <div class="content-wrapper tnTab" id="section_clientes">
+        <div class="content">
+            <h2 class="content-head is-left">Clientes</h2>
+
+            <div>
+              <a class="pure-button" href="#">
+                  Novo Cliente
+              </a>
+              <a class="pure-button" href="#">
+                  Listagem
+              </a>
+              <a class="pure-button" href="#">
+                  <i class="fa fa-fw fa-refresh"></i>
+                  Atualizar
+              </a>
+            </div>
+
+            <div class="pure-g">
+              <div class="pure-u-1-1">
+                <table class="pure-table pure-table-horizontal" id="tbl_clientes">
+                  <thead>
+                    <tr>
+                      <th rowspan="2">#</th>
+                      <th rowspan="2">Cliente</th>
+                      <th rowspan="2">Contato</th>
+                      <th rowspan="2">Local</th>
+                      <th colspan="2">Notas</th>
+                      <th colspan="2">Acesso</th>
+                    </tr>
+                    <tr>
+                      <th>Recebidas</th>
+                      <th>Emitidas</th>
+                      <th>Login</th>
+                      <th>Acesso</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+
+        </div>
+      </div>
+
+      <!--
+        this section need an 'id' and must be a 'tnTab' class div
+        this tnTab belongs to the tnContainer immediatly on top to it
+        this tnTab has siblings in the DOM tree
+      -->
+      <div class="content-wrapper tnTab" id="section_ordens">
+        <div class="content">
+          <h2 class="content-head is-left">Ordens de servi&ccedil;o</h2>
+
+          <div>
+            <a class="pure-button" href="#">
+                Abertas
+            </a>
+            <a class="pure-button" href="#">
+                Em andamento
+            </a>
+            <a class="pure-button" href="#">
+                Concluidas
+            </a>
+            <a class="pure-button" href="#">
+                <i class="fa fa-fw fa-refresh"></i>
+                Atualizar
+            </a>
+          </div>
+
+          <form class="pure-form">
+              <fieldset>
+                <div class="pure-u-1-1">
+                    <div class="pure-u-1-4">
+                      <label for="ordens_datas" class="control-label">Doc</label>
+                      <input type="text" id="ordens_doc" placeholder="e-mail, CNPJ ou CPF do cliente">
+                    </div>
+                    <div class="pure-u-1-4">
+                      <label for="ordens_datas" class="control-label">Limites</label>
+                      <input type="text"  id="ordens_datainicio" placeholder="Inicio">
+                      <input type="text"  id="ordens_datafinal" placeholder="Fim">
+                    </div>
+                    <div class="pure-u-1-4">
+                      <button type="submit" class="pure-button pure-button-primary">Filtrar</button>
+                    </div>
+                </div>
+              </fieldset>
+          </form>
+
+          <div class="pure-g">
+            <div class="pure-u-1-1">
+              <table class="pure-table pure-table-horizontal" id="tbl_ordens">
+                <thead>
+                    <tr>
+                        <th>CNPJ</th>
+                        <th>NOME</th>
+                        <th>N&uacute;mero</th>
+                        <th>Emiss&atilde;o</th>
+                        <th>Descri&ccedil;&atilde;o</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!--
+        this section need an 'id' and must be a 'tnTab' class div
+        this tnTab belongs to the tnContainer immediatly on top to it
+        this tnTab has siblings in the DOM tree
+      -->
+      <div class="content-wrapper tnTab" id="section_usuarios">
+        <div class="content">
+          <h2 class="content-head is-left">Usu&aacute;rios</h2>
+
+          <div>
+            <a class="pure-button" href="#">
+                Como usar
+            </a>
+            <a class="pure-button" href="#">
+                Novo Usu&aacute;rio
+            </a>
+            <a class="pure-button" href="#">
+                <i class="fa fa-fw fa-refresh"></i>
+                Atualizar
+            </a>
+          </div>
+
+          <div class="pure-g">
+            <div class="pure-u-1-1">
+              <table class="pure-table pure-table-horizontal" id="tbl_ordens">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Criador</th>
+                        <th>Vencimento</th>
+                        <th>&Uacute;ltimo Acesso</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="content-wrapper tnTab" id="section_conta">
+        <div class="content">
+          <h2 class="content-head is-left">Conta</h2>
+
+        </div>
+      </div>
+
+    </div>
+  </body>
+  <script src="js/sample.js"></script>
+</html>

@@ -1,0 +1,146 @@
+<html>
+
+<head>
+  <title>WebSocket</title>
+  <style type="text/css">
+  html,
+  body {
+    font: normal 0.9em arial, helvetica;
+  }
+
+  #log {
+    width: 600px;
+    height: 300px;
+    border: 1px solid #7F9DB9;
+    overflow: auto;
+  }
+
+  #msg {
+    width: 400px;
+  }
+  </style>
+  <script type="text/javascript">
+  var socket, uname;
+
+  function formatDate(date) {
+    var hours = date.getHours();
+    var minutes = date.getMinutes();
+    hours = hours < 10 ? '0'+hours : hours;
+    minutes = minutes < 10 ? '0'+minutes : minutes;
+    var strTime = hours + ':' + minutes;
+    return date.getFullYear() + "/" + (date.getMonth() +1) + "/" + date.getDate() + "  " + strTime;
+  }
+
+  function now() {
+    var d=new Date();
+    return formatDate(d);
+  }
+
+  function register() {
+    uname=($("userName").value || "").trim();
+    if (uname>"") {
+      $("userNameSpace").style.display="none";
+      $("chatSpace").style.display="";
+      init();
+    }
+  }
+
+  var heartBeater;
+
+  function init() {
+    if (heartBeater)
+      clearInterval(heartBeater);
+    var host = "ws://127.0.0.1:%(appPort)/echobot"; // SET THIS TO YOUR SERVER
+    try {
+      socket = new WebSocket(host);
+      log(now()+' WebSocket - status ' + socket.readyState);
+      socket.onopen = function(msg) {
+        log(now()+" Welcome - status " + this.readyState);
+        socket.send("uname:"+uname);
+        heartBeater=setInterval(heartbeat, 30000);
+      };
+      socket.onmessage = function(msg) {
+        log(now()+" <b>" + msg.data + '</b>');
+      };
+      socket.onclose = function(msg) {
+        log(now()+" Disconnected - status " + this.readyState);
+      };
+    } catch (ex) {
+      log(ex);
+    }
+    $("msg").focus();
+  }
+
+  function send() {
+    var txt, msg;
+    txt = $("msg");
+    msg = txt.value;
+    if (!msg) {
+      alert("Message can not be empty");
+      return;
+    }
+    txt.value = "";
+    txt.focus();
+    try {
+      socket.send("msg:"+msg);
+      log(uname+' >> <b>' + msg + '</b>');
+    } catch (ex) {
+      log(ex);
+    }
+  }
+
+  function heartbeat() {
+    if (socket.readyState==1)
+      socket.send(".");
+    else
+      reconnect();
+  }
+
+  function quit() {
+    if (socket != null) {
+      log("Goodbye!");
+      socket.close();
+      socket = null;
+    }
+  }
+
+  function reconnect() {
+    quit();
+    init();
+  }
+
+  // Utilities
+  function $(id) {
+    return document.getElementById(id);
+  }
+
+  function log(msg) {
+    $("log").innerHTML += "<br>" + msg;
+  }
+
+  function onkey(event) {
+    if (event.keyCode == 13) {
+      send();
+    }
+  }
+  </script>
+</head>
+
+<body>
+  <h3>WebSocket v2.00</h3>
+  <div id=userNameSpace>
+    <label>User name</label>
+    <input id=userName type=text>
+    <button onclick="register()">Register</button>
+  </div>
+  <div id=chatSpace style="display: none;">
+    <div id="log"></div>
+    <input id="msg" type="textbox" onkeypress="onkey(event)" />
+    <button onclick="send()">Send</button>
+    <button onclick="quit()">Quit</button>
+    <button onclick="reconnect()">Reconnect</button>
+  </div>
+  <p><a href="https://github.com/ghedipunk/PHP-Websockets.git">Original GIT project</a></p>
+</body>
+
+</html>

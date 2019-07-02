@@ -1,0 +1,13 @@
+#!/usr/bin/php
+<?php
+  /*
+   * tools
+   * tools/yupdate
+   * YeAPF 0.8.63-54 built on 2019-07-02 19:38 (-3 DST)
+   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+   * 2019-06-06 08:35:20 (-3 DST)
+   */
+
+  echo basename("tools/yupdate") . "\nYeAPF 0.8.63 tools\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+  echo "WARNING: This has become obsolete.\nPlease use yapp instead\n";
+?>

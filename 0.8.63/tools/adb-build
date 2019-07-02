@@ -1,0 +1,30 @@
+#!/bin/bash
+# (C) 2016 Esteban D.Dortta
+#
+# tools/adb-build
+# YeAPF 0.8.63-54 built on 2019-07-02 19:38 (-3 DST)
+# Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+# 2018-07-09 14:57:44 (-3 DST)
+#
+# This set of scripts requires adb/android-sdk/cordova installed on your device.
+# Has been well tested under Ubuntu 16 and MacOSX 10.11.6
+# It is supposed to run on Cygwin
+
+
+if [ -f www/js/version.js ]; then
+	my_dir="$(dirname "$0")"
+	source "$my_dir/adb-lib.inc.sh"
+
+	newVersion=$(increaseVersion)
+
+	echo "Compiling $newVersion"
+	jshint www/js/index.js && \
+	echo "-----------" && \
+	date && \
+	cordova run android && \
+	echo "----------------" && \
+	tput bel && \
+	./adb-debug.sh
+else
+	echo "www/js/version.js file not found"
+fi
