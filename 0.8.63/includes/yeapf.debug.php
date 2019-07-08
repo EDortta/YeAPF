@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.debug.php
-    YeAPF 0.8.63-54 built on 2019-07-02 19:38 (-3 DST)
+    YeAPF 0.8.63-73 built on 2019-07-08 12:05 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-05-23 09:48:41 (-3 DST)
+    2019-07-05 09:27:38 (-3 DST)
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -36,7 +36,7 @@
 
   function _echo()
   {
-    global $logOutput, $user_IP, $canDoLog, $_echoCount, $isCLI, $cfgCurrentFolder, $cfgMainFolder;
+    global $logOutput, $safe_user_IP, $canDoLog, $_echoCount, $isCLI, $cfgCurrentFolder, $cfgMainFolder;
 
     $args=func_get_args();
     $argList='';
@@ -62,7 +62,7 @@
           if ($isCLI)
             $logLocation = "/var/log/yeapfApp.log";
           else
-            $logLocation = "$cfgCurrentFolder/logs/c.$user_IP.log";
+            $logLocation = "$cfgCurrentFolder/logs/c.$safe_user_IP.log";
           $logLocation = str_replace('..', '.', $logLocation);
           @error_log($argList, 3, $logLocation);
         }

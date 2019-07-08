@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webSocket/server.php
-    YeAPF 0.8.63-54 built on 2019-07-02 19:38 (-3 DST)
+    YeAPF 0.8.63-70 built on 2019-07-05 09:59 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-05-24 18:41:23 (-3 DST)
+    2019-07-05 09:58:33 (-3 DST)
 
     skel / webSocket / server.php
     This file cannot be modified within skel/webSocket
@@ -19,7 +19,7 @@
     if (!isset($GLOBALS[$varName]))
       $GLOBALS[$varName]=$defaultValue;
     if (mb_substr($GLOBALS[$varName],0,2)=='%(') {
-      die("Please, change '\$varName' variable value\n");
+      die("Please, change '$varName' variable value\n");
     }
   }
 

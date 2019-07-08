@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.63-54 built on 2019-07-02 19:38 (-3 DST)
+    YeAPF 0.8.63-73 built on 2019-07-08 12:05 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-06-29 13:05:10 (-3 DST)
+    2019-07-05 17:12:00 (-3 DST)
    */
 
   /*
@@ -351,7 +351,7 @@
   $server_IP=serverSafeVarValue("SERVER_ADDR", gethostbyname(serverSafeVarValue('SERVER_NAME')));
   $isDebugging=(isset($cfgDebugIP))?intval(($server_IP==$cfgDebugIP) && ($server_IP!='') && ($cfgDebugIP!='')):0;
   // in order to avoid ipv6 ':' that mess with windows file system
-  $safe_user_IP=str_replace(":", "", $user_IP);
+  $safe_user_IP=str_replace(":", "_", $user_IP);
 
   if (file_exists("$cfgMainFolder/flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." 0.8.63 ".": loading $user_IP config file\n",3,"$cfgCurrentFolder/logs/yeapf.loader.log");
 
@@ -369,10 +369,20 @@
 
   if (!$isCLI) {
     if (!$cfgSOAPInstalled) {
-      if (!$yeapfConfig['nusoapPath'])
-        $yeapfConfig['nusoapPath']="nuSOAP/nusoap.php";
-      else
-        $yeapfConfig['nusoapPath'].="/nusoap.php";
+      $baseFolder=array($yeapfConfig['nusoapPath'], dirname(dirname(__FILE__)), getcwd());
+      $wonderName=array("nuSOAP/nusoap.php", "lib/nuSOAP/nusoap.php");
+      $nuSOAPFound=false;
+      foreach($baseFolder as $folderName) {
+        if (!$nuSOAPFound) {
+          foreach ($wonderName as $soapName) {
+            if (!$nuSOAPFound)
+              if (file_exists("$folderName/$soapName")) {
+                $nuSOAPFound=true;
+                $yeapfConfig['nusoapPath']="$folderName/$soapName";
+              }
+          }
+        }
+      }
     } else
       $yeapfConfig['nusoapPath']='';
   } else {
@@ -514,7 +524,7 @@
      */
     function _yLoaderDie($reconfigureLinkEnabled)
     {
-      global $callback, $user_IP, $callBackFunction;
+      global $callback, $safe_user_IP, $callBackFunction;
       $script=basename($_SERVER["PHP_SELF"]);
       $isXML=intval(strpos("query.php",$script)!==false);
       $isJSON=intval(strpos("rest.php",$script)!==false);
@@ -568,7 +578,7 @@
 
       if (!file_exists("deathLogs"))
         mkdir("deathLogs",0777);
-      $f=fopen("deathLogs/c.$user_IP.log","a");
+      $f=fopen("deathLogs/c.$safe_user_IP.log","a");
       if ($f) {
         fwrite($f, "/---DEATH----------\n");
         foreach($noHTMLArgs as $arg) {
@@ -768,6 +778,8 @@
     if ($libName>'') {
       if (file_exists($GLOBALS["__yeapfPath"]."/$libName"))
         $libName=$GLOBALS["__yeapfPath"]."/$libName";
+      if (file_exists($GLOBALS["__yeapfPath"]."/lib/$libName"))
+        $libName=$GLOBALS["__yeapfPath"]."/lib/$libName";
       if (file_exists($GLOBALS["__yeapfPath"]."/includes/$libName"))
         $libName=$GLOBALS["__yeapfPath"]."/includes/$libName";
       if (!file_exists($libName))
@@ -1847,7 +1859,7 @@
   {
     global $lastImplementation, $flgCanContinueWorking, $devSession;
 
-    xq_context('YeAPF',       'YeAPF 0.8.63-54 built on 2019-07-02 19:38 (-3 DST)');
+    xq_context('YeAPF',       'YeAPF 0.8.63-73 built on 2019-07-08 12:05 (-3 DST)');
     xq_context('devSession',  $devSession);
     xq_context('ts1',         date('U'));
 

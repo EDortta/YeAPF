@@ -2,9 +2,9 @@
 <?php
 /*
 tools/distributionBuilder/ydocview
-YeAPF 0.8.63-54 built on 2019-07-02 19:38 (-3 DST)
+YeAPF 0.8.63-73 built on 2019-07-08 12:05 (-3 DST)
 Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-2019-05-18 16:16:08 (-3 DST)
+2019-07-03 12:43:17 (-3 DST)
 */
 
 if (!function_exists("objet2array")) {
@@ -50,6 +50,12 @@ function writeHTMLHeader($margin, $title="") {
                       <link rel='icon' href='".$base."images/favicon.png' />
                     </head>
 
+                    <style>
+                      .docEntry {
+                        padding-left: 16px;
+                      }
+                    </style>
+
                     <script>
                       function goBack() {window.history.back();}
                     </script>
@@ -72,8 +78,14 @@ function writeHTMLFooter($margin) {
   chmod($outputFiles[$ofNdx], 0755);
 }
 
-function writeHTMLInfo($htmlText) {
-  global $baseToExport, $toExport, $outputFiles, $ofNdx, $aMap, $aSequence;
+function replace_extension($filename, $new_extension) {
+    $info = pathinfo($filename);
+    $currentExt = '.'.$info['extension'];
+    return $info['dirname'].'/'.$info['filename'] . $new_extension;
+}
+
+function writeHTMLInfo($htmlText, $detailName="") {
+  global $baseToExport, $toExport, $outputFiles, $ofNdx, $aMap, $aSequence, $doPartial;
   
   if ($toExport) {
     $htmlText = trim($htmlText);
@@ -81,12 +93,31 @@ function writeHTMLInfo($htmlText) {
       $aSequence++;
       $aName          = md5($aSequence);
       $targetFileName = substr($outputFiles[$ofNdx], strlen($baseToExport) + 1);
+      if ($detailName > "") {
+        $sourceFilename = replace_extension($outputFiles[$ofNdx], ".auxmd");
+        $sourceFilename = str_replace(".auxmd", "-$detailName.md", $sourceFilename);
+        if (file_exists($sourceFilename)) {
+          $Parsedown = new Parsedown();
+          $sourceFileContent = @file_get_contents($sourceFilename);
+          $sourceFilename = substr($sourceFilename, strlen($baseToExport) + 1);
+          $documentationText = $Parsedown->text($sourceFileContent."\n\n>$sourceFilename");
+          $canDo=true;
+        } else {
+          $documentationText="File <b>$sourceFilename</b> not found.";
+          $canDo = !$doPartial;
+        }
+      } else {
+        $documentationText="Write your doc here...";
+        $canDo=true;
+      }
       if (!isset($aMap[$targetFileName]))
         $aMap[$targetFileName] = array();
       $aMap[$targetFileName][$htmlText] = $targetFileName . "#$aName";
-      $htmlText                         = "<div class='container'><div class='row'><div class='column'><a name='$aName'></a><h3>$htmlText</h3></div></div><div class='row'><div class='column'>doc...</div></div></div>";
-      file_put_contents($outputFiles[$ofNdx], $htmlText, FILE_APPEND);
-      chmod($outputFiles[$ofNdx], 0755);
+      if ($canDo) {
+        $htmlText                         = "<div class='container'><div class='row'><div class='column'><a name='$aName'></a><h3>$htmlText</h3></div></div><div class='row'><div class='column'><div class='docEntry'>$documentationText</div></div></div></div>";
+        file_put_contents($outputFiles[$ofNdx], $htmlText, FILE_APPEND);
+        chmod($outputFiles[$ofNdx], 0755);        
+      }
     }
   }
 }
@@ -137,7 +168,7 @@ function showXdbInfo($margin, $xml, $type = 'file') {
             }
           }
           $funcDeclaration .= ")\n";
-          writeHTMLInfo($funcDeclaration);
+          writeHTMLInfo($funcDeclaration, $detailName);
           $textReturn .= $funcDeclaration;
           
         }
@@ -188,19 +219,39 @@ else
 
 (@include_once "$cmLocation") or die("yclilib.php not found\n");
 
+$parseDownLibPresent=false;
+if (file_exists("$mydir/lib/Parsedown.php")) {
+  (@include_once "$mydir/lib/Parsedown.php") or die("$mydir/lib/Parsedown.php not found\n");
+  $parseDownLibPresent=true;
+}
+else
+  echo "Parsedown library ($mydir/lib/Parsedown.php) not found.\nYou cannot do partial documentation\n";
+
 $cwd          = getcwd();
 $args         = new ArgumentsProcessor(false);
 $myself       = basename($argv[0]);
 $filename     = $args->getSrc(0);
 $toHelp       = $args->argValue('help;h', __FALSE__) == __TRUE__;
 $toDestroy    = $args->argValue('destroy;d', __FALSE__) == __TRUE__;
-$quiet        = $args->argValue('quiet;q', __FALSE__) == __TRUE__;
+$doQuiet      = $args->argValue('quiet;q', __FALSE__) == __TRUE__;
+$doPartial    = ($args->argValue('partial;p', __FALSE__) == __TRUE__) && ($parseDownLibPresent);
 $baseToExport = $args->getSrc(1);
 $toExport     = trim($baseToExport) > '';
 
 echo "YeAPF 0.8.63 $myself\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n";
 if (($toHelp) || (trim($filename) == '')) {
-  die("usage:\n\t$myself <filename> [output-folder] [--destroy] [--quiet]\n\t\tfilename\tis a .xdb created by ydocbuilder\n\t\toutput-folder\tis used to write html files\n\t\t--destroy\tclean the output-folder (delete all html files in folder)\n");
+  echo "usage:\n";
+  echo "\t$myself <filename> [output-folder] [--destroy] [--partial] [--quiet]\n";
+  echo "\t\tfilename\tis a .xdb created by ydocbuilder\n";
+  echo "\t\toutput-folder\tis used to write html files\n";
+  echo "\t\t--destroy\tclean the output-folder (delete all html files in folder)\n"; 
+  echo "\t\t--partial\twrite information only for those items that have a .md correspondent file\n";
+  echo "\t\t--quiet\tshows minimal information\n";
+  echo "\nIn orther to create your .md files, you can use a tool like https://stackedit.io/app#\n";
+  echo "\nIn such case, you need to create each file with .md extension\n";
+  echo "\nFor example: lib/grant_rights.js will become lib/grant_rights.js.md\n";
+  echo "\n.md files are not deleted with -d parameter\n";
+  exit(0);
 }
 
 if (file_exists($filename)) {
@@ -219,7 +270,7 @@ if (file_exists($filename)) {
   }
   
   $xdbInfo = showXdbInfo(0, $xml);
-  if (!$quiet)
+  if (!$doQuiet)
     echo $xdbInfo;
   $docMap = "<!DOCTYPE html>
               <html lang='en'>
@@ -236,6 +287,12 @@ if (file_exists($filename)) {
                   <link rel='stylesheet' href='css/font-awesome.css' />
                   <link rel='icon' href='images/favicon.png' />
                 </head>
+
+                <style>
+                  .docEntry {
+                    padding-left: 16px;
+                  }
+                </style>
 
                 <body><div class='container'><div class='row'><div class='column'><h1>YeAPF Documenter</h1><h3>YeAPF 0.8.63</h3><strong>Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com</strong></div></div>";
   

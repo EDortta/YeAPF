@@ -24,13 +24,18 @@ if [[ "$dist" == "Darwin" ]]; then
   tgt="/usr/local/bin"
 fi
 
-cp ydistbuilder $tgt/
-cp yviewdistinfo $tgt/
-cp ydocbuilder $tgt/
-cp ydocview $tgt/
-cp ycheckdistsource $tgt/
-chmod +x $tgt/ydistbuilder
-chmod +x $tgt/yviewdistinfo
-chmod +x $tgt/ydocbuilder
-chmod +x $tgt/ydocview
-chmod +x $tgt/ycheckdistsource
+if [ ! -d "$tgt/lib" ]; then
+	mkdir "$tgt/lib"
+fi
+cp lib/Parsedown.php "$tgt/lib/"
+
+cp ydistbuilder "$tgt/"
+cp yviewdistinfo "$tgt/"
+cp ydocbuilder "$tgt/"
+cp ydocview "$tgt/"
+cp ycheckdistsource "$tgt/"
+chmod +x "$tgt/ydistbuilder"
+chmod +x "$tgt/yviewdistinfo"
+chmod +x "$tgt/ydocbuilder"
+chmod +x "$tgt/ydocview"
+chmod +x "$tgt/ycheckdistsource"
