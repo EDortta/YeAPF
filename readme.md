@@ -1,10 +1,8 @@
 # **Welcome to YeAPF!**
 
 *(C) 2019 - Esteban D.Dortta - MIT Licence*
-*YeAPF 0.8.63-86 built on 2019-07-09 11:37 (-3 DST)*
-*2019-07-06 10:53:22 (-3 DST)*
-
-[pt-br](readme-pt-br.md) | [es](readme-es.md) 
+*YeAPF 0.8.63-70 built on 2019-07-05 09:59 (-3 DST)*
+*2019-07-02 19:37:16 (-3 DST)*
 
 **YeAPF!** means '**Yet Another PHP Framework**' and is a nerd celebration to [yacc](https://whatis.techtarget.com/definition/yacc-yet-another-compiler-compiler).
 
@@ -17,7 +15,7 @@ On the other hand, you can think agnostically. You can just use the part you bel
 It does not pretend to be light in the sense of how much it weight to be loaded. This is because the main idea is to build applications and not singles pages. But it pretends to be light in the sense of development, usage, data transfer between server(s) and client(s).
 
 ## Usage
-You can just download and use or you can install the embedded tools.
+You can just download an use or you can install the embedded tools.
 
 The effect is the same but with the [tools](http://www.yeapf.com/wp/?p=455) you can achieve a richer and smooth experience because it help you in some day-to-day tasks.
 
@@ -34,7 +32,7 @@ You can use xmlHttpRequest (Ajax), RestFUL, WebSocket, Server Side Events and SO
 While you're free to use whatever CSS Framework you like, we deliver some samples and skeletons using BootStrap, Milligram, Materialize, Pure and Skeleton CSS frameworks you're free to use what yo do believe is better for your needs.
 
 ## Databases
-You can use what do you prefer to keep your data (SQL, NoSQL, Graph) PDO or not... whatever. Meanwhile, we do offer a set of functions that are ready to work with MariaDB (MySQL), Firebird (Interbase) and Postgresql.
+You can use what do you prefer to keep your data (SQL, NoSQL, Graph) PDO or not... whatever. Meanwhile, we do offer a set of functions that are ready to work with MariaDB (MySQL), Firebird (Interbase) and Postgresql,
 
 You just write your sql command an use these functions to query/update your data as you always do. But, if you use SQL92, you can just switch from one database to another with not so much suffering.
 
@@ -43,7 +41,7 @@ There is a tool (ydbmigrate) that helps you to convert a data set from one datab
 ## Stability
 Some applications are running for more than 10 years. From time to time, we need to do some improvements. Those changes are done in the mos careful way in order to no break legacy code. 
 
-Meanwhile, you can just run together two, three, four different versions of YeAPF! in the same server. Just put *includes* files from the correct version into your *includes* app folder.
+Meanwhile, you can just run together two, three, four different versions of YeAPF in the same server. Just put *includes* files from the correct version into your *includes* app folder.
 
 ## Static pages application
 You can produce static pages application as in any other server-side framework. The difference is that you can save those pages in a local cache and serve from here controlling that from the application itself and not from the server. It uses to have a big and good impact on server performance.

@@ -1,5 +1,9 @@
 # Exemplos que usam banco de dados
 
+*(C) 2019 - Esteban D.Dortta - MIT Licence*
+*YeAPF 0.8.63-86 built on 2019-07-09 11:37 (-3 DST)*
+*2019-07-09 11:22:28 (-3 DST)*
+
 [en](readme-database-samples-en.md) | [es](readme-database-samples-es.md)
 
 Todos os exemplos que usam banco de dados são construídos em ao redor de [*world.sql*](http://downloads.mysql.com/docs/world.sql.gz) que é gratuito para download.

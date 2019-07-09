@@ -1,5 +1,8 @@
 # Skeleton and Samples Folders
 
+*(C) 2019 - Esteban D.Dortta - MIT Licence*
+*YeAPF 0.8.63-91 built on 2019-07-09 11:54 (-3 DST)*
+*2019-07-09 11:22:28 (-3 DST)*
 
 ## skeleton
 This folder contains different skeletons that can be used to build YeAPF applications.

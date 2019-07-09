@@ -1,5 +1,9 @@
 # Ejemplos con Banco de Datos
 
+*(C) 2019 - Esteban D.Dortta - MIT Licence*
+*YeAPF 0.8.63-86 built on 2019-07-09 11:37 (-3 DST)*
+*2019-07-09 11:22:28 (-3 DST)*
+
 [en](readme-database-samples-en.md) | [pt-br](readme-database-samples-pt-br.md)
 
 Todas las muestras que usan base de datos se crearon alrededor de [*world.sql*](http://downloads.mysql.com/docs/world.sql.gz) que se puede descargar gratis.

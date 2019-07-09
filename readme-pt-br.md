@@ -1,8 +1,8 @@
 # **Bem-vindo ao YeAPF!**
 
 *(C) 2019 - Esteban D.Dortta - Licença MIT* 
-*%YEAPF_VERSION_LABEL%* 
-*%LAST_FILE_MODIFICATION%* 
+*YeAPF 0.8.63-86 built on 2019-07-09 11:37 (-3 DST)* 
+*2019-07-06 10:45:54 (-3 DST)* 
 
 [en](readme-en.md) | [es](readme-es.md) 
 
