@@ -1,8 +1,8 @@
 # Skeleton and Samples Folders
 
-*(C) 2019 - Esteban D.Dortta - MIT Licence*
-Version: *YeAPF 0.8.63-92 built on 2019-07-09 12:00 (-3 DST)*
-Last file modification: *2019-07-09 11:59:56 (-3 DST)*
+    *(C) 2019 - Esteban D.Dortta - MIT Licence*
+    *YeAPF 0.8.63-93 built on 2019-07-09 12:19 (-3 DST)*
+    *2019-07-09 12:18:47 (-3 DST)*
 
 
 ## skeleton
@@ -34,7 +34,7 @@ This usage examples start from the point you has had downloaded and installed Ye
     Let's say, you went to http://www.yeapf.com -> download
     Then extracted that file in your home folder
     After that, installed YeAPF tools using tools/install.sh as in this line:
-    
+
     $ cd ~/Downloads/YeAPF/tools
     $ sudo ./install.sh
 
@@ -42,9 +42,9 @@ Once this is done, you can use 'yapp' to create your applications
 
 **Example1 - using template**
         Let's say you want to create a webApp using BootStrap 3. The next line will create a folder and put all the required files into it.
-        
-        $ cd /var/www/html
-        $ yapp firstWebApp --create webApp --template bs3
+
+    $ cd /var/www/html
+    $ yapp firstWebApp --create webApp --template bs3
 
 You will see a new folder called *firstWebApp* with a lot of files inside.
 
@@ -52,9 +52,9 @@ Modify yeapf.db.ini and request configure.php from the navigator. Your're ready 
 
 **Example2 - using template**
         Now, let's imagine you want to create a webSocket server. Just use yapp again like this:
-        
-            $ cd /var/www/html
-            $ yapp firstWebSocket --create --appType webSocket --port 9191 --host 192.168.2.1 --name MyWebSocket
+
+    $ cd /var/www/html
+    $ yapp firstWebSocket --create --appType webSocket --port 9191 --host 192.168.2.1 --name MyWebSocket
 
 Again, you will have a new folder with some files.
 Change yeapf.db.ini.
@@ -75,10 +75,10 @@ If all run as expected, you will have an output like this:
 A SOAP webservice is distributed as a sample and not like a template.
     This is because it's not ready to be considered a template where the user files are respected.
  Anyway, you can create a webservice using this lines:
- 
+
     $ cd /var/www/html
     $ yapp firstSOAPService --create --fromSample webservice --name myws
-    
+
 Again, adapt yeapf.db.ini, run configure.php and you're ready to go.
 In this special case, you will need to change myws_def.php in order to declare (using nuSOAP) your functions and myws_imp.php to make the implementation of them.
 

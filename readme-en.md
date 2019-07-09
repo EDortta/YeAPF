@@ -1,8 +1,8 @@
 # **Welcome to YeAPF!**
 
-*(C) 2019 - Esteban D.Dortta - MIT Licence*
-*YeAPF 0.8.63-86 built on 2019-07-09 11:37 (-3 DST)*
-*2019-07-06 10:53:22 (-3 DST)*
+    *(C) 2019 - Esteban D.Dortta - MIT Licence*
+    *YeAPF 0.8.63-93 built on 2019-07-09 12:19 (-3 DST)*
+    *2019-07-09 12:18:47 (-3 DST)*
 
 [pt-br](readme-pt-br.md) | [es](readme-es.md) 
 
@@ -39,6 +39,8 @@ You can use what do you prefer to keep your data (SQL, NoSQL, Graph) PDO or not.
 You just write your sql command an use these functions to query/update your data as you always do. But, if you use SQL92, you can just switch from one database to another with not so much suffering.
 
 There is a tool (ydbmigrate) that helps you to convert a data set from one database server to another if you want that too.
+
+Remember to read about how to use databases in our samples in this [document](readme-database-samples-en.md)
 
 ## Stability
 Some applications are running for more than 10 years. From time to time, we need to do some improvements. Those changes are done in the mos careful way in order to no break legacy code. 

@@ -1,8 +1,8 @@
 # **Bem-vindo ao YeAPF!**
 
-*(C) 2019 - Esteban D.Dortta - MIT Licence*
-Versão: *YeAPF 0.8.63-92 built on 2019-07-09 12:00 (-3 DST)*
-Ultima modificação do arquivo: *2019-07-09 11:59:56 (-3 DST)*
+    *(C) 2019 - Esteban D.Dortta - MIT Licence*
+    *YeAPF 0.8.63-93 built on 2019-07-09 12:19 (-3 DST)*
+    *2019-07-09 12:18:47 (-3 DST)*
 
 [en](readme-en.md) | [es](readme-es.md) 
 
@@ -39,6 +39,8 @@ Você pode usar o que você preferir para manter seus dados (SQL, NoSQL, Graph) 
 Você aenas escreve seu comando sql e usa essas funções para consultar/atualizar seus dados como sempre faz. Mas, se você usar o SQL92, você pode simplesmente mudar de um banco de dados para outro com pouco sofrimento.
 
 Existe uma ferramenta (ydbmigrate) que ajuda você a converter um conjunto de dados de um servidor de banco de dados para outro, se desejar também.
+
+Lembre-se de ler sobre como usar bancos de dados em nossas amostras neste [documento](readme-database-samples-pt-br.md)
 
 ## Estabilidade
 Algumas aplicações estão em execução há mais de 10 anos. De tempos em tempos, precisamos fazer algumas melhorias. Essas mudanças são feitas de forma cuidadosa, a fim de não quebrar o código legado.
