@@ -1,8 +1,8 @@
 # Exemplos que usam banco de dados
 
 *(C) 2019 - Esteban D.Dortta - MIT Licence*
-*YeAPF 0.8.63-91 built on 2019-07-09 11:54 (-3 DST)*
-*2019-07-09 11:22:28 (-3 DST)*
+Versão: *YeAPF 0.8.63-92 built on 2019-07-09 12:00 (-3 DST)*
+Ultima modificação do arquivo: *2019-07-09 11:59:56 (-3 DST)*
 
 [en](readme-database-samples-en.md) | [es](readme-database-samples-es.md)
 
