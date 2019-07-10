@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ydocbuilder
-    YeAPF 0.8.63-54 built on 2019-07-02 19:38 (-3 DST)
+    YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-05-18 09:13:55 (-3 DST)
+    2019-07-10 19:49:18 (-3 DST)
 */
 
   function _cleanup(&$inner)
@@ -288,13 +288,17 @@
 
   function processSourceFolder($folderOrFile)
   {
-    global $src, $avoid;
+    global $src, $avoid, $exclude;
 
-    if (is_dir($folderOrFile))
-      $folderOrFile="$folderOrFile/*";
     $folderOrFile=str_replace('//','/',$folderOrFile);
-    $position = array_search($folderOrFile, $avoid);
+    $position = y_array_fnmatch($avoid, $folderOrFile);
+    if ($position===false) {
+      $position = y_array_fnmatch($exclude, $folderOrFile);
+    }
+
     if ($position === false) {
+      if (is_dir($folderOrFile))
+        $folderOrFile="$folderOrFile/*";
       echo "+ $folderOrFile\n";
       $d = glob($folderOrFile);
       foreach($d as $filename) {
@@ -341,12 +345,22 @@
   $cwd=getcwd();
   $args = new ArgumentsProcessor(false);
   $myself=basename($argv[0]);
+  $exclude=$args->argValue('e;exclude',"");
   $verbose=$args->argValue('v;verbose',0);
   $verbose = ($verbose===__TRUE__);
 
+  $exclude=explode(",", $exclude);
+
   echo "YeAPF 0.8.63 $myself\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n";
   if ($args->argValue('h;help')==true) {
-    die("usage:\n\t$myself [--prior <folder>] [--verbose] [source-folder]\n\t--prior <folder>\tlocation of the prior version of this folder\n\t\t\t\tif none is specified, then an all-new version\n\t\t\t\twill be created\n\t[--verbose|-v]\tShow files being processed\n\nIt will use ydistbuilder.files to find files.\nYou can set a list of unwanted files in ydocbuilder.avoid\n");
+    echo "usage:\n\t$myself [--prior <folder>] [--verbose] [source-folder]\n";
+    echo "\t--prior <folder>\tlocation of the prior version of this folder\n";
+    echo "\t\t\t\tif none is specified, then an all-new version\n";
+    echo "\t\t\t\twill be created\n";
+    echo "\t[--verbose|-v]\tShow files being processed\n";
+    echo "\t[--exclude]   \tList of folder to be excluded from scanner. Comma separated.\n";
+    echo "\nIt will use ydistbuilder.files to find files.\nYou can set a list of unwanted files in ydocbuilder.avoid\n";
+    exit(20);
   }
 
   if (file_exists('ydistbuilder.files')) {
@@ -358,10 +372,16 @@
 
   $files=file("$projectBase/ydistbuilder.files");
   $avoid=file_exists("$projectBase/ydocbuilder.avoid")?file("$projectBase/ydocbuilder.avoid"):array();
-
+  foreach ($avoid as $key => $value) {
+    $avoid[$key]=preg_replace( '/[^[:print:]]/', '', $value ). "/*";
+  }
+  foreach ($exclude as $key => $value) {
+    $exclude[$key]=preg_replace( '/[^[:print:]]/', '', $value ). "/*";
+  }
 
   _LOAD_YEAPF_();
   $files=y_array_diff($files, $avoid);
+  $files=y_array_diff($files, $exclude);
 
   $src = trim($args->getSrc(0));
   if ($src=='')

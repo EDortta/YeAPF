@@ -2,7 +2,7 @@
 <?php
   /*
   tools/yapp
-  YeAPF 0.8.63-73 built on 2019-07-08 12:05 (-3 DST)
+  YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)
   Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
   2019-07-05 08:47:32 (-3 DST)
   */
@@ -479,7 +479,7 @@
             $cfgURL = "http://localhost/" . $yeapfConfig['myself'] . "/configure.php";
             echo "Calling '$cfgURL' ...\n";
             file_get_contents($cfgURL);
-            echo "Ok\nThis folder was updated to YeAPF v0.8.63-73\n";
+            echo "Ok\nThis folder was updated to YeAPF v0.8.63-104\n";
           }
           else {
             echo "Remember to call 'configure.php' from your navigator\n";

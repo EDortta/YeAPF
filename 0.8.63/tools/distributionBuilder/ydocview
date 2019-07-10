@@ -2,9 +2,9 @@
 <?php
 /*
 tools/distributionBuilder/ydocview
-YeAPF 0.8.63-91 built on 2019-07-09 11:54 (-3 DST)
+YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)
 Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-2019-07-09 09:17:14 (-3 DST)
+2019-07-10 13:07:03 (-3 DST)
 */
 
 if (!function_exists("objet2array")) {
@@ -22,7 +22,7 @@ $outputFiles = array();
 function writeHTMLHeader($margin, $title="") {
   global $outputFiles, $ofNdx;
   $auxBase = str_replace("//", "/", dirname($outputFiles[$ofNdx]));
-  $slashCount = substr_count($auxBase,"/");
+  $slashCount = substr_count($auxBase,"/")-1;
   $base     = str_repeat("../", $slashCount);
   $thisFileName=$title;
   if ($title=="")
@@ -48,6 +48,8 @@ function writeHTMLHeader($margin, $title="") {
                       <link rel='stylesheet' href='".$base."css/roboto.css' />
                       <link rel='stylesheet' href='".$base."css/font-awesome.css' />
                       <link rel='icon' href='".$base."images/favicon.png' />
+                      <script src='".$base."js/yloader.min.js'></script>
+                      <script src='".$base."js/ydocviewer.js'></script>
                     </head>
 
                     <style>
@@ -116,7 +118,7 @@ function writeHTMLInfo($htmlText, $detailName="") {
         $aMap[$targetFileName] = array();
       $aMap[$targetFileName][$htmlText] = $targetFileName . "#$aName";
       if ($canDo) {
-        $htmlText                         = "<div class='container'><div class='row'><div class='column'><a name='$aName'></a><h3>$htmlText</h3></div></div><div class='row'><div class='column'><div class='docEntry'>$documentationText</div></div></div></div>";
+        $htmlText = "<div class='container'><div class='row'><div class='column'><a name='$aName'></a><h3><a href='#$aName'><i class='fa fa-caret-right expand-document expander-$aName' data-id='$aName'></i>&nbsp;&nbsp;$htmlText</a></h3></div></div><div class='row'><div class='column'><div class='docEntry' id='$aName' style='display: none'>$documentationText</div></div></div></div>";
         file_put_contents($outputFiles[$ofNdx], $htmlText, FILE_APPEND);
         chmod($outputFiles[$ofNdx], 0755);
       }
@@ -247,16 +249,19 @@ if (($toHelp) || (trim($filename) == '')) {
   echo "\t$myself <filename> [output-folder] [--destroy] [--partial] [--quiet]\n";
   echo "\t\tfilename\tis a .xdb created by ydocbuilder\n";
   echo "\t\toutput-folder\tis used to write html files\n";
-  echo "\t\t--quiet\tshows minimal information\n";
-  echo "\t\t--destroy\tclean the output-folder (delete all html files in folder)\n";
-  echo "\t\t--partial\twrite information only for those items that have a .md correspondent file\n";
-  echo "\t\t--mdsource\tindicate where .md files are located. by default are at 'output-folder'\n";
+  echo "\t\t--quiet   \t(-q) shows minimal information\n";
+  echo "\t\t--destroy \t(-d) clean the output-folder (delete all html files in folder)\n";
+  echo "\t\t--partial \t(-p) write information only for those items that have a .md correspondent file\n";
+  echo "\t\t--mdsource\t(-s) indicate where .md files are located. by default are at 'output-folder'\n";
   echo "\nIn orther to create your .md files, you can use a tool like https://stackedit.io/app#\n";
   echo "\nIn such case, you need to create each file with .md extension\n";
   echo "\nFor example: lib/grant_rights.js will become lib/grant_rights.js.md\n";
   echo "\n.md files are not deleted with -d parameter\n";
   exit(0);
 }
+
+// ydocviewer.min.js
+$ydocviewer_min_js=base64_decode("dmFyIHlEb2NWaWV3ZXJPYmo9ZnVuY3Rpb24oKXsidXNlIHN0cmljdCI7dmFyIHQ9e2V4cGFuZERvY3VtZW50OmZ1bmN0aW9uKHQpe3ZhciBlPXkkKCIuZG9jRW50cnkiKTtpZihlKXtlLmZvckVhY2goZnVuY3Rpb24odCl7dC5zdHlsZS5kaXNwbGF5PSJub25lIn0pO3ZhciBuPXkkKHQpO2lmKG4pe24uc3R5bGUuZGlzcGxheT0iIjt2YXIgYT15JCgiLmV4cGFuZGVyLSIrdCk7YSYmKGE9YVswXSkuYWRkQ2xhc3MoImZhLXJvdGF0ZS05MCIpfX19fSxlPWZ1bmN0aW9uKGUpe2lmKGUmJmUudGFyZ2V0KXt5JCgiLmV4cGFuZC1kb2N1bWVudCIpLmZvckVhY2goZnVuY3Rpb24odCl7dC5kZWxldGVDbGFzcygiZmEtcm90YXRlLTkwIil9KTt2YXIgbj1lLnRhcmdldC5jbG9zZXN0KCJJIikuZ2V0QXR0cmlidXRlKCJkYXRhLWlkIik7dC5leHBhbmREb2N1bWVudChuKX19O3JldHVybiBmdW5jdGlvbigpe2FkZEV2ZW50KCJleHBhbmQtZG9jdW1lbnQiLCJjbGljayIsZSk7dmFyIG4sYT1kb2N1bWVudC5sb2NhdGlvbi5ocmVmLnNwbGl0KCIjIik7KGEubGVuZ3RoPTIpP3QuZXhwYW5kRG9jdW1lbnQoYVsxXSk6MT09KG49eSQoIi5leHBhbmQtZG9jdW1lbnQiKSkubGVuZ3RoJiZ0LmV4cGFuZERvY3VtZW50KG5bMF0uZ2V0QXR0cmlidXRlKCJkYXRhLWlkIikpfSgpfTthZGRPbkxvYWRNYW5hZ2VyKGZ1bmN0aW9uKCl7d2luZG93LnlEb2NWaWV3ZXI9eURvY1ZpZXdlck9iaigpfSk7");
 
 if (file_exists($filename)) {
   $xml = simplexml_load_file($filename);
@@ -290,6 +295,8 @@ if (file_exists($filename)) {
                   <link rel='stylesheet' href='css/roboto.css' />
                   <link rel='stylesheet' href='css/font-awesome.css' />
                   <link rel='icon' href='images/favicon.png' />
+                  <script src='js/yloader.min.js'></script>
+                  <script src='js/ydocviewer.js'></script>
                 </head>
 
                 <style>
@@ -312,6 +319,19 @@ if (file_exists($filename)) {
   }
   $docMap .= "</div><!--container-->\n</body>\n</html>\n";
   file_put_contents("$baseToExport/" . basename($filename) . ".html", $docMap);
+
+  if (!file_exists("$baseToExport/js/ydocviewer.min.js")) {
+    if (!is_dir("$baseToExport/js")) {
+      if (@mkdir("$baseToExport/js")) {
+        if (false===@file_put_contents("$baseToExport/js/ydocviewer.min.js", $ydocviewer_min_js))
+          echo "Was not possible to create '$baseToExport/js/ydocviewer.min.js'\n";
+          exit(20);
+      } else {
+        echo "$baseToExport/js cannot be created\n";
+        exit(20);
+      }
+    }
+  }
 
 } else
   die("\nfile '$filename' not found\n");

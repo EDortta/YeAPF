@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misctools.php
-    YeAPF 0.8.63-54 built on 2019-07-02 19:38 (-3 DST)
+    YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-    2019-04-30 08:15:56 (-3 DST)
+    2019-07-10 19:47:51 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -471,6 +471,31 @@
       }
 
       return $arrayFrom;
+  }
+
+  function y_array_fnmatch($arrayOfPatterns, $string, $flags=0) 
+  {
+    /* goes through the arrayOfPatterns
+       stop at first string match agains pattern
+       return false if none found or arrayOfPatterns position */
+    $ret=false;
+    if (is_array($arrayOfPatterns)) {
+      /*
+      while ( (mb_strlen($string)>0) and 
+              (!(mb_strpos("*\/", mb_substr($string, mb_strlen($string) - 1, 1)) === false) ) ) {
+        $string = mb_substr($string, 0, mb_strlen($string)-1);
+      }
+      */
+      for($i=0; $i<count($arrayOfPatterns) && $ret==false; $i++) {
+        $aux=fnmatch($arrayOfPatterns[$i], $string, $flags);
+        if (!(false===$aux))
+          $ret=$i;
+        else {
+
+        }
+      }      
+    }
+    return $ret;
   }
 
   function renameArrayElement(&$array, $currentKey, $newKey)
