@@ -2,9 +2,9 @@
 <?php
 /*
 tools/distributionBuilder/ydocview
-YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)
+YeAPF 0.8.63-105 built on 2019-07-11 09:18 (-3 DST)
 Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-2019-07-10 13:07:03 (-3 DST)
+2019-07-11 09:07:53 (-3 DST)
 */
 
 if (!function_exists("objet2array")) {
@@ -59,7 +59,8 @@ function writeHTMLHeader($margin, $title="") {
                     </style>
 
                     <script>
-                      function goBack() {window.history.back();}
+                    window.homeHistoryPosition = 0;
+                      function goBack() {window.history.go(homeHistoryPosition);}
                     </script>
 
                     <body><h2>$thisFileName</h2>\n";
@@ -86,9 +87,10 @@ function replace_extension($filename, $new_extension) {
     return $info['dirname'].'/'.$info['filename'] . $new_extension;
 }
 
-function writeHTMLInfo($htmlText, $detailName="") {
+function writeHTMLInfo($htmlText, $detailName="", $detail=null) {
   global $baseToExport, $mdSourceFolder, $toExport, $outputFiles, $ofNdx, $aMap, $aSequence, $doPartial;
 
+  $canDo = false;
   if ($toExport) {
     $htmlText = trim($htmlText);
     if ($htmlText > '') {
@@ -114,20 +116,32 @@ function writeHTMLInfo($htmlText, $detailName="") {
         $documentationText="Write your doc here...";
         $canDo=true;
       }
-      if (!isset($aMap[$targetFileName]))
-        $aMap[$targetFileName] = array();
-      $aMap[$targetFileName][$htmlText] = $targetFileName . "#$aName";
       if ($canDo) {
-        $htmlText = "<div class='container'><div class='row'><div class='column'><a name='$aName'></a><h3><a href='#$aName'><i class='fa fa-caret-right expand-document expander-$aName' data-id='$aName'></i>&nbsp;&nbsp;$htmlText</a></h3></div></div><div class='row'><div class='column'><div class='docEntry' id='$aName' style='display: none'>$documentationText</div></div></div></div>";
+        /* main index entry */
+        if (!isset($aMap[$targetFileName]))
+          $aMap[$targetFileName] = array();
+        $aMap[$targetFileName][$htmlText] = $targetFileName . "#$aName";
+
+        if (is_array($detail)) {
+          if ((isset($detail['code'])) && (!$doPartial)) {
+            $codeInfo = 'md5: '.$detail['code']['md5'].' start: '.$detail['code']['start'].' end: '.$detail['code']['end'];
+            $documentationText = "\n\n<div><pre>$codeInfo</pre></div>\n\n$documentationText\n\n";
+          }
+        }
+        /* html body */
+        $htmlText = "<div class='container'><div class='row'><div class='column'><a name='$aName'></a><h3><a href='#$aName' class='expand-document' data-id='$aName'><i class='fa fa-caret-right expander-$aName'></i>&nbsp;&nbsp;$htmlText</a></h3></div></div><div class='row'><div class='column'><div class='docEntry' id='$aName' style='display: none'>$documentationText</div></div></div></div>";
         file_put_contents($outputFiles[$ofNdx], $htmlText, FILE_APPEND);
         chmod($outputFiles[$ofNdx], 0755);
       }
     }
   }
+  return $canDo;
 }
 
 function showXdbInfo($margin, $xml, $type = 'file') {
   global $baseToExport, $toExport, $outputFiles, $ofNdx, $toDestroy;
+
+  $toDebug = true;
 
   $oldOfNdx = $ofNdx;
 
@@ -172,8 +186,11 @@ function showXdbInfo($margin, $xml, $type = 'file') {
             }
           }
           $funcDeclaration .= ")\n";
-          writeHTMLInfo($funcDeclaration, $detailName);
-          $textReturn .= $funcDeclaration;
+          if (writeHTMLInfo($funcDeclaration, $detailName, $detail)) {
+            if ($detailName>"") {
+              $textReturn .= $funcDeclaration;            
+            }
+          }
 
         }
       } else if ($type == 'class') {
@@ -184,11 +201,13 @@ function showXdbInfo($margin, $xml, $type = 'file') {
       } else if ($type == 'inner') {
         $textReturn .= "*";
       }
-      if ($type == 'file')
+      if ($type == 'file') {
         writeHTMLHeader($margin, $outputFiles[$ofNdx]);
+      }
       $insideInfo = viewInside($margin, $detail);
-      if ($type == 'file')
+      if ($type == 'file') {
         writeHTMLFooter($margin);
+      }
       $textReturn .= $insideInfo;
     }
   }
@@ -261,7 +280,7 @@ if (($toHelp) || (trim($filename) == '')) {
 }
 
 // ydocviewer.min.js
-$ydocviewer_min_js=base64_decode("dmFyIHlEb2NWaWV3ZXJPYmo9ZnVuY3Rpb24oKXsidXNlIHN0cmljdCI7dmFyIHQ9e2V4cGFuZERvY3VtZW50OmZ1bmN0aW9uKHQpe3ZhciBlPXkkKCIuZG9jRW50cnkiKTtpZihlKXtlLmZvckVhY2goZnVuY3Rpb24odCl7dC5zdHlsZS5kaXNwbGF5PSJub25lIn0pO3ZhciBuPXkkKHQpO2lmKG4pe24uc3R5bGUuZGlzcGxheT0iIjt2YXIgYT15JCgiLmV4cGFuZGVyLSIrdCk7YSYmKGE9YVswXSkuYWRkQ2xhc3MoImZhLXJvdGF0ZS05MCIpfX19fSxlPWZ1bmN0aW9uKGUpe2lmKGUmJmUudGFyZ2V0KXt5JCgiLmV4cGFuZC1kb2N1bWVudCIpLmZvckVhY2goZnVuY3Rpb24odCl7dC5kZWxldGVDbGFzcygiZmEtcm90YXRlLTkwIil9KTt2YXIgbj1lLnRhcmdldC5jbG9zZXN0KCJJIikuZ2V0QXR0cmlidXRlKCJkYXRhLWlkIik7dC5leHBhbmREb2N1bWVudChuKX19O3JldHVybiBmdW5jdGlvbigpe2FkZEV2ZW50KCJleHBhbmQtZG9jdW1lbnQiLCJjbGljayIsZSk7dmFyIG4sYT1kb2N1bWVudC5sb2NhdGlvbi5ocmVmLnNwbGl0KCIjIik7KGEubGVuZ3RoPTIpP3QuZXhwYW5kRG9jdW1lbnQoYVsxXSk6MT09KG49eSQoIi5leHBhbmQtZG9jdW1lbnQiKSkubGVuZ3RoJiZ0LmV4cGFuZERvY3VtZW50KG5bMF0uZ2V0QXR0cmlidXRlKCJkYXRhLWlkIikpfSgpfTthZGRPbkxvYWRNYW5hZ2VyKGZ1bmN0aW9uKCl7d2luZG93LnlEb2NWaWV3ZXI9eURvY1ZpZXdlck9iaigpfSk7");
+$ydocviewer_min_js=base64_decode("dmFyIHlEb2NWaWV3ZXJPYmo9ZnVuY3Rpb24oKXt2YXIgYz17ZXhwYW5kRG9jdW1lbnQ6ZnVuY3Rpb24oYSl7dmFyIGI9eSQoIi5kb2NFbnRyeSIpO2ImJihiLmZvckVhY2goZnVuY3Rpb24oYSl7YS5zdHlsZS5kaXNwbGF5PSJub25lIn0pLGI9eSQoYSkpJiYoYi5zdHlsZS5kaXNwbGF5PSIiLGE9eSQoIi5leHBhbmRlci0iK2EpKSYmKGE9YVswXSxhLmFkZENsYXNzKCJmYS1yb3RhdGUtOTAiKSx3aW5kb3cuaG9tZUhpc3RvcnlQb3NpdGlvbi0tKX19LGQ9ZnVuY3Rpb24oYSl7YSYmYS50YXJnZXQmJih5JCgiLmV4cGFuZC1kb2N1bWVudCIpLmZvckVhY2goZnVuY3Rpb24oYSl7YS5kZWxldGVDbGFzcygiZmEtcm90YXRlLTkwIil9KSxhPWEudGFyZ2V0LmNsb3Nlc3QoIkEiKS5nZXRBdHRyaWJ1dGUoImRhdGEtaWQiKSxjLmV4cGFuZERvY3VtZW50KGEpKX07cmV0dXJuIGZ1bmN0aW9uKCl7YWRkRXZlbnQoImV4cGFuZC1kb2N1bWVudCIsImNsaWNrIixkKTt2YXIgYT1kb2N1bWVudC5sb2NhdGlvbi5ocmVmLnNwbGl0KCIjIik7CmEubGVuZ3RoPTI7Yy5leHBhbmREb2N1bWVudChhWzFdKX0oKX07YWRkT25Mb2FkTWFuYWdlcihmdW5jdGlvbigpe3dpbmRvdy55RG9jVmlld2VyPXlEb2NWaWV3ZXJPYmooKX0pOw==");
 
 if (file_exists($filename)) {
   $xml = simplexml_load_file($filename);

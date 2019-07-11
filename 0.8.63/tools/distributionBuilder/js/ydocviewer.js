@@ -13,6 +13,7 @@ var yDocViewerObj = function () {
           if (i) {
             i=i[0];
             i.addClass('fa-rotate-90');
+            window.homeHistoryPosition--;
           }
         }  
     }
@@ -22,8 +23,8 @@ var yDocViewerObj = function () {
     if ((e) && (e.target)) {
       var expandDoumentList = y$('.expand-document');
       expandDoumentList.forEach( function (e) { e.deleteClass('fa-rotate-90'); });
-      var i  = e.target.closest('I');
-      var id = i.getAttribute('data-id');
+      var a  = e.target.closest('A');
+      var id = a.getAttribute('data-id');
       that.expandDocument(id);
     }
   };
