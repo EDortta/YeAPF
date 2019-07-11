@@ -2,9 +2,9 @@
 <?php
 /*
 tools/distributionBuilder/ydocview
-YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+YeAPF 0.8.63-110 built on 2019-07-11 14:44 (-3 DST)
 Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-2019-07-11 09:21:47 (-3 DST)
+2019-07-11 12:30:13 (-3 DST)
 */
 
 if (!function_exists("objet2array")) {
@@ -100,8 +100,11 @@ function writeHTMLInfo($htmlText, $detailName="", $detail=null) {
       if ($detailName > "") {
         $sourceFilename = replace_extension($outputFiles[$ofNdx], ".auxmd");
         $sourceFilename = str_replace(".auxmd", "-$detailName.md", $sourceFilename);
-        if ($mdSourceFolder!=$baseToExport)
-          $sourceFilename = str_replace($baseToExport, $mdSourceFolder, $sourceFilename);
+        if (!file_exists($sourceFilename)) {
+          if ($mdSourceFolder!=$baseToExport) {
+            $sourceFilename = str_replace($baseToExport, $mdSourceFolder, $sourceFilename);
+          }
+        }
         if (file_exists($sourceFilename)) {
           $Parsedown = new Parsedown();
           $sourceFileContent = @file_get_contents($sourceFilename);
