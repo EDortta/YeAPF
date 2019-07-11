@@ -1,6 +1,8 @@
 # **Amostras de YeAPF!**
 
-*(C) 2019 - Esteban D.Dortta - Licença MIT*
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
+    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    Last file version: 2019-07-11 09:39:32 (-3 DST)
 
 Veja também: [Esqueletos](../skel/readme-pt-br.md)
 

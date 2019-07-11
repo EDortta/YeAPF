@@ -1,8 +1,8 @@
 <?php
 /*
     skel/workbench/www/configure.php
-    YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)
-    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
     2018-11-20 06:47:06 (-3 DST)
 */
 
@@ -311,8 +311,8 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)\n");
-      fwrite($configFile," * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n");
+      fwrite($configFile," * YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)\n");
+      fwrite($configFile," * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
       fwrite($configFile," * On $date at $time\n");
@@ -364,8 +364,8 @@
   echo sayStep("<div style='border-left: solid 4px black; padding: 12px; background-color: #fff'>
     <div><a href='http://www.yeapf.com' target='x$timestamp'><img src='http://www.yeapf.com/logo.php'></a></div>
     <h2><big><I>skel/workbench/www/configure.php</I></big></h2>
-    <h3>YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)<br>
-    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com<br>
+    <h3>YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)<br>
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License<br>
     Last modification: 2018-11-20 06:47:06 (-3 DST)</h3></div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {

@@ -2,8 +2,8 @@
 <?php
 /*
     tools/distributionBuilder/ydocbuilder
-    YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)
-    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
     2019-07-10 19:49:18 (-3 DST)
 */
 
@@ -351,7 +351,7 @@
 
   $exclude=explode(",", $exclude);
 
-  echo "YeAPF 0.8.63 $myself\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n";
+  echo "YeAPF 0.8.63 $myself\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n";
   if ($args->argValue('h;help')==true) {
     echo "usage:\n\t$myself [--prior <folder>] [--verbose] [source-folder]\n";
     echo "\t--prior <folder>\tlocation of the prior version of this folder\n";

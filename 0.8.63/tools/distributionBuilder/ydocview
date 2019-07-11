@@ -2,9 +2,9 @@
 <?php
 /*
 tools/distributionBuilder/ydocview
-YeAPF 0.8.63-105 built on 2019-07-11 09:18 (-3 DST)
-Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
-2019-07-11 09:07:53 (-3 DST)
+YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
+2019-07-11 09:21:47 (-3 DST)
 */
 
 if (!function_exists("objet2array")) {
@@ -76,7 +76,7 @@ function writeHTMLFooter($margin) {
   global $outputFiles, $ofNdx;
   $htmlText = "<hr>\n";
   if ($margin<=1)
-    $htmlText.="<small>YeAPF documenter 0.8.63 - Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com</small></body></html>\n";
+    $htmlText.="<small>YeAPF documenter 0.8.63 - Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License</small></body></html>\n";
   file_put_contents($outputFiles[$ofNdx], $htmlText, FILE_APPEND);
   chmod($outputFiles[$ofNdx], 0755);
 }
@@ -124,7 +124,7 @@ function writeHTMLInfo($htmlText, $detailName="", $detail=null) {
 
         if (is_array($detail)) {
           if ((isset($detail['code'])) && (!$doPartial)) {
-            $codeInfo = 'md5: '.$detail['code']['md5'].' start: '.$detail['code']['start'].' end: '.$detail['code']['end'];
+            $codeInfo = ' md5: '.$detail['code']['md5'].' start: '.$detail['code']['start'].' end: '.$detail['code']['end'];
             $documentationText = "\n\n<div><pre>$codeInfo</pre></div>\n\n$documentationText\n\n";
           }
         }
@@ -262,7 +262,7 @@ $doQuiet        = $args->argValue('quiet;q', __FALSE__) == __TRUE__;
 $doPartial      = ($args->argValue('partial;p', __FALSE__) == __TRUE__) && ($parseDownLibPresent);
 $toExport       = trim($baseToExport) > '';
 
-echo "YeAPF 0.8.63 $myself\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n";
+echo "YeAPF 0.8.63 $myself\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n";
 if (($toHelp) || (trim($filename) == '')) {
   echo "usage:\n";
   echo "\t$myself <filename> [output-folder] [--destroy] [--partial] [--quiet]\n";
@@ -324,7 +324,7 @@ if (file_exists($filename)) {
                   }
                 </style>
 
-                <body><div class='container'><div class='row'><div class='column'><h1>YeAPF Documenter</h1><h3>YeAPF 0.8.63</h3><strong>Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com</strong></div></div>";
+                <body><div class='container'><div class='row'><div class='column'><h1>YeAPF Documenter</h1><h3>YeAPF 0.8.63</h3><strong>Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License</strong></div></div>";
 
   ksort($aMap);
 

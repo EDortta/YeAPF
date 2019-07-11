@@ -3,8 +3,8 @@
   /*
    * tools
    * tools/ysetdbconn.php
-   * YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)
-   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+   * YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
    * 2019-06-06 08:40:18 (-3 DST)
    *
    * Purpose: to create yeapf.db.ini basis
@@ -24,7 +24,7 @@
     die("\n$errMessage\n");
   }
 
-  echo basename("tools/ysetdbconn.php")."\nYeAPF 0.8.63 tools\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+  echo basename("tools/ysetdbconn.php")."\nYeAPF 0.8.63 tools\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n\n";
 
   $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
   (@include_once "$mydir/yclilib.php") or die("yclilib.php not found\n");
@@ -67,7 +67,7 @@
 
   if ($helpNeeded) {
     $myself=basename($argv[0]);
-    echo "YeAPF 0.8.63 $myself \nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+    echo "YeAPF 0.8.63 $myself \nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n\n";
     echo "YeAPF dbtools*\nFor change database connection you MUST use these switches:";
     echo "\n\t[--db <host:database name>]\tdatabase identification";
     echo "\n\t[--user <user name>]\t\tdatabase user name";

@@ -3,8 +3,8 @@
   /*
    * tools
    * tools/yconvertcharset
-   * YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)
-   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+   * YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
    * 2018-05-30 11:21:05 (-3 DST)
    */
 
@@ -68,7 +68,7 @@
 
     if ($stop) {
       $myself=basename($argv[0]);
-      echo "YeAPF 0.8.63 $myself \nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+      echo "YeAPF 0.8.63 $myself \nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n\n";
       echo "YeAPF tools*\nusage:";
       echo "\n\t$myself <source> [target]\n\nsource and target are folders, not files.\ntarget defauls to current working directory.";
       echo "\n".wordwrap("The file 'yconvertcharset.exclude' in the sorce folder contain a list of files and folders to be excluded. Each line represents a file/folder and '*' wilcard are allowed")."\n\n";
@@ -180,7 +180,7 @@
     }
   }
 
-  echo basename("tools/yconvertcharset")."\nYeAPF 0.8.63 tools\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+  echo basename("tools/yconvertcharset")."\nYeAPF 0.8.63 tools\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n\n";
 
   $showHelp=true;
   if (count($argv)>1) {

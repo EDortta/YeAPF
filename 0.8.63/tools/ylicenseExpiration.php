@@ -3,8 +3,8 @@
   /*
    * tools
    * tools/ylicenseExpiration.php
-   * YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)
-   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+   * YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
    * 2019-02-25 20:31:46 (-3 DST)
    */
 
@@ -61,7 +61,7 @@
     return $ret;
   }
 
-  echo basename("tools/ylicenseExpiration.php")."\nYeAPF 0.8.63 tools\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+  echo basename("tools/ylicenseExpiration.php")."\nYeAPF 0.8.63 tools\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n\n";
 
   if ($argc<=1) {
     echo "Exemplos:\n\tliberacao para uma data especifica: 18/06/2014 13:53\n";

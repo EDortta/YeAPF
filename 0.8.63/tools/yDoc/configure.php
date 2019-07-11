@@ -1,8 +1,8 @@
 <?php
 /*
     tools/yDoc/configure.php
-    YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)
-    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
     2018-05-30 11:21:05 (-3 DST)
 */
 
@@ -179,8 +179,8 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)\n");
-      fwrite($configFile," * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n");
+      fwrite($configFile," * YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)\n");
+      fwrite($configFile," * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n");
       fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
       fwrite($configFile," * On $date at $time\n");
@@ -240,8 +240,8 @@
   echo "<style>body{padding:8px; font-size:12px; font-family: arial; } .info{margin:2px; padding-bottom:8px; width: 800px} .warn{border-top:dotted 1px #900; border-bottom:dotted 1px #900; color:#A86D00;  font-weight:800; margin:2px; padding:8px; background-color:#FFEAC0} .cpyrght{font-size:14px; border-bottom:solid 2px #BFBFBF; padding-bottom:4px} .code { font-family:Consolas,monospace;  background-color: #E5E5E5;  margin: 8px;  padding: 4px;  border: dotted 1px #7F7F7F} .err {background-color:#FFC0CB;  border-style:solid;  border-width:2px;  border-color:#FF0000; margin:32px; padding:32px; border-radius:4px} .errItem {border-bottom: dotted 1px #FF0000;  margin-bottom:4px; }</style>";
 
   echo "<div class=cpyrght><strong><big><I>tools/yDoc/configure.php</I></big></strong><br>
-    YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)<br>
-    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com<br>
+    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)<br>
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License<br>
     2018-05-30 11:21:05 (-3 DST)</div>";
 
   if (!getMinPath($homeFolder, $homeURL, $relPath))

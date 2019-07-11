@@ -1,8 +1,8 @@
 <?php
   /*
     tools/spread-js.php
-    YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)
-    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
     2019-06-28 08:03:01 (-3 DST)
 
     This script will distribute monolite version of yloader.js
@@ -38,7 +38,7 @@
       grantDirectory($tgtFolder);
       $auxFile = _file($srcFileName);
       if ($addHeader) {
-        $auxFile = "/* YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST) Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com */\n".$auxFile;
+        $auxFile = "/* YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST) Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License */\n".$auxFile;
       }
       $tgtFileName=basename($srcFileName);
       if (file_put_contents("$tgtFolder/$tgtFileName", $auxFile))
@@ -108,7 +108,7 @@
   if (file_exists($minJS)) {
     echo "Minified version source: $minJS\n";
     $yeapf_minJS = join("", file($minJS));
-    $yeapf_minJS = "/* YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST) Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com */\n".$yeapf_minJS;
+    $yeapf_minJS = "/* YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST) Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License */\n".$yeapf_minJS;
   }
 
   grantDirectory("skel/chromeApp/js");

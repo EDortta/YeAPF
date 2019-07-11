@@ -1,7 +1,7 @@
 /*********************************************
  * app-src/js/yanalise.js
- * YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)
- * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+ * YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+ * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
  * 2018-09-18 06:23:51 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yLexObj introduced in 2016-08-22 0.8.50-0

@@ -2,7 +2,7 @@
 /*
     includes/mime_types.inc.php
     0.8.63
-    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
 */
   if (function_exists('_recordWastedTime'))
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);

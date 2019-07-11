@@ -2,8 +2,8 @@
 <?php
 /*
     tools/distributionBuilder/ydocview-backup
-    YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)
-    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
     2019-05-18 10:28:55 (-3 DST)
 */
 
@@ -167,7 +167,7 @@
   $baseToExport=$args->getSrc(1);
   $toExport=trim($baseToExport)>'';
 
-  echo "YeAPF 0.8.63 $myself\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n";
+  echo "YeAPF 0.8.63 $myself\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n";
   if (($toHelp) || (trim($filename)=='')) {
     die("usage:\n\t$myself <filename> [output-folder] [--destroy] [--quiet]\n\t\tfilename\tis a .xdb created by ydocbuilder\n\t\toutput-folder\tis used to write html files\n\t\t--destroy\tclean the output-folder (delete all html files in folder)\n");
   }
@@ -207,7 +207,7 @@
                   <link rel='icon' href='images/favicon.png' />
                 </head>
 
-                <body><h1>YeAPF Documenter</h1><h3>YeAPF 0.8.63</h3><strong>Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com</strong>";
+                <body><h1>YeAPF Documenter</h1><h3>YeAPF 0.8.63</h3><strong>Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License</strong>";
 
     ksort($aMap);
 

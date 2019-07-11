@@ -1,8 +1,8 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)
-    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
     2019-07-05 17:12:00 (-3 DST)
    */
 
@@ -1437,7 +1437,7 @@
         fputs($f,"<?php\n");
         fputs($f,"/* \n");
         fputs($f," * yeapf.config.files.$user_IP\n");
-        fputs($f," * YEAPF Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n");
+        fputs($f," * YEAPF Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n");
         fputs($f," * This config file was auto-updated by YeAPF\n");
         fputs($f," * On $date at $time\n");
         fputs($f," */\n\n");
@@ -1859,7 +1859,7 @@
   {
     global $lastImplementation, $flgCanContinueWorking, $devSession;
 
-    xq_context('YeAPF',       'YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)');
+    xq_context('YeAPF',       'YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)');
     xq_context('devSession',  $devSession);
     xq_context('ts1',         date('U'));
 

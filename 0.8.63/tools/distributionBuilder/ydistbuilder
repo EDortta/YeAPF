@@ -2,8 +2,8 @@
 <?php
 /*
     tools/distributionBuilder/ydistbuilder
-    YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)
-    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
     2019-07-02 19:43:50 (-3 DST)
 */
 
@@ -53,7 +53,7 @@
   $doQuiet = $args->argValue('s;silent', __FALSE__)==__TRUE__;
 
 
-  echo "YeAPF 0.8.63 ydistbuilder\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+  echo "YeAPF 0.8.63 ydistbuilder\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n\n";
   if ($toHelp) {
     die("usage:\n--silent\tdo not display messages\n--update\tdont create new version, just update current one\n");
   }

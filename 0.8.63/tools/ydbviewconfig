@@ -2,8 +2,8 @@
 <?php
 /*
     tools/ydbviewconfig
-    YeAPF 0.8.63-104 built on 2019-07-10 19:52 (-3 DST)
-    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com
+    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
     2019-04-29 10:04:49 (-3 DST)
 */
   $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
@@ -18,7 +18,7 @@
   // $help=($args->argValue('h;help')==true)  tb funfa
 
   if ((!$asIni) && (!$help))
-    echo basename("tools/ydbviewconfig")."\nYeAPF 0.8.63 tools\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com\n\n";
+    echo basename("tools/ydbviewconfig")."\nYeAPF 0.8.63 tools\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n\n";
   /* first version: 2012 */
   if ($help) {
     $myself=$argv[0];
