@@ -2,9 +2,9 @@
 <?php
 /*
 tools/distributionBuilder/ydocview
-YeAPF 0.8.63-110 built on 2019-07-11 14:44 (-3 DST)
+YeAPF 0.8.63-113 built on 2019-07-12 15:23 (-3 DST)
 Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-2019-07-11 12:30:13 (-3 DST)
+2019-07-12 14:37:07 (-3 DST)
 */
 
 if (!function_exists("objet2array")) {
@@ -95,7 +95,7 @@ function writeHTMLInfo($htmlText, $detailName="", $detail=null) {
     $htmlText = trim($htmlText);
     if ($htmlText > '') {
       $aSequence++;
-      $aName          = md5($aSequence);
+      $aName          = $detailName; //md5($aSequence);
       $targetFileName = substr($outputFiles[$ofNdx], strlen($baseToExport) + 1);
       if ($detailName > "") {
         $sourceFilename = replace_extension($outputFiles[$ofNdx], ".auxmd");
@@ -108,8 +108,22 @@ function writeHTMLInfo($htmlText, $detailName="", $detail=null) {
         if (file_exists($sourceFilename)) {
           $Parsedown = new Parsedown();
           $sourceFileContent = @file_get_contents($sourceFilename);
-          $sourceFilename = substr($sourceFilename, strlen($baseToExport) + 1);
+          $sourceFilename = substr($sourceFilename, strlen($baseToExport));
           $documentationText = $Parsedown->text($sourceFileContent."\n\n>$sourceFilename");
+
+          $pattern = '/<a[^>]+href=([\'"])(?<href>\/[a-z\-\/\.\#]*)\1[^>]*>/i';
+          $documentationText = preg_replace_callback($pattern, function ($matches) {
+                    global $baseToExport;
+                    $aux=$matches[0];
+                    $c=substr_count($matches[0], "/")-1;
+                    $cc=preg_match('/([\'\"])(?<href>\/[a-z\-\/\.\#]*)\1[^>]*>/i', $matches[0], $arranjo);
+                    if ($cc) {
+                      $quote=$arranjo[1];
+                      $url=str_repeat("../", $c).$arranjo[2];
+                      $aux=str_replace("//", "/", "<a href=\"$url\">");
+                    }
+                    return $aux;
+                }, $documentationText);
           $canDo=true;
         } else {
           $documentationText="File <b>$sourceFilename</b> not found.";
