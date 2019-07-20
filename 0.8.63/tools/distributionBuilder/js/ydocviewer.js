@@ -1,8 +1,8 @@
 /*
 tools/distributionBuilder/js/ydocviewer.js
-YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+YeAPF 0.8.63-120 built on 2019-07-20 14:22 (-3 DST)
 Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-2019-07-11 09:40:16 (-3 DST)
+2019-07-20 12:05:32 (-3 DST)
 */
 
 var yDocViewerObj = function () {
@@ -11,9 +11,14 @@ var yDocViewerObj = function () {
 
   that.expandDocument = function (id) {
     var docEntryList = y$('.docEntry');
+    var ret=false;
     if (docEntryList) {
         docEntryList.forEach(function (e) { e.style.display='none'; });
         var docEntry = y$(id);
+        if (docEntry==undefined) {
+          if (docEntryList.length==1)
+            docEntry=docEntryList[0];
+        }
         if (docEntry) {
           docEntry.style.display='';
           var i  = y$('.expander-'+id);
@@ -21,9 +26,11 @@ var yDocViewerObj = function () {
             i=i[0];
             i.addClass('fa-rotate-90');
             window.homeHistoryPosition--;
+            ret=true;
           }
         }  
     }
+    return ret;
   };
 
   var expandDocument = function(e) {
@@ -49,9 +56,10 @@ var yDocViewerObj = function () {
   var init=function() {
     addEvent('expand-document', 'click', expandDocument);
     var href=document.location.href.split("#");
-    if (href.length=2)
-      that.expandDocument(href[1]);
-    else
+    if (href.length=2) {
+      if (!that.expandDocument(href[1]))
+        window.homeHistoryPosition=-1;
+    } else
       openIfOnlyOneDoc();
   }
 

@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.sse.php
-    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    YeAPF 0.8.63-120 built on 2019-07-20 14:22 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-    2019-05-09 18:30:39 (-3 DST)
+    2019-07-17 07:21:12 (-3 DST)
    */
 
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -157,6 +157,8 @@
       self::__echo("id: $evId\n");
       if ($eventData>"")
         self::__echo("data: $eventData\n\n");
+      else
+        self::__echo("\n");
       self::__flush(true);
     }
 

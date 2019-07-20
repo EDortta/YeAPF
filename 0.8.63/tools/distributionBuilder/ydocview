@@ -2,9 +2,9 @@
 <?php
 /*
 tools/distributionBuilder/ydocview
-YeAPF 0.8.63-113 built on 2019-07-12 15:23 (-3 DST)
+YeAPF 0.8.63-120 built on 2019-07-20 14:22 (-3 DST)
 Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-2019-07-12 14:37:07 (-3 DST)
+2019-07-20 12:35:24 (-3 DST)
 */
 
 if (!function_exists("objet2array")) {
@@ -19,19 +19,23 @@ $aSequence   = -1;
 $aMap        = array();
 $outputFiles = array();
 
-function writeHTMLHeader($margin, $title="") {
+function writeHTMLHeader($margin, $title="", $htmlFilename="") {
   global $outputFiles, $ofNdx;
-  $auxBase = str_replace("//", "/", dirname($outputFiles[$ofNdx]));
-  $slashCount = substr_count($auxBase,"/")-1;
+  if ($htmlFilename=="")
+    $htmlFilename=$outputFiles[$ofNdx];
+
+  $auxBase = str_replace("//", "/", dirname($htmlFilename));
+  $auxBase = y_solve_parent_reference($auxBase);
+  $slashCount = substr_count($auxBase,"/") - 1;
   $base     = str_repeat("../", $slashCount);
   $thisFileName=$title;
   if ($title=="")
-    $thisFileName=$outputFiles[$ofNdx];
+    $thisFileName=$htmlFilename;
 
   $thisFileName=str_replace(".html", "", $thisFileName);
   $thisFileName="<a onclick='goBack()'><i class='fa fa-chevron-left' aria-hidden='true'></i></a>&nbsp;$thisFileName";
 
-  file_put_contents($outputFiles[$ofNdx], "\n<!-- [ $base ] -->\n", FILE_APPEND);
+  file_put_contents($htmlFilename, "\n<!-- [ $base ] -->\n", FILE_APPEND);
 
   if (true) {
     $htmlText = "<!DOCTYPE html>
@@ -67,18 +71,21 @@ function writeHTMLHeader($margin, $title="") {
   } else {
     $htmlText="<!DOCTYPE html><html lang='en'><body>\n";
   }
-  $htmlText .= "\n<!-- ".dirname($outputFiles[$ofNdx])."/$base -->\n";
-  file_put_contents($outputFiles[$ofNdx], $htmlText, FILE_APPEND);
-  chmod($outputFiles[$ofNdx], 0755);
+  $htmlText .= "\n<!-- ".dirname($htmlFilename)."/$base -->\n";
+  file_put_contents($htmlFilename, $htmlText, FILE_APPEND);
+  chmod($htmlFilename, 0755);
 }
 
-function writeHTMLFooter($margin) {
+function writeHTMLFooter($margin, $htmlFilename="") {
   global $outputFiles, $ofNdx;
+  if ($htmlFilename=="")
+    $htmlFilename=$outputFiles[$ofNdx];
+
   $htmlText = "<hr>\n";
   if ($margin<=1)
     $htmlText.="<small>YeAPF documenter 0.8.63 - Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License</small></body></html>\n";
-  file_put_contents($outputFiles[$ofNdx], $htmlText, FILE_APPEND);
-  chmod($outputFiles[$ofNdx], 0755);
+  file_put_contents($htmlFilename, $htmlText, FILE_APPEND);
+  chmod($htmlFilename, 0755);
 }
 
 function replace_extension($filename, $new_extension) {
@@ -87,8 +94,78 @@ function replace_extension($filename, $new_extension) {
     return $info['dirname'].'/'.$info['filename'] . $new_extension;
 }
 
+function processMDFile($sourceFilename) {
+  global $baseToExport, $currentSourceFileName, $mdSourceFolder;
+
+  $currentSourceFileName=$sourceFilename;
+  $Parsedown = new Parsedown();
+  $sourceFileContent = @file_get_contents($currentSourceFileName);
+  $currentSourceFileName = y_solve_parent_reference(substr($currentSourceFileName, strlen($baseToExport)));
+  $ret = $Parsedown->text($sourceFileContent."\n\n>$currentSourceFileName");
+
+  $pattern = '/<a[^>]+href=([\'"])(?<href>\/[a-z\-\/\.\#\_]*)\1[^>]*>/i';
+  $ret = preg_replace_callback($pattern, function ($matches) {
+            global $baseToExport, $currentSourceFileName;
+            $aux=$matches[0];
+            // $c=substr_count($matches[0], "/")-1;
+            $c=substr_count($currentSourceFileName, "/")-1;
+
+            $cc=preg_match('/([\'\"])(?<href>\/[a-z\-\/\.\#\_]*)\1[^>]*>/i', $matches[0], $arranjo);
+            if ($cc) {
+              $quote = $arranjo[1];
+              $target = $arranjo[2]; 
+
+              $fileLocation = str_replace('//', '/', $baseToExport.dirname($currentSourceFileName)."/".str_repeat("../", $c).$target);          
+              $fileLocation=y_solve_parent_reference($fileLocation);
+
+              $fileResourceLocation = explode("#", $fileLocation);
+              $ext = pathinfo($fileResourceLocation[0], PATHINFO_EXTENSION);
+              if (mb_strtolower($ext)=="md") {
+                DIE("RESOLVER ISTO AQUI:");
+                $mdSource=explode(",", $mdSourceFolder);
+                $found=false;
+                for($c=0; $c<count($mdSource) && !$found; $c++) {
+                  $folder=$mdSource[$c];
+                  if ($folder!=$baseToExport) {
+                    $sourceFilename = str_replace($baseToExport, $folder, $sourceFilename);
+                    $found=file_exists($sourceFilename);
+                  }
+                }
+
+                if (file_exists($fileResourceLocation[0])) {
+                  $newFilename = str_replace(".$ext", ".html", $fileResourceLocation[0]);
+                  $htmlTextFromMD=processMDFile($fileResourceLocation[0]);
+
+                  $aName=basename($currentSourceFileName);
+
+                  $htmlText = "<div class='container'><div class='row'><div class='column'><div class='docEntry' id='$aName' style='display:block'>$htmlTextFromMD</div></div></div></div>";
+
+
+                  if (file_exists($newFilename))
+                    unlink($newFilename);
+                  writeHTMLHeader(0, $target, $newFilename);
+                  if (!@file_put_contents($newFilename, $htmlText, FILE_APPEND)) {
+                    die("Was not possible to write $newFilename\n");
+                  } else {
+                    $target=str_replace(".$ext", ".html", $target);
+                  }
+                } else
+                  echo "File not found: $fileResourceLocation[0]\n";
+              }
+
+
+              $url=str_repeat("../", $c).$target;
+              $url=str_replace('//', '/', $url);
+              $href="<a href=\"$url\">";
+            }
+            return $href;
+        }, $ret);
+  return $ret;
+}
+
 function writeHTMLInfo($htmlText, $detailName="", $detail=null) {
-  global $baseToExport, $mdSourceFolder, $toExport, $outputFiles, $ofNdx, $aMap, $aSequence, $doPartial;
+  global $baseToExport, $mdSourceFolder, $toExport, $outputFiles, $ofNdx, $aMap, $aSequence, $doPartial, 
+         $currentSourceFileName;
 
   $canDo = false;
   if ($toExport) {
@@ -101,29 +178,18 @@ function writeHTMLInfo($htmlText, $detailName="", $detail=null) {
         $sourceFilename = replace_extension($outputFiles[$ofNdx], ".auxmd");
         $sourceFilename = str_replace(".auxmd", "-$detailName.md", $sourceFilename);
         if (!file_exists($sourceFilename)) {
-          if ($mdSourceFolder!=$baseToExport) {
-            $sourceFilename = str_replace($baseToExport, $mdSourceFolder, $sourceFilename);
+          $mdSource=explode(",", $mdSourceFolder);
+          $found=false;
+          for($c=0; $c<count($mdSource) && !$found; $c++) {
+            $folder=$mdSource[$c];
+            if ($folder!=$baseToExport) {
+              $sourceFilename = str_replace($baseToExport, $folder, $sourceFilename);
+              $found=file_exists($sourceFilename);
+            }
           }
         }
         if (file_exists($sourceFilename)) {
-          $Parsedown = new Parsedown();
-          $sourceFileContent = @file_get_contents($sourceFilename);
-          $sourceFilename = substr($sourceFilename, strlen($baseToExport));
-          $documentationText = $Parsedown->text($sourceFileContent."\n\n>$sourceFilename");
-
-          $pattern = '/<a[^>]+href=([\'"])(?<href>\/[a-z\-\/\.\#]*)\1[^>]*>/i';
-          $documentationText = preg_replace_callback($pattern, function ($matches) {
-                    global $baseToExport;
-                    $aux=$matches[0];
-                    $c=substr_count($matches[0], "/")-1;
-                    $cc=preg_match('/([\'\"])(?<href>\/[a-z\-\/\.\#]*)\1[^>]*>/i', $matches[0], $arranjo);
-                    if ($cc) {
-                      $quote=$arranjo[1];
-                      $url=str_repeat("../", $c).$arranjo[2];
-                      $aux=str_replace("//", "/", "<a href=\"$url\">");
-                    }
-                    return $aux;
-                }, $documentationText);
+          $documentationText = processMDFile($sourceFilename);
           $canDo=true;
         } else {
           $documentationText="File <b>$sourceFilename</b> not found.";
@@ -279,6 +345,7 @@ $doQuiet        = $args->argValue('quiet;q', __FALSE__) == __TRUE__;
 $doPartial      = ($args->argValue('partial;p', __FALSE__) == __TRUE__) && ($parseDownLibPresent);
 $toExport       = trim($baseToExport) > '';
 
+
 echo "YeAPF 0.8.63 $myself\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n";
 if (($toHelp) || (trim($filename) == '')) {
   echo "usage:\n";
@@ -288,16 +355,21 @@ if (($toHelp) || (trim($filename) == '')) {
   echo "\t\t--quiet   \t(-q) shows minimal information\n";
   echo "\t\t--destroy \t(-d) clean the output-folder (delete all html files in folder)\n";
   echo "\t\t--partial \t(-p) write information only for those items that have a .md correspondent file\n";
-  echo "\t\t--mdsource\t(-s) indicate where .md files are located. by default are at 'output-folder'\n";
+  echo "\t\t--mdsource\t(-s) indicate where .md files are located. By default are at 'output-folder'. use ',' to split folders\n";
   echo "\nIn orther to create your .md files, you can use a tool like https://stackedit.io/app#\n";
   echo "\nIn such case, you need to create each file with .md extension\n";
   echo "\nFor example: lib/grant_rights.js will become lib/grant_rights.js.md\n";
-  echo "\n.md files are not deleted with -d parameter\n";
+  echo "\nNOTE: .md files are not deleted with -d parameter\n";
   exit(0);
 }
 
+_LOAD_YEAPF_();
+
+
+
+
 // ydocviewer.min.js
-$ydocviewer_min_js=base64_decode("dmFyIHlEb2NWaWV3ZXJPYmo9ZnVuY3Rpb24oKXt2YXIgYz17ZXhwYW5kRG9jdW1lbnQ6ZnVuY3Rpb24oYSl7dmFyIGI9eSQoIi5kb2NFbnRyeSIpO2ImJihiLmZvckVhY2goZnVuY3Rpb24oYSl7YS5zdHlsZS5kaXNwbGF5PSJub25lIn0pLGI9eSQoYSkpJiYoYi5zdHlsZS5kaXNwbGF5PSIiLGE9eSQoIi5leHBhbmRlci0iK2EpKSYmKGE9YVswXSxhLmFkZENsYXNzKCJmYS1yb3RhdGUtOTAiKSx3aW5kb3cuaG9tZUhpc3RvcnlQb3NpdGlvbi0tKX19LGQ9ZnVuY3Rpb24oYSl7YSYmYS50YXJnZXQmJih5JCgiLmV4cGFuZC1kb2N1bWVudCIpLmZvckVhY2goZnVuY3Rpb24oYSl7YS5kZWxldGVDbGFzcygiZmEtcm90YXRlLTkwIil9KSxhPWEudGFyZ2V0LmNsb3Nlc3QoIkEiKS5nZXRBdHRyaWJ1dGUoImRhdGEtaWQiKSxjLmV4cGFuZERvY3VtZW50KGEpKX07cmV0dXJuIGZ1bmN0aW9uKCl7YWRkRXZlbnQoImV4cGFuZC1kb2N1bWVudCIsImNsaWNrIixkKTt2YXIgYT1kb2N1bWVudC5sb2NhdGlvbi5ocmVmLnNwbGl0KCIjIik7CmEubGVuZ3RoPTI7Yy5leHBhbmREb2N1bWVudChhWzFdKX0oKX07YWRkT25Mb2FkTWFuYWdlcihmdW5jdGlvbigpe3dpbmRvdy55RG9jVmlld2VyPXlEb2NWaWV3ZXJPYmooKX0pOw==");
+$ydocviewer_min_js=base64_decode("dmFyIHlEb2NWaWV3ZXJPYmo9ZnVuY3Rpb24oKXsidXNlIHN0cmljdCI7dmFyIHQ9e2V4cGFuZERvY3VtZW50OmZ1bmN0aW9uKHQpe3ZhciBlPXkkKCIuZG9jRW50cnkiKSxuPSExO2lmKGUpe2UuZm9yRWFjaChmdW5jdGlvbih0KXt0LnN0eWxlLmRpc3BsYXk9Im5vbmUifSk7dmFyIG89eSQodCk7aWYobnVsbD09byYmMT09ZS5sZW5ndGgmJihvPWVbMF0pLG8pe28uc3R5bGUuZGlzcGxheT0iIjt2YXIgYT15JCgiLmV4cGFuZGVyLSIrdCk7YSYmKChhPWFbMF0pLmFkZENsYXNzKCJmYS1yb3RhdGUtOTAiKSx3aW5kb3cuaG9tZUhpc3RvcnlQb3NpdGlvbi0tLG49ITApfX1yZXR1cm4gbn19LGU9ZnVuY3Rpb24oZSl7aWYoZSYmZS50YXJnZXQpe3kkKCIuZXhwYW5kLWRvY3VtZW50IikuZm9yRWFjaChmdW5jdGlvbih0KXt0LmRlbGV0ZUNsYXNzKCJmYS1yb3RhdGUtOTAiKX0pO3ZhciBuPWUudGFyZ2V0LmNsb3Nlc3QoIkEiKS5nZXRBdHRyaWJ1dGUoImRhdGEtaWQiKTt0LmV4cGFuZERvY3VtZW50KG4pfX07cmV0dXJuIGZ1bmN0aW9uKCl7YWRkRXZlbnQoImV4cGFuZC1kb2N1bWVudCIsImNsaWNrIixlKTt2YXIgbixvPWRvY3VtZW50LmxvY2F0aW9uLmhyZWYuc3BsaXQoIiMiKTsoby5sZW5ndGg9Mik/dC5leHBhbmREb2N1bWVudChvWzFdKXx8KHdpbmRvdy5ob21lSGlzdG9yeVBvc2l0aW9uPS0xKToxPT0obj15JCgiLmV4cGFuZC1kb2N1bWVudCIpKS5sZW5ndGgmJnQuZXhwYW5kRG9jdW1lbnQoblswXS5nZXRBdHRyaWJ1dGUoImRhdGEtaWQiKSl9KCl9O2FkZE9uTG9hZE1hbmFnZXIoZnVuY3Rpb24oKXt3aW5kb3cueURvY1ZpZXdlcj15RG9jVmlld2VyT2JqKCl9KTs=");
 
 if (file_exists($filename)) {
   $xml = simplexml_load_file($filename);

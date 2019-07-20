@@ -1,8 +1,8 @@
   /********************************************************************
   * app-src/js/ycomm-sse.js
-  * YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+  * YeAPF 0.8.63-120 built on 2019-07-20 14:22 (-3 DST)
   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-  * 2019-04-18 20:32:49 (-3 DST)
+  * 2019-07-17 07:54:52 (-3 DST)
   ********************************************************************/
   var ycommSSEBase = function (workgroup, user, dataLocation, pollTimeout, preferredGateway, dbgSSEDiv) {
     window.SSE_UNINITIALIZED  =-1;
@@ -374,7 +374,10 @@
 
                 that.evtSource.onopen    = that.openEvent;
                 that.evtSource.onclose   = that.closeEvent;
+                /* not working in the same way in all browsers */
+                that.evtSource.addEventListener("message", that.message);
                 that.evtSource.onmessage = that.messageEvent;
+                
                 that.addEventListener("ping",  that.pingEvent, false);
                 that.addEventListener("reset", that.resetEvent, false);
 

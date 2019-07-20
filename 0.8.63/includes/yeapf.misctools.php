@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misctools.php
-    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    YeAPF 0.8.63-120 built on 2019-07-20 14:22 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-    2019-07-10 19:47:51 (-3 DST)
+    2019-07-20 11:23:11 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -365,6 +365,16 @@
       return preg_replace('@<(\w+)\b.*?>.*?</\1>@si', '', $text);
     }
     return $text;
+  }
+
+  function y_solve_parent_reference($url) {
+    $auxBase = $url;
+    while ($p=strpos($auxBase, "../", 2)) {
+      $innerBase=substr($auxBase, 0, $p-1);
+      $o=strrpos($innerBase, "/");
+      $auxBase = substr($auxBase, 0, $o+1).substr($auxBase, $p + 3);
+    }
+    return $auxBase;
   }
 
   function stripNL($valorCampo)
