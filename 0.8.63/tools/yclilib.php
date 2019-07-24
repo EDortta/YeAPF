@@ -1,15 +1,50 @@
 <?php
 /*
     tools/yclilib.php
-    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    YeAPF 0.8.63-131 built on 2019-07-24 09:00 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-    2019-05-29 11:46:48 (-3 DST)
+    2019-07-24 08:46:50 (-3 DST)
 */
 
   $PHPVer = phpversion();
   $PHPVersion = explode('.', $PHPVer);
   $PHPVersion = $PHPVersion[0]*10000 + $PHPVersion[1]*100+$PHPVersion[2];
   unset($PHPVer);
+
+  function yclibErrorHandler ($errno, $errstr, $errfile, $errline) {
+    if (!(error_reporting() & $errno)) {
+            // This error code is not included in error_reporting, so let it fall
+            // through to the standard PHP error handler
+            return false;
+        }
+
+        switch ($errno) {
+        case E_USER_ERROR:
+            echo "<b>My ERROR</b> [$errno] $errstr<br />\n";
+            echo "  Fatal error on line $errline in file $errfile";
+            echo ", PHP " . PHP_VERSION . " (" . PHP_OS . ")<br />\n";
+            echo "Aborting...<br />\n";
+            exit(1);
+            break;
+
+        case E_USER_WARNING:
+            echo "<b>My WARNING</b> [$errno] $errstr<br />\n";
+            break;
+
+        case E_USER_NOTICE:
+            echo "<b>My NOTICE</b> [$errno] $errstr<br />\n";
+            break;
+
+        default:
+            echo "Unknown error type: [$errno] $errstr<br />\n";
+            break;
+        }
+
+        /* Don't execute PHP internal error handler */
+        return true;
+  }
+  $old_error_handler = set_error_handler("yclibErrorHandler");
+
 
   function updateFiles($sourcePath, $pattern, $target='.',  $toForce=false)
   {
@@ -99,7 +134,7 @@
 
   function _LOAD_YEAPF_($libraryList='')
   {
-    global $__yeapfPath, $cfgAvoidIncludesLst;
+    global $__yeapfPath, $cfgAvoidIncludesLst, $flagDBStructureCanBeReviewed;
 
     /* avoid loading includes.lst in app folders */
     $cfgAvoidIncludesLst = 'yes';
@@ -108,7 +143,11 @@
     if (substr($__yeapfPath,0,1)=='%')
       $__yeapfPath = __DIR__."/../";
 
+    $flagDBStructureCanBeReviewed=false;
+
+    echo "Loading YeAPF from $__yeapfPath\n";
     (@include_once("$__yeapfPath/includes/yeapf.functions.php")) or die("Impossible to load YeAPF functions\npath: $__yeapfPath\n");
+    echo "YeAPF ready\n";
     if ($libraryList>'') {
       $libraryList=explode(';',$libraryList);
       foreach ($libraryList as $libName)

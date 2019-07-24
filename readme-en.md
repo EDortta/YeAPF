@@ -1,8 +1,8 @@
 # **Welcome to YeAPF!**
 
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
-    Last file version: 2019-07-11 09:39:34 (-3 DST)
+    YeAPF 0.8.63-131 built on 2019-07-24 09:00 (-3 DST)
+    Last file version: 2019-07-24 08:46:50 (-3 DST)
 
 [pt-br](readme-pt-br.md) | [es](readme-es.md) 
 
@@ -15,6 +15,9 @@ The idea behind this is to keep all people producing using the same approach to 
 On the other hand, you can think agnostically. You can just use the part you believe is better for you and left all others.
 
 It does not pretend to be light in the sense of how much it weight to be loaded. This is because the main idea is to build applications and not singles pages. But it pretends to be light in the sense of development, usage, data transfer between server(s) and client(s).
+
+## Requirements
+You will need php >= 5.4; php-mbstring; php-curl; php-iconv and the database connections (i.e. php-mysql, php-interbase, php-pgsql)
 
 ## Usage
 You can just download and use or you can install the embedded tools.

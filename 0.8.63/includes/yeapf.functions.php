@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    YeAPF 0.8.63-131 built on 2019-07-24 09:00 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-    2019-07-05 17:12:00 (-3 DST)
+    2019-07-24 08:46:50 (-3 DST)
    */
 
   /*
@@ -116,6 +116,162 @@
 
     return $ret;
   }
+
+  function DEFINE_yLoaderDie() {
+    /* This is a copy of the one created by configure.php
+       The idea is to allow the programmer to build an application
+       without using 'yeapf.php' stubloader.
+       (Ah?  Yes, you can do that just loading yeapf.functions.php)
+     */
+    function _yLoaderDie($reconfigureLinkEnabled)
+    {
+      global $callback, $safe_user_IP, $callBackFunction;
+      $script=basename($_SERVER["PHP_SELF"]);
+      $isXML=intval(strpos("query.php",$script)!==false);
+      $isJSON=intval(strpos("rest.php",$script)!==false);
+      $isHTML=intval( (strpos("configure.php",$script)!==false) ||
+                      (strpos("config2.php",$script)!==false) ||
+                      (strpos("index.php",$script)!==false) || 
+                      (strpos("body.php",$script)!==false) );
+      $isCLI=intval(php_sapi_name() == "cli");
+      $outputType = $isHTML *1000 +
+                    $isXML  * 100 +
+                    $isJSON *  10 +
+                    $isCLI  *   1;
+
+      $args=func_get_args();
+      array_shift($args);
+      $noHTMLArgs = array();
+      $deathLogMessage = "";
+      foreach($args as $k=>$v) {
+        $noHTMLArgs[$k]  = str_replace("\n", ". ", strip_tags($v));
+        $deathLogMessage.=$noHTMLArgs[$k]." ";
+      }
+      $timestamp=date("U");
+      $now=date("Y-m-d H:i:s");
+      $reconfigureLinkEnabled = intval($reconfigureLinkEnabled);
+      $ret = array("reconfigureLinkEnabled" => $reconfigureLinkEnabled,
+                   "outputType" => $outputType,
+                   "isHTML" => $isHTML,
+                   "isJSON" => $isJSON,
+                   "isCLI" => $isCLI,
+                   "isXML" => $isXML);
+
+      if ($isHTML)
+        $ret["userMsg"] = $args;
+      else
+        $ret["userMsg"] = $noHTMLArgs;
+
+      $ret['ini_file'] = php_ini_loaded_file();
+      $ret['php_version'] = phpversion();
+
+      if (is_array($ret["userMsg"])) {
+        $ret["userMsg_Details"] = array_slice($ret["userMsg"], 1);
+        $ret["userMsg"]=$ret["userMsg"][0];
+      }
+
+      if (function_exists("get_backtrace")) {
+        $ret["stack"]=array();
+        $auxStack = get_backtrace();
+        $stackNum = 0;
+        foreach($auxStack as $item) {
+          $ret["stack"]["$stackNum"]="$item";
+          $stackNum++;
+        }
+      }
+
+      if (!file_exists("deathLogs"))
+        mkdir("deathLogs",0777);
+      $f=fopen("deathLogs/c.$safe_user_IP.log","a");
+      if ($f) {
+        fwrite($f, "/---DEATH----------\n");
+        foreach($noHTMLArgs as $arg) {
+          fwrite($f, "| $now $arg\n");
+        }
+        fwrite($f, "\---DEATH----------\n");
+        fclose($f);
+      }
+
+      $deathLogMessage="$now Fatal Error: $deathLogMessage OutputType: $outputType";
+      if (function_exists("_recordWastedTime"))
+        _recordWastedTime($deathLogMessage);
+      if (function_exists("_dump"))
+        _dump($deathLogMessage);
+
+      switch ($outputType) {
+        case 10:
+          /* JSON */
+          if ((is_string($callback)) && (trim($callback)>"")) {
+            echo "if (typeof $callback == \'function\') $callback(500, \'error\', {}, ".json_encode($ret).");";
+          } else {
+            echo json_encode($ret);
+          }
+          break;
+
+        case 100:
+          /* XML */
+          $xmlData="";
+
+          if (!isset($callBackFunction))
+            $callBackFunction="alert";
+
+          foreach($ret as $k=>$v) {
+            if (is_array($v)) {
+              $auxV="";
+              foreach($v as $k1=>$v2) {
+                if (is_numeric($k1))
+                  $k1=$k."_$k1";
+                $auxV.="\t<$k1>$v2</$k1>\n";
+              }
+              $v="$auxV";
+            }
+            if (is_numeric($k))
+              $k="_$k_";
+            $xmlData.="<$k>$v</$k>";
+          }
+          $xmlData="<callBackFunction>$callBackFunction</callBackFunction><dataContext>$xmlData</dataContext>";
+          $xmlOutput="<?xml version=\'1.0\' encoding=\'UTF-8\'?>\n<root>$xmlData<sgug><timestamp>$timestamp</timestamp></sgug></root>";
+          echo $xmlOutput;
+          break;
+
+        case 1000:
+          /* HTML */
+          if (function_exists("_minimalCSS")) {
+            _minimalCSS();
+          } else {
+            echo "<style>body {background-color: #f6f6f6;font-family: sans-serif;-webkit-font-smoothing: antialiased;font-size: 14px;line-height: 1.4;margin: 0;padding: 0;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;}</style>";
+          }
+          echo "<style>.details { font-size:80%; padding-left: 18px } .userMsg { color: #C50000} .userMsg .explain { font-size: 120%; font-weight: 800} .stack { color: #666666; font-family: \'Courier New\', Courier, monospace }</style>";
+
+          echo "<div style='padding: 16px; margin: 16px; border: dotted 1px #66CCFF; border-radius: 6px; background-color: #fff'>";
+          echo "<div><a href='http://www.yeapf.com' target=x$timestamp><img src='http://www.yeapf.com/logo.php'></a></div><table>";
+          foreach($ret as $k=>$v) {
+            $auxK=$k;
+            if (strpos($auxK, "_")>0)
+              $auxK=substr($auxK, 0, strpos($auxK, "_"));
+            if (is_array($v)) {
+              foreach($v as $kx=>$vx) {
+                echo "<tr><td width=150px><span class='$auxK'><span class=number>$k.$kx</span></span></td><td><div class=details><span class='$auxK'><span class=explain>$vx</span></span></div></td></tr>\n";
+              }
+            } else {
+              echo "<tr><td width=150px><span class='$auxK'>$k</span></td><td><span class='$auxK'><span class=explain>$v</span></span></td></tr>\n";
+            }
+          }
+          echo "</table></div>";
+          break;
+        default:
+
+          /* TEXT (cli) */
+          print_r($ret);
+      }
+      die();
+    }
+  }
+
+  if (!function_exists('_yLoaderDie')) {
+    DEFINE_yLoaderDie();
+  }
+
 
   if (file_exists("$cfgMainFolder/flags/timezone")) {
     $cfgTimeZone=file_get_contents("$cfgMainFolder/flags/timezone");
@@ -516,157 +672,6 @@
 
                       'yeapf.pre-processor.php'
                         );
-  function DEFINE_yLoaderDie() {
-    /* This is a copy of the one created by configure.php
-       The idea is to allow the programmer to build an application
-       without using 'yeapf.php' stubloader.
-       (Ah?  Yes, you can do that just loading yeapf.functions.php)
-     */
-    function _yLoaderDie($reconfigureLinkEnabled)
-    {
-      global $callback, $safe_user_IP, $callBackFunction;
-      $script=basename($_SERVER["PHP_SELF"]);
-      $isXML=intval(strpos("query.php",$script)!==false);
-      $isJSON=intval(strpos("rest.php",$script)!==false);
-      $isHTML=intval( (strpos("configure.php",$script)!==false) ||
-                      (strpos("config2.php",$script)!==false) ||
-                      (strpos("index.php",$script)!==false) || 
-                      (strpos("body.php",$script)!==false) );
-      $isCLI=intval(php_sapi_name() == "cli");
-      $outputType = $isHTML *1000 +
-                    $isXML  * 100 +
-                    $isJSON *  10 +
-                    $isCLI  *   1;
-
-      $args=func_get_args();
-      array_shift($args);
-      $noHTMLArgs = array();
-      $deathLogMessage = "";
-      foreach($args as $k=>$v) {
-        $noHTMLArgs[$k]  = str_replace("\n", ". ", strip_tags($v));
-        $deathLogMessage.=$noHTMLArgs[$k]." ";
-      }
-      $timestamp=date("U");
-      $now=date("Y-m-d H:i:s");
-      $reconfigureLinkEnabled = intval($reconfigureLinkEnabled);
-      $ret = array("reconfigureLinkEnabled" => $reconfigureLinkEnabled,
-                   "outputType" => $outputType,
-                   "isHTML" => $isHTML,
-                   "isJSON" => $isJSON,
-                   "isCLI" => $isCLI,
-                   "isXML" => $isXML);
-
-      if ($isHTML)
-        $ret["userMsg"] = $args;
-      else
-        $ret["userMsg"] = $noHTMLArgs;
-
-      if (is_array($ret["userMsg"])) {
-        $ret["userMsg_Details"] = array_slice($ret["userMsg"], 1);
-        $ret["userMsg"]=$ret["userMsg"][0];
-      }
-
-      if (function_exists("get_backtrace")) {
-        $ret["stack"]=array();
-        $auxStack = get_backtrace();
-        $stackNum = 0;
-        foreach($auxStack as $item) {
-          $ret["stack"]["$stackNum"]="$item";
-          $stackNum++;
-        }
-      }
-
-      if (!file_exists("deathLogs"))
-        mkdir("deathLogs",0777);
-      $f=fopen("deathLogs/c.$safe_user_IP.log","a");
-      if ($f) {
-        fwrite($f, "/---DEATH----------\n");
-        foreach($noHTMLArgs as $arg) {
-          fwrite($f, "| $now $arg\n");
-        }
-        fwrite($f, "\---DEATH----------\n");
-        fclose($f);
-      }
-
-      $deathLogMessage="$now Fatal Error: $deathLogMessage OutputType: $outputType";
-      if (function_exists("_recordWastedTime"))
-        _recordWastedTime($deathLogMessage);
-      if (function_exists("_dump"))
-        _dump($deathLogMessage);
-
-      switch ($outputType) {
-        case 10:
-          /* JSON */
-          if ((is_string($callback)) && (trim($callback)>"")) {
-            echo "if (typeof $callback == \'function\') $callback(500, \'error\', {}, ".json_encode($ret).");";
-          } else {
-            echo json_encode($ret);
-          }
-          break;
-
-        case 100:
-          /* XML */
-          $xmlData="";
-
-          if (!isset($callBackFunction))
-            $callBackFunction="alert";
-
-          foreach($ret as $k=>$v) {
-            if (is_array($v)) {
-              $auxV="";
-              foreach($v as $k1=>$v2) {
-                if (is_numeric($k1))
-                  $k1=$k."_$k1";
-                $auxV.="\t<$k1>$v2</$k1>\n";
-              }
-              $v="$auxV";
-            }
-            if (is_numeric($k))
-              $k="_$k_";
-            $xmlData.="<$k>$v</$k>";
-          }
-          $xmlData="<callBackFunction>$callBackFunction</callBackFunction><dataContext>$xmlData</dataContext>";
-          $xmlOutput="<?xml version=\'1.0\' encoding=\'UTF-8\'?>\n<root>$xmlData<sgug><timestamp>$timestamp</timestamp></sgug></root>";
-          echo $xmlOutput;
-          break;
-
-        case 1000:
-          /* HTML */
-          if (function_exists("_minimalCSS")) {
-            _minimalCSS();
-          } else {
-            echo "<style>body {background-color: #f6f6f6;font-family: sans-serif;-webkit-font-smoothing: antialiased;font-size: 14px;line-height: 1.4;margin: 0;padding: 0;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;}</style>";
-          }
-          echo "<style>.details { font-size:80%; padding-left: 18px } .userMsg { color: #C50000} .userMsg .explain { font-size: 120%; font-weight: 800} .stack { color: #666666; font-family: \'Courier New\', Courier, monospace }</style>";
-
-          echo "<div style='padding: 16px; margin: 16px; border: dotted 1px #66CCFF; border-radius: 6px; background-color: #fff'>";
-          echo "<div><a href='http://www.yeapf.com' target=x$timestamp><img src='http://www.yeapf.com/logo.php'></a></div><table>";
-          foreach($ret as $k=>$v) {
-            $auxK=$k;
-            if (strpos($auxK, "_")>0)
-              $auxK=substr($auxK, 0, strpos($auxK, "_"));
-            if (is_array($v)) {
-              foreach($v as $kx=>$vx) {
-                echo "<tr><td width=150px><span class='$auxK'><span class=number>$k.$kx</span></span></td><td><div class=details><span class='$auxK'><span class=explain>$vx</span></span></div></td></tr>\n";
-              }
-            } else {
-              echo "<tr><td width=150px><span class='$auxK'>$k</span></td><td><span class='$auxK'><span class=explain>$v</span></span></td></tr>\n";
-            }
-          }
-          echo "</table></div>";
-          break;
-        default:
-
-          /* TEXT (cli) */
-          print_r($ret);
-      }
-      die();
-    }
-  }
-
-  if (!function_exists('_yLoaderDie')) {
-    DEFINE_yLoaderDie();
-  }
 
   if (!function_exists('http_response_code')) {
     function http_response_code($code = NULL) {
@@ -1859,7 +1864,7 @@
   {
     global $lastImplementation, $flgCanContinueWorking, $devSession;
 
-    xq_context('YeAPF',       'YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)');
+    xq_context('YeAPF',       'YeAPF 0.8.63-131 built on 2019-07-24 09:00 (-3 DST)');
     xq_context('devSession',  $devSession);
     xq_context('ts1',         date('U'));
 
