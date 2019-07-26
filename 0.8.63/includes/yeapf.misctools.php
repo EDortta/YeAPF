@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.misctools.php
-    YeAPF 0.8.63-120 built on 2019-07-20 14:22 (-3 DST)
+    YeAPF 0.8.63-132 built on 2019-07-26 09:28 (-3 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-    2019-07-20 11:23:11 (-3 DST)
+    2019-07-25 11:10:07 (-3 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -369,10 +369,16 @@
 
   function y_solve_parent_reference($url) {
     $auxBase = $url;
-    while ($p=strpos($auxBase, "../", 2)) {
+    $ref=0;
+    while ($p=strpos($auxBase, "../", 1)) {
       $innerBase=substr($auxBase, 0, $p-1);
       $o=strrpos($innerBase, "/");
-      $auxBase = substr($auxBase, 0, $o+1).substr($auxBase, $p + 3);
+      if ($o) {
+        $auxBase = substr($auxBase, 0, $o+1).substr($auxBase, $p + 3);
+        $ref++;
+      } else {
+        $auxBase="Error: $ref references.";
+      }
     }
     return $auxBase;
   }
