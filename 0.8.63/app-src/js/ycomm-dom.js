@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ycomm-dom.js
- * YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+ * YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
  * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
- * 2019-05-17 12:26:25 (-3 DST)
+ * 2019-10-24 18:20:52 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  **********************************************/
 //# sourceURL=app-src/js/ycomm-dom.js
@@ -793,7 +793,7 @@ ycomm.dom.fillElement = function(aElementID, xData, aLineSpec, aFlags) {
   }
 };
 
-/*
+/* @REVIEW 20190805
  * search for the first container from the element
  * The container could be: a table row, a select option, a listbox item
  * i.e. if the container is a row, aContainerID is the table which
@@ -844,7 +844,7 @@ ycomm.dom.highlightRow = function(tableId, aRowId, highlightClass) {
 
 ycomm.dom.getTableRowInplaceData = function(aRow, fieldName) {
   if (aRow)
-    return aRow.getAttribute('data-' + fieldName);
+    return aRow.getAttribute('data-' + fieldName) || aRow.getAttribute(fieldName);
   else
     return null;
 };
@@ -946,6 +946,7 @@ ycomm.dom.cleanElement = function(aElement) {
         case "range":
         case "search":
         case "tel":
+        case "email":
         case "time":
         case "url":
         case "week":
@@ -1033,14 +1034,15 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
     i, fieldType, fieldId, fieldValue, maxLength, classes;
 
 
-  var genString = function(base, minLen, maxLen) {
+  var genString = function(base, minLen, maxLen, sep) {
+    sep = sep || '';
     var ret = '',
       n, j;
     maxLen = Math.floor((Math.random() * maxLen) + minLen);
     j = 0;
     while (j < maxLen) {
       n = Math.floor((Math.random() * base.length));
-      ret += base[n];
+      ret += base[n]+sep;
       j++;
     }
     return ret;
@@ -1079,7 +1081,7 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
           fieldValue = genString(ycomm.dom._scratch.ch, 6, 15);
           break;
         case "textarea":
-          fieldValue = genString(ycomm.dom._scratch.t, 1, 15 * maxLength);
+          fieldValue = genString(ycomm.dom._scratch.t, 1, 15 * maxLength,' ');
           break;
         case "email":
           fieldValue = genString(ycomm.dom._scratch.mn, 2, 3) + "@" + genString(ycomm.dom._scratch.d, 1, 1);
@@ -1140,6 +1142,8 @@ ycomm.dom.testFormWithJunk = function(aFormId) {
             fieldValue = genNumber(10, 99);
             fieldValue += '.' + genNumber(0, 999, 3);
             fieldValue += '-' + genNumber(0, 999, 3);
+          } else if (classHasName('name')) {
+            fieldValue = genString(ycomm.dom._scratch.mn, 1, 2, ' ')+" "+genString(ycomm.dom._scratch.sn, 1, 2, ' ');
           } else if (classHasName('zip')) {
             /* http://www.mapanet.eu/en/resources/Postal-Format.asp */
             fieldValue = genNumber(0, 99999, 5);

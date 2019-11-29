@@ -1,9 +1,9 @@
 <?php
   /*
     includes/yeapf.functions.php
-    YeAPF 0.8.63-131 built on 2019-07-24 09:00 (-3 DST)
+    YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-    2019-07-24 08:46:50 (-3 DST)
+    2019-10-24 18:20:52 (-2 DST)
    */
 
   /*
@@ -131,7 +131,7 @@
       $isJSON=intval(strpos("rest.php",$script)!==false);
       $isHTML=intval( (strpos("configure.php",$script)!==false) ||
                       (strpos("config2.php",$script)!==false) ||
-                      (strpos("index.php",$script)!==false) || 
+                      (strpos("index.php",$script)!==false) ||
                       (strpos("body.php",$script)!==false) );
       $isCLI=intval(php_sapi_name() == "cli");
       $outputType = $isHTML *1000 +
@@ -202,9 +202,9 @@
         case 10:
           /* JSON */
           if ((is_string($callback)) && (trim($callback)>"")) {
-            echo "if (typeof $callback == \'function\') $callback(500, \'error\', {}, ".json_encode($ret).");";
+            echo "if (typeof $callback == \'function\') $callback(500, \'error\', {}, ".json_encode($ret, JSON_FLAGS).");";
           } else {
-            echo json_encode($ret);
+            echo json_encode($ret, JSON_FLAGS);
           }
           break;
 
@@ -301,6 +301,10 @@
   $PHPVersion = explode('.', $PHPVer);
   $PHPVersion = $PHPVersion[0]*10000 + $PHPVersion[1]*100 + intval($PHPVersion[2])*1;
   unset($PHPVer);
+  if ($PHPVersion<70000)
+    define("JSON_FLAGS", 0);
+  else
+    define("JSON_FLAGS", JSON_PRETTY_PRINT);
 
   if (file_exists("$cfgCurrentFolder/logs/wastedTime.log"))
     error_log("\n\n\n",3,"$cfgCurrentFolder/logs/wastedTime.log");
@@ -413,13 +417,13 @@
     $GLOBALS['yeapfConfig']['yeapfPath'] = dirname(__FILE__);
   }
   setMySelf($_MYSELF_);
-  
+
   /* Compilation Symbol Definition File */
   $yeapfSymList=array();
   $yeapfSymListFile=dirname(__FILE__)."/../version.def";
   if (file_exists($yeapfSymListFile)) {
     $auxYeapfSymList = @file_get_contents($yeapfSymListFile);
-    $yeapfSymList = unserialize($yeapfSymList);
+    $yeapfSymList = unserialize($auxYeapfSymList);
     unset($auxYeapfSymList);
   }
 
@@ -778,6 +782,7 @@
     _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
   foreach($yeapfLibrary as $libName) {
+
     $libName=trim($libName);
     // nusoap puede haber sido eliminado de la carga por se tratar de um CLI ou estarem usando a soap nativa
     if ($libName>'') {
@@ -787,9 +792,9 @@
         $libName=$GLOBALS["__yeapfPath"]."/lib/$libName";
       if (file_exists($GLOBALS["__yeapfPath"]."/includes/$libName"))
         $libName=$GLOBALS["__yeapfPath"]."/includes/$libName";
-      if (!file_exists($libName))
+      if (!file_exists($libName)) {
         _yLoaderDie(true, "Error loading '$libName'","File not found.", "Path: ".$GLOBALS["__yeapfPath"]);
-      else {
+      } else {
         if (file_exists("$cfgMainFolder/flags/flag.dbgphp")) {
           $userFuncs=get_defined_functions();
           if (isset($userFuncs['user']))
@@ -811,13 +816,14 @@
           if (file_exists("$cfgMainFolder/flags/flag.dbgphp")) {
             $t2=decimalMicrotime()-$t1;
             error_log("    wasted time: $t2\n",3,"$cfgCurrentFolder/logs/yeapf.loader.log");
-          }          
+          }
         } catch(Exception $e) {
-            _yLoaderDie(false, "Fatal error trying to load $libName: ".$e->getMessage());          
+            _yLoaderDie(false, "Fatal error trying to load $libName: ".$e->getMessage());
         }
       }
     }
   }
+
   if (file_exists("$cfgMainFolder/flags/flag.dbgphp"))
     error_log("Ready...\n\n",3,"$cfgCurrentFolder/logs/yeapf.loader.log");
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
@@ -1859,12 +1865,12 @@
 
   if (file_exists("$cfgMainFolder/flags/flag.dbgloader")) error_log(date("YmdHis ").$GLOBALS['_debugTag']." ".basename(__FILE__)." ".__LINE__." 0.8.63 ".": function block #2\n",3,"$cfgCurrentFolder/logs/yeapf.loader.log");
 
-  function implementation($s, $a='', $prefix='f', $onlyTest=false, 
+  function implementation($s, $a='', $prefix='f', $onlyTest=false,
                           $parameters=null, $scaffolding=null)
   {
     global $lastImplementation, $flgCanContinueWorking, $devSession;
 
-    xq_context('YeAPF',       'YeAPF 0.8.63-131 built on 2019-07-24 09:00 (-3 DST)');
+    xq_context('YeAPF',       'YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)');
     xq_context('devSession',  $devSession);
     xq_context('ts1',         date('U'));
 
@@ -3467,7 +3473,7 @@
   {
     global $_JSFilesCache;
     if (strpos($fileName,".js")!==false) {
-      if ($_JSFilesCache[$fileName])
+      if (@$_JSFilesCache[$fileName])
         return false;
       else {
         $_JSFilesCache[$fileName]=true;
@@ -3558,7 +3564,7 @@
     global $intoFormFile, $includedFiles, $appName, $includeHistory,
            $lastCommands, $yeapfConfig, $appCharset,
            $_IncludedFiles, $cfgCurrentFile, $isDebugging,
-           $PHPVersion, 
+           $PHPVersion,
            $yeapfSymList;
     $s=null;
     $priorFile = $cfgCurrentFile;
@@ -3566,7 +3572,6 @@
       $cfgCurrentFile = $fileName;
       if (!isset($_IncludedFiles[$fileName])) {
         $_IncludedFiles[$fileName]=true;
-        // echo "incluindo $fileName $intoFormFile<br>";
         $lastCommands.="<b>$fileName</b><br>{<ul>";
 
         $p=strrpos($fileName, '.');
@@ -3672,17 +3677,18 @@
             $s=str_replace('type="hidden"', 'type="text" class="dbg-show-id" read-only="yes"', $s);
             $s=str_replace("type='hidden'", 'type="text" class="dbg-show-id" read-only="yes"', $s);
           }
-
           $s=analisarString($s, $pegarDadosDaTabela, $nomeTabela, $campoChave, $valorChave);
 
           /* replace global definitions */
-          foreach($yeapfSymList as $k=>$v) {
-            if (!is_array($v)) {
-              $s=str_replace("%$k%",$v,$s);
-              $k=strtoupper($k);
-              $s=str_replace("%$k%",$v,$s);
-              $k=strtolower($k);
-              $s=str_replace("%$k%",$v,$s);
+          if (is_array($yeapfSymList)) {
+            foreach($yeapfSymList as $k=>$v) {
+              if (!is_array($v)) {
+                $s=str_replace("%$k%",$v,$s);
+                $k=strtoupper($k);
+                $s=str_replace("%$k%",$v,$s);
+                $k=strtolower($k);
+                $s=str_replace("%$k%",$v,$s);
+              }
             }
           }
 

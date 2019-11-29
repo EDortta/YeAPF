@@ -2,9 +2,9 @@
 <?php
   /*
   tools/yapp
-  YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+  YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
   Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-  2019-07-05 08:47:32 (-3 DST)
+  2019-09-09 08:27:18 (-2 DST)
   */
   $mydir = dirname($_SERVER['SCRIPT_FILENAME']);
   $cmRequired = false;
@@ -141,7 +141,6 @@
   /* Since 0.8.60 yapp saves the location of the projetcs in __yeapfPath/.projects folder.
   This is like this in order to help yapp to update/list all the projects at a time */
 
-
   if (!is_dir("$__yeapfPath/.projects")) {
     if (!mkdir("$__yeapfPath/.projects")) {
       die("You have not enough rights to create '$__yeapfPath/.projects'\n");
@@ -162,7 +161,7 @@
     if (!is_writable("$appFolder/.config")) {
       die("You don't have enough rights to write in '$appFolder/.config'\n");
     }
-    chmod("$appFolder/.config", 0777);
+    @chmod("$appFolder/.config", 0777);
   }
 
   $yeapfAppIniFilename = "$appFolder/.config/yeapf-tools.ini";
@@ -204,12 +203,21 @@
       $appType = $yeapfAppIni['appType'];
       $template = $yeapfAppIni['template'];
       $fromSample = $yeapfAppIni['fromSample'];
-      $beAutonomous = strpos(",yes,true,on,1,", mb_strtolower($yeapfAppIni['autonomous']))>=0;
+      if (isset($yeapfAppIni['autonomous'])) {
+        $aux = mb_strtolower(trim(" ".$yeapfAppIni['autonomous']));
+        if (strlen($aux)>0)
+          $beAutonomous = strpos(",yes,true,on,1,", mb_strtolower($aux))>0;
+        unset($aux);
+      }
       if (!is_writeable($yeapfAppIniFilename)) {
         die("You have not enough rights to write '$yeapfAppIniFilename'\n");
       }
     }
   }
+
+  if ($beAutonomous)
+    echo "Configured as autonomous application\n";
+
 
   $toHelp = $toHelp || (!(($toUpdate) || ($toCreate)));
 
@@ -287,7 +295,7 @@
     }
   }
 
-  if (chmod($appFolder, 0777)) {
+  if (@chmod($appFolder, 0777)) {
     if (!is_dir("$appFolder/.config")) {
       if (!mkdir("$appFolder/.config", 0777, true)) {
         die("\nWas not possible to create '$appFolder/.config'\n");
@@ -397,14 +405,15 @@
     if (is_dir("$appFolder/lib/NuSOAP")) {
       if (!is_dir("$appFolder/lib/nuSOAP")) {
         if (!rename("$appFolder/lib/NuSOAP","$appFolder/lib/nuSOAP")) {
-          die("Was not possible to rename '$appFolder/lib/NuSOAP' to '$appFolder/lib/nuSOAP'");
+          die("\nWas not possible to rename '$appFolder/lib/NuSOAP' to '$appFolder/lib/nuSOAP'\n");
         }
       } else {
-        die("There is a folder called '$appFolder/lib/nuSOAP' already.");
+        echo "\nThere is a folder called '$appFolder/lib/nuSOAP' already.\nPlease remove it in order to continue\n";
       }
     }
 
     if ($beAutonomous) {
+      echo "Granting autonomous support folders\n";
       grantAppFolder("$appFolder/includes");
       grantAppFolder("$appFolder/lib");
       grantAppFolder("$appFolder/lib/nuSOAP");
@@ -444,7 +453,7 @@
     fclose($f);
     /* update/install template */
     if ($template > '') {
-      if (!is_folder("$YFolder/skel/webApp/templates/$template"))
+      if (!is_dir("$YFolder/skel/webApp/templates/$template"))
         die("Template $template not found\n");
       updateFiles("$YFolder/skel/webApp/templates/$template", "*", "$appFolder/", ($toCreate || $toForce));
     }
@@ -479,7 +488,7 @@
             $cfgURL = "http://localhost/" . $yeapfConfig['myself'] . "/configure.php";
             echo "Calling '$cfgURL' ...\n";
             file_get_contents($cfgURL);
-            echo "Ok\nThis folder was updated to YeAPF v0.8.63-106\n";
+            echo "Ok\nThis folder was updated to YeAPF v0.8.63-242\n";
           }
           else {
             echo "Remember to call 'configure.php' from your navigator\n";

@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/templates/bs3/configure.php
-    YeAPF 0.8.63-139 built on 2019-07-29 09:42 (-3 DST)
+    YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-    2019-07-29 09:42:25 (-3 DST)
+    2019-11-29 09:22:24 (-2 DST)
 */
 
 
@@ -19,6 +19,7 @@
    * 2014-02-21 - invert the searchPath order.  preserve the search.path lines order
    * 2014-03-10 - Check if configure.php and yeapf.functions are using the same version
    * 2017-09-01 - 'silent' paramenter
+   * 2019-08-20 - creation of .config folder under cfgMainFolder location
    */
 
   if (isset($silent))
@@ -81,7 +82,8 @@
     }
     $silent=false;
     $ret=sayStep($argList);
-    unlock('configure');
+    if (function_exists("unlock"))
+      unlock('configure');
     die($ret);
   }
 
@@ -313,9 +315,9 @@
       $time=date("G:i:s");
       fwrite($configFile,"<?php\n\n/* \n");
       fwrite($configFile," * yeapf.config\n");
-      fwrite($configFile," * YeAPF 0.8.63-139 built on 2019-07-29 09:42 (-3 DST)\n");
+      fwrite($configFile," * YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)\n");
       fwrite($configFile," * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n");
-      fwrite($configFile," * YEAPF (C) 2004-2014 Esteban Dortta (dortta@yahoo.com)\n");
+      fwrite($configFile," * YEAPF (C) 2004-2019 Esteban Dortta (dortta@yahoo.com)\n");
       fwrite($configFile," * This config file was created using configure.php\n");
       fwrite($configFile," * On $date at $time\n");
       fwrite($configFile," */\n\n");
@@ -369,9 +371,9 @@
   echo sayStep("<div style='border-left: solid 4px black; padding: 12px; background-color: #fff'>
     <div><a href='http://www.yeapf.com' target='x$timestamp'><img src='http://www.yeapf.com/logo.php'></a></div>
     <h2><big><I>skel/webApp/templates/bs3/configure.php</I></big></h2>
-    <h3>YeAPF 0.8.63-139 built on 2019-07-29 09:42 (-3 DST)<br>
+    <h3>YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)<br>
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License<br>
-    Last modification: 2019-07-29 09:42:25 (-3 DST)</h3></div>");
+    Last modification: 2019-11-29 09:22:24 (-2 DST)</h3></div>");
 
   if (!getMinPath($homeFolder, $homeURL, $relPath)) {
     dieConfig(sayStep("<span class=redDot></span><div class=err><b>$homeFolder</b> is not a real dir.<br>Probably '$relPath' is not a real path.<br>Maybe it's an alias or link<hr>Try again using an real path</div>"));
@@ -609,33 +611,33 @@
           $_httpReferer_=dirname($_httpReferer_);
         $_httpReferer_=str_replace('//','/',$_httpReferer_);
 
-        $yeapfDB='';
+        $yeapfDBPath='';
 
-        $yeapfDB.=','.getSgugPath(str_replace("\\" ,"/" ,getcwd()));
-        $yeapfDB.=','.getSgugPath(dirname(getcwd()));
-        $yeapfDB.=','.getSgugPath($_httpReferer_);
+        $yeapfDBPath.=','.getSgugPath(str_replace("\\" ,"/" ,getcwd()));
+        $yeapfDBPath.=','.getSgugPath(dirname(getcwd()));
+        $yeapfDBPath.=','.getSgugPath($_httpReferer_);
 
         /*
-        $yeapfDB.=','.getSgugPath($_MYSELF_);
-        $yeapfDB.=','.getSgugPath(dirname($_MYSELF_));
+        $yeapfDBPath.=','.getSgugPath($_MYSELF_);
+        $yeapfDBPath.=','.getSgugPath(dirname($_MYSELF_));
         */
-        $yeapfDB.=','.getSgugPath(dirname("$_httpReferer_"));
+        $yeapfDBPath.=','.getSgugPath(dirname("$_httpReferer_"));
 
         $auxDir=dirname(dirname("$_httpReferer_"));
         if ($auxDir!='/home')
-          $yeapfDB.=','.getSgugPath($auxDir);
+          $yeapfDBPath.=','.getSgugPath($auxDir);
 
-        $yeapfDB=str_replace('\\','/',$yeapfDB);
-        $yeapfDB=str_replace('//','/',$yeapfDB);
+        $yeapfDBPath=str_replace('\\','/',$yeapfDBPath);
+        $yeapfDBPath=str_replace('//','/',$yeapfDBPath);
 
-        $yeapfDB=array_unique(explode(',',$yeapfDB));
-        foreach($yeapfDB as $k=>$v)
+        $yeapfDBPath=array_unique(explode(',',$yeapfDBPath));
+        foreach($yeapfDBPath as $k=>$v)
           if ($v<$_SERVER['DOCUMENT_ROOT'])
-            unset($yeapfDB[$k]);
+            unset($yeapfDBPath[$k]);
 
         $aux=$_MY_CONTEXT_;
         while ($aux>$_SERVER['DOCUMENT_ROOT']) {
-          $yeapfDB[count($yeapfDB)]=$aux;
+          $yeapfDBPath[count($yeapfDBPath)]=$aux;
           $aux=dirname($aux);
         }
 
@@ -646,9 +648,9 @@
         if (file_exists(".config/db.ini"))
           unlink(".config/db.ini");
 
-        $SGUG_INI_PATH = whereis($yeapfDB, 'sgug.ini', true);
-        $DB_CSV_PATH   = whereis($yeapfDB, 'db.csv',   true);
-        $YEAPF_INI_PATH=whereis($yeapfDB, 'yeapf.db.ini', true);
+        $SGUG_INI_PATH = whereis($yeapfDBPath, 'sgug.ini', true);
+        $DB_CSV_PATH   = whereis($yeapfDBPath, 'db.csv',   true);
+        $YEAPF_INI_PATH=whereis($yeapfDBPath,  'yeapf.db.ini', true);
         /* introduced in 0.8.44
          * 'sgug.ini' renamed to 'db.csv'
          * 0.8.47 db.csv has higher priority in mixed environments */
@@ -825,7 +827,7 @@
                         $thisIsActive=intval($v1)==1;
                         if ($thisIsActive) {
                           $activeCount++;
-                          verifyActiveApp();                          
+                          verifyActiveApp();
                         }
                       }
 
@@ -889,531 +891,540 @@
 
               // @AQUI! verifyConfigFolder(dirname($dbCSVFilename)."/lock")
 
+              /* CREATION OF cfgMainFolder */
+              $cfgMainFolder = dirname($dbCSVFilename);
 
-              $TEMP_CFG_LOCK_DIR=dirname($dbCSVFilename)."/.lock";
+              $TEMP_CFG_LOCK_DIR=$cfgMainFolder."/.lock";
 
               if ((!file_exists($dbCSVFilename)) || (substr($TEMP_CFG_LOCK_DIR,0,3=='//.')))
                 dieConfig("<div class='err'><span class=redDot></span>Please, add yeapf.db.ini or db.csv to your main folder. <div>'$dbCSVFilename' not found</div><div><strong>OR</strong></div>Not regular TEMP_CFG_LOCK_DIR '$TEMP_CFG_LOCK_DIR' ($yeapfDB_configured)</div>");
 
-              if (verifyConfigFolder($TEMP_CFG_LOCK_DIR)) {
-                function cleanupfolder($folder) {
-                  if (is_dir($folder)) {
-                    if (is_writable($folder)) {
-                      $d=dir($folder);
-                      while (false !== ( $entry=$d->read() ) ) {
-                        if (substr($entry,0,1)!='.')
-                          if ($entry!='configure') {
-                            echo echoStep("Deleting $folder/$entry");
-                            @unlink("$folder/$entry");
-                          }
-                      }
-                    } else
-                      dieConfig(sayStep("<span class=redDot></span><span class=err>Folder '$folder' is not writable</span>"));
-                  }
-                }
-
-                cleanupfolder($TEMP_CFG_LOCK_DIR);
-                cleanupfolder("logs");
-
-                /* eliminate older 'lock' folder if exists */
-                cleanupfolder("lock");
-                if (is_dir("lock"))
-                  @rmdir("lock");
-                cleanupfolder(".config/lock");
-                if (is_dir(".config/lock"))
-                  @rmdir(".config/lock");
-
-                if (!openConfigFile()) {
-                  dieConfig(sayStep("IMPOSSIVEL CRIAR ARQUIVO DE CONFIGURA&Ccedil;&Atilde;O"));
-                }
-                writeConfigFile('cfgCurrentFolder', $_MY_CONTEXT_);
-                writeConfigFile('myself',$_MYSELF_);
-                if (isset($cfgDebugIP))
-                  writeConfigFile('cfgDebugIP',$cfgDebugIP);
-                writeConfigFile('root',$_THIS_SERVER_);
-                writeConfigFile("httpReferer",$_httpReferer_);
-                writeConfigFile("httpHost",$_httpHost_);
-
-                if ($yeapfDB_configured) {
-                  writeConfigFile("yeapfDB",$dbCSVFilename);
-                  writeConfigFile("cfgMainFolder",dirname($dbCSVFilename));
-
-                  if (ini_get("open_basedir")>'')
-                    $searchPath = explode( PATH_SEPARATOR, str_replace('\\','/',ini_get('open_basedir')) );
-                  else {
-                    $searchPath = explode( PATH_SEPARATOR, str_replace('\\','/',ini_get('include_path')) );
-                    foreach($searchPath as $k=>$v)
-                      if (strpos($v,'SGUG')!==false)
-                        unset($searchPath[$k]);
+              if (verifyConfigFolder("$cfgMainFolder/.config")) {
+                if (verifyConfigFolder($TEMP_CFG_LOCK_DIR)) {
+                  function cleanupfolder($folder) {
+                    if (is_dir($folder)) {
+                      if (is_writable($folder)) {
+                        $d=dir($folder);
+                        while (false !== ( $entry=$d->read() ) ) {
+                          if (substr($entry,0,1)!='.')
+                            if ($entry!='configure') {
+                              echo echoStep("Deleting $folder/$entry");
+                              @unlink("$folder/$entry");
+                            }
+                        }
+                      } else
+                        dieConfig(sayStep("<span class=redDot></span><span class=err>Folder '$folder' is not writable</span>"));
+                    }
                   }
 
-                  $cfgSOAPInstalled=function_exists("is_soap_fault");
+                  cleanupfolder($TEMP_CFG_LOCK_DIR);
+                  cleanupfolder("logs");
 
-                  array_push($searchPath,'../includes');
-                  array_push($searchPath,'../../includes');
-                  if (!$cfgSOAPInstalled) {
-                    array_push($searchPath,'includes/nuSOAP');
-                    array_push($searchPath,'../includes/nuSOAP');
-                    array_push($searchPath,'../../includes/nuSOAP');
+                  /* eliminate older 'lock' folder if exists */
+                  cleanupfolder("lock");
+                  if (is_dir("lock"))
+                    @rmdir("lock");
+                  cleanupfolder(".config/lock");
+                  if (is_dir(".config/lock"))
+                    @rmdir(".config/lock");
+
+                  if (!openConfigFile()) {
+                    dieConfig(sayStep("IMPOSSIVEL CRIAR ARQUIVO DE CONFIGURA&Ccedil;&Atilde;O"));
                   }
-                  if (ini_get("open_basedir")=='') {
-                    array_push($searchPath,$_MYSELF_);
-                    // array_push($searchPath,'./');
-                    array_push($searchPath,$_SERVER["DOCUMENT_ROOT"].'/lib');
-                    array_push($searchPath,$_SERVER["DOCUMENT_ROOT"].'/lib/nuSOAP');
-                    array_push($searchPath,'lib');
-                    array_push($searchPath,'../lib');
-                    array_push($searchPath,'../../lib');
+                  writeConfigFile('cfgCurrentFolder', $_MY_CONTEXT_);
+                  writeConfigFile('myself',$_MYSELF_);
+                  if (isset($cfgDebugIP))
+                    writeConfigFile('cfgDebugIP',$cfgDebugIP);
+                  writeConfigFile('root',$_THIS_SERVER_);
+                  writeConfigFile("httpReferer",$_httpReferer_);
+                  writeConfigFile("httpHost",$_httpHost_);
+
+                  if ($yeapfDB_configured) {
+                    writeConfigFile("yeapfDB",$dbCSVFilename);
+                    writeConfigFile("cfgMainFolder", $cfgMainFolder);
+
+                    if (ini_get("open_basedir")>'')
+                      $searchPath = explode( PATH_SEPARATOR, str_replace('\\','/',ini_get('open_basedir')) );
+                    else {
+                      $searchPath = explode( PATH_SEPARATOR, str_replace('\\','/',ini_get('include_path')) );
+                      foreach($searchPath as $k=>$v)
+                        if (strpos($v,'SGUG')!==false)
+                          unset($searchPath[$k]);
+                    }
+
+                    $cfgSOAPInstalled=function_exists("is_soap_fault");
+
+                    array_push($searchPath,'../includes');
+                    array_push($searchPath,'../../includes');
                     if (!$cfgSOAPInstalled) {
-                      array_push($searchPath,'lib/nuSOAP');
-                      array_push($searchPath,'../lib/nuSOAP');
-                      array_push($searchPath,'../../lib/nuSOAP');
+                      array_push($searchPath,'includes/nuSOAP');
+                      array_push($searchPath,'../includes/nuSOAP');
+                      array_push($searchPath,'../../includes/nuSOAP');
                     }
-                    if (file_exists('flags/flag.production')) {
-                      array_push($searchPath,'../../YeAPF/includes');
-                      array_push($searchPath,'YeAPF/includes');
-                      array_push($searchPath,'..');
-                    }
-                    array_push($searchPath,'includes');
-                    if (file_exists('flags/flag.production'))
-                      array_push($searchPath,'../YeAPF/includes');
-                    array_push($searchPath,'includes');
-                    array_push($searchPath,'imagens');
-                    array_push($searchPath,'images');
-                  }
-
-                  if ($homeFolder!='/') {
-                    array_push($searchPath,$homeFolder.'lib');
-                    array_push($searchPath,$homeFolder.'lib/nuSOAP');
-                  }
-                  array_unshift($searchPath,'mdForms');
-
-                  $searchPath=array_unique($searchPath);
-                  $aux='';
-                  foreach($searchPath as $asp)
-                    $aux.="<span style='padding-left:4px; padding-right:4px; border-left: dotted 1px #8A8A8A'>$asp</span>";
-                  echo echoStep("Search path: $aux");
-                  if (!$cfgSOAPInstalled) {
-                    $nusoapPath=whereis($searchPath,'nusoap.php',file_exists('flag.dbgphp.configure'));
-                    if ($nusoapPath=='') {
-                      unlock('configure');
-                      dieConfig(sayStep("<span class=redDot></span><div class=err>** nusoap.php not found</div>"));
-                    }
-                  }
-
-                  if (file_exists('search.path')) {
-                    $auxSearchPath=file('search.path');
-                    $auxPath = array();
-                    foreach($auxSearchPath as $asp) {
-                      if ((substr($asp,0,1)!=';') && (substr($asp,0,1)!='#'))
-                        array_unshift($auxPath, $asp);
-                    }
-                    foreach($auxPath as $asp) {
-                      array_unshift($searchPath, $asp);
-                    }
-                  }
-
-                  array_unshift($searchPath, $_SERVER["DOCUMENT_ROOT"].'/lib/YeAPF');
-                  array_unshift($searchPath, $_SERVER["DOCUMENT_ROOT"].'/YeAPF');
-
-                  $searchPath=array_unique($searchPath);
-
-                  $auxPath=locateFileInPath($searchPath, "yeapf.js", true);
-                  if ($auxPath=='')
-                    $auxPath=locateFile($_SERVER["DOCUMENT_ROOT"].'/YeAPF',"yeapf.js");
-                  array_unshift($searchPath,$auxPath);
-                  array_unshift($searchPath,"$auxPath/develop");
-
-                  $auxPath=locateFileInPath($searchPath, "yeapf.develop.php", true);
-                  if ($auxPath=='')
-                    $auxPath=locateFile($_SERVER["DOCUMENT_ROOT"].'/YeAPF/develop',"yeapf.develop.php");
-                  array_unshift($searchPath, $auxPath);
-                  array_unshift($searchPath, $__PL__);
-                  array_unshift($searchPath, dirname($__PL__));
-
-                  $searchPath=join(';',validatePath($searchPath));
-
-                  writeConfigFile("searchPath",$searchPath);
-                  if (!$cfgSOAPInstalled)
-                    writeConfigFile("nusoapPath",$nusoapPath);
-
-                  writeConfigFile("homeURL",$homeURL);
-                  writeConfigFile("homeFolder",$homeFolder);
-
-                  writeConfigFile("yeapfPath",$__PL__);
-                  closeConfigFile();
-
-                  // ??? OBSOLETO
-                  // fwrite($f,"if (\"\$imBuildForm\"=='Y') chdir('$_MY_CONTEXT_');\n\n\t");
-
-                  echo sayStep("Ready to write stubloader");
-
-                  if ((file_exists('yeapf.php')) && (!is_writable('yeapf.php')))
-                    dieConfig(sayStep("<span class=redDot></span><div class=err>Impossible to write to 'yeapf.php'</div>"));
-                  $f=fopen("yeapf.php", "w");
-
-                  $yeapfStub = '
-                  /*
-                  * yeapf.php
-                  * (C) 2004-2018 Esteban Daniel Dortta (dortta@yahoo.com)
-                  */
-
-                  global $__yeapfGlobalError;
-                  $__yeapfGlobalError = false;
-
-                  function _yLoaderDie($reconfigureLinkEnabled)
-                  {
-                    global $__yeapfGlobalError, $callback, $user_IP, $callBackFunction, $s, $a, $v, $SQLDieOnError;
-                    if (!$__yeapfGlobalError) {
-                      $script=basename($_SERVER["PHP_SELF"]);
-                      $isXML=intval(strpos("query.php",$script)!==false);
-                      $isJSON=intval(strpos("rest.php",$script)!==false);
-                      $isHTML=intval( (strpos("index.php",$script)!==false) || (strpos("body.php",$script)!==false) );
-                      $isCLI=intval(php_sapi_name() == "cli");
-                      $outputType = $isHTML *1000 +
-                                    $isXML  * 100 +
-                                    $isJSON *  10 +
-                                    $isCLI  *   1;
-
-                      $args=func_get_args();
-                      array_shift($args);
-                      $noHTMLArgs = array();
-                      $deathLogMessage = "";
-                      foreach($args as $kAux=>$vAux) {
-                        if (is_array($vAux))
-                          $vAux=json_encode($vAux);
-                        $noHTMLArgs[$kAux] = preg_replace(\'!\s+!\', " ", str_replace("\n", " ", strip_tags($vAux)));
-                        $deathLogMessage.=$noHTMLArgs[$kAux]." ";
+                    if (ini_get("open_basedir")=='') {
+                      array_push($searchPath,$_MYSELF_);
+                      // array_push($searchPath,'./');
+                      array_push($searchPath,$_SERVER["DOCUMENT_ROOT"].'/lib');
+                      array_push($searchPath,$_SERVER["DOCUMENT_ROOT"].'/lib/nuSOAP');
+                      array_push($searchPath,'lib');
+                      array_push($searchPath,'../lib');
+                      array_push($searchPath,'../../lib');
+                      if (!$cfgSOAPInstalled) {
+                        array_push($searchPath,'lib/nuSOAP');
+                        array_push($searchPath,'../lib/nuSOAP');
+                        array_push($searchPath,'../../lib/nuSOAP');
                       }
-                      $timestamp=date("U");
-                      $now=date("Y-m-d H:i:s");
-                      $reconfigureLinkEnabled = intval($reconfigureLinkEnabled);
-                      $ret = array("reconfigureLinkEnabled" => $reconfigureLinkEnabled,
-                                   "outputType" => $outputType,
-                                   "isHTML" => $isHTML,
-                                   "isJSON" => $isJSON,
-                                   "isCLI" => $isCLI,
-                                   "isXML" => $isXML,
-                                   "s" => $s,
-                                   "v" => $v,
-                                   "a" => $a
-                                   );
-
-                      if ($isHTML)
-                        $ret["userMsg"] = $args;
-                      else
-                        $ret["userMsg"] = $noHTMLArgs;
-
-                      if (is_array($ret["userMsg"])) {
-                        $ret["userMsgDetails"] = array_slice($ret["userMsg"], 1);
-                        $ret["userMsg"]=$ret["userMsg"][0];
+                      if (file_exists('flags/flag.production')) {
+                        array_push($searchPath,'../../YeAPF/includes');
+                        array_push($searchPath,'YeAPF/includes');
+                        array_push($searchPath,'..');
                       }
+                      array_push($searchPath,'includes');
+                      if (file_exists('flags/flag.production'))
+                        array_push($searchPath,'../YeAPF/includes');
+                      array_push($searchPath,'includes');
+                      array_push($searchPath,'imagens');
+                      array_push($searchPath,'images');
+                    }
 
-                      if (function_exists("get_backtrace")) {
-                        $ret["sys"]=array();
-                        $auxStack = get_backtrace();
-                        $stackNum = 0;
-                        foreach($auxStack as $item) {
-                          $ret["stack"]["$stackNum"]="$item";
-                          $stackNum++;
+                    if ($homeFolder!='/') {
+                      array_push($searchPath,$homeFolder.'lib');
+                      array_push($searchPath,$homeFolder.'lib/nuSOAP');
+                    }
+                    array_unshift($searchPath,'mdForms');
+
+                    $searchPath=array_unique($searchPath);
+                    $aux='';
+                    foreach($searchPath as $asp)
+                      $aux.="<span style='padding-left:4px; padding-right:4px; border-left: dotted 1px #8A8A8A'>$asp</span>";
+                    echo echoStep("Search path: $aux");
+                    if (!$cfgSOAPInstalled) {
+                      $nusoapPath=whereis($searchPath,'nusoap.php',file_exists('flag.dbgphp.configure'));
+                      if ($nusoapPath=='') {
+                        unlock('configure');
+                        dieConfig(sayStep("<span class=redDot></span><div class=err>** nusoap.php not found</div>"));
+                      }
+                    }
+
+                    if (file_exists('search.path')) {
+                      $auxSearchPath=file('search.path');
+                      $auxPath = array();
+                      foreach($auxSearchPath as $asp) {
+                        if ((substr($asp,0,1)!=';') && (substr($asp,0,1)!='#'))
+                          array_unshift($auxPath, $asp);
+                      }
+                      foreach($auxPath as $asp) {
+                        array_unshift($searchPath, $asp);
+                      }
+                    }
+
+                    array_unshift($searchPath, $_SERVER["DOCUMENT_ROOT"].'/lib/YeAPF');
+                    array_unshift($searchPath, $_SERVER["DOCUMENT_ROOT"].'/YeAPF');
+
+                    $searchPath=array_unique($searchPath);
+
+                    $auxPath=locateFileInPath($searchPath, "yeapf.js", true);
+                    if ($auxPath=='')
+                      $auxPath=locateFile($_SERVER["DOCUMENT_ROOT"].'/YeAPF',"yeapf.js");
+                    array_unshift($searchPath,$auxPath);
+                    array_unshift($searchPath,"$auxPath/develop");
+
+                    $auxPath=locateFileInPath($searchPath, "yeapf.develop.php", true);
+                    if ($auxPath=='')
+                      $auxPath=locateFile($_SERVER["DOCUMENT_ROOT"].'/YeAPF/develop',"yeapf.develop.php");
+                    array_unshift($searchPath, $auxPath);
+                    array_unshift($searchPath, $__PL__);
+                    array_unshift($searchPath, dirname($__PL__));
+
+                    $searchPath=join(';',validatePath($searchPath));
+
+                    writeConfigFile("searchPath",$searchPath);
+                    if (!$cfgSOAPInstalled)
+                      writeConfigFile("nusoapPath",$nusoapPath);
+
+                    writeConfigFile("homeURL",$homeURL);
+                    writeConfigFile("homeFolder",$homeFolder);
+
+                    writeConfigFile("yeapfPath",$__PL__);
+                    closeConfigFile();
+
+                    // ??? OBSOLETO
+                    // fwrite($f,"if (\"\$imBuildForm\"=='Y') chdir('$_MY_CONTEXT_');\n\n\t");
+
+                    echo sayStep("Ready to write stubloader");
+
+                    if ((file_exists('yeapf.php')) && (!is_writable('yeapf.php')))
+                      dieConfig(sayStep("<span class=redDot></span><div class=err>Impossible to write to 'yeapf.php'</div>"));
+                    $f=fopen("yeapf.php", "w");
+
+                    $yeapfStub = '
+                    /*
+                    * yeapf.php
+                    * (C) 2004-2018 Esteban Daniel Dortta (dortta@yahoo.com)
+                    */
+
+                    global $__yeapfGlobalError;
+                    $__yeapfGlobalError = false;
+
+                    function _yLoaderDie($reconfigureLinkEnabled)
+                    {
+                      global $__yeapfGlobalError, $callback, $user_IP, $callBackFunction, $s, $a, $v, $SQLDieOnError;
+                      if (!$__yeapfGlobalError) {
+                        $script=basename($_SERVER["PHP_SELF"]);
+                        $isXML=intval(strpos("query.php",$script)!==false);
+                        $isJSON=intval(strpos("rest.php",$script)!==false);
+                        $isHTML=intval( (strpos("index.php",$script)!==false) || (strpos("body.php",$script)!==false) );
+                        $isCLI=intval(php_sapi_name() == "cli");
+                        $outputType = $isHTML *1000 +
+                                      $isXML  * 100 +
+                                      $isJSON *  10 +
+                                      $isCLI  *   1;
+
+                        $args=func_get_args();
+                        array_shift($args);
+                        $noHTMLArgs = array();
+                        $deathLogMessage = "";
+                        foreach($args as $kAux=>$vAux) {
+                          if (is_array($vAux))
+                            $vAux=json_encode($vAux);
+                          $noHTMLArgs[$kAux] = preg_replace(\'!\s+!\', " ", str_replace("\n", " ", strip_tags($vAux)));
+                          $deathLogMessage.=$noHTMLArgs[$kAux]." ";
                         }
-                      }
+                        $timestamp=date("U");
+                        $now=date("Y-m-d H:i:s");
+                        $reconfigureLinkEnabled = intval($reconfigureLinkEnabled);
+                        $ret = array("reconfigureLinkEnabled" => $reconfigureLinkEnabled,
+                                     "outputType" => $outputType,
+                                     "isHTML" => $isHTML,
+                                     "isJSON" => $isJSON,
+                                     "isCLI" => $isCLI,
+                                     "isXML" => $isXML,
+                                     "s" => $s,
+                                     "v" => $v,
+                                     "a" => $a
+                                     );
 
-                      if (!file_exists("deathLogs"))
-                        mkdir("deathLogs",0777);
-                      $f=fopen("deathLogs/c.$user_IP.log","a");
-                      if ($f) {
-                        fwrite($f, "/---DEATH----------\n");
-                        foreach($noHTMLArgs as $arg) {
-                          fwrite($f, "| $now $arg\n");
+                        if ($isHTML)
+                          $ret["userMsg"] = $args;
+                        else
+                          $ret["userMsg"] = $noHTMLArgs;
+
+                        if (is_array($ret["userMsg"])) {
+                          $ret["userMsgDetails"] = array_slice($ret["userMsg"], 1);
+                          $ret["userMsg"]=$ret["userMsg"][0];
                         }
-                        fwrite($f, "\---DEATH----------\n");
-                        fclose($f);
-                      }
 
-                      $deathLogMessage="$now Fatal Error: $deathLogMessage OutputType: $outputType";
-                      if (function_exists("_recordWastedTime"))
-                        _recordWastedTime($deathLogMessage);
-                      if (function_exists("_dump"))
-                        _dump($deathLogMessage);
-
-                      switch ($outputType) {
-                        case 10:
-                          /* JSON */
-                          if ((is_string($callback)) && (trim($callback)>"")) {
-                            echo "if (typeof $callback == \'function\') $callback(500, \'error\', {}, ".json_encode($ret).");";
-                          } else {
-                            echo json_encode($ret);
+                        if (function_exists("get_backtrace")) {
+                          $ret["sys"]=array();
+                          $auxStack = get_backtrace();
+                          $stackNum = 0;
+                          foreach($auxStack as $item) {
+                            $ret["stack"]["$stackNum"]="$item";
+                            $stackNum++;
                           }
-                          break;
+                        }
 
-                        case 100:
-                          /* XML */
-                          $xmlData="";
-
-                          if (!isset($callBackFunction))
-                            $callBackFunction="alert";
-
-                          foreach($ret as $kAux=>$vAux) {
-                            if (is_array($vAux)) {
-                              $auxV="";
-                              foreach($vAux as $k1=>$v2) {
-                                if (is_numeric($k1))
-                                  $k1=$kAux."_$k1";
-                                $auxV.="\t<$k1>$v2</$k1>\n";
-                              }
-                              $vAux="$auxV";
-                            }
-                            if (is_numeric($kAux))
-                              $kAux="_$kAux"."_";
-                            $xmlData.="<$kAux>$vAux</$kAux>";
+                        if (!file_exists("deathLogs"))
+                          mkdir("deathLogs",0777);
+                        $f=fopen("deathLogs/c.$user_IP.log","a");
+                        if ($f) {
+                          fwrite($f, "/---DEATH----------\n");
+                          foreach($noHTMLArgs as $arg) {
+                            fwrite($f, "| $now $arg\n");
                           }
-                          $xmlData="<callBackFunction>$callBackFunction</callBackFunction><dataContext>$xmlData</dataContext>";
-                          $xmlOutput="<?xml version=\'1.0\' encoding=\'UTF-8\'?>\n<root>$xmlData<sgug><timestamp>$timestamp</timestamp></sgug></root>";
-                          echo $xmlOutput;
-                          break;
+                          fwrite($f, "\---DEATH----------\n");
+                          fclose($f);
+                        }
 
-                        case 1000:
-                          /* HTML */
-                          if (function_exists("_minimalCSS")) {
-                            _minimalCSS();
-                          } else {
-                            echo "<style>body {background-color: #f6f6f6;font-family: sans-serif;-webkit-font-smoothing: antialiased;font-size: 14px;line-height: 1.4;margin: 0;padding: 0;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;}</style>";
-                          }
-                          echo "<style>.userMsg { color: #800000} .userMsg .explain { font-size: 120%; font-weight: 800} .stack { color: #666666; font-family: \'Courier New\', Courier, monospace }</style>";
+                        $deathLogMessage="$now Fatal Error: $deathLogMessage OutputType: $outputType";
+                        if (function_exists("_recordWastedTime"))
+                          _recordWastedTime($deathLogMessage);
+                        if (function_exists("_dump"))
+                          _dump($deathLogMessage);
 
-                          echo "<div style=\'padding: 16px; margin: 16px; border: dotted 1px #66CCFF; border-radius: 6px; background-color: #fff\'>";
-                          echo "<div><a href=\'http://www.yeapf.com\' target=x$timestamp><img src=\'http://www.yeapf.com/logo.php\'></a></div><table>";
-                          foreach($ret as $k=>$vAux) {
-                            if (is_array($vAux)) {
-                              foreach($vAux as $kx=>$vx) {
-                                echo "<tr><td width=150px><span class=$k><span class=number>$k.$kx</span></span></td><td><span class=$k><span class=explain>$vx</span></span></td></tr>\n";
-                              }
+                        switch ($outputType) {
+                          case 10:
+                            /* JSON */
+                            if ((is_string($callback)) && (trim($callback)>"")) {
+                              echo "if (typeof $callback == \'function\') $callback(500, \'error\', {}, ".json_encode($ret).");";
                             } else {
-                              echo "<tr><td width=150px>$k</td><td>$vAux</td></tr>\n";
+                              echo json_encode($ret);
                             }
+                            break;
+
+                          case 100:
+                            /* XML */
+                            $xmlData="";
+
+                            if (!isset($callBackFunction))
+                              $callBackFunction="alert";
+
+                            foreach($ret as $kAux=>$vAux) {
+                              if (is_array($vAux)) {
+                                $auxV="";
+                                foreach($vAux as $k1=>$v2) {
+                                  if (is_numeric($k1))
+                                    $k1=$kAux."_$k1";
+                                  $auxV.="\t<$k1>$v2</$k1>\n";
+                                }
+                                $vAux="$auxV";
+                              }
+                              if (is_numeric($kAux))
+                                $kAux="_$kAux"."_";
+                              $xmlData.="<$kAux>$vAux</$kAux>";
+                            }
+                            $xmlData="<callBackFunction>$callBackFunction</callBackFunction><dataContext>$xmlData</dataContext>";
+                            $xmlOutput="<?xml version=\'1.0\' encoding=\'UTF-8\'?>\n<root>$xmlData<sgug><timestamp>$timestamp</timestamp></sgug></root>";
+                            echo $xmlOutput;
+                            break;
+
+                          case 1000:
+                            /* HTML */
+                            if (function_exists("_minimalCSS")) {
+                              _minimalCSS();
+                            } else {
+                              echo "<style>body {background-color: #f6f6f6;font-family: sans-serif;-webkit-font-smoothing: antialiased;font-size: 14px;line-height: 1.4;margin: 0;padding: 0;-ms-text-size-adjust: 100%;-webkit-text-size-adjust: 100%;}</style>";
+                            }
+                            echo "<style>.userMsg { color: #800000} .userMsg .explain { font-size: 120%; font-weight: 800} .stack { color: #666666; font-family: \'Courier New\', Courier, monospace }</style>";
+
+                            echo "<div style=\'padding: 16px; margin: 16px; border: dotted 1px #66CCFF; border-radius: 6px; background-color: #fff\'>";
+                            echo "<div><a href=\'http://www.yeapf.com\' target=x$timestamp><img src=\'http://www.yeapf.com/logo.php\'></a></div><table>";
+                            foreach($ret as $k=>$vAux) {
+                              if (is_array($vAux)) {
+                                foreach($vAux as $kx=>$vx) {
+                                  echo "<tr><td width=150px><span class=$k><span class=number>$k.$kx</span></span></td><td><span class=$k><span class=explain>$vx</span></span></td></tr>\n";
+                                }
+                              } else {
+                                echo "<tr><td width=150px>$k</td><td>$vAux</td></tr>\n";
+                              }
+                            }
+                            echo "</table></div>";
+                            break;
+                          default:
+
+                            /* TEXT (cli) */
+                            print_r($ret);
+                        }
+
+                        if (function_exists("db_set_flag")) {
+                          db_set_flag(_DB_DIRTY_);
+                        }
+                        if ($SQLDieOnError) {
+                          if ($SQLDieOnError==1)
+                            die();
+                          else {
+                            exit($SQLDieOnError);
                           }
-                          echo "</table></div>";
-                          break;
-                        default:
-
-                          /* TEXT (cli) */
-                          print_r($ret);
-                      }
-
-                      if (function_exists("db_set_flag")) {
-                        db_set_flag(_DB_DIRTY_);
-                      }
-                      if ($SQLDieOnError) {
-                        if ($SQLDieOnError==1)
-                          die();
-                        else {
-                          exit($SQLDieOnError);
                         }
                       }
                     }
-                  }
 
-                  function _yeapf_getFileValue($fileName)
-                  {
-                    $aux1=$aux2=0;
-                    if (file_exists($fileName))
-                      $aux1=join("",file($fileName));
-                    if (file_exists("flags/".$fileName))
-                      $aux2=join("",file("flags/".$fileName));
-                    $ret=intval($aux1) | intval($aux2);
-                    return $ret;
-                  }
-
-                  if (file_exists("flags/flag.dbgloader")) error_log(basename(__FILE__)." ".date("i:s").": preparing flags\n",3,"logs/yeapf.loader.log");
-
-                  $yeapfLogFlags=_yeapf_getFileValue("debug.flags");
-                  $yeapfLogLevel=_yeapf_getFileValue("debug.level");
-                  $yeapfLogBacktrace=_yeapf_getFileValue("debug.trace");
-                  $yeapfDebugAll=intval(file_exists("flags/flag.dbgphp"))?1:0;
-                  $yeapfPauseAfterClickFlag=_yeapf_getFileValue("flags/flag.pause");
-
-                  $logOutput=0;  // default is to not produce debug output
-
-                  if ($yeapfDebugAll) {
-                    ini_set("display_errors","1");
-                    error_reporting (E_ALL);
-                  }
-
-                  if (file_exists("flags/development.debug"))
-                   $developmentStage = join("",file("flags/development.debug"));
-
-                  $jsDumpEnabled = intval(file_exists("flags/debug.javascript")) || isset($jsDumpEnabled)?intval($jsDumpEnabled):0;
-                  $aDebugIP = trim(file_exists("flags/debug.ip")?join(file("flags/debug.ip")):"");
-
-                  if (file_exists("flags/flag.dbgloader")) error_log(basename(__FILE__)." ".date("i:s").": loading config files\n",3,"logs/yeapf.loader.log");
-
-                  if (file_exists(dirname(__FILE__)."/.config/yeapf.config"))
-                    (@include_once dirname(__FILE__)."/.config/yeapf.config") || _yLoaderDie(true, dirname(__FILE__)."Error loading /.config/yeapf.config");
-                  else
-                    _yLoaderDie(true, dirname(__FILE__)."/.config/yeapf.config not found");
-
-                  $__yeapfPath=$yeapfConfig["yeapfPath"];
-                  $__yeapfContext=$yeapfConfig["cfgCurrentFolder"];
-                  $__yeapfCWD = getcwd();
-                  $__yeapfCWD = str_replace("\\\\","/",$__yeapfCWD);
-                  if ($__yeapfContext != $__yeapfCWD) _yLoaderDie(true,"YeAPF running out of original context or is missconfigured\n * $__yeapfCWD differs from $__yeapfContext");
-
-
-
-                  $auxAppFolderName="";
-                  if (file_exists("appFolderName.def"))
-                    $auxAppFolderName="appFolderName.def";
-
-                  if ($auxAppFolderName>"") {
-                    $appFolder=file($auxAppFolderName);
-                    while (count($appFolder)<3)
-                      $appFolder[count($appFolder)]="";
-                    $appFolderName=$appFolder[0];
-                    $appFolderRights=intval($appFolder[1]);
-                    $appFolderInsecureEvents=trim($appFolder[2]);
-                  } else {
-                    $appFolderName=basename(getcwd());
-                    $appFolderRights=0;
-                    // md5("*.") = "3db6003ce6c1725a9edb9d0e99a9ac3d"
-                    $appFolderInsecureEvents="3db6003ce6c1725a9edb9d0e99a9ac3d";
-                  }
-                  // in case cfgInitialVerb is defined, we need to put this verb as insecure
-                  if (isset($cfgInitialVerb)) {
-                    if ($appFolderInsecureEvents>"")
-                      $appFolderInsecureEvents.=",";
-                    $appFolderInsecureEvents.=md5($cfgInitialVerb.".");
-                  }
-                  unset($auxAppFolderName);
-                  if (file_exists("flags/flag.dbgloader")) error_log(basename(__FILE__)." ".date("i:s").": loading $__yeapfPath/yeapf.functions.php\n",3,"logs/yeapf.loader.log");
-                  ';
-
-                  fwrite($f,"<?php\n$yeapfStub");
-                  $now=date('U')+3;
-
-                  // appFolder
-                  $appFolderLoader = '
-                  $md5Files=array("body.php", "index.php", "configure.php", "search.path");
-                  $configMD5="";
-                  foreach($md5Files as $aFileName) {
-                    if (file_exists($aFileName)) {
-                      $configMD5.=join("", file($aFileName));
+                    function _yeapf_getFileValue($fileName)
+                    {
+                      $aux1=$aux2=0;
+                      if (file_exists($fileName))
+                        $aux1=join("",file($fileName));
+                      if (file_exists("flags/".$fileName))
+                        $aux2=join("",file("flags/".$fileName));
+                      $ret=intval($aux1) | intval($aux2);
+                      return $ret;
                     }
-                  }
-                  $configMD5=md5($configMD5);
-                  $yeapfStubMTime = filemtime("yeapf.php");
-                  if ($yeapfStubMTime>'.$now.')
-                    $savedConfigMD5=md5('.$now.');
-                  else
-                    $savedConfigMD5 = join("",file("configure.md5"));
 
-                  if ((file_exists("configure.php")) && ($configMD5 != $savedConfigMD5)) {
-                    _yLoaderDie(true, "YeAPF not configured\nRun <a href=\"configure.php\">configure.php</a> again.");
-                  }
-                  ';
+                    if (file_exists("flags/flag.dbgloader")) error_log(basename(__FILE__)." ".date("i:s").": preparing flags\n",3,"logs/yeapf.loader.log");
 
-                  fwrite($f,$appFolderLoader);
+                    $yeapfLogFlags=_yeapf_getFileValue("debug.flags");
+                    $yeapfLogLevel=_yeapf_getFileValue("debug.level");
+                    $yeapfLogBacktrace=_yeapf_getFileValue("debug.trace");
+                    $yeapfDebugAll=intval(file_exists("flags/flag.dbgphp"))?1:0;
+                    $yeapfPauseAfterClickFlag=_yeapf_getFileValue("flags/flag.pause");
 
-                  $yeapfStub2='
-                  (@include_once $__yeapfPath."/yeapf.functions.php") || (_yLoaderDie("$__yeapfPath/yeapf.functions.php not found"));
+                    $logOutput=0;  // default is to not produce debug output
 
-                  _recordWastedTime("StubLoader ready");
-                  if (!function_exists("decimalMicrotime")) _die("decimalMicrotime() required");
+                    if ($yeapfDebugAll) {
+                      ini_set("display_errors","1");
+                      error_reporting (E_ALL);
+                    }
 
-                  $t0=decimalMicrotime();
+                    if (file_exists("flags/development.debug"))
+                     $developmentStage = join("",file("flags/development.debug"));
 
-                  if (file_exists("flags/flag.dbgloader")) error_log(basename(__FILE__)." ".date("i:s").": verifiyng yeapf version\n",3,"logs/yeapf.loader.log");
+                    $jsDumpEnabled = intval(file_exists("flags/debug.javascript")) || isset($jsDumpEnabled)?intval($jsDumpEnabled):0;
+                    $aDebugIP = trim(file_exists("flags/debug.ip")?join(file("flags/debug.ip")):"");
 
-                  _recordWastedTime("Checking YeAPF Version");
+                    if (file_exists("flags/flag.dbgloader")) error_log(basename(__FILE__)." ".date("i:s").": loading config files\n",3,"logs/yeapf.loader.log");
 
-                  if (function_exists("yeapfVersion"))
-                    if (("%"."YEAPF_VERSION%")==yeapfVersion()) {
-                      error_log(basename(__FILE__)." ".date("i:s").": WARNING: Using developer version\n",3,"logs/yeapf.loader.log");
+                    if (file_exists(dirname(__FILE__)."/.config/yeapf.config"))
+                      (@include_once dirname(__FILE__)."/.config/yeapf.config") || _yLoaderDie(true, dirname(__FILE__)."Error loading /.config/yeapf.config");
+                    else
+                      _yLoaderDie(true, dirname(__FILE__)."/.config/yeapf.config not found");
+
+                    $__yeapfPath=$yeapfConfig["yeapfPath"];
+                    $__yeapfContext=$yeapfConfig["cfgCurrentFolder"];
+                    $__yeapfCWD = getcwd();
+                    $__yeapfCWD = str_replace("\\\\","/",$__yeapfCWD);
+                    if ($__yeapfContext != $__yeapfCWD) _yLoaderDie(true,"YeAPF running out of original context or is missconfigured\n * $__yeapfCWD differs from $__yeapfContext");
+
+
+
+                    $auxAppFolderName="";
+                    if (file_exists("appFolderName.def"))
+                      $auxAppFolderName="appFolderName.def";
+
+                    if ($auxAppFolderName>"") {
+                      $appFolder=file($auxAppFolderName);
+                      while (count($appFolder)<3)
+                        $appFolder[count($appFolder)]="";
+                      $appFolderName=$appFolder[0];
+                      $appFolderRights=intval($appFolder[1]);
+                      $appFolderInsecureEvents=trim($appFolder[2]);
                     } else {
-                      if (("0.8.63") != yeapfVersion())
-                        _yLoaderDie(true, "Your configure version is \'0.8.63\' while your installed version is \'".yeapfVersion()."\'");
+                      $appFolderName=basename(getcwd());
+                      $appFolderRights=0;
+                      // md5("*.") = "3db6003ce6c1725a9edb9d0e99a9ac3d"
+                      $appFolderInsecureEvents="3db6003ce6c1725a9edb9d0e99a9ac3d";
                     }
-                  if (!isset($appName))
-                    $appName = "dummy";
-                  $yeapfConfig["searchPath"]=$appName.";".$yeapfConfig["searchPath"];
-                  set_include_path(get_include_path().":".str_replace(";",":",$yeapfConfig["searchPath"]));
-                  ';
-                  fwrite($f,$yeapfStub2);
-
-                  // appScript and appFolderScript
-                  $appScriptLoader = '
-                  if (file_exists("flags/flag.dbgloader")) error_log(basename(__FILE__)." ".date("i:s").": loading application script\n",3,"logs/yeapf.loader.log");
-                  // load application script
-                  $appWD=basename(getcwd());
-                  // drop version info as in "customers-3.5" keeping with "costumers"
-                  $appWD=substr($appWD,0,strpos($appWD."-","-"));
-                  $__scriptList = array("$appWD.php", "$appWD.rules.php",
-                                        "$appName.php", "$appName.$appWD.php",
-                                        "$appName.rules.php", "$appName.$appWD.rules.php", "rules.php",
-                                        bestName("$appName.security.php"),
-                                        "includes/security.php");
-                  _recordWastedTime("Loading app libraries");
-                  $t1=decimalMicrotime();
-                  foreach($__scriptList as $__scriptName) {
-                    $__scriptName = bestName($__scriptName);
-                    if ((file_exists($__scriptName)) && (!is_dir($__scriptName))) {
-                      _recordWastedTime("Loading $__scriptName");
-
-                      (@include_once "$__scriptName") or _yLoaderDie(true, dirname(__FILE__)."Error loading $__scriptName");
+                    // in case cfgInitialVerb is defined, we need to put this verb as insecure
+                    if (isset($cfgInitialVerb)) {
+                      if ($appFolderInsecureEvents>"")
+                        $appFolderInsecureEvents.=",";
+                      $appFolderInsecureEvents.=md5($cfgInitialVerb.".");
                     }
-                  }
-                  $t2=decimalMicrotime()-$t1;
-                  _recordWastedTime("App libraries loaded ($t2)");
+                    unset($auxAppFolderName);
+                    if (file_exists("flags/flag.dbgloader")) error_log(basename(__FILE__)." ".date("i:s").": loading $__yeapfPath/yeapf.functions.php\n",3,"logs/yeapf.loader.log");
+                    ';
 
-                  ';
+                    fwrite($f,"<?php\n$yeapfStub");
+                    $now=date('U')+3;
 
-                  fwrite($f,$appScriptLoader);
+                    // appFolder
+                    $appFolderLoader = '
+                    $md5Files=array("body.php", "index.php", "configure.php", "search.path");
+                    $configMD5="";
+                    foreach($md5Files as $aFileName) {
+                      if (file_exists($aFileName)) {
+                        $configMD5.=join("", file($aFileName));
+                      }
+                    }
+                    $configMD5=md5($configMD5);
+                    $yeapfStubMTime = filemtime("yeapf.php");
+                    if ($yeapfStubMTime>'.$now.')
+                      $savedConfigMD5=md5('.$now.');
+                    else
+                      $savedConfigMD5 = join("",file("configure.md5"));
 
-                  fwrite($f,"\n          _dumpY(1,1,'yeapf loaded');\n\n");
+                    if ((file_exists("configure.php")) && ($configMD5 != $savedConfigMD5)) {
+                      _yLoaderDie(true, "YeAPF not configured\nRun <a href=\"configure.php\">configure.php</a> again.");
+                    }
+                    ';
 
-                  $appStarter = '
-                  yeapfStage("click");
-                  yeapfStage("registerAppEvents_$appWD");
-                  yeapfStage("registerAppEvents");
-                  ';
-                  fwrite($f,$appStarter);
+                    fwrite($f,$appFolderLoader);
 
-                  fwrite($f,'
-                  $t0=decimalMicrotime()-$t0;
-                  _recordWastedTime("overall loader wasted time: $t0");
-                  ?>');
-                  fclose($f);
+                    $yeapfStub2='
+                    (@include_once $__yeapfPath."/yeapf.functions.php") || (_yLoaderDie("$__yeapfPath/yeapf.functions.php not found"));
 
-                  echo sayStep("Stubloader 'yeapf.php' has been created");
+                    if (function_exists("_recordWastedTime"))
+                      _recordWastedTime("StubLoader ready");
+                    if (!function_exists("decimalMicrotime")) _die("decimalMicrotime() required");
 
-                  $referer_uri=isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:'./';
-                  if ($referer_uri==$_SERVER['SCRIPT_NAME'])
-                    $referer_uri='./';
+                    $t0=decimalMicrotime();
 
-                  if (file_exists('develop.php'))
-                    $developLink="<div class='basicLink'><a class='minButton' href='develop.php'>Develop</a></div>";
-                  else
-                    $developLink='';
+                    if (file_exists("flags/flag.dbgloader")) error_log(basename(__FILE__)." ".date("i:s").": verifiyng yeapf version\n",3,"logs/yeapf.loader.log");
 
-                  if ($silent) {
-                    echo "<br>\n<u>YeAPF 0.8.63 well configured!<span class=greenDot></span></u>";
-                    echo "<br>\nYeAPF Folder: <b>$__PL__</b>";
-                    echo "<br>\nDB config: <b>$dbCSVFilename</b>";
-                    echo "<br>\nDebug IP: <b>".(isset($cfgDebugIP)?$cfgDebugIP:'none')."</b>";
+                    if (function_exists("_recordWastedTime"))
+                      _recordWastedTime("Checking YeAPF Version");
+
+                    if (function_exists("yeapfVersion"))
+                      if (("%"."YEAPF_VERSION%")==yeapfVersion()) {
+                        error_log(basename(__FILE__)." ".date("i:s").": WARNING: Using developer version\n",3,"logs/yeapf.loader.log");
+                      } else {
+                        if (("0.8.63") != yeapfVersion())
+                          _yLoaderDie(true, "Your configure version is \'0.8.63\' while your installed version is \'".yeapfVersion()."\'");
+                      }
+                    if (!isset($appName))
+                      $appName = "dummy";
+                    $yeapfConfig["searchPath"]=$appName.";".$yeapfConfig["searchPath"];
+                    set_include_path(get_include_path().":".str_replace(";",":",$yeapfConfig["searchPath"]));
+                    ';
+                    fwrite($f,$yeapfStub2);
+
+                    // appScript and appFolderScript
+                    $appScriptLoader = '
+                    if (file_exists("flags/flag.dbgloader")) error_log(basename(__FILE__)." ".date("i:s").": loading application script\n",3,"logs/yeapf.loader.log");
+                    // load application script
+                    $appWD=basename(getcwd());
+                    // drop version info as in "customers-3.5" keeping with "costumers"
+                    $appWD=substr($appWD,0,strpos($appWD."-","-"));
+                    $__scriptList = array("$appWD.php", "$appWD.rules.php",
+                                          "$appName.php", "$appName.$appWD.php",
+                                          "$appName.rules.php", "$appName.$appWD.rules.php", "rules.php",
+                                          bestName("$appName.security.php"),
+                                          "includes/security.php");
+                    if (function_exists("_recordWastedTime"))
+                      _recordWastedTime("Loading app libraries");
+                    $t1=decimalMicrotime();
+                    foreach($__scriptList as $__scriptName) {
+                      $__scriptName = bestName($__scriptName);
+                      if ((file_exists($__scriptName)) && (!is_dir($__scriptName))) {
+                        _recordWastedTime("Loading $__scriptName");
+
+                        (@include_once "$__scriptName") or _yLoaderDie(true, dirname(__FILE__)."Error loading $__scriptName");
+                      }
+                    }
+                    $t2=decimalMicrotime()-$t1;
+                    if (function_exists("_recordWastedTime"))
+                      _recordWastedTime("App libraries loaded ($t2)");
+
+                    ';
+
+                    fwrite($f,$appScriptLoader);
+
+                    fwrite($f,"\n          _dumpY(1,1,'yeapf loaded');\n\n");
+
+                    $appStarter = '
+                    yeapfStage("click");
+                    yeapfStage("registerAppEvents_$appWD");
+                    yeapfStage("registerAppEvents");
+                    ';
+                    fwrite($f,$appStarter);
+
+                    fwrite($f,'
+                    $t0=decimalMicrotime()-$t0;
+                    if (function_exists("_recordWastedTime"))
+                      _recordWastedTime("overall loader wasted time: $t0");
+                    ?>');
+                    fclose($f);
+
+                    echo sayStep("Stubloader 'yeapf.php' has been created");
+
+                    $referer_uri=isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:'./';
+                    if ($referer_uri==$_SERVER['SCRIPT_NAME'])
+                      $referer_uri='./';
+
+                    if (file_exists('develop.php'))
+                      $developLink="<div class='basicLink'><a class='minButton' href='develop.php'>Develop</a></div>";
+                    else
+                      $developLink='';
+
+                    if ($silent) {
+                      echo "<br>\n<u>YeAPF 0.8.63 well configured!<span class=greenDot></span></u>";
+                      echo "<br>\nYeAPF Folder: <b>$__PL__</b>";
+                      echo "<br>\nDB config: <b>$dbCSVFilename</b>";
+                      echo "<br>\nDebug IP: <b>".(isset($cfgDebugIP)?$cfgDebugIP:'none')."</b>";
+                    } else {
+                      echo sayStep("<style>.basicLink {max-width: 240px; float: left; height: 24px; padding-right: 18px} .minButton {   display: inline-block;   margin: 0;   padding: 0.75rem 1rem;   border: 0;   border-radius: 0.317rem;   background-color: #aaa;   color: #fff;   text-decoration: none;   font-weight: 700;   font-size: 1rem;   line-height: 1.5;   font-family: 'Helvetica Neue', Arial, sans-serif;   cursor: pointer;   -webkit-appearance: none;   -webkit-font-smoothing: antialiased; }  .minButton:hover {   opacity: 0.85; }  .minButton:active {   box-shadow: inset 0 3px 4px hsla(0, 0%, 0%, 0.2); }  .minButton:focus {   outline: thin dotted #444;   outline: 5px auto -webkit-focus-ring-color;   outline-offset: -2px; }  .minButton_primary {   background-color: #1fa3ec; }  .minButton_secondary {   background-color: #e98724; }  .minButton-icon {   display: inline-block;   position: relative;   top: -0.1em;   vertical-align: middle;   margin-right: 0.317rem; }</style><div style='box-shadow: 5px 5px 2px #888888; padding: 16px; margin: 16px; border: dotted 1px #66CCFF; border-left: solid 8px #337001; border-radius: 6px; background-color: #fff'><big><u>YeAPF 0.8.63 well configured!</u>&nbsp;<span class=greenDot></span></big><div style='padding-left: 16px'>Location: <b>$__PL__</b><br>DB config: <b>$dbCSVFilename</b><br>Debug IP: <b>".(isset($cfgDebugIP)?$cfgDebugIP:'none')."</b></div><div style='width:100%; height: 24px'><div class='basicLink'><a class='minButton' href='$referer_uri'>Back</a></div><div class='basicLink'><a class='minButton' href='configure.php?debugSteps=1'>Debug configure</a></div><div class='basicLink'><a class='minButton minButton_primary' href='index.php'>Start</a></div><div class='basicLink'>$developLink</div><div class='basicLink'><a class='minButton minButton_secondary' href='configure.php?destroydb=yes'>Recreate DB conn</a></div></div><br></div>");
+                    }
+                    $aux=join(file('.config/yeapf.config'),'<br>');
+                    // echo echoStep("<div class=code>$aux</div>");
+                    $aux=join(file('yeapf.php'),'<br>');
+                    // echo echoStep("<div class=code>$aux</div>");
+
                   } else {
-                    echo sayStep("<style>.basicLink {max-width: 240px; float: left; height: 24px; padding-right: 18px} .minButton {   display: inline-block;   margin: 0;   padding: 0.75rem 1rem;   border: 0;   border-radius: 0.317rem;   background-color: #aaa;   color: #fff;   text-decoration: none;   font-weight: 700;   font-size: 1rem;   line-height: 1.5;   font-family: 'Helvetica Neue', Arial, sans-serif;   cursor: pointer;   -webkit-appearance: none;   -webkit-font-smoothing: antialiased; }  .minButton:hover {   opacity: 0.85; }  .minButton:active {   box-shadow: inset 0 3px 4px hsla(0, 0%, 0%, 0.2); }  .minButton:focus {   outline: thin dotted #444;   outline: 5px auto -webkit-focus-ring-color;   outline-offset: -2px; }  .minButton_primary {   background-color: #1fa3ec; }  .minButton_secondary {   background-color: #e98724; }  .minButton-icon {   display: inline-block;   position: relative;   top: -0.1em;   vertical-align: middle;   margin-right: 0.317rem; }</style><div style='box-shadow: 5px 5px 2px #888888; padding: 16px; margin: 16px; border: dotted 1px #66CCFF; border-left: solid 8px #337001; border-radius: 6px; background-color: #fff'><big><u>YeAPF 0.8.63 well configured!</u>&nbsp;<span class=greenDot></span></big><div style='padding-left: 16px'>Location: <b>$__PL__</b><br>DB config: <b>$dbCSVFilename</b><br>Debug IP: <b>".(isset($cfgDebugIP)?$cfgDebugIP:'none')."</b></div><div style='width:100%; height: 24px'><div class='basicLink'><a class='minButton' href='$referer_uri'>Back</a></div><div class='basicLink'><a class='minButton' href='configure.php?debugSteps=1'>Debug configure</a></div><div class='basicLink'><a class='minButton minButton_primary' href='index.php'>Start</a></div><div class='basicLink'>$developLink</div><div class='basicLink'><a class='minButton minButton_secondary' href='configure.php?destroydb=yes'>Recreate DB conn</a></div></div><br></div>");
+                    writeConfigFile("cfgMainFolder",getcwd());
+                    $errMsg="<BR><span class=redDot></span>The dbConnection could not be written.<br>Check your access rights to '".getcwd()."' folder ";
+                    echo sayStep($errMsg);
+                    if ($silent) echo $errMsg;
+                    echo sayStep("<span class=err>(You can debug configuration process clicking <a href='configure.php?debugSteps=1'>here</a>)</span>");
                   }
-                  $aux=join(file('.config/yeapf.config'),'<br>');
-                  // echo echoStep("<div class=code>$aux</div>");
-                  $aux=join(file('yeapf.php'),'<br>');
-                  // echo echoStep("<div class=code>$aux</div>");
-
-                } else {
-                  writeConfigFile("cfgMainFolder",getcwd());
-                  $errMsg="<BR><span class=redDot></span>The dbConnection could not be written.<br>Check your access rights to '".getcwd()."' folder ";
-                  echo sayStep($errMsg);
-                  if ($silent) echo $errMsg;
-                  echo sayStep("<span class=err>(You can debug configuration process clicking <a href='configure.php?debugSteps=1'>here</a>)</span>");
                 }
               }
 

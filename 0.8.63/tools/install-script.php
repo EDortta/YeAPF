@@ -1,11 +1,10 @@
 <?php
 /*
     tools/install-script.php
-    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-    2019-05-06 11:43:31 (-3 DST)
+    2019-08-20 18:44:08 (-2 DST)
 */
-
   function installFile($entry)
   {
     global $yeapfPath, $chmodScript, $targetPath, $phpPath;

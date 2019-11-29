@@ -1,9 +1,9 @@
 <?php
 /*
     skel/webApp/body.php
-    YeAPF 0.8.63-139 built on 2019-07-29 09:42 (-3 DST)
+    YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-    2019-07-29 09:42:25 (-3 DST)
+    2019-11-29 09:22:24 (-2 DST)
 
     skel/webApp / body.php
     This file cannot be modified within skel/webApp
@@ -152,7 +152,9 @@
       else if (!$withoutBody)
         $footer=$aBody;
 
+      /* @OBSOLETE 20190812
       $userContext->menuFooter();
+      */
 
       error_log("s=$s | a=$a | u=$u | aBody=$aBody | appScript=null\n",3,sys_get_temp_dir()."/yeapf.log");
     } else {

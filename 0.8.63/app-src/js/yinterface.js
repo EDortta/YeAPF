@@ -1,12 +1,14 @@
 /*
     app-src/js/yinterface.js
-    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-    2019-05-14 10:44:25 (-3 DST)
+    2019-09-09 08:27:18 (-2 DST)
 */
 
 var yInterfaceObj = function() {
   var that = {};
+
+  that._tableALineSpec = [];
 
   that.openTab = function(e) {
     var opcoes = y$('.op-menu');
@@ -19,17 +21,17 @@ var yInterfaceObj = function() {
         /* se for um click, pego o destino */
         if (e.target)
           e = e.target;
-        while (  (e) &&
-                  !(  (e.getAttribute('data-tab') !== null) ||
-                     (e.nodeName == 'LI'))  )
-           e = e.parentNode;
+        while ( (e) &&
+                !((e.getAttribute('data-tab') !== null) ||
+                (e.nodeName == 'LI')) )
+          e = e.parentNode;
         if (!e.hasClass("disabled")) {
           e.addClass('active');
           var tab = e.getAttribute('data-tab');
-          if ("string"==typeof tab)
+          if ("string" == typeof tab)
             mTabNav.showTab(tab);
           else {
-            console.warn((e.id || "unidentified") +" does not has data-tab attribute");
+            console.warn((e.id || "unidentified") + " does not has data-tab attribute");
           }
         }
       } else if (typeof e == "string") {
@@ -56,7 +58,7 @@ var yInterfaceObj = function() {
           function(s, e, d, m, c) {
             if (200 == s) {
               if ((d) && (d[0])) {
-                d[0].cc=d[0].cc || d[0].CC || 0;
+                d[0].cc = d[0].cc || d[0].CC || 0;
                 resolve(d[0]);
               } else {
                 reject("status: " + s);
@@ -92,15 +94,16 @@ var yInterfaceObj = function() {
 
         table.setAttribute('data-pageStep', step);
 
-        for (n = 1; n < 1+pageCount;) {
+        for (n = 1; n < 1 + pageCount;) {
           aTag = document.createElement('A');
           aTag.setAttribute('href', '#' + subject);
-          aTag.setAttribute('class', 'page-' + subject);
+          aTag.setAttribute('class', 'page-' + subject + " page-link");
           aTag.setAttribute('data-subject', subject);
           aTag.setAttribute('data-table', tableId);
           aTag.setAttribute('data-pageNo', n);
           aTag.innerHTML = n;
           newLI = document.createElement('LI');
+          newLI.addClass('page-item');
           newLI.appendChild(aTag);
           if (n == currentPage)
             newLI.addClass('active');
@@ -121,7 +124,7 @@ var yInterfaceObj = function() {
 
   };
 
-  that.initializePagination = function(subject, tableId, paginatorId, pageLen, params) {
+  that.initializePagination = function(subject, tableId, paginatorId, pageLen, params, aLineSpec) {
     tableId = tableId || "tbl-" + subject;
     paginatorId = paginatorId || 'pagination-' + subject;
     pageLen = Math.max(1, pageLen || 20);
@@ -138,6 +141,8 @@ var yInterfaceObj = function() {
       table.setAttribute('data-params', JSON.stringify(tableParams));
       table.setAttribute('data-subject', subject);
       table.setAttribute('data-paginator', paginatorId);
+
+      that._tableALineSpec[tableId] = aLineSpec;
     }
 
     var promiseReturn = new Promise(
@@ -172,59 +177,50 @@ var yInterfaceObj = function() {
   that.gotoPage = function(e) {
     e = e.target;
     var pageNo = e.getAttribute('data-pageNo'),
-        tableId = e.getAttribute('data-table') ;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    that.loadTablePage(e.getAttribute('data-subject'), pageNo, tableId);
+        tableId = e.getAttribute('data-table'),
+        aLineSpec = {};
+    if (tableId)
+      aLineSpec = that._tableALineSpec[tableId];
+    that.loadTablePage(e.getAttribute('data-subject'), pageNo, tableId, null, aLineSpec);
   };
 
-  that.loadTablePage = function(subject, pageNo, tableId, params) {
+  that.loadTablePage = function(subject, pageNo, tableId, params, aLineSpec) {
     tableId = tableId || "tbl-" + subject;
-    pageNo = (pageNo===-1)?pageNo:Math.max(1, pageNo || 0);
+    pageNo = (pageNo === -1) ? pageNo : Math.max(1, pageNo || 0);
+    aLineSpec = aLineSpec || {};
 
     var table = y$(tableId),
       tableParams = {},
-      pageLen, pageCount, pageStep, 
-      dataPaginator,n,
+      pageLen, pageCount, pageStep,
+      dataPaginator, paginatorId, n,
       promiseReturn;
 
     if (table) {
-      pageStep      = table.getAttribute("data-pageStep") || 0;
-      pageCount     = table.getAttribute("data-pageCount") || 0;
-      dataPaginator = (y$(table.getAttribute("data-paginator")) || {children:[]}).children;
+      pageStep = table.getAttribute("data-pageStep") || 0;
+      pageCount = table.getAttribute("data-pageCount") || 0;
+      paginatorId = table.getAttribute("data-paginator");
+      dataPaginator = (y$(paginatorId) || { children: [] }).children;
 
-      ycomm.dom.fillElement(tableId,{});
+      ycomm.dom.fillElement(tableId, {});
 
-      if (pageNo===-1)
+      if (pageNo === -1)
         pageNo = pageCount;
 
-      if (pageStep>1) {
+      if (pageStep > 1) {
         that.mountPagesIndex(tableId, pageNo);
       } else {
-        for (n=0; n<dataPaginator.length; n++) {
+        for (n = 0; n < dataPaginator.length; n++) {
           dataPaginator[n].deleteClass('active');
         }
-        if (dataPaginator[pageNo-1])
-          dataPaginator[pageNo-1].addClass('active');
+        if (dataPaginator[pageNo - 1])
+          dataPaginator[pageNo - 1].addClass('active');
       }
 
       tableParams = JSON.parse(table.getAttribute('data-params') || '{}');
       pageLen = tableParams.pageLen;
       if (!pageLen) {
         console.warn("Call initializePagination() first");
-        that.initializePagination(subject, tableId);
+        that.initializePagination(subject, tableId,  paginatorId, null, params, aLineSpec);
       }
 
       // tableParams.currentPage=pageNo;
@@ -257,12 +253,13 @@ var yInterfaceObj = function() {
               tableParams,
               function(status, error, data, userMsg, dataContext) {
                 if (status == 200) {
-                  ycomm.dom.fillElement(tableId, data, {}, {
+                  var flags = {
                     deleteRows: blockStart == 0
-                  });
+                  };
+                  ycomm.dom.fillElement(tableId, data, aLineSpec, flags);
                   if ((dataContext) && ((dataContext.rowCount >= dataContext.requestedRows))) {
                     blockStart += dataContext.rowCount;
-                    if ((dataContext.rowCount>0) && ((pageNo - 1) * pageLen + blockStart < blockSize)) {
+                    if ((dataContext.rowCount > 0) && ((pageNo - 1) * pageLen + blockStart < blockSize)) {
                       setTimeout(__loadTable, 125);
                     } else
                       blockReady = true;
@@ -301,9 +298,10 @@ var yInterfaceObj = function() {
     return promiseReturn;
   };
 
-  that.loadTable = function(subject, tableId, params) {
+  that.loadTable = function(subject, tableId, params, aLineSpec) {
     /* curo o nome da tabela */
     tableId = tableId || "tbl-" + subject;
+    aLineSpec  = aLineSpec || {};
 
     var table = y$(tableId),
       tableParams = {};
@@ -333,7 +331,7 @@ var yInterfaceObj = function() {
             tableParams,
             function(status, error, data, userMsg, dataContext) {
               if (status == 200) {
-                ycomm.dom.fillElement(tableId, data, {}, {
+                ycomm.dom.fillElement(tableId, data, aLineSpec, {
                   deleteRows: blockStart == 0
                 });
                 if (dataContext.rowCount >= dataContext.requestedRows) {
@@ -482,7 +480,7 @@ var yInterfaceObj = function() {
         function(s, e, d) {
           if (200 == s) {
             if ((d) && (d[0])) {
-              console.log(formId+" chegou ");
+              console.log(formId + " chegou ");
               if ("undefined" == typeof that._forms_cache)
                 that._forms_cache = [];
               that._forms_cache[subject + '.' + formId] = d[0];
@@ -610,7 +608,7 @@ var yInterfaceObj = function() {
 
   that.log = function() {
     var args = (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments));
-    var __log = that.logFunction || (false)?console.log:null;
+    var __log = that.logFunction || (false) ? console.log : null;
     if (__log) {
       var _logLine = "";
       for (var i = 0; i < args.length; i++)
@@ -843,10 +841,10 @@ var yInterfaceObj = function() {
       for (var i = 0; i < classes.length; i++) {
         mySensitivitySpec = undefined;
 
-        if ("undefined" !== typeof (yInterface._sensitiveFields[classes[i]])) {
+        if ("undefined" !== typeof(yInterface._sensitiveFields[classes[i]])) {
           mySensitivitySpec = yInterface._sensitiveFields[classes[i]];
         }
-        if ("undefined" !== typeof (yInterface._sensitiveFields["." + classes[i]])) {
+        if ("undefined" !== typeof(yInterface._sensitiveFields["." + classes[i]])) {
           mySensitivitySpec = yInterface._sensitiveFields["." + classes[i]];
         }
 
@@ -862,41 +860,41 @@ var yInterfaceObj = function() {
   };
 
   that.formFilled = function(e) {
-    console.log("FORMFILLED "+e.target.id);
+    console.log("FORMFILLED " + e.target.id);
   };
 
   that.emptyForm = function() {
     return {
-      getAttribute: function () {return '';},
+      getAttribute: function() { return ''; },
       removeEventListener: function() {}
     };
   };
 
   that.buildFormFromJSON = function(formManager, formId, jForm, fieldPrefix, fieldPostfix) {
     var form = y$(formId) || that.emptyForm(),
-      formInfoJ = JSON.parse( ( jForm ||{} ).form || "{}"),
-      sourceCodeViewer=y$('sourceCodeViewer');
+      formInfoJ = JSON.parse((jForm || {}).form || "{}"),
+      sourceCodeViewer = y$('sourceCodeViewer');
 
     if (sourceCodeViewer) {
       /* https://stackoverflow.com/questions/4810841/how-can-i-pretty-print-json-using-javascript*/
-      sourceCodeViewer.innerHTML=(function() {
+      sourceCodeViewer.innerHTML = (function() {
         var json = JSON.stringify(jForm.form, undefined, 2);
-        json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(new RegExp("\n", 'g'),"*").replace('\\"','\"');
-        return '<pre style="white-space: pre-wrap; word-break: keep-all;">'+json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-            var cls = 'number';
-            if (/^"/.test(match)) {
-                if (/:$/.test(match)) {
-                    cls = 'key';
-                } else {
-                    cls = 'string';
-                }
-            } else if (/true|false/.test(match)) {
-                cls = 'boolean';
-            } else if (/null/.test(match)) {
-                cls = 'null';
+        json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(new RegExp("\n", 'g'), "*").replace('\\"', '\"');
+        return '<pre style="white-space: pre-wrap; word-break: keep-all;">' + json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
+          var cls = 'number';
+          if (/^"/.test(match)) {
+            if (/:$/.test(match)) {
+              cls = 'key';
+            } else {
+              cls = 'string';
             }
-            return '<span class="' + cls + '">' + match + '</span>';
-        })+'</pre>';
+          } else if (/true|false/.test(match)) {
+            cls = 'boolean';
+          } else if (/null/.test(match)) {
+            cls = 'null';
+          }
+          return '<span class="' + cls + '">' + match + '</span>';
+        }) + '</pre>';
       })();
     }
 
@@ -918,19 +916,19 @@ var yInterfaceObj = function() {
         groupingClass = '',
         userData = '',
         aux, elementId, auxNdx,
-        paragraphModel           = "<div class='form-group {1}' id='{0}'><label>{2}</label><div {4} <!--USERDATA--> ><p>{3}</p></div></div>",
-        inputModel               = "<div class='form-group {1}' id='grp_{0}'><label for='{0}'>{3}</label><input type='{2}' autocomplete='off' class='form-control {5}' id='{0}' {4} {6} <!--USERDATA--> /></div>",
-        inputModelWithLeftAddon  = "<div class='form-group {1}' id='grp_{0}'><label for='{0}'>{3}</label><div class='input-group'><span class='input-group-addon'>{7}</span><input type='{2}' autocomplete='off' class='form-control {5}' id='{0}' {4} {6} <!--USERDATA--> /></div></div>",
+        paragraphModel = "<div class='form-group {1}' id='{0}'><label>{2}</label><div {4} <!--USERDATA--> ><p>{3}</p></div></div>",
+        inputModel = "<div class='form-group {1}' id='grp_{0}'><label for='{0}'>{3}</label><input type='{2}' autocomplete='off' class='form-control {5}' id='{0}' {4} {6} <!--USERDATA--> /></div>",
+        inputModelWithLeftAddon = "<div class='form-group {1}' id='grp_{0}'><label for='{0}'>{3}</label><div class='input-group'><span class='input-group-addon'>{7}</span><input type='{2}' autocomplete='off' class='form-control {5}' id='{0}' {4} {6} <!--USERDATA--> /></div></div>",
         inputModelWithRightAddon = "<div class='form-group {1}' id='grp_{0}'><label for='{0}'>{3}</label><div class='input-group'><input type='{2}' autocomplete='off' class='form-control {5}' id='{0}' {4} {6} <!--USERDATA--> /><span class='input-group-addon'>{7}</span></div></div>",
-        inputWithListModel       = "<div class='form-group {1}' id='grp_{0}'><label for='{0}'>{3}</label><input type='{2}' class='form-control {5}' id='{0}' {4} {11} list='{6}' data-subject='{7}' data-action='{8}' data-line-spec='{9}' data-result-spec='{10}' <!--USERDATA--> /><datalist id='{6}'></datalist></div>",
-        hiddenInputModel         = "<input type=hidden id='{0}' {1} value='{2}' <!--USERDATA--> />",
-        buttonModel              = "<button type='button' class='{1}' id='{0}' {4} {5} <!--USERDATA--> ><i class='{3}'></i>{2}</button>",
-        selectModelWithQuery     = "<div class='form-group {1}' id='grp_{0}'><label for={0}>{2}</label><select id='{0}' class='form-control' {3} {4} <!--USERDATA--> ></select></div>",
-        selectModelWithOptions   = "<div class='form-group {1}' id='grp_{0}'><label for={0}>{2}</label><select id='{0}' class='form-control' {3} {4} <!--USERDATA--> >{5}</select></div>",
-        checkboxModel            = "<div class='form-group {1}' id='grp_{0}'><label>{4}</label><div class='checkbox'><label><input type='checkbox' value='{3}' id='{0}' {5} {6} <!--USERDATA--> >{2}</label></div></div>",
-        radioModel               = "<div class='{1}' id='grp_{0}'><div class='radio'><label><input type='radio' name='{3}' id='{0}' value='{4}' {5} <!--USERDATA--> >{2}</label></div></div>",
-        textareaModel            = "<div class='form-group {1}' id='grp_{0}'><label for='{0}'>{2}</label><textarea class='form-control' id='{0}' cols='{3}' rows='{4}' {5} {6} <!--USERDATA--> ></textarea></div>",
-        formModel                = "<form role='form' id='{0}' data-prefix='{2}' class='{1}' {3} <!--USERDATA--> >{4}</form>";
+        inputWithListModel = "<div class='form-group {1}' id='grp_{0}'><label for='{0}'>{3}</label><input type='{2}' class='form-control {5}' id='{0}' {4} {11} list='{6}' data-subject='{7}' data-action='{8}' data-line-spec='{9}' data-result-spec='{10}' <!--USERDATA--> /><datalist id='{6}'></datalist></div>",
+        hiddenInputModel = "<input type=hidden id='{0}' {1} value='{2}' <!--USERDATA--> />",
+        buttonModel = "<button type='button' class='{1}' id='{0}' {4} {5} <!--USERDATA--> ><i class='{3}'></i>{2}</button>",
+        selectModelWithQuery = "<div class='form-group {1}' id='grp_{0}'><label for={0}>{2}</label><select id='{0}' class='form-control' {3} {4} <!--USERDATA--> ></select></div>",
+        selectModelWithOptions = "<div class='form-group {1}' id='grp_{0}'><label for={0}>{2}</label><select id='{0}' class='form-control' {3} {4} <!--USERDATA--> >{5}</select></div>",
+        checkboxModel = "<div class='form-group {1}' id='grp_{0}'><label>{4}</label><div class='checkbox'><label><input type='checkbox' value='{3}' id='{0}' {5} {6} <!--USERDATA--> >{2}</label></div></div>",
+        radioModel = "<div class='{1}' id='grp_{0}'><div class='radio'><label><input type='radio' name='{3}' id='{0}' value='{4}' {5} <!--USERDATA--> >{2}</label></div></div>",
+        textareaModel = "<div class='form-group {1}' id='grp_{0}'><label for='{0}'>{2}</label><textarea class='form-control' id='{0}' cols='{3}' rows='{4}' {5} {6} <!--USERDATA--> ></textarea></div>",
+        formModel = "<form role='form' id='{0}' data-prefix='{2}' class='{1}' {3} <!--USERDATA--> >{4}</form>";
 
       masterObject = masterObject || {};
       if ("string" == typeof masterObject) {
@@ -1170,7 +1168,7 @@ var yInterfaceObj = function() {
               /* o problema é adiar as opçoes do select */
               if (jList[i].query) {
                 html += selectModelWithQuery.format(elementId, jList[i].class, jList[i].label || '', groupingSpecs, null);
-                for(var auxP in jList[i].query.params) {
+                for (var auxP in jList[i].query.params) {
                   if (jList[i].query.params.hasOwnProperty(auxP)) {
                     jList[i].query.params[auxP] = yAnalise(jList[i].query.params[auxP], undefined, formManager);
                   }
@@ -1178,9 +1176,9 @@ var yInterfaceObj = function() {
                 _loadSelectOptions(jList[i].query, elementId, (jList[i].readOnly || '').toUpperCase() == 'YES');
               } else if (jList[i].options) {
                 var auxOptions = '';
-                for(var op in jList[i].options) {
+                for (var op in jList[i].options) {
                   if (jList[i].options.hasOwnProperty(op)) {
-                    auxOptions+="<option value='{0}'>{1}</option>".format(jList[i].options[op].value, jList[i].options[op].label);
+                    auxOptions += "<option value='{0}'>{1}</option>".format(jList[i].options[op].value, jList[i].options[op].label);
                   }
                 }
                 html += selectModelWithOptions.format(elementId, jList[i].class, jList[i].label || '', groupingSpecs, null, auxOptions);
@@ -1346,22 +1344,22 @@ var yInterfaceObj = function() {
         }
       }
 
-      var __addEvent = function(elementId, eventName, eventHandler)  {
-        if (eventName=='changeOrBlur') {
+      var __addEvent = function(elementId, eventName, eventHandler) {
+        if (eventName == 'changeOrBlur') {
           var auxElement = y$(elementId);
-          if ("undefined" == typeof (auxElement ||{}).length) {
-            if ((auxElement.nodeName=='INPUT') && (!((auxElement.type=='radio') || (auxElement.type=='checkbox'))))
+          if ("undefined" == typeof(auxElement || {}).length) {
+            if ((auxElement.nodeName == 'INPUT') && (!((auxElement.type == 'radio') || (auxElement.type == 'checkbox'))))
               __addEvent(elementId, 'blur', eventHandler);
             else
               __addEvent(elementId, 'change', eventHandler);
           } else {
-            for(var el=0; el<(auxElement ||{}).length || 0; el++) {
+            for (var el = 0; el < (auxElement || {}).length || 0; el++) {
               __addEvent(auxElement[el].id, eventName, eventHandler);
             }
           }
         } else {
           addEvent(elementId, eventName, eventHandler);
-          if ((eventName == 'change')||(eventName == 'blur')) {
+          if ((eventName == 'change') || (eventName == 'blur')) {
             if ("undefined" == typeof dispatchedEvents["{0}.{1}".format(eventName, elementId)]) {
               dispatchedEvents["{0}.{1}".format(eventName, elementId)] = true;
               that.log("dispatching event {0} on{1}".format(elementId, eventName));
@@ -1387,7 +1385,7 @@ var yInterfaceObj = function() {
                   var evtError = '';
                   if ("object" == typeof window[ev[0]]) {
                     if ("function" == typeof window[ev[0]][ev[1]]) {
-                      __addEvent(elementId, eventName, window[ev[0]][ev[1]] );
+                      __addEvent(elementId, eventName, window[ev[0]][ev[1]]);
                     } else {
                       evtError = "'{0}' not found in '{1}'".format(ev[1], ev[0]);
                     }
@@ -1405,27 +1403,23 @@ var yInterfaceObj = function() {
       }
 
       if ("undefined" != typeof flatpickr) {
-        flatpickr(".date-select-field",{dateFormat: "d/m/Y"});
+        flatpickr(".date-select-field", { dateFormat: "d/m/Y" });
       }
 
       if ("undefined" != typeof InputMask) {
-        new InputMask().Initialize(document.querySelectorAll(".masked-year-field"),
-        {
+        new InputMask().Initialize(document.querySelectorAll(".masked-year-field"), {
           mask: InputMaskDefaultMask.DateMonthYear,
           placeHolder: "yyyy"
         });
-        new InputMask().Initialize(document.querySelectorAll(".masked-month-year-field"),
-        {
+        new InputMask().Initialize(document.querySelectorAll(".masked-month-year-field"), {
           mask: InputMaskDefaultMask.DateMonthYear,
           placeHolder: "mm/yyyy"
         });
-        new InputMask().Initialize(document.querySelectorAll(".masked-date-field"),
-        {
+        new InputMask().Initialize(document.querySelectorAll(".masked-date-field"), {
           mask: InputMaskDefaultMask.Date,
           placeHolder: "dd/mm/yyyy"
         });
-        new InputMask().Initialize(document.querySelectorAll(".masked-time-field"),
-        {
+        new InputMask().Initialize(document.querySelectorAll(".masked-time-field"), {
           mask: InputMaskDefaultMask.TimeShort,
           placeHolder: "hh:mm"
         });
@@ -1442,7 +1436,7 @@ var yInterfaceObj = function() {
       function(solve, reject) {
 
         solve({
-          'html': "<div class='json-dyn-form'>"+createFields(formInfoJ)+'</div>',
+          'html': "<div class='json-dyn-form'>" + createFields(formInfoJ) + '</div>',
 
           'eventList': eventList,
           'apiUsage': apiUsageList
@@ -1492,7 +1486,7 @@ var yInterfaceObj = function() {
     var tables = y$('.table');
     if (tables) {
       tables.forEach(function(table) {
-        if ((table.getAttribute('data-dbtable') || 'no')=='yes') {
+        if ((table.getAttribute('data-dbtable') || 'no') == 'yes') {
           ycomm.dom.fillElement(table.id, {});
         }
       });

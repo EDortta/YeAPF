@@ -2,9 +2,9 @@
 <?php
 /*
     tools/distributionBuilder/ydistbuilder
-    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-    2019-07-02 19:43:50 (-3 DST)
+    2019-10-24 18:20:52 (-2 DST)
 */
 
   function getVerFromPath($aPath)
@@ -51,26 +51,39 @@
   $toHelp = $args->argValue('h;help', __FALSE__)==__TRUE__;
   $toUpdate = $args->argValue('u;update', __FALSE__)==__TRUE__;
   $doQuiet = $args->argValue('s;silent', __FALSE__)==__TRUE__;
+  $toShowSymTable = $args->argValue('t;table', __FALSE__)==__TRUE__;
 
 
   echo "YeAPF 0.8.63 ydistbuilder\nCopyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n\n";
   if ($toHelp) {
-    die("usage:\n--silent\tdo not display messages\n--update\tdont create new version, just update current one\n");
+    echo "usage:\n";
+    echo "  --silent\tdo not display messages\n";
+    echo "  --update\tdont create new version, just update current one\n";
+    echo "  --table\tshows symbol table\n";
+    echo "Some files are required in order to versionate:\n";
+    echo "  ydistbuilder.files\twith a list of files to be included\n";
+    echo "  ydistbuilder.copyright\twith a copyright note to be pasted in each file\n";
+    echo "  version.app\twith the application name (it defaults to folder name)\n\n";
+    exit(100);
   }
 
   if (file_exists('ydistbuilder.files'))
     $files=file("ydistbuilder.files");
   else if (file_exists(dirname($_SERVER["_"])."/ydistbuilder.files"))
     $files=file(dirname($_SERVER["_"])."/ydistbuilder.files");
-  else
-    die("Please create 'ydistbuilder.files' with file list\n");
+  else {
+    echo "Please create 'ydistbuilder.files' with file list\n";
+    exit(101);
+  }
 
   if (file_exists('ydistbuilder.copyright'))
     $copyright=join('\n',file("ydistbuilder.copyright"));
   else if (file_exists(dirname($_SERVER["_"])."/ydistbuilder.copyright"))
     $copyright=join('\n',file(dirname($_SERVER["_"])."/ydistbuilder.copyright"));
-  else
-    die("Please create 'ydistbuilder.copyright' with your copyright note\nThis is just a valid PHP double-quoted string to be 'evaled()'\n");
+  else {
+    echo "Please create 'ydistbuilder.copyright' with your copyright note\nThis is just a valid PHP double-quoted string to be 'evaled()'\n";
+    exit(102);
+  }
 
 
 
@@ -124,7 +137,7 @@
               echo " ERROR: Cannot be created";
           }
         }
-        
+
         $fileStat=stat($fileName);
 
         if ((trim($ext)=='') || (in_array($ext, $textualExtensions))) {
@@ -253,6 +266,27 @@
     $yeapfSymList[$appName.'_VERSION']="$newVersion";
     $yeapfSymList[$appName.'_VERSION_SEQUENCE']="$newVersionSequence";
     $yeapfSymList['COPYRIGHT_NOTE']=$copyright;
+
+    if ($toShowSymTable) {
+      $maxLen = 0;
+      foreach ($yeapfSymList as $key => $value) {
+        if (strlen($key)>$maxLen) {
+          $maxLen = strlen($key);
+        }
+      }
+      echo "Symbol table\n------------------------\n";
+      echo "Global symbols\n";
+      foreach ($yeapfSymList as $key => $value) {
+        if (!is_int($key))
+          echo "$key".str_repeat(".", $maxLen-strlen($key)).": ".$value."\n";
+      }
+      echo "------------------------\nLocal symbols*\n";
+      $globalSymbols = array('LAST_FILE_MODIFICATION','FILE_NAME','WARNING','MD5');
+      foreach($globalSymbols as $key) {
+        echo "$key".str_repeat(".", $maxLen-strlen($key)).": depends of each file\n";
+      }
+      echo "* MD5 symbol is calculated over the original source code and is NOT valid to check produced outputs\n* LAST_FILE_MODIFICATION means the last timestamp the source file was touched. This timestamp is keeped on the produced output\n\n";
+    }
 
     $distDir=".distribution/$newVersion";
     if (!is_dir($distDir))

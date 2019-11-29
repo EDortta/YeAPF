@@ -1,9 +1,9 @@
 # (C) 2016 Esteban D.Dortta
 #
 # tools/adb-lib.inc.sh
-# YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+# YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
 # Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-# 2018-07-09 14:58:29 (-3 DST)
+# 2019-10-24 18:20:52 (-2 DST)
 #
 # This set of scripts requires adb/android-sdk/cordova installed on your device.
 # Has been well tested under Ubuntu 16 and MacOSX 10.11.6
@@ -30,8 +30,9 @@ setDebug()
 
 setVersion()
 {
+  verDef="{version: '$1'}"
   curVer=`cat www/js/version.js | grep __appVersion | awk -F\= '{ print $2 }'`
-  sed -i -e  "s/$curVer/$1\;/g"  www/js/version.js
+  sed -i -e  "s/$curVer/$verDef\;/g"  www/js/version.js
   return
 }
 
@@ -39,9 +40,8 @@ currentVersion()
 {
   version=`cat config.xml | grep version | grep widget | awk '{print $3}' | awk -F\= '{print $2}'`
   version=`eval echo $version`
-  newVer="{version: '$version'}"
 
-  setVersion "$newVer"
+  setVersion "$version"
 
   echo $version
   return
@@ -60,10 +60,12 @@ increaseVersion()
     b=$((b+1))
     c=0
   fi
-  novaVersao=`echo $a\.$b\.$c`
-  sed -i -e "s/$version/$novaVersao/g" ./config.xml
+  newVer=`echo $a\.$b\.$c`
+  sed -i -e "s/$version/$newVer/g" ./config.xml
 
-  echo $novaVersao
+  setVersion "$newVer"
+
+  echo $newVer
   return
 }
 

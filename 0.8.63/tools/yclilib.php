@@ -1,9 +1,9 @@
 <?php
 /*
     tools/yclilib.php
-    YeAPF 0.8.63-131 built on 2019-07-24 09:00 (-3 DST)
+    YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-    2019-07-24 08:46:50 (-3 DST)
+    2019-08-21 19:48:43 (-2 DST)
 */
 
   $PHPVer = phpversion();
@@ -145,9 +145,9 @@
 
     $flagDBStructureCanBeReviewed=false;
 
-    echo "Loading YeAPF from $__yeapfPath\n";
+    echo "; Loading YeAPF from $__yeapfPath\n";
     (@include_once("$__yeapfPath/includes/yeapf.functions.php")) or die("Impossible to load YeAPF functions\npath: $__yeapfPath\n");
-    echo "YeAPF ready\n";
+    echo "; YeAPF ready\n";
     if ($libraryList>'') {
       $libraryList=explode(';',$libraryList);
       foreach ($libraryList as $libName)

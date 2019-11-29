@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/ymisc.js
- * YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+ * YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
  * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
- * 2019-05-15 10:01:59 (-3 DST)
+ * 2019-11-29 09:20:48 (-2 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  *
  * Many of the prototypes extensions are based
@@ -229,7 +229,7 @@ var Base64 = {
     var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
     var i = 0;
 
-    input = Base64._utf8_encode(input);
+    input = this._utf8_encode(input);
 
     while (i < input.length) {
 

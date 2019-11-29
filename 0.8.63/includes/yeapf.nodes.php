@@ -1,9 +1,9 @@
 <?php
 /*
     includes/yeapf.nodes.php
-    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-    2019-06-04 11:36:33 (-3 DST)
+    2019-10-24 18:20:52 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
@@ -323,7 +323,7 @@
                   }
                 }
               } else {
-                self::registerAction(1, "Error: ".json_encode($retSegments));
+                self::registerAction(1, "Error: ".json_encode($retSegments, JSON_FLAGS));
               }
             }
 
@@ -862,7 +862,7 @@
       $ret['error']=-3;
     }
 
-    $jsonRet = json_encode($ret);
+    $jsonRet = json_encode($ret, JSON_FLAGS);
     echo produceRestOutput($jsonRet);
   }
 

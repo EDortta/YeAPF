@@ -1,14 +1,16 @@
 <?php
 /*
     includes/yeapf.db.php
-    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-    2019-05-07 11:55:40 (-3 DST)
+    2019-09-09 08:27:18 (-2 DST)
 */
   _recordWastedTime("Gotcha! ".$dbgErrorCount++);
 
   function getConfigFileName()
   {
+    global $yeapfConfig, $dbCSVFilename;
+    /*
     global $sgugPath, $dbCSVFilename, $yeapfConfig;
 
     if (($yeapfConfig) && (isset($yeapfConfig['yeapfDB']))) {
@@ -37,7 +39,6 @@
       $achado=false;
       foreach($sgugPath as $sp) {
         $aux="$sp/db.csv";
-        // echo "$aux<BR>";
         if (file_exists($aux)) {
           $achado=true;
           $dbCSVFilename=$sp.'/db.csv';
@@ -45,8 +46,18 @@
         }
       }
     }
-    // die("<hr>$dbCSVFilename");
     return ($dbCSVFilename);
+    */
+    $dbCSVFilename="db.csv";
+    if ((!isset($yeapfConfig)) || (!isset($yeapfConfig['yeapfDB']))) {
+      if (file_exists(".config/yeapf.config")) {
+        (@include_once ".config/yeapf.config") || _yLoaderDie("Error loading .config/yeapf.config");
+        $dbCSVFilename=$yeapfConfig['yeapfDB'];
+      }
+    } else {
+      $dbCSVFilename=$yeapfConfig['yeapfDB'];
+    }
+    return $dbCSVFilename;
   }
 
 
@@ -755,7 +766,7 @@
             db_die("<b>Aguarde...</b>
                   <p><div align=center class=dbErr><b>Sistema em manuten&ccedil;&atilde;o</b><BR><div>$pauseCause</div><br>Libera&ccedil;&atilde;o estimada para $le<BR>Hora do sistema: $ha</div>", "dbWarn");
           }
-          exit;
+          exit(1);
         } else if ($canWork) {
           if (!isset($ydb_conn)) {
 
@@ -806,7 +817,7 @@
             $now=date("Y-m-d H:i:s");
             db_die("<div><h3>Application out of service</h3>Try again on $auxOnlineTime<br>Server time: $now</div>");
           }
-          exit;
+          exit(1);
         }
       }
     } else {

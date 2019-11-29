@@ -2,7 +2,6 @@
 echo "YeAPF 0.8.63 tools installer";
 echo "Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License";
 
-
 cant=1
 dist=`uname -s`
 dist=${dist:0:6}

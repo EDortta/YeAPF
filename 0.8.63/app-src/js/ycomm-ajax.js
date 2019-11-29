@@ -1,8 +1,8 @@
   /********************************************************************
    * app-src/js/ycomm-ajax.js
-   * YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+   * YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
    * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-   * 2019-05-01 08:55:49 (-3 DST)
+   * 2019-11-29 09:20:48 (-2 DST)
    *
    * Com o advento do WebSocket, precisamos de novas formas para
    * provocar o servidor.
@@ -339,8 +339,10 @@
 
                     } else {
                       console.log(r.statusText);
-                      if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOffline =='function'))
+                      if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOffline =='function')) {
+                        ycomm._lastRPCMethod=ycomm.invoke;
                         ycomm.msg.notifyServerOffline();
+                      }
                       reject({ status: r.status });
                     }
 

@@ -5,6 +5,7 @@
 
 # The location of the closure compiler jar. You'll probably need to edit this.
 #CLOSURE_COMPILER=/usr/local/bin/compiler.jar
+
 CLOSURE_COMPILER=~/www/YeAPF/tools/compressors/compiler.jar
 
 case "$1" in

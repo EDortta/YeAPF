@@ -1,8 +1,8 @@
 /*********************************************
   * skel/webApp/templates/milligram-1.3/js/yloader.js
-  * YeAPF 0.8.63-139 built on 2019-07-29 09:42 (-3 DST)
+  * YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-  * 2019-07-29 09:42:25 (-3 DST)
+  * 2019-11-29 09:22:24 (-2 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.63-139 built on 2019-07-29 09:42 (-3 DST)");
+ console.log("YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -529,7 +529,7 @@
          var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
          var i = 0;
      
-         input = Base64._utf8_encode(input);
+         input = this._utf8_encode(input);
      
          while (i < input.length) {
      
@@ -5502,8 +5502,10 @@
      
                          } else {
                            console.log(r.statusText);
-                           if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOffline =='function'))
+                           if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOffline =='function')) {
+                             ycomm._lastRPCMethod=ycomm.invoke;
                              ycomm.msg.notifyServerOffline();
+                           }
                            reject({ status: r.status });
                          }
      
@@ -6523,7 +6525,7 @@
        }
      };
      
-     /*
+     /* @REVIEW 20190805
       * search for the first container from the element
       * The container could be: a table row, a select option, a listbox item
       * i.e. if the container is a row, aContainerID is the table which
@@ -6574,7 +6576,7 @@
      
      ycomm.dom.getTableRowInplaceData = function(aRow, fieldName) {
        if (aRow)
-         return aRow.getAttribute('data-' + fieldName);
+         return aRow.getAttribute('data-' + fieldName) || aRow.getAttribute(fieldName);
        else
          return null;
      };
@@ -6676,6 +6678,7 @@
              case "range":
              case "search":
              case "tel":
+             case "email":
              case "time":
              case "url":
              case "week":
@@ -6763,14 +6766,15 @@
          i, fieldType, fieldId, fieldValue, maxLength, classes;
      
      
-       var genString = function(base, minLen, maxLen) {
+       var genString = function(base, minLen, maxLen, sep) {
+         sep = sep || '';
          var ret = '',
            n, j;
          maxLen = Math.floor((Math.random() * maxLen) + minLen);
          j = 0;
          while (j < maxLen) {
            n = Math.floor((Math.random() * base.length));
-           ret += base[n];
+           ret += base[n]+sep;
            j++;
          }
          return ret;
@@ -6809,7 +6813,7 @@
                fieldValue = genString(ycomm.dom._scratch.ch, 6, 15);
                break;
              case "textarea":
-               fieldValue = genString(ycomm.dom._scratch.t, 1, 15 * maxLength);
+               fieldValue = genString(ycomm.dom._scratch.t, 1, 15 * maxLength,' ');
                break;
              case "email":
                fieldValue = genString(ycomm.dom._scratch.mn, 2, 3) + "@" + genString(ycomm.dom._scratch.d, 1, 1);
@@ -6870,6 +6874,8 @@
                  fieldValue = genNumber(10, 99);
                  fieldValue += '.' + genNumber(0, 999, 3);
                  fieldValue += '-' + genNumber(0, 999, 3);
+               } else if (classHasName('name')) {
+                 fieldValue = genString(ycomm.dom._scratch.mn, 1, 2, ' ')+" "+genString(ycomm.dom._scratch.sn, 1, 2, ' ');
                } else if (classHasName('zip')) {
                  /* http://www.mapanet.eu/en/resources/Postal-Format.asp */
                  fieldValue = genNumber(0, 99999, 5);
@@ -7132,682 +7138,776 @@
  /* END ycomm-dom.js */
  _dump("ycomm-dom");
  /* START ycomm-msg.js */
-     /*********************************************
-      * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
-      * These routines were written in order to help interprocess process messages
-      * but as an remote process messages implementation.
-      * Or, IPC over RPC as you like.
-      * In Windows(TM) and Linux you would send a message to an application
-      * meanwhile, with YeAPF you will send messages to connected users.
-      * As this was not inteded to send chat messages, is correct to
-      * send messages to and only to connected users.
-      **********************************************/
+         /*********************************************
+          * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
+          * These routines were written in order to help interprocess process messages
+          * but as an remote process messages implementation.
+          * Or, IPC over RPC as you like.
+          * In Windows(TM) and Linux you would send a message to an application
+          * meanwhile, with YeAPF you will send messages to connected users.
+          * As this was not inteded to send chat messages, is correct to
+          * send messages to and only to connected users.
+          **********************************************/
+         
      
+         var ycommMsgBase = function() {
+           var that = {
+             messagePeekerTimer: null,
+             messageStack: [],
+             msgProcs: [],
+             _dbgFlag_noMessageProcessorPresent: false,
+             msgCount: 0,
+             serverOfflineFlag: null
+           };
      
-     var ycommMsgBase = function() {
-       var that = {
-         messagePeekerTimer: null,
-         messageStack: [],
-         msgProcs: [],
-         _dbgFlag_noMessageProcessorPresent: false,
-         msgCount: 0,
-         serverOfflineFlag: null
-       };
+           that.grantMsgProc = function(aInterval) {
+             /* caso venha sem parÃ¡mtros, calcular um tempo prudente de no mÃ¡ximo 20 segs
+              * Isso acontece quando o servidor devolveu uma resposta errada
+              * e queremos que o sistema de mensagens continue em operaÃ§Ã£o. */
+             if ((aInterval === undefined) || (aInterval <= 0))
+               aInterval = Math.min(20000, messagePeekerInterval * 2);
      
-       that.grantMsgProc = function(aInterval) {
-         /* caso venha sem parÃ¡mtros, calcular um tempo prudente de no mÃ¡ximo 20 segs
-          * Isso acontece quando o servidor devolveu uma resposta errada
-          * e queremos que o sistema de mensagens continue em operaÃ§Ã£o. */
-         if ((aInterval === undefined) || (aInterval <= 0))
-           aInterval = Math.min(20000, messagePeekerInterval * 2);
+             if (that.messagePeekerTimer === undefined) {
+               if (that.msgCount === 0)
+                 _dumpy(16, 1, "Configuring receivers interval to " +
+                   aInterval + 'ms');
+               that.messagePeekerTimer = setTimeout(ycomm.msg.peek,
+                 aInterval);
+             } else
+               _dumpy(16, 1, "Receivers interval already defined");
+           };
      
-         if (that.messagePeekerTimer === undefined) {
-           if (that.msgCount === 0)
-             _dumpy(16, 1, "Configuring receivers interval to " + aInterval + 'ms');
-           that.messagePeekerTimer = setTimeout(ycomm.msg.peek, aInterval);
-         } else
-           _dumpy(16, 1, "Receivers interval already defined");
-       };
+           that.feedBack = function() {
+             if (dRowCount > 0) {
+               that.msgCount++;
+               for (var j in xData) {
+                 if (!isNaN(parseInt(j))) {
+                   var aux = xData[j];
      
-       that.feedBack = function() {
-         if (dRowCount > 0) {
-           that.msgCount++;
-           for (var j in xData) {
-             if (!isNaN(parseInt(j))) {
-               var aux = xData[j];
-     
-               that.messageStack.push(new Array(aux['sourceUserId'],
-                 aux['message'],
-                 aux['wParam'],
-                 aux['lParam']));
-             }
-           }
-     
-           if (that.messageStack.length > 0) {
-             if (that.msgProcs.length == 0) {
-               if (!that._dbgFlag_noMessageProcessorPresent)
-                 if (jsDumpEnabled)
-                   window.alert("Messages arriving at  '" + _CurrentFileName + "'  but there is not\na registered message processor in order to receive it.\nUse _registerMsgProc() to register it");
-               that._dbgFlag_noMessageProcessorPresent = true;
-             } else {
-               while (that.messageStack.length > 0) {
-                 var oldLen = that.messageStack.length;
-                 for (var i = 0; i < that.msgProcs.length; i++) {
-                   // _dumpy(16,1,"Calling: "+that.msgProcs[i]);
-                   var auxCallFunction = '<script>' + that.msgProcs[i] + '();</' + 'script>';
-                   auxCallFunction.evalScripts();
+                   that.messageStack.push(new Array(aux['sourceUserId'],
+                     aux['message'],
+                     aux['wParam'],
+                     aux['lParam']));
                  }
-                 if (oldLen == that.messageStack.length)
-                   that.messageStack.shift();
                }
-             }
-           }
      
-         }
-         that.grantMsgProc(messagePeekerInterval);
-       };
-     
-       that.peek = function() {
-         clearTimeout(that.messagePeekerTimer);
-         that.messagePeekerTimer = null;
-     
-         var ts = new Date();
-         var auxParameters = 's=y_msg&u=' + u + '&a=peekMessage&formID=' + formID + '&ts=' +
-           ts.getTime() + '&callBackFunction=ycomm.msg.feedBack&messagePeekerInterval=' + messagePeekerInterval;
-         var aux = new Ajax.Request(
-           'query.php', {
-             method: 'get',
-             asynchronous: true,
-             parameters: auxParameters,
-             onComplete: function(transport) {
-               if (transport.status == 200)
-                 _QUERY_RETURN(transport);
-               else {
-                 _dumpy(16, 1, "*** XMLHttpRequest call failure");
-                 setTimeout(that.notifyServerOffline, 500);
+               if (that.messageStack.length > 0) {
+                 if (that.msgProcs.length == 0) {
+                   if (!that._dbgFlag_noMessageProcessorPresent)
+                     if (jsDumpEnabled)
+                       window.alert("Messages arriving at  '" +
+                         _CurrentFileName +
+                         "'  but there is not\na registered message processor in order to receive it.\nUse _registerMsgProc() to register it"
+                       );
+                   that._dbgFlag_noMessageProcessorPresent = true;
+                 } else {
+                   while (that.messageStack.length > 0) {
+                     var oldLen = that.messageStack.length;
+                     for (var i = 0; i < that.msgProcs.length; i++) {
+                       // _dumpy(16,1,"Calling: "+that.msgProcs[i]);
+                       var auxCallFunction = '<script>' + that.msgProcs[
+                         i] + '();</' + 'script>';
+                       auxCallFunction.evalScripts();
+                     }
+                     if (oldLen == that.messageStack.length)
+                       that.messageStack.shift();
+                   }
+                 }
                }
+     
              }
-           }
-         );
-       };
+             that.grantMsgProc(messagePeekerInterval);
+           };
      
-       that.postMessage = function(aTargetUserID, aMessage, aWParam, aLParam, aBroadcastCondition) {
-         var ts = new Date();
-         if (aBroadcastCondition != undefined)
-           var aux = '&targetUser=*&broadcastCondition="' + aBroadcastCondition + '"';
-         else
-           var aux = '&broadcastCondition=&targetUser=' + aTargetUserID;
+           that.peek = function() {
+             clearTimeout(that.messagePeekerTimer);
+             that.messagePeekerTimer = null;
      
-         var auxParameters = 's=y_msg&u=' + u + '&a=postMessage' + aux + '&formID=' + formID +
-           '&message=' + aMessage + '&wParam=' + aWParam + '&lParam=' + aLParam +
-           '&ts=' + ts.getTime() + '&callBackFunction=ycomm.msg.feedBack';
-         var aux = new Ajax.Request(
-           'query.php', {
-             method: 'get',
-             asynchronous: false,
-             parameters: auxParameters,
-             onComplete: _QUERY_RETURN
-           }
-         );
-       };
+             var ts = new Date();
+             var auxParameters = 's=y_msg&u=' + u +
+               '&a=peekMessage&formID=' + formID + '&ts=' +
+               ts.getTime() +
+               '&callBackFunction=ycomm.msg.feedBack&messagePeekerInterval=' +
+               messagePeekerInterval;
+             var aux = new Ajax.Request(
+               'query.php', {
+                 method: 'get',
+                 asynchronous: true,
+                 parameters: auxParameters,
+                 onComplete: function(transport) {
+                   if (transport.status == 200)
+                     _QUERY_RETURN(transport);
+                   else {
+                     _dumpy(16, 1, "*** XMLHttpRequest call failure");
+                     setTimeout(that.notifyServerOffline, 500);
+                   }
+                 }
+               }
+             );
+           };
      
-       that.cleanMsgQueue = function() {
-         that.msgProcs.length = 0;
-       };
-     
-       that.notifyServerOnline = function() {
-         if ((that.serverOfflineFlag==null) || (that.serverOfflineFlag > 0)) {
-           that.serverOfflineFlag = 0;
-           var notificationArea = y$('notificationArea');
-           if (notificationArea)
-             notificationArea.style.display = 'none';
-     
-           if (typeof _notifyServerOnline =='function')
-             setTimeout(_notifyServerOnline,500);
-         }
-       };
-     
-       that.notifyServerOffline = function() {
-         that.serverOfflineFlag=(that.serverOfflineFlag || 0)+1;
-     
-         var notificationArea = y$('notificationArea');
-         if (!notificationArea) {
-           notificationArea = document.createElement('div');
-           notificationArea.id = 'notificationArea';
-           notificationArea.setOpacity(90);
-           document.body.appendChild(notificationArea);
-           if (!getStyleRuleValue('.notificationArea')) {
-             notificationArea.style.zIndex = 1000;
-             notificationArea.style.position = 'absolute';
-             notificationArea.style.left = '0px';
-             notificationArea.style.top = '0px';
-             notificationArea.style.border = '1px #900 solid';
-             notificationArea.style.backgroundColor = '#fefefe';
-           } else {
-             notificationArea.className = 'notificationArea';
-           }
-     
-           notificationArea.innerHTML = "<div style='padding: 32px'><big><b>Server Offline</b></big><hr>Your server has become offline or is misspelling answers when requested.<br>Wait a few minutes and try again later, or wait while YeAPF try again by itself</div>&nbsp;<br><img src='http://yeapf.com/images/yeapf-logo.png' style='width: 128px'>";
-         }
-     
-         notificationArea.style.width = document.body.clientWidth + 'px';
-         notificationArea.style.height = document.body.clientHeight + 'px';
-         notificationArea.style.display = '';
-     
-         if (typeof _notifyServerOffline =='function')
-           setTimeout(_notifyServerOffline,500);
-     
-         that.grantMsgProc();
-       };
-     
-       that.registerMsgProc = function(aFunctionName) {
-         var canAdd = true;
-         _dumpy(16, 1, "Registering message receiver: " + aFunctionName);
-         for (var i = 0; i < that.msgProcs.length; i++)
-           if (that.msgProcs[i] == aFunctionName)
-             canAdd = false;
-     
-         if (canAdd)
-           that.msgProcs[that.msgProcs.length] = aFunctionName;
-     
-         that.grantMsgProc(messagePeekerInterval);
-       };
-     
-       that.stopMsgProc = function() {
-         clearTimeout(that.messagePeekerTimer);
-       }
-     
-       return that;
-     }
-     
-     if ("function" == typeof addOnLoadManager) {
-       addOnLoadManager(
-         function()
-         {
-           if (typeof messagePeekerInterval=="undefined") {
-             /*
-              *  Si existe la bandera flags/debug.javascript, entonces, el tiempo de latencia es mayor
-              *  para permitir poder depurar los eventos con calma
-              */
-             if (typeof jsDumpEnabled == "undefined")
-               jsDumpEnabled = 0;
-     
-             if (jsDumpEnabled==1)
-               messagePeekerInterval=15000;
+           that.postMessage = function(aTargetUserID, aMessage, aWParam,
+             aLParam, aBroadcastCondition) {
+             var ts = new Date();
+             if (aBroadcastCondition != undefined)
+               var aux = '&targetUser=*&broadcastCondition="' +
+                 aBroadcastCondition + '"';
              else
-               messagePeekerInterval=750;
+               var aux = '&broadcastCondition=&targetUser=' +
+                 aTargetUserID;
+     
+             var auxParameters = 's=y_msg&u=' + u + '&a=postMessage' +
+               aux + '&formID=' + formID +
+               '&message=' + aMessage + '&wParam=' + aWParam +
+               '&lParam=' + aLParam +
+               '&ts=' + ts.getTime() +
+               '&callBackFunction=ycomm.msg.feedBack';
+             var aux = new Ajax.Request(
+               'query.php', {
+                 method: 'get',
+                 asynchronous: false,
+                 parameters: auxParameters,
+                 onComplete: _QUERY_RETURN
+               }
+             );
+           };
+     
+           that.cleanMsgQueue = function() {
+             that.msgProcs.length = 0;
+           };
+     
+           that.notifyServerOnline = function() {
+             if ((that.serverOfflineFlag == null) || (that.serverOfflineFlag >
+                 0)) {
+               that.serverOfflineFlag = 0;
+               var notificationArea = y$('notificationArea');
+               if (notificationArea)
+                 notificationArea.style.display = 'none';
+     
+               if (typeof _notifyServerOnline == 'function')
+                 setTimeout(_notifyServerOnline, 500);
+             }
+           };
+     
+           that.notifyServerOffline = function() {
+             that.serverOfflineFlag = (that.serverOfflineFlag || 0) + 1;
+     
+             var notificationArea = y$('notificationArea');
+             if (!notificationArea) {
+               notificationArea = document.createElement('div');
+               notificationArea.id = 'notificationArea';
+               notificationArea.setOpacity(90);
+               document.body.appendChild(notificationArea);
+               if (!getStyleRuleValue('.notificationArea')) {
+                 notificationArea.style.zIndex = 1000;
+                 notificationArea.style.position = 'absolute';
+                 notificationArea.style.left = '0px';
+                 notificationArea.style.top = '0px';
+                 notificationArea.style.border = '1px #900 solid';
+                 notificationArea.style.backgroundColor = '#fefefe';
+               } else {
+                 notificationArea.className = 'notificationArea';
+               }
+     
+               notificationArea.innerHTML =
+                 "<div style='padding: 32px'><big><b>Server Offline</b></big><hr>Your server has become offline or is misspelling answers when requested.<br>Wait a few minutes and try again later, or wait while YeAPF try again by itself in 30secs</div>&nbsp;<br><img src='http://yeapf.com/images/yeapf-seal-2019.png' style='width: 128px'>";
+             }
+     
+             notificationArea.style.width = document.body.clientWidth +
+               'px';
+             notificationArea.style.height = document.body.clientHeight +
+               'px';
+             notificationArea.style.display = '';
+     
+             if (typeof _notifyServerOffline == 'function') {
+               setTimeout(_notifyServerOffline, 500);
+             }
+     
+             if (typeof ycomm._lastRPCMethod == 'function') {
+               setTimeout(
+                 function() {
+                   ycomm._lastRPCMethod("yeapf","ping", {});
+                 },
+                 30000
+               );
+             }
+     
+             that.grantMsgProc();
+           };
+     
+           that.registerMsgProc = function(aFunctionName) {
+             var canAdd = true;
+             _dumpy(16, 1, "Registering message receiver: " +
+               aFunctionName);
+             for (var i = 0; i < that.msgProcs.length; i++)
+               if (that.msgProcs[i] == aFunctionName)
+                 canAdd = false;
+     
+             if (canAdd)
+               that.msgProcs[that.msgProcs.length] = aFunctionName;
+     
+             that.grantMsgProc(messagePeekerInterval);
+           };
+     
+           that.stopMsgProc = function() {
+             clearTimeout(that.messagePeekerTimer);
            }
      
+           return that;
          }
-       );
-     }
      
-     ycomm.msg = ycommMsgBase();
+         if ("function" == typeof addOnLoadManager) {
+           addOnLoadManager(
+             function() {
+               if (typeof messagePeekerInterval == "undefined") {
+                 /*
+                  *  Si existe la bandera flags/debug.javascript, entonces, el tiempo de latencia es mayor
+                  *  para permitir poder depurar los eventos con calma
+                  */
+                 if (typeof jsDumpEnabled == "undefined")
+                   jsDumpEnabled = 0;
      
+                 if (jsDumpEnabled == 1)
+                   messagePeekerInterval = 15000;
+                 else
+                   messagePeekerInterval = 750;
+               }
+     
+             }
+           );
+         }
+     
+         ycomm.msg = ycommMsgBase();
  /* END ycomm-msg.js */
  _dump("ycomm-msg");
  /* START ycomm-sse.js */
-       /********************************************************************
-       ********************************************************************/
-       var ycommSSEBase = function (workgroup, user, dataLocation, pollTimeout, preferredGateway, dbgSSEDiv) {
-         window.SSE_UNINITIALIZED  =-1;
-         window.SSE_CLOSING        = 0;
-         window.SSE_NONOPERATIONAL = 1;
-         window.SSE_OPERATIONAL    = 2;
-         var that = {
-     
+         /********************************************************************
+          ********************************************************************/
+         var ycommSSEBase2 = function(params, initCallback) {
+           // PARAMETERS
+           params = params || {};
+           params.workgroup = params.workgroup || "unknown";
+           params.user = ((params.user !== null) && (typeof params.user !=
+             "undefined")) ? params.user : generateUUID();
+           params.dataLocation = params.dataLocation || undefined;
            /* pollTimeout must be between 60 and 900 seconds */
-           pollTimeout: Math.min(900000, Math.max(typeof pollTimeout=='number'?pollTimeout:60000, 60000)),
-           prefGateway: (preferredGateway || 'SSE').toUpperCase(),
-           dbgDiv: y$(dbgSSEDiv),
-           debugEnabled: false,
+           params.pollTimeout = Math.min(900000, Math.max(typeof params.pollTimeout ==
+             'number' ? params.pollTimeout : 60000, 60000));
+           params.preferredGateway = (params.preferredGateway || 'SSE').toUpperCase();
+           params.dbgSSEDiv = params.dbgSSEDiv || undefined;
+           params.debugEnabled = params.debugEnabled || undefined;
+           params.closeOnError = params.closeOnError || false;
      
-           setDebug: function(newValue) {
-             newValue=newValue || false;
-             that.debugEnabled = newValue;
-           },
+           if ((typeof params.dataLocation == "undefined") || (params.dataLocation ===
+               null)) {
+             /* default data location is current location/sse.php */
+             params.dataLocation = (
+               function() {
+                 var a = that.getLocation();
+                 var b = a.lastIndexOf('/');
+                 return a.substr(0, b + 1) + 'sse.php';
+               }
+             )();
+           }
      
-           debug: function() {
-             var d=(new Date()),
+           // CONSTANTS 
+           window.SSE_DELETED = -2;
+           window.SSE_UNINITIALIZED = -1;
+           window.SSE_CLOSING = 0;
+           window.SSE_NONOPERATIONAL = 1;
+           window.SSE_OPERATIONAL = 2;
+     
+           // OBJECT
+           var that = {
+             dbgDiv: y$(params.dbgSSEDiv),
+             debugEnabled: false,
+     
+             setDebug: function(newValue) {
+               newValue = newValue || false;
+               that.debugEnabled = newValue;
+             },
+     
+             debug: function() {
+               var d = (new Date()),
                  line,
                  dbgClass,
-                 isError=false,
-                 isWarning=false;
-             if (that.debugEnabled) {
-               line=pad(d.getHours(),2)+':'+pad(d.getMinutes(),2)+':'+pad(d.getSeconds(),2)+' SSE: ';
+                 isError = false,
+                 isWarning = false;
+               if (that.debugEnabled) {
+                 line = pad(d.getHours(), 2) + ':' + pad(d.getMinutes(),
+                   2) + ':' + pad(d.getSeconds(), 2) + ' SSE: ';
      
-               for (var i=0; i < arguments.length; i++) {
-                 line+=arguments[i].trim()+" ";
-                 if (arguments[i].toUpperCase().indexOf('ERROR')>=0)
-                   isError=true;
-                 if (arguments[i].toUpperCase().indexOf('STATUS')>=0)
-                   isWarning=true;
-                 if (arguments[i].toUpperCase().indexOf('WARN')>=0)
-                   isWarning=true;
-               }
-               if (isError) {
-                 console.error(line);
-                 dbgClass='label-danger';
-               } else if (isWarning) {
-                 console.warn(line);
-                 dbgClass='label-warning';
-               } else {
-                 console.log(line);
-                 dbgClass='';
-               }
-               if ('undefined' != typeof that.dbgDiv) {
-                 var aux="<div class='label {0}' style='display: inline-block'>{1}</div><br>".format(dbgClass, line);
-                 var currentText = that.dbgDiv.innerHTML.split("<br>");
-                 if (currentText.length>100) {
-                   currentText.splice(0,100-currentText.length);
-                   that.dbgDiv.innerHTML=currentText.join("<br>");
+                 for (var i = 0; i < arguments.length; i++) {
+                   line += arguments[i].trim() + " ";
+                   if (arguments[i].toUpperCase().indexOf('ERROR') >=
+                     0)
+                     isError = true;
+                   if (arguments[i].toUpperCase().indexOf('STATUS') >=
+                     0)
+                     isWarning = true;
+                   if (arguments[i].toUpperCase().indexOf('WARN') >= 0)
+                     isWarning = true;
                  }
-                 that.dbgDiv.innerHTML+=aux;
+                 if (isError) {
+                   console.error(line);
+                   dbgClass = 'label-danger';
+                 } else if (isWarning) {
+                   console.warn(line);
+                   dbgClass = 'label-warning';
+                 } else {
+                   console.log(line);
+                   dbgClass = '';
+                 }
+                 if ('undefined' != typeof that.dbgDiv) {
+                   var aux =
+                     "<div class='label {0}' style='display: inline-block'>{1}</div><br>"
+                     .format(dbgClass, line);
+                   var currentText = that.dbgDiv.innerHTML.split(
+                     "<br>");
+                   if (currentText.length > 100) {
+                     currentText.splice(0, 100 - currentText.length);
+                     that.dbgDiv.innerHTML = currentText.join("<br>");
+                   }
+                   that.dbgDiv.innerHTML += aux;
+                 }
                }
-             }
-           },
+             },
      
-           getLocation: function() {
-             return (typeof document=='object' && document.location && document.location.href)?document.location.href:'';
-           },
+             getLocation: function() {
+               return (typeof document == 'object' && document.location &&
+                   document.location.href) ? document.location.href :
+                 '';
+             },
      
-           getFolder: function(location) {
-             var b=location.lastIndexOf('/');
-             return location.substr(0,b+1);
-           },
+             getFolder: function(location) {
+               var b = location.lastIndexOf('/');
+               return location.substr(0, b + 1);
+             },
      
-           rpc: function(a, params) {
-             params = params || {};
-             if (typeof that.sse_session_id!="undefined")
-               params.sse_session_id = that.sse_session_id;
+             rpc: function(a, params) {
+               params = params || {};
+               if (typeof that.sse_session_id != "undefined")
+                 params.sse_session_id = that.sse_session_id;
      
-             var p = new Promise(
-               function(resolve, reject) {
-                 that.debug("OUT: "+a);
-                 that.rpcMethod(
-                   "_sse", a, params,
-                   function(status, error, data) {
-                     if (status==200) {
-                       resolve(data);
-                     } else {
-                       reject(status);
-                     }
-                   },
-                   false
-                 );
-               }
-             );
-             return p;
-           },
+               var p = new Promise(
+                 function(resolve, reject) {
+                   that.debug("OUT: " + a);
+                   that.rpcMethod(
+                     "_sse", a, params,
+                     function(status, error, data) {
+                       if (status == 200) {
+                         resolve(data);
+                       } else {
+                         reject(status);
+                       }
+                     },
+                     false
+                   );
+                 }
+               );
+               return p;
+             },
      
-           poll: function () {
-             if (that.pollEnabled) {
-               that.rpc("peekMessage").then( function(data) {
+             poll: function() {
+               if (that.pollEnabled) {
+                 that.rpc("peekMessage").then(function(data) {
                    if (data) {
-                     that.debug("IN: data: "+JSON.stringify(data));
+                     that.debug("IN: data: " + JSON.stringify(data));
                      var eventName;
-                     for(var i=0; i<data.length; i++) {
-                       if (!that.dispatchEvent(data[i].event, { data: data[i].data } )) {
+                     for (var i = 0; i < data.length; i++) {
+                       if (!that.dispatchEvent(data[i].event, { data: data[
+                             i].data })) {
                          that.message({
-                           'data' : data[i].data
+                           'data': data[i].data
                          });
                        }
                      }
                    }
-                   setTimeout(that.poll, that.pollTimeout);
+                   setTimeout(that.poll, params.pollTimeout);
                  });
-             }
-           },
-     
-           userAlive: function () {
-             clearTimeout(that._userAliveScheduler);
-     
-             var _userAlive = function(data) {
-               var toClose=false;
-               if (data) {
-                 var info = data[0] || data;
-                 toClose = (info.event || '').toUpperCase() == 'CLOSE';
                }
-               if (toClose) {
-                 _userOffline();
-               } else {
-                 that.debug("IN: User is alive");
-                 if (that.state!=SSE_OPERATIONAL) {
-                   that.debug("Unexpected SSE state: "+that.state);
+             },
+     
+             userAlive: function() {
+               clearTimeout(that._userAliveScheduler);
+     
+               var _userAlive = function(data) {
+                 var toClose = false;
+                 if (data) {
+                   var info = data[0] || data;
+                   toClose = (info.event || '').toUpperCase() ==
+                     'CLOSE';
                  }
-                 that.scheduleUserAlive(that.userAliveInterval);
+                 if (toClose) {
+                   _userOffline();
+                 } else {
+                   that.debug("IN: User is alive");
+                   if (that.state != SSE_OPERATIONAL) {
+                     that.debug("Unexpected SSE state: " + that.state);
+                   }
+                   that.scheduleUserAlive(that.userAliveInterval);
+                 }
+               };
+     
+               var _userOffline = function(e) {
+                 that.debug("STATUS: User logged out");
+                 that.close(e);
+               };
+     
+               if (that.state == SSE_OPERATIONAL) {
+                 var p = that.rpc("userAlive");
+                 p.then(_userAlive).catch(_userOffline);
+               } else {
+                 that.scheduleUserAlive(Math.max(100, that.userAliveInterval /
+                   100));
                }
-             };
+             },
      
-             var _userOffline = function(e) {
-               that.debug("STATUS: User logged out");
-               that.close(e);
-             };
+             scheduleUserAlive: function(timeout_ms) {
+               timeout_ms = timeout_ms || that.userAliveInterval;
+               clearTimeout(that._userAliveScheduler);
+               console.log(
+                 "%c scheduling UserAlive indicator for {0}ms".format(
+                   timeout_ms), 'background: #222; color: #429BDA');
+               that._userAliveScheduler = setTimeout(that.userAlive,
+                 timeout_ms);
+             },
      
-             if (that.state==SSE_OPERATIONAL) {
-               var p = that.rpc("userAlive");
-               p.then(_userAlive).catch(_userOffline);
-             } else {
-               that.scheduleUserAlive(Math.max(100,that.userAliveInterval/100));
-             }
-           },
-     
-           scheduleUserAlive: function (timeout_ms) {
-             timeout_ms = timeout_ms || that.userAliveInterval;
-             clearTimeout(that._userAliveScheduler);
-             console.log("%c scheduling UserAlive indicator for {0}ms".format(timeout_ms),'background: #222; color: #429BDA');
-             that._userAliveScheduler = setTimeout(that.userAlive, timeout_ms);
-           },
-     
-           attachUser: function (callback) {
-             that.rpc(
-               "attachUser",
-               {
-                 "w": workgroup,
-                 "user": that.user
-               }).then(function(data) {
+             attachUser: function(callback) {
+               that.rpc(
+                 "attachUser", {
+                   "w": params.workgroup,
+                   "user": params.user
+                 }).then(function(data) {
                  that.debug("IN: attach info");
                  if (data) {
                    var info = data[0] || data;
                    if (info.ok) {
-                     that.w                 = workgroup;
-                     that.sse_session_id    = info.sse_session_id;
+                     that.w = params.workgroup;
+                     that.sse_session_id = info.sse_session_id;
                      /* cfgSSEUserAliveInterleave -> userAliveInterval
                         it comes in seconds
                         but as js works in ms, we translate it
                         The allowed interleave is between 61 and 900 seconds */
-                     that.userAliveInterval = Math.min(900, Math.max(61,info.userAliveInterval)) * 1000;
-                     that.debug("set userAliveInterval value to {0}ms ".format(that.userAliveInterval));
+                     that.userAliveInterval = Math.min(900, Math.max(
+                       61, info.userAliveInterval)) * 1000;
+                     that.debug(
+                       "set userAliveInterval value to {0}ms ".format(
+                         that.userAliveInterval));
                      callback();
                    }
                  }
-               });
-           },
+               }).catch(function(error) { console.log(
+                   "Error attaching user to SSE server");
+                 console.log(error); });
+             },
      
-           sendPing: function(callback) {
-             if (that.state==SSE_OPERATIONAL) {
-               that.rpc(
-                 "ping",
-                 {w: workgroup, user: that.user}
-               ).then(callback);
-             }
-           },
-     
-           addEventListener: function (eventName, func) {
-             /* save the event in the internal list */
-             if (typeof that.events == "undefined") {
-               that.events={};
-             }
-             if ("undefined" == typeof that.events[eventName])
-               that.events[eventName] = [];
-             that.events[eventName].push([that.state, func]);
-     
-             if (that.state==SSE_OPERATIONAL) {
-               if (!that.pollEnabled)
-                 that.evtSource.addEventListener(eventName, func);
-               if (trim(eventName.toLowerCase()) == "ready") {
-                 that.dispatchEvent("ready");
+             sendPing: function(callback) {
+               if (that.state == SSE_OPERATIONAL) {
+                 that.rpc(
+                   "ping", { w: params.workgroup, user: params.user }
+                 ).then(callback);
                }
-             }
-             return that;
-           },
+             },
      
-           dispatchEvent: function (eventName, params) {
-             var ret=false;
-             if ((that.state==SSE_OPERATIONAL) || (eventName=="onerror")) {
-               if (typeof that.events !== "undefined") {
-                 for(var implementations=0; implementations<(that.events[eventName] || []).length; implementations++) {
-                   var eventDef = that.events[eventName][implementations];
-                   eventDef[1](params);
-                   ret |= true;
+             addEventListener: function(eventName, func) {
+               /* save the event in the internal list */
+               if (typeof that.events == "undefined") {
+                 that.events = {};
+               }
+               if ("undefined" == typeof that.events[eventName])
+                 that.events[eventName] = [];
+               that.events[eventName].push([that.state, func]);
+     
+               if (that.state == SSE_OPERATIONAL) {
+                 if (!that.pollEnabled)
+                   that.evtSource.addEventListener(eventName, func);
+                 if (trim(eventName.toLowerCase()) == "ready") {
+                   that.dispatchEvent("ready");
                  }
                }
+               return that;
+             },
      
-               eventName1=eventName;
-               eventName2="on_"+eventName;
-               if (typeof that[eventName1] == "function") {
-                 that[eventName1](params);
-                 ret |= true;
-               } else if (typeof that[eventName2] == "function") {
-                 that[eventName2](params);
-                 ret |= true;
-               } else
-                 ret |= false;
-             }
-             return ret;
-           },
+             dispatchEvent: function(eventName, params) {
+               var ret = false;
+               if ((that.state >= SSE_UNINITIALIZED) || (eventName ==
+                   "error")) {
+                 if (typeof that.events !== "undefined") {
+                   for (var implementations = 0; implementations < (
+                       that.events[eventName] || []).length; implementations++) {
+                     var eventDef = that.events[eventName][
+                       implementations
+                     ];
+                     eventDef[1](params);
+                     ret |= true;
+                   }
+                 }
      
-           startPolling : function() {
-             clearTimeout(that.evtGuardian);
-             that.pollEnabled=true;
-             that.state=SSE_OPERATIONAL;
-             that.dispatchEvent("ready", {"gateway": "Polling"});
-             setTimeout(that.poll, 125);
-             that.debug("STATUS: polling for messages. pollTimeout: {0}ms".format(that.pollTimeout));
-           },
+                 eventName1 = eventName;
+                 eventName2 = "on" + eventName;
+                 if (typeof that[eventName1] == "function") {
+                   that[eventName1](params);
+                   ret |= true;
+                 } else if (typeof that[eventName2] == "function") {
+                   that[eventName2](params);
+                   ret |= true;
+                 } else
+                   ret |= false;
+               }
+               return ret;
+             },
      
-           guardianTimeout: function (e) {
-             that.debug("Guardian Timeout! Let's use polling mode");
-             /* if SSE.PHP don't answer up to guardian timeout, use poll version */
-             clearTimeout(that.evtGuardian);
-             that.__destroy__();
-             that.startPolling();
-           },
+             startPolling: function() {
+               clearTimeout(that.evtGuardian);
+               that.pollEnabled = true;
+               that.state = SSE_OPERATIONAL;
+               that.dispatchEvent("ready", { "gateway": "Polling" });
+               setTimeout(that.poll, 125);
+               that.debug(
+                 "STATUS: polling for messages. pollTimeout: {0}ms".format(
+                   params.pollTimeout));
+             },
      
-           __destroy__: function() {
-               that.closing=true;
+             guardianTimeout: function(e) {
+               that.debug("Guardian Timeout! Let's use polling mode");
+               /* if SSE.PHP don't answer up to guardian timeout, use poll version */
+               clearTimeout(that.evtGuardian);
+               that.__destroy__();
+               that.startPolling();
+             },
+     
+             __destroy__: function() {
+               that.closing = true;
                clearTimeout(that.evtGuardian);
                that.debug('DESTROYING');
-               that.state=SSE_UNINITIALIZED;
-               that.evtSource=null;
-               that.GUID=null;
-           },
+               that.state = SSE_DELETED;
+               delete that.evtSource;
+               that.GUID = null;
+             },
      
-           close: function(e) {
-             clearTimeout(that.evtGuardian);
-             if (!that.closing) {
-               that.closing=true;
-               that.state=SSE_CLOSING;
-               that.debug("STATUS: CLOSE");
-               that.rpc(
-                 "detachUser",
-                 {
-                   w: workgroup,
-                   user: that.user
-                 }).then(function() {
-                   that.state=SSE_UNINITIALIZED;
+             close: function(e) {
+               clearTimeout(that.evtGuardian);
+               if (!that.closing) {
+                 that.closing = true;
+                 that.state = SSE_CLOSING;
+                 that.debug("STATUS: CLOSE");
+                 that.rpc(
+                   "detachUser", {
+                     w: params.workgroup,
+                     user: params.user
+                   }).then(function() {
+                   that.state = SSE_UNINITIALIZED;
                    that.pollEnabled = false;
                    that.__destroy__();
-                   that.closing=false;
+                   that.closing = false;
                  }).catch(function() {
-                   that.closing=false; setTimeout(that.close, 1500);
+                   that.closing = false;
+                   setTimeout(that.close, 1500);
                  });
-             }
-           },
+               }
+             },
      
-           closeEvent: function(e) {
-             clearTimeout(that.evtGuardian);
-             console.log("%c close: {0}".format(e.data || "NULL"),"color: #8787FF");
-             that.__destroy__();
-           },
+             closeEvent: function(e) {
+               that.dispatchEvent('close', e);
+               clearTimeout(that.evtGuardian);
+               console.log("%c close: {0}".format(e.data || "NULL"),
+                 "color: #ff8000");
+               that.__destroy__();
+             },
      
-           errorEvent: function(e) {
-             clearTimeout(that.evtGuardian);
-             console.log("%c error: {0}".format(e.data || "NULL"),"color: #8787FF");
-             that.debug("ERROR: while using SSE");
-             that.dispatchEvent('onerror');
-             that.state=SSE_NONOPERATIONAL;
-             setTimeout(that.startup, 2500);
-           },
+             errorEvent: function(e) {
+               clearTimeout(that.evtGuardian);
+               console.log("%c error: {0}".format(e.data || "NULL"),
+                 "color: #990000");
+               that.debug("ERROR: while using SSE state: " + that.state);
+               that.dispatchEvent('error', e);
+               if (params.closeOnError) {
+                 if (that.state == SSE_OPERATIONAL) {
+                   that.state = SSE_NONOPERATIONAL;
+                   that.close();
+                   setTimeout(initCallback, 15000);
+                 }
+               }
+             },
      
-           openEvent: function (e) {
-             clearTimeout(that.evtGuardian);
-             console.log("%c open: {0}".format(e.data || "NULL"),"color: #8787FF");
-             that.debug("STATUS: OPEN");
-             /* the first UAI happens in 1/100th after OPEN */
-             that.scheduleUserAlive(that.userAliveInterval/100);
-             that.dispatchEvent('onopen');
+             openEvent: function(e) {
+               clearTimeout(that.evtGuardian);
+               console.log("%c open: {0}".format(e.data || "NULL"),
+                 "color: #8787FF");
+               that.debug("STATUS: OPEN");
+               /* the first UAI happens in 1/100th after OPEN */
+               that.scheduleUserAlive(that.userAliveInterval / 100);
+               that.dispatchEvent('open', e);
      
-             if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOnline =='function'))
-               ycomm.msg.notifyServerOnline();
-           },
+               if ((ycomm.msg) && (typeof ycomm.msg.notifyServerOnline ==
+                   'function'))
+                 ycomm.msg.notifyServerOnline();
+             },
      
-           messageEvent: function (e) {
-             /* as connected, clear guardian timeout */
-             clearTimeout(that.evtGuardian);
-             console.log("%c message: {0}".format(e.data || "NULL"),"color: #8787FF");
-             if ((!e) || (e.target.readyState==2)) {
-               that.close();
-             } else {
-               that.debug("MESSAGE");
-               if (that.state>SSE_CLOSING) {
-                 /* firs message just synchro the message table */
-                 that.state=SSE_OPERATIONAL;
-                 that.debug("userAliveInterval: {0}ms".format(that.userAliveInterval));
+             messageEvent: function(e) {
+               /* as connected, clear guardian timeout */
+               clearTimeout(that.evtGuardian);
+               console.log("%c message: {0}".format(e.data || "NULL"),
+                 "color: #8787FF");
+               if ((!e) || (e.target.readyState == 2)) {
+                 that.close();
+               } else {
+                 that.debug("MESSAGE");
+                 if (that.state > SSE_CLOSING) {
+                   /* firs message just synchro the message table */
+                   that.state = SSE_OPERATIONAL;
+                   that.debug("userAliveInterval: {0}ms".format(that.userAliveInterval));
      
-                 for(var eventName in that.events) {
-                   if (that.events.hasOwnProperty(eventName)) {
-                     for(var implementations=0; implementations<that.events[eventName].length; implementations++) {
-                       var eventDef = that.events[eventName][implementations];
-                       if (eventDef[0]<1) {
-                         eventDef[0]=1;
-                         that.evtSource.addEventListener(eventName, eventDef[1]);
+                   for (var eventName in that.events) {
+                     if (that.events.hasOwnProperty(eventName)) {
+                       for (var implementations = 0; implementations <
+                         that.events[eventName].length; implementations++
+                       ) {
+                         var eventDef = that.events[eventName][
+                           implementations
+                         ];
+                         if (eventDef[0] < 1) {
+                           eventDef[0] = 1;
+                           that.evtSource.addEventListener(eventName,
+                             eventDef[1]);
+                         }
                        }
                      }
                    }
+                   that.dispatchEvent("ready", { "gateway": "SSE" });
                  }
-                 that.dispatchEvent("onready", {"gateway": "SSE"});
-               }
      
-               if (that.state>SSE_UNINITIALIZED) {
-                 if (typeof that.onmessage=="function") {
-                   that.onmessage(e.data);
-                 }
-               }
-             }
-           },
-     
-           pingEvent: function(e) {
-             console.log("%c ping: {0}".format(e.data || "NULL"),"color: #8787FF");
-           },
-     
-           startup: function(gateway) {
-             gateway = (gateway || that.prefGateway || 'SSE').toUpperCase();
-             console.log("%c startup: {0}".format(gateway),"color: #8787FF");
-             that.prefGateway = gateway;
-             if (that.evtGuardian) {
-               clearTimeout(that.evtGuardian);
-             }
-             if ((typeof that.GUID != "string") || (that.state<=SSE_NONOPERATIONAL)) {
-     
-               if (typeof that.GUID != "string")
-                 that.GUID=generateUUID();
-     
-               that.attachUser(
-                 function() {
-                   that.state=SSE_NONOPERATIONAL;
-                   /* first try to use EventSource() */
-                   if ((that.prefGateway=='SSE') && (typeof window.EventSource == "function")) {
-                     that.debug("INFO: Attaching events");
-                     if (!that.evtSource) {
-                       that.debug("INFO: All new evtSource");
-                       that.evtSource = new EventSource(that._dataLocation_+"?si="+md5(that.sse_session_id));
-                       that.evtSource.onerror=that.errorEvent;
-                     } else {
-                       that.debug("INFO: Reusing component");
-                     }
-     
-                     that.evtSource.onopen    = that.openEvent;
-                     that.evtSource.onclose   = that.closeEvent;
-                     /* not working in the same way in all browsers */
-                     that.evtSource.addEventListener("message", that.message);
-                     that.evtSource.onmessage = that.messageEvent;
-                     
-                     that.addEventListener("ping",  that.pingEvent, false);
-                     that.addEventListener("reset", that.resetEvent, false);
-     
-                     that.debug("INFO: Configuring guardianTimeout to {0}ms".format(that.userAliveInterval * 1.5));
-                     that.evtGuardian = setTimeout(that.guardianTimeout, that.userAliveInterval * 1.5);
-                     that.scheduleUserAlive(that.userAliveInterval/100);
-                   } else {
-                     that.startPolling();
+                 if (that.state > SSE_UNINITIALIZED) {
+                   if (typeof that.onmessage == "function") {
+                     that.onmessage(e.data);
                    }
                  }
-               );
-             } else {
-               that.debugEnabled=true;
-               that.debug("ERROR: SSE object already initialized");
-             }
-           },
+               }
+             },
      
-           resetEvent: function() {
-             that.close();
-             that.__destroy__();
-             that.state=SSE_NONOPERATIONAL;
-             setTimeout(that.startup, 3500);
-           },
+             pingEvent: function(e) {
+               console.log("%c ping: {0}".format(e.data || "NULL"),
+                 "color: #8787FF");
+             },
      
-           init: function() {
-             that.state=SSE_UNINITIALIZED;
-             if ((typeof dataLocation=="undefined") || (dataLocation === null)) {
-               /* default data location is current location/sse.php */
-               that._dataLocation_ = (
-                 function() {
-                   var a = that.getLocation();
-                   var b = a.lastIndexOf('/');
-                   return a.substr(0,b+1)+'sse.php';
-                 }
-               )();
-             } else {
-               that._dataLocation_=dataLocation;
-             }
+             startup: function(gateway) {
+               gateway = (gateway || params.prefGateway || 'SSE').toUpperCase();
+               console.log("%c startup: {0}".format(gateway),
+                 "color: #8787FF");
+               params.prefGateway = gateway;
+               if (that.evtGuardian) {
+                 clearTimeout(that.evtGuardian);
+               }
+               if ((typeof that.GUID != "string") || (that.state <=
+                   SSE_NONOPERATIONAL)) {
      
-             if (that._dataLocation_.substr(0,5)=="file:") {
-               that.debug("ERROR: '"+that._dataLocation_+"' is not a correct data location");
-             } else {
-               /* create user id */
-               that.user = ((user !==null) && (typeof user != "undefined"))?user:generateUUID();
+                 if (typeof that.GUID != "string")
+                   that.GUID = generateUUID();
      
-               /* check same-source */
-               var l1=that.getFolder(that.getLocation()),
-                   l2=that.getFolder(that._dataLocation_);
+                 that.attachUser(
+                   function() {
+                     that.state = SSE_NONOPERATIONAL;
+                     /* first try to use EventSource() */
+                     if ((params.prefGateway == 'SSE') && (typeof window
+                         .EventSource == "function")) {
+                       that.debug("INFO: Attaching events");
+                       if (!that.evtSource) {
+                         that.debug("INFO: All new evtSource");
+                         that.evtSource = new EventSource(params.dataLocation +
+                           "?si=" + md5(that.sse_session_id), { withCredentials: false }
+                         );
+                         that.evtSource.onerror = that.errorEvent;
+                       } else {
+                         that.debug("INFO: Reusing component");
+                       }
      
-               /* chose better way to communicate with server */
-               if (l1==l2) {
-                 that.rpcMethod = ycomm.invoke;
+                       that.evtSource.onopen = that.openEvent;
+                       that.evtSource.onclose = that.closeEvent;
+                       /* not working in the same way in all browsers */
+                       // that.evtSource.addEventListener("message", that.message);
+                       that.evtSource.onmessage = that.messageEvent;
+     
+                       that.addEventListener("ping", that.pingEvent,
+                         false);
+                       that.addEventListener("reset", that.resetEvent,
+                         false);
+     
+                       that.debug(
+                         "INFO: Configuring guardianTimeout to {0}ms"
+                         .format(that.userAliveInterval * 1.5));
+                       that.evtGuardian = setTimeout(that.guardianTimeout,
+                         that.userAliveInterval * 1.5);
+                       that.scheduleUserAlive(that.userAliveInterval /
+                         100);
+                     } else {
+                       that.startPolling();
+                     }
+                   }
+                 );
                } else {
-                 that.rpcMethod = ycomm.crave;
+                 that.debugEnabled = true;
+                 that.debug("ERROR: SSE object already initialized");
+               }
+             },
+     
+             resetEvent: function() {
+               that.close();
+               that.__destroy__();
+               that.state = SSE_NONOPERATIONAL;
+               setTimeout(that.startup, 3500);
+             },
+     
+             init: function() {
+               that.state = SSE_UNINITIALIZED;
+     
+               initCallback = initCallback || that.startup;
+     
+               if (params.dataLocation.substr(0, 5) == "file:") {
+                 that.debug("ERROR: '" + params.dataLocation +
+                   "' is not a correct data location");
+               } else {
+                 /* check same-source */
+                 var l1 = that.getFolder(that.getLocation()),
+                   l2 = that.getFolder(params.dataLocation);
+     
+                 /* chose better way to communicate with server */
+                 if (l1 == l2) {
+                   that.rpcMethod = ycomm.invoke;
+                 } else {
+                   that.rpcMethod = ycomm.crave;
+                 }
+     
+                 that.startup();
+     
                }
      
-               that.startup();
-     
+               return that;
              }
+           };
      
-             return that;
-           }
+           var __state = -2;
+           var __getState = function() {
+             return __state;
+           };
+           var __setState = function(newState) {
+             if (newState != __state) {
+               console.log("%c SSE state changed from {0} to {1}".format(
+                   __state, newState),
+                 'background: #222; color: #bada55');
+               __state = newState;
+             }
+           };
+     
+           Object.defineProperty(that, "state", {
+             'configurable': false,
+             'enumerable': false,
+             'get': __getState,
+             'set': __setState
+           });
+     
+           return that.init();
          };
-     
-         var __state=-2;
-         var __getState = function() {
-           return __state;
-         };
-         var __setState = function(newState) {
-           if (newState != __state) {
-             console.log("%c SSE state changed from {0} to {1}".format(__state, newState), 'background: #222; color: #bada55');
-             __state = newState;
-           }
-         };
-     
-         Object.defineProperty(that, "state", {
-           'configurable': false,
-           'enumerable': false,
-           'get': __getState,
-           'set': __setState
-         });
-     
-         return that.init();
-       };
-     
  /* END ycomm-sse.js */
  _dump("ycomm-sse");
  /* START ycomm-websocket.js */
@@ -9686,13 +9786,15 @@
  /* START yinterface.js */
      /*
          skel/webApp/templates/milligram-1.3/js/yloader.js
-         YeAPF 0.8.63-139 built on 2019-07-29 09:42 (-3 DST)
+         YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
          Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-         2019-07-29 09:42:25 (-3 DST)
+         2019-11-29 09:22:24 (-2 DST)
      */
      
      var yInterfaceObj = function() {
        var that = {};
+     
+       that._tableALineSpec = [];
      
        that.openTab = function(e) {
          var opcoes = y$('.op-menu');
@@ -9705,17 +9807,17 @@
              /* se for um click, pego o destino */
              if (e.target)
                e = e.target;
-             while (  (e) &&
-                       !(  (e.getAttribute('data-tab') !== null) ||
-                          (e.nodeName == 'LI'))  )
-                e = e.parentNode;
+             while ( (e) &&
+                     !((e.getAttribute('data-tab') !== null) ||
+                     (e.nodeName == 'LI')) )
+               e = e.parentNode;
              if (!e.hasClass("disabled")) {
                e.addClass('active');
                var tab = e.getAttribute('data-tab');
-               if ("string"==typeof tab)
+               if ("string" == typeof tab)
                  mTabNav.showTab(tab);
                else {
-                 console.warn((e.id || "unidentified") +" does not has data-tab attribute");
+                 console.warn((e.id || "unidentified") + " does not has data-tab attribute");
                }
              }
            } else if (typeof e == "string") {
@@ -9742,7 +9844,7 @@
                function(s, e, d, m, c) {
                  if (200 == s) {
                    if ((d) && (d[0])) {
-                     d[0].cc=d[0].cc || d[0].CC || 0;
+                     d[0].cc = d[0].cc || d[0].CC || 0;
                      resolve(d[0]);
                    } else {
                      reject("status: " + s);
@@ -9778,15 +9880,16 @@
      
              table.setAttribute('data-pageStep', step);
      
-             for (n = 1; n < 1+pageCount;) {
+             for (n = 1; n < 1 + pageCount;) {
                aTag = document.createElement('A');
                aTag.setAttribute('href', '#' + subject);
-               aTag.setAttribute('class', 'page-' + subject);
+               aTag.setAttribute('class', 'page-' + subject + " page-link");
                aTag.setAttribute('data-subject', subject);
                aTag.setAttribute('data-table', tableId);
                aTag.setAttribute('data-pageNo', n);
                aTag.innerHTML = n;
                newLI = document.createElement('LI');
+               newLI.addClass('page-item');
                newLI.appendChild(aTag);
                if (n == currentPage)
                  newLI.addClass('active');
@@ -9807,7 +9910,7 @@
      
        };
      
-       that.initializePagination = function(subject, tableId, paginatorId, pageLen, params) {
+       that.initializePagination = function(subject, tableId, paginatorId, pageLen, params, aLineSpec) {
          tableId = tableId || "tbl-" + subject;
          paginatorId = paginatorId || 'pagination-' + subject;
          pageLen = Math.max(1, pageLen || 20);
@@ -9824,6 +9927,8 @@
            table.setAttribute('data-params', JSON.stringify(tableParams));
            table.setAttribute('data-subject', subject);
            table.setAttribute('data-paginator', paginatorId);
+     
+           that._tableALineSpec[tableId] = aLineSpec;
          }
      
          var promiseReturn = new Promise(
@@ -9858,59 +9963,50 @@
        that.gotoPage = function(e) {
          e = e.target;
          var pageNo = e.getAttribute('data-pageNo'),
-             tableId = e.getAttribute('data-table') ;
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-     
-         that.loadTablePage(e.getAttribute('data-subject'), pageNo, tableId);
+             tableId = e.getAttribute('data-table'),
+             aLineSpec = {};
+         if (tableId)
+           aLineSpec = that._tableALineSpec[tableId];
+         that.loadTablePage(e.getAttribute('data-subject'), pageNo, tableId, null, aLineSpec);
        };
      
-       that.loadTablePage = function(subject, pageNo, tableId, params) {
+       that.loadTablePage = function(subject, pageNo, tableId, params, aLineSpec) {
          tableId = tableId || "tbl-" + subject;
-         pageNo = (pageNo===-1)?pageNo:Math.max(1, pageNo || 0);
+         pageNo = (pageNo === -1) ? pageNo : Math.max(1, pageNo || 0);
+         aLineSpec = aLineSpec || {};
      
          var table = y$(tableId),
            tableParams = {},
-           pageLen, pageCount, pageStep, 
-           dataPaginator,n,
+           pageLen, pageCount, pageStep,
+           dataPaginator, paginatorId, n,
            promiseReturn;
      
          if (table) {
-           pageStep      = table.getAttribute("data-pageStep") || 0;
-           pageCount     = table.getAttribute("data-pageCount") || 0;
-           dataPaginator = (y$(table.getAttribute("data-paginator")) || {children:[]}).children;
+           pageStep = table.getAttribute("data-pageStep") || 0;
+           pageCount = table.getAttribute("data-pageCount") || 0;
+           paginatorId = table.getAttribute("data-paginator");
+           dataPaginator = (y$(paginatorId) || { children: [] }).children;
      
-           ycomm.dom.fillElement(tableId,{});
+           ycomm.dom.fillElement(tableId, {});
      
-           if (pageNo===-1)
+           if (pageNo === -1)
              pageNo = pageCount;
      
-           if (pageStep>1) {
+           if (pageStep > 1) {
              that.mountPagesIndex(tableId, pageNo);
            } else {
-             for (n=0; n<dataPaginator.length; n++) {
+             for (n = 0; n < dataPaginator.length; n++) {
                dataPaginator[n].deleteClass('active');
              }
-             if (dataPaginator[pageNo-1])
-               dataPaginator[pageNo-1].addClass('active');
+             if (dataPaginator[pageNo - 1])
+               dataPaginator[pageNo - 1].addClass('active');
            }
      
            tableParams = JSON.parse(table.getAttribute('data-params') || '{}');
            pageLen = tableParams.pageLen;
            if (!pageLen) {
              console.warn("Call initializePagination() first");
-             that.initializePagination(subject, tableId);
+             that.initializePagination(subject, tableId,  paginatorId, null, params, aLineSpec);
            }
      
            // tableParams.currentPage=pageNo;
@@ -9943,12 +10039,13 @@
                    tableParams,
                    function(status, error, data, userMsg, dataContext) {
                      if (status == 200) {
-                       ycomm.dom.fillElement(tableId, data, {}, {
+                       var flags = {
                          deleteRows: blockStart == 0
-                       });
+                       };
+                       ycomm.dom.fillElement(tableId, data, aLineSpec, flags);
                        if ((dataContext) && ((dataContext.rowCount >= dataContext.requestedRows))) {
                          blockStart += dataContext.rowCount;
-                         if ((dataContext.rowCount>0) && ((pageNo - 1) * pageLen + blockStart < blockSize)) {
+                         if ((dataContext.rowCount > 0) && ((pageNo - 1) * pageLen + blockStart < blockSize)) {
                            setTimeout(__loadTable, 125);
                          } else
                            blockReady = true;
@@ -9987,9 +10084,10 @@
          return promiseReturn;
        };
      
-       that.loadTable = function(subject, tableId, params) {
+       that.loadTable = function(subject, tableId, params, aLineSpec) {
          /* curo o nome da tabela */
          tableId = tableId || "tbl-" + subject;
+         aLineSpec  = aLineSpec || {};
      
          var table = y$(tableId),
            tableParams = {};
@@ -10019,7 +10117,7 @@
                  tableParams,
                  function(status, error, data, userMsg, dataContext) {
                    if (status == 200) {
-                     ycomm.dom.fillElement(tableId, data, {}, {
+                     ycomm.dom.fillElement(tableId, data, aLineSpec, {
                        deleteRows: blockStart == 0
                      });
                      if (dataContext.rowCount >= dataContext.requestedRows) {
@@ -10168,7 +10266,7 @@
              function(s, e, d) {
                if (200 == s) {
                  if ((d) && (d[0])) {
-                   console.log(formId+" chegou ");
+                   console.log(formId + " chegou ");
                    if ("undefined" == typeof that._forms_cache)
                      that._forms_cache = [];
                    that._forms_cache[subject + '.' + formId] = d[0];
@@ -10296,7 +10394,7 @@
      
        that.log = function() {
          var args = (arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments));
-         var __log = that.logFunction || (false)?console.log:null;
+         var __log = that.logFunction || (false) ? console.log : null;
          if (__log) {
            var _logLine = "";
            for (var i = 0; i < args.length; i++)
@@ -10529,10 +10627,10 @@
            for (var i = 0; i < classes.length; i++) {
              mySensitivitySpec = undefined;
      
-             if ("undefined" !== typeof (yInterface._sensitiveFields[classes[i]])) {
+             if ("undefined" !== typeof(yInterface._sensitiveFields[classes[i]])) {
                mySensitivitySpec = yInterface._sensitiveFields[classes[i]];
              }
-             if ("undefined" !== typeof (yInterface._sensitiveFields["." + classes[i]])) {
+             if ("undefined" !== typeof(yInterface._sensitiveFields["." + classes[i]])) {
                mySensitivitySpec = yInterface._sensitiveFields["." + classes[i]];
              }
      
@@ -10548,41 +10646,41 @@
        };
      
        that.formFilled = function(e) {
-         console.log("FORMFILLED "+e.target.id);
+         console.log("FORMFILLED " + e.target.id);
        };
      
        that.emptyForm = function() {
          return {
-           getAttribute: function () {return '';},
+           getAttribute: function() { return ''; },
            removeEventListener: function() {}
          };
        };
      
        that.buildFormFromJSON = function(formManager, formId, jForm, fieldPrefix, fieldPostfix) {
          var form = y$(formId) || that.emptyForm(),
-           formInfoJ = JSON.parse( ( jForm ||{} ).form || "{}"),
-           sourceCodeViewer=y$('sourceCodeViewer');
+           formInfoJ = JSON.parse((jForm || {}).form || "{}"),
+           sourceCodeViewer = y$('sourceCodeViewer');
      
          if (sourceCodeViewer) {
            /* https://stackoverflow.com/questions/4810841/how-can-i-pretty-print-json-using-javascript*/
-           sourceCodeViewer.innerHTML=(function() {
+           sourceCodeViewer.innerHTML = (function() {
              var json = JSON.stringify(jForm.form, undefined, 2);
-             json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(new RegExp("\n", 'g'),"*").replace('\\"','\"');
-             return '<pre style="white-space: pre-wrap; word-break: keep-all;">'+json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
-                 var cls = 'number';
-                 if (/^"/.test(match)) {
-                     if (/:$/.test(match)) {
-                         cls = 'key';
-                     } else {
-                         cls = 'string';
-                     }
-                 } else if (/true|false/.test(match)) {
-                     cls = 'boolean';
-                 } else if (/null/.test(match)) {
-                     cls = 'null';
+             json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(new RegExp("\n", 'g'), "*").replace('\\"', '\"');
+             return '<pre style="white-space: pre-wrap; word-break: keep-all;">' + json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function(match) {
+               var cls = 'number';
+               if (/^"/.test(match)) {
+                 if (/:$/.test(match)) {
+                   cls = 'key';
+                 } else {
+                   cls = 'string';
                  }
-                 return '<span class="' + cls + '">' + match + '</span>';
-             })+'</pre>';
+               } else if (/true|false/.test(match)) {
+                 cls = 'boolean';
+               } else if (/null/.test(match)) {
+                 cls = 'null';
+               }
+               return '<span class="' + cls + '">' + match + '</span>';
+             }) + '</pre>';
            })();
          }
      
@@ -10604,19 +10702,19 @@
              groupingClass = '',
              userData = '',
              aux, elementId, auxNdx,
-             paragraphModel           = "<div class='form-group {1}' id='{0}'><label>{2}</label><div {4} <!--USERDATA--> ><p>{3}</p></div></div>",
-             inputModel               = "<div class='form-group {1}' id='grp_{0}'><label for='{0}'>{3}</label><input type='{2}' autocomplete='off' class='form-control {5}' id='{0}' {4} {6} <!--USERDATA--> /></div>",
-             inputModelWithLeftAddon  = "<div class='form-group {1}' id='grp_{0}'><label for='{0}'>{3}</label><div class='input-group'><span class='input-group-addon'>{7}</span><input type='{2}' autocomplete='off' class='form-control {5}' id='{0}' {4} {6} <!--USERDATA--> /></div></div>",
+             paragraphModel = "<div class='form-group {1}' id='{0}'><label>{2}</label><div {4} <!--USERDATA--> ><p>{3}</p></div></div>",
+             inputModel = "<div class='form-group {1}' id='grp_{0}'><label for='{0}'>{3}</label><input type='{2}' autocomplete='off' class='form-control {5}' id='{0}' {4} {6} <!--USERDATA--> /></div>",
+             inputModelWithLeftAddon = "<div class='form-group {1}' id='grp_{0}'><label for='{0}'>{3}</label><div class='input-group'><span class='input-group-addon'>{7}</span><input type='{2}' autocomplete='off' class='form-control {5}' id='{0}' {4} {6} <!--USERDATA--> /></div></div>",
              inputModelWithRightAddon = "<div class='form-group {1}' id='grp_{0}'><label for='{0}'>{3}</label><div class='input-group'><input type='{2}' autocomplete='off' class='form-control {5}' id='{0}' {4} {6} <!--USERDATA--> /><span class='input-group-addon'>{7}</span></div></div>",
-             inputWithListModel       = "<div class='form-group {1}' id='grp_{0}'><label for='{0}'>{3}</label><input type='{2}' class='form-control {5}' id='{0}' {4} {11} list='{6}' data-subject='{7}' data-action='{8}' data-line-spec='{9}' data-result-spec='{10}' <!--USERDATA--> /><datalist id='{6}'></datalist></div>",
-             hiddenInputModel         = "<input type=hidden id='{0}' {1} value='{2}' <!--USERDATA--> />",
-             buttonModel              = "<button type='button' class='{1}' id='{0}' {4} {5} <!--USERDATA--> ><i class='{3}'></i>{2}</button>",
-             selectModelWithQuery     = "<div class='form-group {1}' id='grp_{0}'><label for={0}>{2}</label><select id='{0}' class='form-control' {3} {4} <!--USERDATA--> ></select></div>",
-             selectModelWithOptions   = "<div class='form-group {1}' id='grp_{0}'><label for={0}>{2}</label><select id='{0}' class='form-control' {3} {4} <!--USERDATA--> >{5}</select></div>",
-             checkboxModel            = "<div class='form-group {1}' id='grp_{0}'><label>{4}</label><div class='checkbox'><label><input type='checkbox' value='{3}' id='{0}' {5} {6} <!--USERDATA--> >{2}</label></div></div>",
-             radioModel               = "<div class='{1}' id='grp_{0}'><div class='radio'><label><input type='radio' name='{3}' id='{0}' value='{4}' {5} <!--USERDATA--> >{2}</label></div></div>",
-             textareaModel            = "<div class='form-group {1}' id='grp_{0}'><label for='{0}'>{2}</label><textarea class='form-control' id='{0}' cols='{3}' rows='{4}' {5} {6} <!--USERDATA--> ></textarea></div>",
-             formModel                = "<form role='form' id='{0}' data-prefix='{2}' class='{1}' {3} <!--USERDATA--> >{4}</form>";
+             inputWithListModel = "<div class='form-group {1}' id='grp_{0}'><label for='{0}'>{3}</label><input type='{2}' class='form-control {5}' id='{0}' {4} {11} list='{6}' data-subject='{7}' data-action='{8}' data-line-spec='{9}' data-result-spec='{10}' <!--USERDATA--> /><datalist id='{6}'></datalist></div>",
+             hiddenInputModel = "<input type=hidden id='{0}' {1} value='{2}' <!--USERDATA--> />",
+             buttonModel = "<button type='button' class='{1}' id='{0}' {4} {5} <!--USERDATA--> ><i class='{3}'></i>{2}</button>",
+             selectModelWithQuery = "<div class='form-group {1}' id='grp_{0}'><label for={0}>{2}</label><select id='{0}' class='form-control' {3} {4} <!--USERDATA--> ></select></div>",
+             selectModelWithOptions = "<div class='form-group {1}' id='grp_{0}'><label for={0}>{2}</label><select id='{0}' class='form-control' {3} {4} <!--USERDATA--> >{5}</select></div>",
+             checkboxModel = "<div class='form-group {1}' id='grp_{0}'><label>{4}</label><div class='checkbox'><label><input type='checkbox' value='{3}' id='{0}' {5} {6} <!--USERDATA--> >{2}</label></div></div>",
+             radioModel = "<div class='{1}' id='grp_{0}'><div class='radio'><label><input type='radio' name='{3}' id='{0}' value='{4}' {5} <!--USERDATA--> >{2}</label></div></div>",
+             textareaModel = "<div class='form-group {1}' id='grp_{0}'><label for='{0}'>{2}</label><textarea class='form-control' id='{0}' cols='{3}' rows='{4}' {5} {6} <!--USERDATA--> ></textarea></div>",
+             formModel = "<form role='form' id='{0}' data-prefix='{2}' class='{1}' {3} <!--USERDATA--> >{4}</form>";
      
            masterObject = masterObject || {};
            if ("string" == typeof masterObject) {
@@ -10856,7 +10954,7 @@
                    /* o problema Ã© adiar as opÃ§oes do select */
                    if (jList[i].query) {
                      html += selectModelWithQuery.format(elementId, jList[i].class, jList[i].label || '', groupingSpecs, null);
-                     for(var auxP in jList[i].query.params) {
+                     for (var auxP in jList[i].query.params) {
                        if (jList[i].query.params.hasOwnProperty(auxP)) {
                          jList[i].query.params[auxP] = yAnalise(jList[i].query.params[auxP], undefined, formManager);
                        }
@@ -10864,9 +10962,9 @@
                      _loadSelectOptions(jList[i].query, elementId, (jList[i].readOnly || '').toUpperCase() == 'YES');
                    } else if (jList[i].options) {
                      var auxOptions = '';
-                     for(var op in jList[i].options) {
+                     for (var op in jList[i].options) {
                        if (jList[i].options.hasOwnProperty(op)) {
-                         auxOptions+="<option value='{0}'>{1}</option>".format(jList[i].options[op].value, jList[i].options[op].label);
+                         auxOptions += "<option value='{0}'>{1}</option>".format(jList[i].options[op].value, jList[i].options[op].label);
                        }
                      }
                      html += selectModelWithOptions.format(elementId, jList[i].class, jList[i].label || '', groupingSpecs, null, auxOptions);
@@ -11032,22 +11130,22 @@
              }
            }
      
-           var __addEvent = function(elementId, eventName, eventHandler)  {
-             if (eventName=='changeOrBlur') {
+           var __addEvent = function(elementId, eventName, eventHandler) {
+             if (eventName == 'changeOrBlur') {
                var auxElement = y$(elementId);
-               if ("undefined" == typeof (auxElement ||{}).length) {
-                 if ((auxElement.nodeName=='INPUT') && (!((auxElement.type=='radio') || (auxElement.type=='checkbox'))))
+               if ("undefined" == typeof(auxElement || {}).length) {
+                 if ((auxElement.nodeName == 'INPUT') && (!((auxElement.type == 'radio') || (auxElement.type == 'checkbox'))))
                    __addEvent(elementId, 'blur', eventHandler);
                  else
                    __addEvent(elementId, 'change', eventHandler);
                } else {
-                 for(var el=0; el<(auxElement ||{}).length || 0; el++) {
+                 for (var el = 0; el < (auxElement || {}).length || 0; el++) {
                    __addEvent(auxElement[el].id, eventName, eventHandler);
                  }
                }
              } else {
                addEvent(elementId, eventName, eventHandler);
-               if ((eventName == 'change')||(eventName == 'blur')) {
+               if ((eventName == 'change') || (eventName == 'blur')) {
                  if ("undefined" == typeof dispatchedEvents["{0}.{1}".format(eventName, elementId)]) {
                    dispatchedEvents["{0}.{1}".format(eventName, elementId)] = true;
                    that.log("dispatching event {0} on{1}".format(elementId, eventName));
@@ -11073,7 +11171,7 @@
                        var evtError = '';
                        if ("object" == typeof window[ev[0]]) {
                          if ("function" == typeof window[ev[0]][ev[1]]) {
-                           __addEvent(elementId, eventName, window[ev[0]][ev[1]] );
+                           __addEvent(elementId, eventName, window[ev[0]][ev[1]]);
                          } else {
                            evtError = "'{0}' not found in '{1}'".format(ev[1], ev[0]);
                          }
@@ -11091,27 +11189,23 @@
            }
      
            if ("undefined" != typeof flatpickr) {
-             flatpickr(".date-select-field",{dateFormat: "d/m/Y"});
+             flatpickr(".date-select-field", { dateFormat: "d/m/Y" });
            }
      
            if ("undefined" != typeof InputMask) {
-             new InputMask().Initialize(document.querySelectorAll(".masked-year-field"),
-             {
+             new InputMask().Initialize(document.querySelectorAll(".masked-year-field"), {
                mask: InputMaskDefaultMask.DateMonthYear,
                placeHolder: "yyyy"
              });
-             new InputMask().Initialize(document.querySelectorAll(".masked-month-year-field"),
-             {
+             new InputMask().Initialize(document.querySelectorAll(".masked-month-year-field"), {
                mask: InputMaskDefaultMask.DateMonthYear,
                placeHolder: "mm/yyyy"
              });
-             new InputMask().Initialize(document.querySelectorAll(".masked-date-field"),
-             {
+             new InputMask().Initialize(document.querySelectorAll(".masked-date-field"), {
                mask: InputMaskDefaultMask.Date,
                placeHolder: "dd/mm/yyyy"
              });
-             new InputMask().Initialize(document.querySelectorAll(".masked-time-field"),
-             {
+             new InputMask().Initialize(document.querySelectorAll(".masked-time-field"), {
                mask: InputMaskDefaultMask.TimeShort,
                placeHolder: "hh:mm"
              });
@@ -11128,7 +11222,7 @@
            function(solve, reject) {
      
              solve({
-               'html': "<div class='json-dyn-form'>"+createFields(formInfoJ)+'</div>',
+               'html': "<div class='json-dyn-form'>" + createFields(formInfoJ) + '</div>',
      
                'eventList': eventList,
                'apiUsage': apiUsageList
@@ -11178,7 +11272,7 @@
          var tables = y$('.table');
          if (tables) {
            tables.forEach(function(table) {
-             if ((table.getAttribute('data-dbtable') || 'no')=='yes') {
+             if ((table.getAttribute('data-dbtable') || 'no') == 'yes') {
                ycomm.dom.fillElement(table.id, {});
              }
            });

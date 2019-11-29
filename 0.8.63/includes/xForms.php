@@ -1,9 +1,9 @@
 <?php
 /*
     includes/xForms.php
-    YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
+    YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
     Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-    2019-04-11 11:11:57 (-3 DST)
+    2019-11-29 09:20:48 (-2 DST)
 */
 
   global $cfgMainFolder;
@@ -1220,6 +1220,7 @@
       $unknowedFields='';
       $erros=0;
       foreach($this->xfFields as $fieldName => $fieldType) {
+        $fieldType=trim($fieldType);
         $fieldName = cleanFieldName($fieldName, $fieldPrefix, $fieldPostfix);
         $exportVarValue = false;
         if ($this->convertOnSaving) {
@@ -1311,7 +1312,7 @@
       $whereSQL='';
       foreach($keyTypes as $k=>$t) {
         $v=$keyValues[$k];
-        $t=strtolower($t);
+        $t=strtolower(trim($t));
 
         $keyDef="$k:$t";
         _dumpY(64,1,$keyDef);
@@ -1324,6 +1325,7 @@
           case 'numeric':
             $v=intval($v);
             break;
+          case 'char':
           case 'unique':
           case 'uniquemd5':
           case 'sequence32':
@@ -1367,6 +1369,7 @@
                 $GLOBALS[$k]=$v;
                 break;
               case 'unique':
+              case 'char':
               case 'uniquemd5':
               case 'sequence32':
               case 'unique40':
@@ -1913,7 +1916,7 @@
       )
     );
 
-    $ret=json_encode($ret, JSON_PRETTY_PRINT);
+    $ret=json_encode($ret, JSON_FLAGS);
     return $ret;
   }
 

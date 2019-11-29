@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # http://developer.yahoo.com/yui/compressor/
+
 YUI_COMPRESSOR=/usr/local/bin/yuicompressor-2.4.8.jar
 
 case "$1" in

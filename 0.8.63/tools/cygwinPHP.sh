@@ -4,12 +4,12 @@
 
 # Path to the PHP executable
 php="%PHP%"
- 
+
 for ((n=1; n <= $#; n++)); do
     if [ -e "${!n}" ]; then
         # Converts Unix style paths to Windows equivalents
         path="$(cygpath --mixed ${!n} | xargs)"
- 
+
         case 1 in
             $(( n == 1 )) )
                 set -- "$path" "${@:$(($n+1))}";;
@@ -20,5 +20,5 @@ for ((n=1; n <= $#; n++)); do
         esac
     fi
 done
- 
+
 "$php" "$@"
