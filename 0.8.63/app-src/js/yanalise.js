@@ -1,8 +1,8 @@
 /*********************************************
  * app-src/js/yanalise.js
- * YeAPF 0.8.63-106 built on 2019-07-11 09:42 (-3 DST)
- * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
- * 2018-09-18 06:23:51 (-3 DST)
+ * YeAPF 0.8.63-259 built on 2020-02-26 11:44 (-3 DST)
+ * Copyright (C) 2004-2020 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
+ * 2020-02-26 11:39:25 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yLexObj introduced in 2016-08-22 0.8.50-0
 **********************************************/
@@ -12,7 +12,8 @@ function yAnalise(aLine, aStack, aObject) {
   "use strict";
   if (aLine !== undefined) {
 
-    aLine = unmaskHTML(aLine);
+    if ("string" == typeof aLine)
+      aLine = unmaskHTML(aLine);
     if (true === window.__allowInsecureJSCalls__) {
       aObject = aObject || window;
     } else {
@@ -21,7 +22,7 @@ function yAnalise(aLine, aStack, aObject) {
 
     /* var yPattern = /%[+(\w)]|[]\(/gi; */
     var yPattern = /\%(|\w+)\(/gi;
-    var yFunctions = ',int,integer,intz,intn,decimal,ibdate,tsdate,tstime,tsdatetime,date,time,lat2deg,lon2deg,words,image,nl2br,quoted,singleQuoted,condLabel,checked,rg,cpf,cnpj,phone,cep,brDocto';
+    var yFunctions = ',int,integer,intz,intn,decimal,ibdate,tsdate,tstime,tsdatetime,date,time,lat2deg,lon2deg,words,image,nl2br,quoted,singleQuoted,condLabel,checked,rg,cpf,cnpj,phone,cep,brDocto,bool2str,str2bool,';
     var p, p1, p2, c1, c2, p3;
     var aValue = '';
 
@@ -101,6 +102,12 @@ function yAnalise(aLine, aStack, aObject) {
             break;
           case 'phone':
             aValue = (aValue || '').asPhone();
+            break;
+          case 'bool2str':
+            aValue = bool2str(aValue, false);
+            break;
+          case 'str2bool':
+            aValue = str2bool(""+aValue, false);
             break;
           case 'lon2deg':
             aValue = dec2deg(aValue, false);

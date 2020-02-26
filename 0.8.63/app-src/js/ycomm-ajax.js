@@ -1,8 +1,8 @@
   /********************************************************************
    * app-src/js/ycomm-ajax.js
-   * YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
-   * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-   * 2019-11-29 09:20:48 (-2 DST)
+   * YeAPF 0.8.63-259 built on 2020-02-26 11:44 (-3 DST)
+   * Copyright (C) 2004-2020 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
+   * 2020-02-26 11:39:25 (-3 DST)
    *
    * Com o advento do WebSocket, precisamos de novas formas para
    * provocar o servidor.
@@ -80,9 +80,9 @@
     };
   }
 
-  ycomm.scriptName = yloader.isWorker?'../query.php':'query.php';
+  ycomm.scriptName = document.location.href.split("#")[0] + '/' + (yloader.isWorker?'../query.php':'query.php');
 
-  ycomm.defaultMethod = 'post';
+  ycomm.defaultMethod = 'POST';
   ycomm.canReceiveMessages = true;
 
   /* receive the xml envelope and split it in parts in order

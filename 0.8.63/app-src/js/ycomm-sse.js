@@ -1,8 +1,8 @@
     /********************************************************************
      * app-src/js/ycomm-sse.js
-     * YeAPF 0.8.63-242 built on 2019-11-29 09:22 (-2 DST)
-     * Copyright (C) 2004-2019 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-     * 2019-11-29 09:20:48 (-2 DST)
+     * YeAPF 0.8.63-259 built on 2020-02-26 11:44 (-3 DST)
+     * Copyright (C) 2004-2020 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
+     * 2020-02-26 11:39:25 (-3 DST)
      ********************************************************************/
     var ycommSSEBase2 = function(params, initCallback) {
       // PARAMETERS
@@ -205,6 +205,7 @@
               var info = data[0] || data;
               if (info.ok) {
                 that.w = params.workgroup;
+                that.u = params.user;
                 that.sse_session_id = info.sse_session_id;
                 /* cfgSSEUserAliveInterleave -> userAliveInterval
                    it comes in seconds
