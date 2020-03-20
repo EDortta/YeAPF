@@ -1,0 +1,202 @@
+#!/usr/bin/php
+<?php
+/*
+    tools/yDoc/ydocimport
+    YeAPF 0.8.64-7 built on 2020-03-20 13:04 (-3 DST)
+    Copyright (C) 2004-2020 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
+    2018-05-30 11:21:05 (-3 DST)
+*/
+
+  $myself=basename($argv[0]);
+  echo "YeAPF 0.8.64 $myself\nCopyright (C) 2004-2020 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n\n";
+  if (!file_exists("yeapf.php")) {
+    die("$myself need to be invoked from a well configured YeAPF folder.\n=============================================================\nBEWARE!.It will write data on your local configured database!\n=============================================================\n");
+  }
+  require_once "yeapf.php";
+
+  function object2array($object) { return @json_decode(@json_encode($object),1); }
+
+  function checkDatabaseStructure()
+  {
+    if (!db_tableExists('ydoc_projects')) {
+      db_sql('CREATE TABLE "ydoc_projects" (
+                          "id" char(32) NOT NULL,
+                          "name" varchar(80) NOT NULL,
+                          "description" text NOT NULL
+                        );');
+    }
+
+    if (!db_tableExists('ydoc_versions')) {
+      db_sql('CREATE TABLE "ydoc_versions" (
+                          "id" char(32) NOT NULL,
+                          "project" char(32) NOT NULL,
+                          "firstRelease" char(14) NOT NULL,
+                          "lastUpdate" char(14) NOT NULL,
+                          "version" integer NOT NULL
+                        );');
+    }
+    if (!db_tableExists('ydoc_functions')) {
+      db_sql('CREATE  "ydoc_functions" (
+                      "id" char(32) NOT NULL,
+                      "name" varchar(80) NOT NULL,
+                      "status" int(11) DEFAULT NULL,
+                      "scope" int(11) DEFAULT NULL,
+                      "version" char(32) NOT NULL,
+                      "filename" varchar(80) NOT NULL,
+                      "md5" char(32) NOT NULL,
+                      "start" int(11) NOT NULL,
+                      "end" int(11) NOT NULL,
+                      PRIMARY KEY ("id"),
+                      KEY "nameVersion" ("name","version")
+                    )');
+    }
+
+    if (!db_tableExists('ydoc_parameters')) {
+      db_sql('CREATE TABLE "ydoc_parameters" (
+                          "id" char(32) NOT NULL,
+                          "function" char(32) NOT NULL,
+                          "name" varchar(80) NOT NULL,
+                          "o" INT NULL DEFAULT NULL,
+                          "type" varchar(40) NOT NULL,
+                          "default" varchar(120) NOT NULL
+                        );');
+    }
+
+    if (!db_tableExists('ydoc_function_explained')) {
+      db_sql('CREATE TABLE "ydoc_function_explained" (
+                          "id" char(32) NOT NULL,
+                          "lang" varchar(20) NOT NULL DEFAULT "en",
+                          "version" char(32) NOT NULL,
+                          "name" varchar(80) NOT NULL,
+                          "brief" varchar(250) DEFAULT NULL,
+                          "explained" text NOT NULL,
+                          UNIQUE KEY "uniqueID" ("id"),
+                          KEY "LangVerName" ("lang","version","name")
+                        )"');
+    }
+
+  }
+
+  function grantID($fieldReference, $fieldValue)
+  {
+    $fieldReference = explode('.',$fieldReference);
+    $tableName = $fieldReference[0];
+    $fieldName = $fieldReference[1];
+
+    $id = db_sql("select id from `$tableName` where `$fieldName`='$fieldValue'");
+    if (trim($id=='')) {
+      $id=md5(y_uniqid('grantID',true));
+      db_sql("insert into `$tableName` (id, `$fieldName`) values ('$id', '$fieldValue')");
+    }
+    return $id;
+  }
+
+  $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
+  $cmRequired=false;
+  if (file_exists("$mydir/yclilib.php"))
+    $cmLocation = "$mydir/yclilib.php";
+  else
+    $cmLocation = "$mydir/../yclilib.php";
+
+  (@include_once "$cmLocation") or die("yclilib.php not found\n");
+
+  $cwd=getcwd();
+  $args = new ArgumentsProcessor(false);
+
+  if (($args->argValue('h;help')==true) || ($argc<2)) {
+    die("usage:\n\t$myself <project-name> [--append] [--xdb <file-name></file-name>]\n\t--append can be used to not overwrite current version documentation.\n\tThe default action is to overwrite it.\n\t-- xdb indicates which xdb file is to be used\n\n");
+  }
+
+  checkDatabaseStructure();
+
+  $append=$args->argValue('append',0);
+  $xdb=$args->argValue('xdb',0);
+  $projectName = trim($args->getSrc(0));
+
+  $appendLabel = (($append===__TRUE__)?"Yes":"No");
+  echo "Project: $projectName\nAppend: $appendLabel\nXDB: $xdb\n";
+
+  if (file_exists($xdb)) {
+    $projectID = grantID('ydoc_projects.name', $projectName);
+    echo "Project ID: $projectID\n";
+
+    $xdbInfo = pathinfo($xdb);
+    $xdbVersion = ver2value(substr($xdbInfo['filename'],0,40));
+
+    if ($xdbVersion<=0)
+      die("\nERROR: This program need at least 0.0.1 version\n");
+
+    $xdbVersionTag = value2ver($xdbVersion);
+
+    $now=date("Ymdhis");
+
+    $versionID = db_sql("select id from ydoc_versions where project='$projectID' and version='$xdbVersion'");
+    if ($versionID=='') {
+      $versionID = md5(y_uniqid());
+      db_sql("insert into ydoc_versions (id, project, firstRelease, version)
+              values ('$versionID', '$projectID', '$now', '$xdbVersion')");
+    }
+    db_sql("update ydoc_versions set lastUpdate='$now' where id='$versionID'");
+
+    echo "Version: $xdbVersionTag  ($versionID)\n";
+
+    $xml = simplexml_load_file($xdb);
+    $arr = object2array($xml);
+    foreach($arr as $fileName => $fileInfo) {
+      echo "$fileName\n";
+      $functions = $fileInfo['functions'];
+      foreach($functions as $func => $funcDef) {
+        echo "\t".substr($func.str_repeat(' ',40),0,40);
+        $functionID = db_sql("select id from ydoc_functions where name='$func' and version='$versionID'");
+        if ($functionID=='') {
+          $functionID = md5(y_uniqid());
+          db_sql("insert into ydoc_functions(id, name, version) values ('$functionID', '$func', '$versionID')");
+        }
+
+        if (!isset($funcDef['code'])) {
+          $md5='null';
+          $start='null';
+          $code='null';
+        } else {
+          $md5="'".$funcDef['code']['md5']."'";
+          $start=intval($funcDef['code']['start']);
+          $end=intval($funcDef['code']['end']);
+        }
+
+        echo "\t$functionID ( ";
+        db_sql("update ydoc_functions set filename='$fileName', md5=$md5, start=$start, end=$end where id='$functionID'");
+
+        if (isset($funcDef['parameters'])) {
+          $pCount=0;
+          foreach($funcDef['parameters'] as $paramName => $paramDef) {
+            if ($pCount++>0)
+              echo ", ";
+            if (is_numeric($paramName)) {
+              die(var_dump($funcDef['parameters']));
+              $paramName=$funcDef['parameters'][$paramName];
+            }
+
+            echo $paramName.' ';
+            $parameterID = db_sql("select id from ydoc_parameters where name='$paramName' and function='$functionID'");
+            if ($parameterID == '') {
+              $parameterID = md5(y_uniqid());
+              db_sql("insert into ydoc_parameters (id, function, name) values ('$parameterID', '$functionID', '$paramName')");
+            }
+
+            db_sql("update ydoc_parameters set o=$pCount where id='$parameterID'");
+
+            if (isset($paramDef['default'])) {
+              $defaultParamValue=mysql_real_escape_string(unquote(urldecode($paramDef['default'])));
+              echo "= '$defaultParamValue' ";
+              db_sql("update ydoc_parameters set `default`='$defaultParamValue' where id='$parameterID'");
+            }
+          }
+        } else
+          db_sql("delete from ydoc_parameters where function='$functionID'");
+
+        echo ")\n";
+      }
+    }
+  } else
+    echo "'$xdb' file not found\n";
+?>

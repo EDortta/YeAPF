@@ -1,0 +1,50 @@
+    <!doctype html>
+    <html lang="#(appLang)">
+
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <meta name="description" content="(appDescription)">
+      <title>#(appTitle)</title>
+      <meta name="description" content="#(appName)">
+      <meta name="author" content="#(appAuthor)">
+      <link rel="stylesheet" href="css/pure-min.css">
+      <!--[if lte IE 8]>
+    <link rel="stylesheet" href="css/grids-responsive-old-ie-min.css">
+<![endif]-->
+      <!--[if gt IE 8]><!-->
+      <link rel="stylesheet" href="css/grids-responsive-min.css">
+      <!--<![endif]-->
+      <link rel="stylesheet" href="css/font-awesome.css">
+      <!--[if lte IE 8]>
+        <link rel="stylesheet" href="css/layouts/marketing-old-ie.css">
+    <![endif]-->
+      <!--[if gt IE 8]><!-->
+      <link rel="stylesheet" href="css/layouts/marketing.css">
+      <!--<![endif]-->
+    </head>
+
+    <body>
+      <div class="content">
+        <div class="pure-g">
+          <div class="l-box-lrg pure-u-md-1-5">
+          </div>
+          <div class="l-box-lrg pure-u-md-2-5">
+            <form class="pure-form pure-form-stacked" method="post" action="index.php">
+              <input type="hidden" name="s" value="createUser">
+              <fieldset>
+                <label for="q2">Your Name</label>
+                <input name="q2" id="q2" type="text" placeholder="Your Name">
+                <label for="q4">Your Email</label>
+                <input name="q4" id="q4" type="text" placeholder="Your Email">
+                <label for="q1">Password</label>
+                <input id="q1" name="q1" type="password" placeholder="Your Password">
+                <label for="q3">Password Again</label>
+                <input id="q3" name="q3" type="password" placeholder="Your Password">
+                <button type="submit" class="pure-button">Enter</button>
+              </fieldset>
+            </form>
+          </div>
+        </div>
+      </div>
+    </body>

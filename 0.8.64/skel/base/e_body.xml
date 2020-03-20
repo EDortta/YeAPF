@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<root>
+  #(xmlData)
+  <sgug>
+    <version>
+      YeAPF 0.8.64-7 built on 2020-03-20 13:04 (-3 DST)
+    </version>
+    <mtime>
+      2018-06-01 09:31:47 (-3 DST)
+    </mtime>
+    <timestamp>
+      #(sysTimeStamp)
+    </timestamp>
+    <devsession>
+      #(devSession)
+    </devsession>
+  </sgug>
+</root>

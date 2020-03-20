@@ -1,0 +1,505 @@
+#!/usr/bin/php
+<?php
+  /*
+  tools/yapp
+  YeAPF 0.8.64-7 built on 2020-03-20 13:04 (-3 DST)
+  Copyright (C) 2004-2020 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
+  2019-09-09 08:27:18 (-3 DST)
+  */
+  $mydir = dirname($_SERVER['SCRIPT_FILENAME']);
+  $cmRequired = false;
+  (@include_once "$mydir/yclilib.php") or die("yclilib.php not found\n");
+
+  if (file_exists(".config/yeapf.config")) {
+    (@include_once ".config/yeapf.config") or die("Error loading '.config/yeapf.config'");
+
+  }
+
+  function grantAppFolder($folderName) {
+    if (!is_dir($folderName)) {
+      if (@mkdir($folderName))
+        return true;
+      else
+        die("Was not possible to create '$folderName'\n");
+    }
+  }
+
+  function process_ini_file($yapp_ini_filename) {
+    global $args, $yappContext;
+
+    $yapp_ini = file_get_contents($yapp_ini_filename);
+    $yappContext = array(
+      'template'  => @$GLOBALS['template'],
+      'fromSample'=> @$GLOBALS['fromSample'],
+      'appName'   => @$GLOBALS['appName'],
+      'appType'   => @$GLOBALS['appType'],
+      'appFolder' => @$GLOBALS['appFolder']
+    );
+    $auxArgs = $args->getOptionList();
+    foreach ($auxArgs as $key => $value) {
+      if (mb_strtolower(mb_substr($key, 0, 3)!='app'))
+        $yappContext['app'.ucfirst($key)] = $value;
+      else
+        $yappContext[$key] = $value;
+    }
+    foreach($yappContext as $yKey => $yValue) {
+      $yapp_ini = preg_replace("/\%\($yKey\)/", "$yValue", $yapp_ini);
+    }
+    $yapp_ini = parse_ini_string($yapp_ini, true);
+
+    $yapp_ini_return = array('parameters'=>array());
+    if (!isset($yapp_ini['subst']))
+      $yapp_ini_return['subst']=array('*');
+    else
+      $yapp_ini_return['subst']=$yapp_ini['subst'];
+
+    if (isset($yapp_ini['parameters'])) {
+      foreach($yapp_ini['parameters'] as $param=>$default) {
+        if (mb_strtolower(mb_substr($param, 0, 3)!='app'))
+          $keyName = 'app'.ucfirst($param);
+        else
+          $keyName = $param;
+        if (!isset($yapp_ini_return['parameters'][$keyName])) {
+          $yapp_ini_return['parameters'][$keyName] = $args->argValue($param, $default);
+        }
+      }
+    } else {
+
+    }
+    /*
+    foreach ($yappContext as $key => $value) {
+      if (mb_substr($key, 0, 3)=='app') {
+        if (!((mb_substr($key, 3)=='Type') || (mb_substr($key, 3)=='Name') || (mb_substr($key, 3)=='Folder')))   {
+          $yapp_ini['parameters'][$key]=trim($value);
+        }
+      }
+    }*/
+
+    return $yapp_ini_return;
+  }
+
+  function showAuxParameters($dirName) {
+    if (is_dir($dirName)) {
+      if (file_exists("$dirName/yapp.ini")) {
+        $aux = process_ini_file("$dirName/yapp.ini");
+        if (isset($aux['parameters'])) {
+          foreach($aux['parameters'] as $param=>$default) {
+            echo "\t\t\t--$param";
+            if ($default>'') {
+              echo "\t(defaults to $default) ";
+            }
+            echo "\n";
+          }
+        }
+      }
+    }
+  }
+
+  function substFileMacros($aFolder) {
+    global $yappContext, $appFolder;
+
+    $privateFolders = array("deathLogs", "logs", "lib");
+    if (!in_array(basename($aFolder), $privateFolders)) {
+      echo " (subst) ".substr($aFolder,strlen($appFolder)+1)."\n";
+      if ((mb_substr($aFolder, mb_strlen($aFolder)-1,1))!="*")
+        $folder=$aFolder."/*";
+      else
+        $folder=$aFolder;
+
+      $files=glob("$folder");
+      foreach($files as $fileName) {
+        echo " (subst) ".substr($fileName, strlen($appFolder)+1)."\n";
+        if (!(($fileName=='.') || ($fileName=='..'))) {
+          if (is_dir("$fileName")) {
+            substFileMacros("$fileName");
+          } else {
+
+            $tempFile = file_get_contents("$fileName");
+            foreach($yappContext as $yKey => $yValue) {
+              $tempFile = preg_replace("/\%\($yKey\)/", "$yValue", $tempFile);
+            }
+            file_put_contents("$fileName", $tempFile);
+          }
+        }
+      }    
+    }
+  }
+
+  echo basename("tools/yapp") . "\nYeAPF 0.8.64 tools\nCopyright (C) 2004-2020 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n\n";
+  $args = new ArgumentsProcessor();
+  $appFolder = $args->getSrc(0);
+  $toHelp = $args->argValue('help', __FALSE__) == __TRUE__;
+  $toForce = $args->argValue('force', __FALSE__) == __TRUE__;
+  $toUpdate = $args->argValue('update', __FALSE__) == __TRUE__;
+  $beAutonomous = $args->argValue('autonomous', __FALSE__) == __TRUE__;
+  $appType = $args->argValue('appType', '');
+  $template = $args->argValue('template', '');
+  $fromSample = $args->argValue('fromSample', '');
+  $appName = $args->argValue('name', basename($appFolder));
+  $toCreate = $args->argValue('create', '');
+  $YFolder = $args->argValue('source', $__yeapfPath);
+  /* Since 0.8.60 yapp saves the location of the projetcs in __yeapfPath/.projects folder.
+  This is like this in order to help yapp to update/list all the projects at a time */
+
+  if (!is_dir("$__yeapfPath/.projects")) {
+    if (!mkdir("$__yeapfPath/.projects")) {
+      die("You have not enough rights to create '$__yeapfPath/.projects'\n");
+    }
+  }
+
+  if (trim($appFolder) == '') {
+    /*"./"*/
+    $appFolder = getcwd();
+  }
+
+  if (!is_writable(dirname("$appFolder"))) {
+    $appHolder = dirname($appFolder);
+    die("You have not enough rights to write in '$appHolder'\n");
+  }
+
+  if (is_dir("$appFolder/.config")) {
+    if (!is_writable("$appFolder/.config")) {
+      die("You don't have enough rights to write in '$appFolder/.config'\n");
+    }
+    @chmod("$appFolder/.config", 0777);
+  }
+
+  $yeapfAppIniFilename = "$appFolder/.config/yeapf-tools.ini";
+  /*  backguard compatibility
+  transform yTemplate.txt in yeapf-tools.ini
+  */
+
+  if (file_exists("$appFolder/.config/yTemplate.txt")) {
+    if (($appType == '') || ($appType == 'webApp')) {
+      /* if yTemplate.txt exists, it's a webApp */
+      $appType = 'webApp';
+      $templateUsed = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', join('', file("$appFolder/.config/yTemplate.txt")));
+      /* upgrade file structure */
+      $yeapfAppIni = "[app]\nappType=webApp\ntemplate=$templateUsed\n";
+      if (file_put_contents("$yeapfAppIniFilename", $yeapfAppIni)) {
+        if (!unlink("$appFolder/.config/yTemplate.txt")) {
+          die("Was not possible to delete '$appFolder/.config/yTemplate.txt'\n");
+        } else {
+          die("Was not possible to create '$yeapfAppIniFilename' file\n");
+        }
+      }
+
+      /* the new template need to be equals to the old one in order to update */
+      if (($template > '') && ($templateUsed != $template)) {
+        die("Your folder is configured to use '$templateUsed' template.\n\n");
+      } else {
+        $template = $templateUsed;
+      }
+    } else {
+      die("This folder is a webApp. So you cannot use it with another skeleton.");
+    }
+  }
+
+  /* load current configuration */
+
+  if (($appType == '') && ($template == '') && ($fromSample=='')) {
+    if (file_exists($yeapfAppIniFilename)) {
+      $yeapfAppIni = parse_ini_file($yeapfAppIniFilename);
+      $appType = $yeapfAppIni['appType'];
+      $template = $yeapfAppIni['template'];
+      $fromSample = $yeapfAppIni['fromSample'];
+      if (isset($yeapfAppIni['autonomous'])) {
+        $aux = mb_strtolower(trim(" ".$yeapfAppIni['autonomous']));
+        if (strlen($aux)>0)
+          $beAutonomous = strpos(",yes,true,on,1,", mb_strtolower($aux))>0;
+        unset($aux);
+      }
+      if (!is_writeable($yeapfAppIniFilename)) {
+        die("You have not enough rights to write '$yeapfAppIniFilename'\n");
+      }
+    }
+  }
+
+  if ($beAutonomous)
+    echo "Configured as autonomous application\n";
+
+
+  $toHelp = $toHelp || (!(($toUpdate) || ($toCreate)));
+
+  if ( (($appType == '') && ($fromSample == '')) ||
+       (($appType>'') && ($fromSample>'')) ||
+       ($toHelp) ||
+       ($appFolder == '') ) {
+    echo "YeAPF application builder\n";
+    echo "simple usage:\n\t" . basename("tools/yapp") . " [app-folder] [options]\n\n";
+    echo "options:\n";
+    echo "\t--create\n";
+    echo "\t--force\n";
+    echo "\t--update\n";
+    echo "\t--autonomous\n\t\tCreate/update 'includes' and 'lib' folders\n";
+    echo "\t--name <app-name>\n\t\tDefaults to app-folder's basename\n";
+    echo "\t--source <YeAPF source folder>\n\t\tDefaults to '$__yeapfPath'\n";
+    echo "\t--appType <app-type-name> (Cannot be used with --fromSample)\n";
+    if (is_dir("$YFolder/skel")) {
+      $d = dir("$YFolder/skel");
+      while ($entry = $d->read()) {
+        if (substr($entry, 0, 1) != '.') {
+          echo "\t\t$entry\n";
+          showAuxParameters("$YFolder/skel/$entry");
+        }
+      }
+    } else {
+      echo "\t\tYour source of distribution in '$YFolder' does not contain any skeleton\n";
+    }
+
+    echo "\t--template <template-name>\t(applies ONLY to webApp)\n";
+    if (is_dir("$YFolder/skel/webApp/templates")) {
+      $d = dir("$YFolder/skel/webApp/templates");
+      while ($entry = $d->read()) {
+        if (substr($entry, 0, 1) != '.') {
+          echo "\t\t$entry\n";
+          showAuxParameters("$YFolder/skel/webApp/templates/$entry");
+        }
+      }
+    } else {
+      echo "\t\tYour source of distribution in '$YFolder/skel/webApp/templates' does not contain any template\n";
+    }
+
+    echo "\t--fromSample <sample-name>\t(Cannot be used with --appType)\n";
+    if (is_dir("$YFolder/samples")) {
+      $d = dir("$YFolder/samples");
+      while ($entry = $d->read()) {
+        if (substr($entry, 0, 1) != '.') {
+          echo "\t\t$entry\n";
+          showAuxParameters("$YFolder/samples/$entry");
+        }
+      }
+    } else {
+      echo "\t\tYour source of distribution in '$YFolder/samples' does not contain any sample\n";
+    }
+
+    echo "\n* app-folder defaults to current folder if .config exists\n";
+    if ($appFolder == '') {
+      echo "\nYou need to declare an 'app-folder' name.\nIf it not exists, we will create it\n";
+    } else {
+      echo "\nCurrent config:\n\tapp-folder:\t$appFolder";
+      if ($appType>'') {
+        echo "\n\tappType:\t$appType\n\ttemplate:\t$template\n";
+      } else if ($fromSample>"") {
+        echo "\n\tfromSample:\t$fromSample\n";
+      }
+    }
+
+    die("\n\n");
+  }
+
+  /* grant app folders */
+  if (!is_dir($appFolder)) {
+    if (!mkdir($appFolder, 0777)) {
+      die("You have not enough rights to create '$appFolder'\n");
+    }
+  }
+
+  if (@chmod($appFolder, 0777)) {
+    if (!is_dir("$appFolder/.config")) {
+      if (!mkdir("$appFolder/.config", 0777, true)) {
+        die("\nWas not possible to create '$appFolder/.config'\n");
+      }
+    }
+
+    if (!is_writable($appFolder)) {
+      die("'$appFolder' is not writable\n");
+    }
+
+    /* clean current environment */
+    $environmentFiles = array(
+      "yeapf.php",
+      "configure.md5",
+      "WebSocketEmptyImplementation.php"
+    );
+    foreach($environmentFiles as $key => $fileName) {
+      if (file_exists("$appFolder/$fileName")) {
+        if (!unlink("$appFolder/$fileName")) {
+          die("You cannot delete '$appFolder/$fileName'\n");
+        }
+      }
+    }
+
+    /* granting personalized yeapf.db.ini */
+    if (!file_exists("$appFolder/yeapf.db.ini")) {
+      if (file_exists("$YFolder/skel/base/yeapf.db.ini")) {
+        $aux = join("", file("$YFolder/skel/base/yeapf.db.ini"));
+        $aux = str_replace('%(appFolder)', $appFolder, $aux);
+        $newAppRegistry = md5(uniqid('YeAPF-app', true));
+        $aux = str_replace('%(newAppRegistry)', $newAppRegistry, $aux);
+        $f = fopen("$appFolder/yeapf.db.ini", "w");
+        fwrite($f, $aux);
+        fclose($f);
+        echo "\n+------------------------------------";
+        echo "\n| Adjust database connection in \n| '$appFolder/yeapf.db.ini' first\n| then navigate to 'configure.php'";
+        echo "\n+------------------------------------\n";
+      } else {
+        echo "$YFolder/skel/base/yeapf.db.ini not found in skel/base folder!\n";
+      }
+    } else {
+      echo "yeapf.db.ini not touched\n";
+    }
+
+    $exts = array(
+      "css",
+      "xml",
+      "php",
+      "html",
+      "js",
+      "json"
+    );
+    $folders = array(
+      "css",
+      "js",
+      "fonts",
+      "img",
+      "lib",
+      "samples",
+      "www"
+    );
+    if ($toCreate) {
+      echo "Installing:\n";
+    } else {
+      if ($toForce) {
+        echo "Forcing update:\n";
+      } else {
+        echo "Updating:\n";
+      }
+    }
+
+    /* Update/Install files */
+    if ($appType>'') {
+      foreach($exts as $e) {
+        updateFiles("$YFolder/skel/$appType", "*.$e", "$appFolder", ($toCreate || $toForce));
+      }
+      updateFiles("$YFolder/skel/$appType", "config.ini", "$appFolder", $toCreate);
+
+      /* Update/Install support folders */
+      foreach($folders as $folderName) {
+        updateFiles("$YFolder/skel/$appType/$folderName", "*", "$appFolder/$folderName", ($toCreate || $toForce));
+      }
+      $yapp_ini_filename = "$YFolder/skel/$appType/yapp.ini";
+    } else if ($fromSample>'') {
+      foreach($exts as $e) {
+        updateFiles("$YFolder/samples/$fromSample", "*.$e", "$appFolder", ($toCreate || $toForce));
+      }
+      updateFiles("$YFolder/samples/$fromSample", "config.ini", "$appFolder", $toCreate);
+
+      /* Update/Install support folders */
+      foreach($folders as $folderName) {
+        updateFiles("$YFolder/samples/$fromSample/$folderName", "*", "$appFolder/$folderName", ($toCreate || $toForce));
+      }
+      $yapp_ini_filename = "$YFolder/samples/$fromSample/yapp.ini";
+    }
+
+    if (file_exists($yapp_ini_filename)) {
+      $yapp_ini = process_ini_file($yapp_ini_filename);
+      if (isset($yapp_ini['subst'])) {
+        foreach ($yapp_ini['subst'] as $value) {
+          substFileMacros("$appFolder/$value");
+        }
+      }
+    }
+
+    /* change folder name in order to follow 0.8.63 distro modifications */
+    if (is_dir("$appFolder/lib/NuSOAP")) {
+      if (!is_dir("$appFolder/lib/nuSOAP")) {
+        if (!rename("$appFolder/lib/NuSOAP","$appFolder/lib/nuSOAP")) {
+          die("\nWas not possible to rename '$appFolder/lib/NuSOAP' to '$appFolder/lib/nuSOAP'\n");
+        }
+      } else {
+        echo "\nThere is a folder called '$appFolder/lib/nuSOAP' already.\nPlease remove it in order to continue\n";
+      }
+    }
+
+    if ($beAutonomous) {
+      echo "Granting autonomous support folders\n";
+      grantAppFolder("$appFolder/includes");
+      grantAppFolder("$appFolder/lib");
+      grantAppFolder("$appFolder/lib/nuSOAP");
+    }
+
+    if (is_dir("$appFolder/lib/nuSOAP")) {
+      updateFiles("$YFolder/lib/nuSOAP", "*", "$appFolder/lib/nuSOAP", ($toCreate || $toForce));
+    }
+
+    if (is_dir("$appFolder/includes")) {
+      updateFiles("$YFolder/includes", "*", "$appFolder/includes", ($toCreate || $toForce));
+    }
+
+    if (is_dir("$appFolder/YeAPF")) {
+      updateFiles("$YFolder", "*", "$appFolder/YeAPF", ($toCreate || $toForce));
+    }
+
+    if (!file_exists("$appFolder/search.path")) {
+      if ($beAutonomous)
+        $mySearchPath[] = "includes";
+      else
+        $mySearchPath[] = "$YFolder";
+    } else {
+      $mySearchPath = file("$appFolder/search.path");
+      foreach($mySearchPath as $i => $path) {
+        if (strpos($path, "YeAPF")) {
+          $mySearchPath[$i] = $YFolder;
+        }
+      }
+    }
+
+    echo "Updating $appFolder/search.path\n";
+    $f = fopen("$appFolder/search.path", "w");
+    foreach($mySearchPath as $i => $path) {
+      fputs($f, $path);
+    }
+    fclose($f);
+    /* update/install template */
+    if ($template > '') {
+      if (!is_dir("$YFolder/skel/webApp/templates/$template"))
+        die("Template $template not found\n");
+      updateFiles("$YFolder/skel/webApp/templates/$template", "*", "$appFolder/", ($toCreate || $toForce));
+    }
+
+    /* save application tools environment */
+    $yeapfAppIniAux = array(
+      "appType"=>$appType,
+      "template"=>$template,
+      "fromSample"=>$fromSample,
+      "folder"=>getcwd(),
+      "date"=>date("Y-m-dTH:i:s"),
+      "yeapfVersion"=>"%YEAPF_VERSION_SEQUENCE",
+      "autonomous"=>$beAutonomous?"yes":"no"
+    );
+    $yeapfAppIni = "[app]\n";
+    foreach($yeapfAppIniAux as $key=>$value) {
+      $yeapfAppIni.="$key=$value\n";
+    }
+    if (!file_put_contents("$yeapfAppIniFilename", $yeapfAppIni)) {
+      echo "\nWARNING!\n\tWas not possible to write '$yeapfAppIniFilename'\n";
+    }
+
+    if (copy($yeapfAppIniFilename, "$__yeapfPath/.projects/" . str_replace("/", "_", getcwd()) . ".ini")) {
+      $yeapfAppType = ($appType>'')?"appType:$appType($template)":"fromSample:$fromSample";
+      if ($toCreate) {
+        echo "YeAPF app ($yeapfAppType) called '$appFolder' created.\nModify 'yeapf.db.ini' and then run 'configure.php' from your browser\n";
+      } else {
+        echo "*PA means 'Pay Attention'. Those files are under your responsability.\n";
+        if ($toUpdate) {
+          echo "YeAPF app ($yeapfAppType) updated at $appFolder\n";
+          if ((isset($yeapfConfig)) && (isset($yeapfConfig['myself']))) {
+            $cfgURL = "http://localhost/" . $yeapfConfig['myself'] . "/configure.php";
+            echo "Calling '$cfgURL' ...\n";
+            file_get_contents($cfgURL);
+            echo "Ok\nThis folder was updated to YeAPF v0.8.64-7\n";
+          }
+          else {
+            echo "Remember to call 'configure.php' from your navigator\n";
+          }
+        }
+      }
+    } else {
+      die("Was not possible to copy '$yeapfAppIniFilename' onto '$__yeapfPath/.projects/'");
+    }
+  } else {
+    die("Was not possible to change user rights of '$appFolder'.");
+  }
+
+?>

@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset='utf-8'>
+  <title>Configure</title>
+  <meta content='width=device-width, initial-scale=1' name='viewport'>
+  <script type='text/javascript'>
+  #include("js/yloader.min.js")
+  </script>
+  <style>
+    #include("css/colors.min.css")
+    #include("css/roboto.min.css")
+    #include("css/simple-grid.min.css")
+    #include("css/normalize.min.css")
+    #include("css/milligram.min.css")
+
+    .adminSection{
+      border-top: dotted 1px gray;
+      padding-top: 18px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class='container'>
+    <div class='row'>
+      <div class='col-2'>
+        <input class="button button-clear" id='menuAppConfig' type="button" value="App &amp; conn">
+      </div>
+      <div class='col-2'>
+        <input class="button button-clear" id='menuSecurityConfig' type="button" value="Security">
+      </div>
+      <div class='col-2'>
+        <input class="button button-clear" id='menuControl' type="button" value="Control">
+      </div>
+      <div class='col-2'>
+        <input class="button button-clear" id='menuLogs' type="button" value="Logs">
+      </div>
+      <div class='col-2'>
+        <input class="button button-clear" id='menuAbout' type="button" value="About">
+      </div>
+      <div class='col-12' style='display: none'>
+        <ul class='nav nav-tabs'>
+          <li class='dropdown pull-right'>
+            <a class='dropdown-toggle' data-toggle='dropdown' href='#'>Control<strong class='caret'></strong></a>
+            <ul class='dropdown-menu'>
+              <li>
+                <a href='#'>Pause</a>
+              </li>
+              <li>
+                <a href='#'>Release</a>
+              </li>
+              <li>
+              </li>
+              <li class='divider'>
+              </li>
+              <li>
+                <a href='#'>Save</a>
+              </li>
+              <li>
+                <a href='#'>Discard changes</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <div class='section'>
+    <div class='container tnContainer'>
+      <div class='tnTab' id='vwAbout'>
+        <div style="text-align:center">
+          <img class='img-responsive' src='img/yeapf-logo.png'>
+          <br> (C) 2016 Esteban D.Dortta
+          <pre style='text-align:left; border: none; font-size: 80%'>#include('../license.txt')</pre>
+        </div>
+      </div>
+      <div class='tnTab' id='vwAppConfig'>
+        <div class='row'>
+          <div class='col-12'>
+            <form role='form'>
+              <div class="adminSection">
+                <h3>Application Config</h3>
+                <div class='row'>
+                  <div class='col-6'>
+                    <label for="appCfg_appName">Application Name</label>
+                    <input type="text" placeholder="Internal name" id="appCfg_appName">
+                  </div>
+                  <div class='col-6'>
+                    <label for="appCfg_appAuthor">Application Author</label>
+                    <input type="text" placeholder="Could be your email" id="appCfg_appAuthor">
+                  </div>
+                </div>
+                <div class='row'>
+                  <div class='col-4'>
+                    <label for="appCfg_appRegistry">Application Registry</label>
+                    <input type="text" placeholder="Unique identificator" id="appCfg_appRegistry">
+                  </div>
+                  <div class='col-2'>
+                    <br>
+                    <button class='button' type='button'><small>Request</small></button>
+                  </div>
+                  <div class='col-6'>
+                    <label for="appCfg_appLang">Language (ISO 639-1)</label>
+                    <select id="appCfg_appLang">
+                      <option value='aa'>aa-Afar</option>
+                      <option value='ab'>ab-Abkhazian</option>
+                      <option value='af'>af-Afrikaans</option>
+                      <option value='am'>am-Amharic</option>
+                      <option value='ar'>ar-Arabic</option>
+                      <option value='ar-ae'>ar-ae-Arabic (U.A.E.)</option>
+                      <option value='ar-bh'>ar-bh-Arabic (Bahrain)</option>
+                      <option value='ar-dz'>ar-dz-Arabic (Algeria)</option>
+                      <option value='ar-eg'>ar-eg-Arabic (Egypt)</option>
+                      <option value='ar-iq'>ar-iq-Arabic (Iraq)</option>
+                      <option value='ar-jo'>ar-jo-Arabic (Jordan)</option>
+                      <option value='ar-kw'>ar-kw-Arabic (Kuwait)</option>
+                      <option value='ar-lb'>ar-lb-Arabic (Lebanon)</option>
+                      <option value='ar-ly'>ar-ly-Arabic (libya)</option>
+                      <option value='ar-ma'>ar-ma-Arabic (Morocco)</option>
+                      <option value='ar-om'>ar-om-Arabic (Oman)</option>
+                      <option value='ar-qa'>ar-qa-Arabic (Qatar)</option>
+                      <option value='ar-sa'>ar-sa-Arabic (Saudi Arabia)</option>
+                      <option value='ar-sy'>ar-sy-Arabic (Syria)</option>
+                      <option value='ar-tn'>ar-tn-Arabic (Tunisia)</option>
+                      <option value='ar-ye'>ar-ye-Arabic (Yemen)</option>
+                      <option value='as'>as-Assamese</option>
+                      <option value='ay'>ay-Aymara</option>
+                      <option value='az'>az-Azeri</option>
+                      <option value='ba'>ba-Bashkir</option>
+                      <option value='be'>be-Belarusian</option>
+                      <option value='bg'>bg-Bulgarian</option>
+                      <option value='bh'>bh-Bihari</option>
+                      <option value='bi'>bi-Bislama</option>
+                      <option value='bn'>bn-Bengali</option>
+                      <option value='bo'>bo-Tibetan</option>
+                      <option value='br'>br-Breton</option>
+                      <option value='ca'>ca-Catalan</option>
+                      <option value='co'>co-Corsican</option>
+                      <option value='cs'>cs-Czech</option>
+                      <option value='cy'>cy-Welsh</option>
+                      <option value='da'>da-Danish</option>
+                      <option value='de'>de-German</option>
+                      <option value='de-at'>de-at-German (Austria)</option>
+                      <option value='de-ch'>de-ch-German (Switzerland)</option>
+                      <option value='de-li'>de-li-German (Liechtenstein)</option>
+                      <option value='de-lu'>de-lu-German (Luxembourg)</option>
+                      <option value='div'>div-Divehi</option>
+                      <option value='dz'>dz-Bhutani</option>
+                      <option value='el'>el-Greek</option>
+                      <option value='en'>en-English</option>
+                      <option value='en-au'>en-au-English (Australia)</option>
+                      <option value='en-bz'>en-bz-English (Belize)</option>
+                      <option value='en-ca'>en-ca-English (Canada)</option>
+                      <option value='en-gb'>en-gb-English (United Kingdom)</option>
+                      <option value='en-ie'>en-ie-English (Ireland)</option>
+                      <option value='en-jm'>en-jm-English (Jamaica)</option>
+                      <option value='en-nz'>en-nz-English (New Zealand)</option>
+                      <option value='en-ph'>en-ph-English (Philippines)</option>
+                      <option value='en-tt'>en-tt-English (Trinidad)</option>
+                      <option value='en-us'>en-us-English (United States)</option>
+                      <option value='en-za'>en-za-English (South Africa)</option>
+                      <option value='en-zw'>en-zw-English (Zimbabwe)</option>
+                      <option value='eo'>eo-Esperanto</option>
+                      <option value='es'>es-Spanish</option>
+                      <option value='es-ar'>es-ar-Spanish (Argentina)</option>
+                      <option value='es-bo'>es-bo-Spanish (Bolivia)</option>
+                      <option value='es-cl'>es-cl-Spanish (Chile)</option>
+                      <option value='es-co'>es-co-Spanish (Colombia)</option>
+                      <option value='es-cr'>es-cr-Spanish (Costa Rica)</option>
+                      <option value='es-do'>es-do-Spanish (Dominican Republic)</option>
+                      <option value='es-ec'>es-ec-Spanish (Ecuador)</option>
+                      <option value='es-es'>es-es-Spanish (España)</option>
+                      <option value='es-gt'>es-gt-Spanish (Guatemala)</option>
+                      <option value='es-hn'>es-hn-Spanish (Honduras)</option>
+                      <option value='es-mx'>es-mx-Spanish (Mexico)</option>
+                      <option value='es-ni'>es-ni-Spanish (Nicaragua)</option>
+                      <option value='es-pa'>es-pa-Spanish (Panama)</option>
+                      <option value='es-pe'>es-pe-Spanish (Peru)</option>
+                      <option value='es-pr'>es-pr-Spanish (Puerto Rico)</option>
+                      <option value='es-py'>es-py-Spanish (Paraguay)</option>
+                      <option value='es-sv'>es-sv-Spanish (El Salvador)</option>
+                      <option value='es-us'>es-us-Spanish (United States)</option>
+                      <option value='es-uy'>es-uy-Spanish (Uruguay)</option>
+                      <option value='es-ve'>es-ve-Spanish (Venezuela)</option>
+                      <option value='et'>et-Estonian</option>
+                      <option value='eu'>eu-Basque</option>
+                      <option value='fa'>fa-Farsi</option>
+                      <option value='fi'>fi-Finnish</option>
+                      <option value='fj'>fj-Fiji</option>
+                      <option value='fo'>fo-Faeroese</option>
+                      <option value='fr'>fr-French</option>
+                      <option value='fr-be'>fr-be-French (Belgium)</option>
+                      <option value='fr-ca'>fr-ca-French (Canada)</option>
+                      <option value='fr-ch'>fr-ch-French (Switzerland)</option>
+                      <option value='fr-lu'>fr-lu-French (Luxembourg)</option>
+                      <option value='fr-mc'>fr-mc-French (Monaco)</option>
+                      <option value='fy'>fy-Frisian</option>
+                      <option value='ga'>ga-Irish</option>
+                      <option value='gd'>gd-Gaelic</option>
+                      <option value='gl'>gl-Galician</option>
+                      <option value='gn'>gn-Guarani</option>
+                      <option value='gu'>gu-Gujarati</option>
+                      <option value='ha'>ha-Hausa</option>
+                      <option value='he'>he-Hebrew</option>
+                      <option value='hi'>hi-Hindi</option>
+                      <option value='hr'>hr-Croatian</option>
+                      <option value='hu'>hu-Hungarian</option>
+                      <option value='hy'>hy-Armenian</option>
+                      <option value='ia'>ia-Interlingua</option>
+                      <option value='id'>id-Indonesian</option>
+                      <option value='ie'>ie-Interlingue</option>
+                      <option value='ik'>ik-Inupiak</option>
+                      <option value='in'>in-Indonesian</option>
+                      <option value='is'>is-Icelandic</option>
+                      <option value='it'>it-Italian</option>
+                      <option value='it-ch'>it-ch-Italian (Switzerland)</option>
+                      <option value='iw'>iw-Hebrew</option>
+                      <option value='ja'>ja-Japanese</option>
+                      <option value='ji'>ji-Yiddish</option>
+                      <option value='jw'>jw-Javanese</option>
+                      <option value='ka'>ka-Georgian</option>
+                      <option value='kk'>kk-Kazakh</option>
+                      <option value='kl'>kl-Greenlandic</option>
+                      <option value='km'>km-Cambodian</option>
+                      <option value='kn'>kn-Kannada</option>
+                      <option value='ko'>ko-Korean</option>
+                      <option value='kok'>kok-Konkani</option>
+                      <option value='ks'>ks-Kashmiri</option>
+                      <option value='ku'>ku-Kurdish</option>
+                      <option value='ky'>ky-Kirghiz</option>
+                      <option value='kz'>kz-Kyrgyz</option>
+                      <option value='la'>la-Latin</option>
+                      <option value='ln'>ln-Lingala</option>
+                      <option value='lo'>lo-Laothian</option>
+                      <option value='ls'>ls-Slovenian</option>
+                      <option value='lt'>lt-Lithuanian</option>
+                      <option value='lv'>lv-Latvian</option>
+                      <option value='mg'>mg-Malagasy</option>
+                      <option value='mi'>mi-Maori</option>
+                      <option value='mk'>mk-FYRO Macedonian</option>
+                      <option value='ml'>ml-Malayalam</option>
+                      <option value='mn'>mn-Mongolian</option>
+                      <option value='mo'>mo-Moldavian</option>
+                      <option value='mr'>mr-Marathi</option>
+                      <option value='ms'>ms-Malay</option>
+                      <option value='mt'>mt-Maltese</option>
+                      <option value='my'>my-Burmese</option>
+                      <option value='na'>na-Nauru</option>
+                      <option value='nb-no'>nb-no-Norwegian (Bokmal)</option>
+                      <option value='ne'>ne-Nepali (India)</option>
+                      <option value='nl'>nl-Dutch</option>
+                      <option value='nl-be'>nl-be-Dutch (Belgium)</option>
+                      <option value='nn-no'>nn-no-Norwegian</option>
+                      <option value='no'>no-Norwegian (Bokmal)</option>
+                      <option value='oc'>oc-Occitan</option>
+                      <option value='om'>om-(Afan)/Oromoor/Oriya</option>
+                      <option value='or'>or-Oriya</option>
+                      <option value='pa'>pa-Punjabi</option>
+                      <option value='pl'>pl-Polish</option>
+                      <option value='ps'>ps-Pashto/Pushto</option>
+                      <option value='pt'>pt-Portuguese</option>
+                      <option value='pt-br'>pt-br-Portuguese (Brazil)</option>
+                      <option value='qu'>qu-Quechua</option>
+                      <option value='rm'>rm-Rhaeto-Romanic</option>
+                      <option value='rn'>rn-Kirundi</option>
+                      <option value='ro'>ro-Romanian</option>
+                      <option value='ro-md'>ro-md-Romanian (Moldova)</option>
+                      <option value='ru'>ru-Russian</option>
+                      <option value='ru-md'>ru-md-Russian (Moldova)</option>
+                      <option value='rw'>rw-Kinyarwanda</option>
+                      <option value='sa'>sa-Sanskrit</option>
+                      <option value='sb'>sb-Sorbian</option>
+                      <option value='sd'>sd-Sindhi</option>
+                      <option value='sg'>sg-Sangro</option>
+                      <option value='sh'>sh-Serbo-Croatian</option>
+                      <option value='si'>si-Singhalese</option>
+                      <option value='sk'>sk-Slovak</option>
+                      <option value='sl'>sl-Slovenian</option>
+                      <option value='sm'>sm-Samoan</option>
+                      <option value='sn'>sn-Shona</option>
+                      <option value='so'>so-Somali</option>
+                      <option value='sq'>sq-Albanian</option>
+                      <option value='sr'>sr-Serbian</option>
+                      <option value='ss'>ss-Siswati</option>
+                      <option value='st'>st-Sesotho</option>
+                      <option value='su'>su-Sundanese</option>
+                      <option value='sv'>sv-Swedish</option>
+                      <option value='sv-fi'>sv-fi-Swedish (Finland)</option>
+                      <option value='sw'>sw-Swahili</option>
+                      <option value='sx'>sx-Sutu</option>
+                      <option value='syr'>syr-Syriac</option>
+                      <option value='ta'>ta-Tamil</option>
+                      <option value='te'>te-Telugu</option>
+                      <option value='tg'>tg-Tajik</option>
+                      <option value='th'>th-Thai</option>
+                      <option value='ti'>ti-Tigrinya</option>
+                      <option value='tk'>tk-Turkmen</option>
+                      <option value='tl'>tl-Tagalog</option>
+                      <option value='tn'>tn-Tswana</option>
+                      <option value='to'>to-Tonga</option>
+                      <option value='tr'>tr-Turkish</option>
+                      <option value='ts'>ts-Tsonga</option>
+                      <option value='tt'>tt-Tatar</option>
+                      <option value='tw'>tw-Twi</option>
+                      <option value='uk'>uk-Ukrainian</option>
+                      <option value='ur'>ur-Urdu</option>
+                      <option value='us'>us-English</option>
+                      <option value='uz'>uz-Uzbek</option>
+                      <option value='vi'>vi-Vietnamese</option>
+                      <option value='vo'>vo-Volapuk</option>
+                      <option value='wo'>wo-Wolof</option>
+                      <option value='xh'>xh-Xhosa</option>
+                      <option value='yi'>yi-Yiddish</option>
+                      <option value='yo'>yo-Yoruba</option>
+                      <option value='zh'>zh-Chinese</option>
+                      <option value='zh-cn'>zh-cn-Chinese (China)</option>
+                      <option value='zh-hk'>zh-hk-Chinese (Hong Kong SAR)</option>
+                      <option value='zh-mo'>zh-mo-Chinese (Macau SAR)</option>
+                      <option value='zh-sg'>zh-sg-Chinese (Singapore)</option>
+                      <option value='zh-tw'>zh-tw-Chinese (Taiwan)</option>
+                      <option value='zu'>zu-Zulu</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="adminSection">
+                <h3>First jump for webApps</h3>
+                <p>Only applies for web application and after login</p>
+                <div class='row'>
+                  <div class='col-6'>
+                    <label for="appCfg_use_logonForm"><input aria-label='' id='appCfg_use_logonForm' name='appCfg_logonWay' type='radio' value='logonForm'>&nbsp;Access using this logon form:</label>
+                    <input type="text" placeholder="i.e. f_logon" id="appCfg_logonForm">
+                  </div>
+                  <div class='col-6'>
+                    <label for="appCfg_initialVerb"><input aria-label='' id='appCfg_initialVerb' name='appCfg_logonWay' type='radio' value='logonForm'>&nbsp;Jump to next action:</label>
+                    <input type="text" placeholder="i.e. welcome" id="appCfg_initialVerb">
+                  </div>
+                </div>
+              </div>
+              <div class="adminSection">
+                <h3>CSS for webApps</h3>
+                <p>Only applies for web application</p>
+                <div class='row'>
+                  <div class='col-4'>
+                    <label class='control-label' for='appCfg_cfgUniversalCSS'>Universal CSS</label>
+                    <input class='form-control' id='appCfg_cfgUniversalCSS' placeholder='i.e. style.css' type='text'>
+                  </div>
+                  <div class='col-4'>
+                    <label class='control-label' for='appCfg_cfgDesktopCSS'>Desktop CSS</label>
+                    <input class='form-control' id='appCfg_cfgDesktopCSS' placeholder='i.e. desktop-style.css' type='text'>
+                  </div>
+                  <div class='col-4'>
+                    <label class='control-label' for='appCfg_cfgMobileCSS'>Mobile CSS</label>
+                    <input class='form-control' id='appCfg_cfgMobileCSS' placeholder='i.e. mobile-style.css' type='text'>
+                  </div>
+                </div>
+              </div>
+              <div class="adminSection">
+                <h3>User logon tables and fields</h3>
+                <div class='row'>
+                  <div class='col-6'>
+                    <label class='control-label' for='appCfg_usrTableName'>Table Name</label>
+                    <input class='form-control' id='appCfg_usrTableName' placeholder='default: is_users' type='text'>
+                  </div>
+                  <div class='col-6'>
+                    <label class='control-label' for='appCfg_usrNicknameField'>User nickname field</label>
+                    <input class='form-control' id='appCfg_usrNicknameField' placeholder='default: nickName' type='text'>
+                  </div>
+                </div>
+                <div class='row'>
+                  <div class='col-4'>
+                    <label class='control-label' for='appCfg_usrSuperField'>Super User field</label>
+                    <input class='form-control' id='appCfg_usrSuperField' placeholder='default: super' type='text'>
+                  </div>
+                  <div class='col-4'>
+                    <label class='control-label' for='appCfg_usrSessionIDField'>Session ID field</label>
+                    <input class='form-control' id='appCfg_usrSessionIDField' placeholder='default: userId' type='text'>
+                  </div>
+                  <div class='col-4'>
+                    <label class='control-label' for='appCfg_usrUniqueIDField'>Unique ID field</label>
+                    <input class='form-control' id='appCfg_usrUniqueIDField' placeholder='default: id' type='text'>
+                  </div>
+                </div>
+              </div>
+              <div class="adminSection">
+                <h3>Database connection</h3>
+                <div class='row'>
+                  <div class='col-6'>
+                    <label class='control-label' for='appCfg_dbType'>Type</label>
+                    <select id='appCfg_dbType' class='form-control'>
+                      <option value=mysql>MySQL (deprecated)</option>
+                      <option value=mysqli>MySQLi</option>
+                      <option value=firebird>Firebird/Interbase</option>
+                      <option value=postgresql>PostgreSQL</option>
+                    </select>
+                  </div>
+                  <div class='col-6'>
+                    <label class='control-label' for='appCfg_dbServer'>Server</label>
+                    <input class='form-control' id='appCfg_dbServer' placeholder='i.e. 127.0.0.1' type='text'>
+                  </div>
+                </div>
+                <div class='row'>
+                  <div class='col-6'>
+                    <label class='control-label' for='appCfg_dbName'>DB Name</label>
+                    <input class='form-control' id='appCfg_dbName' placeholder='i.e. sample_db' type='text'>
+                  </div>
+                  <div class='col-6'>
+                    <label class='control-label' for='appCfg_dbUser'>DB User name</label>
+                    <input class='form-control' id='appCfg_dbUser' placeholder='i.e. db_user' type='text'>
+                  </div>
+                </div>
+                <div class='row'>
+                  <div class='col-6'>
+                    <label class='control-label' for='appCfg_dbPassword'>DB User password</label>
+                    <input class='form-control' id='appCfg_dbPassword' placeholder='Database User password' type='password'>
+                  </div>
+                  <div class='col-6'>
+                    <label class='control-label' for='appCfg_dbOnline'>Online time</label>
+                    <input class='form-control' id='appCfg_dbOnline' placeholder='i.e. 06:00-20:00, 22:15-23:59' type='text'>
+                  </div>
+                </div>
+              </div>
+              <button class='button' type='button'>Save</button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class='tnTab' id='vwSecurityConfig'>
+        <h3>Security Configuration</h3>
+      </div>
+      <div class='tnTab' id='vwLogs'>
+        <h3>Logs</h3>
+      </div>
+    </div>
+  </div>
+</body>
+<script>
+#include("js/configure.js")
+</script>
+
+</html>

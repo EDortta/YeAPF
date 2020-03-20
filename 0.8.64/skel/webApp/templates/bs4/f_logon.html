@@ -1,0 +1,56 @@
+    <!DOCTYPE html>
+    <html lang="#(appLang)">
+
+    <head>
+      <meta charset="#(appCharset)">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>#(appTitle)</title>
+      <meta name="description" content="#(appName)">
+      <meta name="author" content="#(appAuthor)">
+      <link href="css/bootstrap.min.css" rel="stylesheet">
+      <link href="css/login.css" rel="stylesheet">
+      <link href="css/style.css" rel="stylesheet">
+    </head>
+
+    <body>
+      <div class="container">
+        <div class="row justify-content-md-center">
+          <div class="col-md-4">
+            <div class="login-form">
+              <form action="index.php" method="post">
+                <input type="hidden" name="s" value="logon">
+                <h2 class="text-center">Log in</h2>
+                <div class="form-group">
+                  <input type="text" name="q2" class="form-control"
+                    placeholder="Username" required="required">
+                </div>
+                <div class="form-group">
+                  <input type="password" name="q1" class="form-control"
+                    placeholder="Password" required="required">
+                </div>
+                <div class="form-group">
+                  <button type="submit" class="btn btn-primary btn-block">Log
+                    in</button>
+                </div>
+                <div class="clearfix">
+                  <label class="pull-left checkbox-inline">
+                    <input type="checkbox" name="q3" value="r">
+                    Remember me</label>
+                    <hr>
+                  <a href="?s=recoverPassword" class="pull-right">Forgot
+                    Password?</a>
+                </div>
+              </form>
+              <p class="text-center"><a href="?s=newUser">Create an
+                  Account</a></p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script src="js/google-analytics.js"></script>
+      <script src="js/jquery.min.js"></script>
+      <script src="js/bootstrap.min.js"></script>
+    </body>
+
+    </html>

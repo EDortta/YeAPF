@@ -1,0 +1,20 @@
+table='is_menu';
+
+fields {
+  XID: integer,
+  Xenabled: char,
+  Xattr: integer,
+  Xo: integer,
+  Xancestor: integer,
+  Xlabel: char,
+  Xd: char,
+  Xrights: integer,
+  Xa: char,
+  Xs: char,
+  Ximplementation: char,
+  Xexplanation: integer
+};
+
+key {
+  ID: integer
+};

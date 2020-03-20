@@ -1,0 +1,349 @@
+#!/usr/bin/php
+<?php
+/*
+    tools/distributionBuilder/ydistbuilder
+    YeAPF 0.8.64-7 built on 2020-03-20 13:04 (-3 DST)
+    Copyright (C) 2004-2020 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
+    2019-10-24 18:20:52 (-3 DST)
+*/
+
+  function getVerFromPath($aPath)
+  {
+    /*
+     * V.S.C-n
+     * | | | +-> update sequence (integer)
+     * | | +---> compilation (0-36)
+     * | +-----> subversion  (0-9)
+     * +-------> version
+     */
+
+    if (file_exists("$aPath"))
+      $version=str_replace("\n","",join('',file("$aPath")));
+    else
+      $version="0.0.0";
+
+    return $version;
+  }
+
+  function latestVersion()
+  {
+    $uSeq1 = $uSeq2 = 0;
+    $distVersion=getVerFromPath(".distribution/version.inf",$uSeq1);
+    $curVersion=getVerFromPath("version.inf", $uSeq2);
+
+    if (ver2value($distVersion, $uSeq1)>ver2value($curVersion, $uSeq2))
+      return $distVersion;
+    else
+      return $curVersion;
+  }
+
+  $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
+  $cmRequired=false;
+  if (file_exists("$mydir/yclilib.php"))
+    $cmLocation = "$mydir/yclilib.php";
+  else
+    $cmLocation = "$mydir/../yclilib.php";
+
+  (@include_once "$cmLocation") or die("yclilib.php not found\n");
+
+  $args = new ArgumentsProcessor(false);
+  $myself = basename($argv[0]);
+  $toHelp = $args->argValue('h;help', __FALSE__)==__TRUE__;
+  $toUpdate = $args->argValue('u;update', __FALSE__)==__TRUE__;
+  $doQuiet = $args->argValue('s;silent', __FALSE__)==__TRUE__;
+  $toShowSymTable = $args->argValue('t;table', __FALSE__)==__TRUE__;
+
+
+  echo "YeAPF 0.8.64 ydistbuilder\nCopyright (C) 2004-2020 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n\n";
+  if ($toHelp) {
+    echo "usage:\n";
+    echo "  --silent\tdo not display messages\n";
+    echo "  --update\tdont create new version, just update current one\n";
+    echo "  --table\tshows symbol table\n";
+    echo "Some files are required in order to versionate:\n";
+    echo "  ydistbuilder.files\twith a list of files to be included\n";
+    echo "  ydistbuilder.copyright\twith a copyright note to be pasted in each file\n";
+    echo "  version.app\twith the application name (it defaults to folder name)\n\n";
+    exit(100);
+  }
+
+  if (file_exists('ydistbuilder.files'))
+    $files=file("ydistbuilder.files");
+  else if (file_exists(dirname($_SERVER["_"])."/ydistbuilder.files"))
+    $files=file(dirname($_SERVER["_"])."/ydistbuilder.files");
+  else {
+    echo "Please create 'ydistbuilder.files' with file list\n";
+    exit(101);
+  }
+
+  if (file_exists('ydistbuilder.copyright'))
+    $copyright=join('\n',file("ydistbuilder.copyright"));
+  else if (file_exists(dirname($_SERVER["_"])."/ydistbuilder.copyright"))
+    $copyright=join('\n',file(dirname($_SERVER["_"])."/ydistbuilder.copyright"));
+  else {
+    echo "Please create 'ydistbuilder.copyright' with your copyright note\nThis is just a valid PHP double-quoted string to be 'evaled()'\n";
+    exit(102);
+  }
+
+
+
+  $_distErrorList = '';
+  function recordDistErrors($distError) {
+    global $_distErrorList;
+    $_distErrorList.="$distError";
+    echo $distError;
+  }
+
+  function doDistFile($fileName)
+  {
+    global $distDir, $yeapfSymList, $utcOffset, $doQuiet;
+
+    $fileName=str_replace("\n","",$fileName);
+
+    if (substr($fileName, 0, 1)!=';') {
+
+      if (!$doQuiet) echo "    $fileName ";
+      if (is_dir($fileName)) {
+        if (!$doQuiet) echo " (DIR)\n";
+        foreach(glob("$fileName/*") as $entry)
+          if (!(($entry=='.') || ($entry=='..'))) {
+            if (strpos($entry,'~')===false)
+              doDistFile($entry);
+          }
+
+      } else if (file_exists($fileName)) {
+        $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+        $textualExtensions = array('php', 'phps', 'html', 'htmls', 'md',
+                                   'ini', 'txt', 'text', 'js', 'css',
+                                   'def', 'path', 'csv', 'xml', 'sh',
+                                   'files',
+                                   'inc', 'inf', 'def', 'pas', 'dpr',
+                                   'c', 'h', 'cpp', 'hpp',
+                                   'java');
+
+        $fileName=str_replace("\\","/",$fileName);
+        $dir=dirname("$fileName");
+        if ($dir!='.')
+          $dirList=explode("/","$distDir/$dir");
+        else
+          $dirList=explode("/",$distDir);
+        $auxDirName='';
+        foreach($dirList as $dir) {
+          if ($auxDirName>'')  $auxDirName.='/';
+          $auxDirName.="$dir";
+          if (!is_dir($auxDirName)) {
+            if (!$doQuiet) echo "\nmkdir $auxDirName";
+            if (!mkdir($auxDirName))
+              echo " ERROR: Cannot be created";
+          }
+        }
+
+        $fileStat=stat($fileName);
+
+        if ((trim($ext)=='') || (in_array($ext, $textualExtensions))) {
+          $file=join("",file($fileName));
+
+          $yeapfSymList[$fileName] = array();
+          $yeapfSymList[$fileName]['LAST_FILE_MODIFICATION']=@date('Y-m-d H:i:s',$fileStat['mtime'])." ($utcOffset DST)";
+          $yeapfSymList[$fileName]['FILE_NAME']=$fileName;
+
+          $md5Begin=md5($file);
+
+          /* replace local definitions */
+          foreach($yeapfSymList[$fileName] as $k=>$v) {
+            if (!is_array($v)) {
+              $file=str_replace("%$k%",$v,$file);
+              $k=strtoupper($k);
+              $file=str_replace("%$k%",$v,$file);
+              $k=strtolower($k);
+              $file=str_replace("%$k%",$v,$file);
+            }
+          }
+
+          /* replace global definitions */
+          foreach($yeapfSymList as $k=>$v) {
+            if (!is_array($v)) {
+              $file=str_replace("%$k%",$v,$file);
+              $k=strtoupper($k);
+              $file=str_replace("%$k%",$v,$file);
+              $k=strtolower($k);
+              $file=str_replace("%$k%",$v,$file);
+            }
+          }
+
+          $md5End=md5($file);
+          if ($md5End == $md5Begin) {
+            $yeapfSymList[$fileName]['WARNING']="File without version information";
+            if (!$doQuiet) echo "\tWARNING: ".$yeapfSymList[$fileName]['WARNING'];
+          }
+          $yeapfSymList[$fileName]['MD5'] = $md5End;
+
+          if (!$doQuiet) echo "\n";
+          $fileName = str_replace(" ", "\\ ",$fileName);
+          $fName = pathinfo($fileName, PATHINFO_FILENAME);
+          if ($ext=='php') {
+            if (($fName!='slotEmptyImplementation') && ($fName!='WebSocketEmptyImplementation')) {
+              $op=array();
+              echo str_pad(substr($fileName,0,80),81," ")."\r";
+              if ($fileName!="tools/ydbcreateform_files/script.php") {
+                $output = exec("php -l $fileName",$op,$ret_val);
+                if ($ret_val!=0) {
+                  foreach($op as $v) {
+                    if (!$doQuiet) echo "** $v\n";
+                  }
+                }
+              }
+            }
+          }
+
+          $f=fopen("$distDir/$fileName","w");
+          fwrite($f,$file);
+          fclose($f);
+        } else {
+          if (!$doQuiet) echo " (BINARY FILE)\n";
+          $f=fopen("$distDir/$fileName","wb");
+          $fIn = fopen("$fileName","rb");
+          while (!feof($fIn)) {
+            $buff = fread($fIn, 4096);
+            fwrite($f, $buff);
+          }
+          fclose($f);
+          fclose($fIn);
+        }
+
+        $op=array();
+        exec("touch -t ".@date('YmdHi.s',$fileStat['mtime'])." \"$distDir/$fileName\"", $op, $ret_val);
+        if ($ret_val!=0)
+          throw new Exception($op[0]);
+      } else {
+        recordDistErrors(" $fileName DON'T EXISTS!!!\n");
+        //throw new Exception("$fileName don't exists");
+      }
+    }
+  }
+
+  /*
+   * calculate new version number
+   */
+
+  $curVersion=latestVersion();
+  if (file_exists("version.app"))
+    $appName=trim(str_replace("\n"," ",join(' ',file("version.app"))));
+  else
+    $appName=pathinfo(getcwd(), PATHINFO_BASENAME);
+
+  echo "Current '$appName' version: $curVersion\n";
+  $curVersion=ver2value($curVersion, $updateSequence);
+  $updateSequence++;
+  if (!$toUpdate) {
+    $curVersion++;
+    $updateSequence=0;
+  }
+  if ($curVersion==1)
+    die("Please create first 'version.inf' file on this folder\n");
+  $newVersionSequence=value2ver($curVersion, $updateSequence);
+  $newVersion=explode('-',$newVersionSequence);
+  $newVersion=$newVersion[0];
+
+  $canMoveon=false;
+  try {
+
+    $utcOffset = date('Z') / 3600;
+    eval("\$copyright=$copyright;");
+
+    $yeapfSymList=array('APP_NAME',
+                   'FILE_NAME',
+                   $appName.'_VERSION_LABEL',
+                   $appName.'_VERSION_DATE',
+                   $appName.'_VERSION',
+                   $appName.'_VERSION_SEQUENCE',
+                   'COPYRIGHT_NOTE',
+                   'LAST_FILE_MODIFICATION');
+
+    $yeapfSymList['APP_NAME'] = $appName;
+    $yeapfSymList[$appName.'_VERSION_LABEL']="$appName $newVersionSequence built on ".date('Y-m-d H:i')." ($utcOffset DST)";
+    $yeapfSymList[$appName.'_VERSION_DATE']=date('Y-m-d H:i')." ($utcOffset DST)";
+    $yeapfSymList[$appName.'_VERSION']="$newVersion";
+    $yeapfSymList[$appName.'_VERSION_SEQUENCE']="$newVersionSequence";
+    $yeapfSymList['COPYRIGHT_NOTE']=$copyright;
+
+    if ($toShowSymTable) {
+      $maxLen = 0;
+      foreach ($yeapfSymList as $key => $value) {
+        if (strlen($key)>$maxLen) {
+          $maxLen = strlen($key);
+        }
+      }
+      echo "Symbol table\n------------------------\n";
+      echo "Global symbols\n";
+      foreach ($yeapfSymList as $key => $value) {
+        if (!is_int($key))
+          echo "$key".str_repeat(".", $maxLen-strlen($key)).": ".$value."\n";
+      }
+      echo "------------------------\nLocal symbols*\n";
+      $globalSymbols = array('LAST_FILE_MODIFICATION','FILE_NAME','WARNING','MD5');
+      foreach($globalSymbols as $key) {
+        echo "$key".str_repeat(".", $maxLen-strlen($key)).": depends of each file\n";
+      }
+      echo "* MD5 symbol is calculated over the original source code and is NOT valid to check produced outputs\n* LAST_FILE_MODIFICATION means the last timestamp the source file was touched. This timestamp is keeped on the produced output\n\n";
+    }
+
+    $distDir=".distribution/$newVersion";
+    if (!is_dir($distDir))
+      mkdir($distDir,0777,true);
+    foreach($files as $k=>$fileName) {
+      $fileName=str_replace("\n","",$fileName);
+      if (strpos($fileName,'*')!==FALSE) {
+        ini_set('display_errors','1');
+        error_reporting (5);
+        foreach(glob($fileName) as $entry)
+          if (!(($entry=='.') || ($entry=='..'))) {
+            if (strpos($entry,'~')===false)
+              doDistFile($entry);
+          }
+      } else
+        doDistFile($fileName);
+    }
+    $canMoveon=true;
+  } catch (Exception $e) {
+    echo 'ERROR: '.$e->getMessage();
+    $canMoveon=false;
+  }
+
+  if ($canMoveon) {
+    $f=fopen("version.inf","w");
+    fwrite($f,$newVersionSequence);
+    fclose($f);
+
+    $f=fopen("$distDir/version.def","w");
+    fwrite($f,serialize($yeapfSymList));
+    fclose($f);
+
+    $f=fopen("version.lst","a");
+    fwrite($f,"$newVersionSequence\t".$yeapfSymList[$appName.'_VERSION_DATE']."\n");
+    fclose($f);
+
+    copy("version.inf",".distribution/version.inf");
+    copy("version.lst",".distribution/version.lst");
+
+    echo "New '$appName' Version: $newVersionSequence\nReleased at ".$yeapfSymList[$appName.'_VERSION_DATE']."\n";
+    echo "Copyright note: ".$yeapfSymList['COPYRIGHT_NOTE']."\n";
+
+    if (!is_dir('downloads'))
+      mkdir('downloads');
+
+    $cwd=getcwd();
+    $zipName="$cwd/downloads/$appName-$newVersion.zip";
+    $zipScript="cd $cwd/$distDir\nzip -rD9 $zipName *\ncd $cwd\nzip -rD9 $zipName .distribution/version.*\n";
+    $zsName="/tmp/".uniqid().'.sh';
+    $f=fopen($zsName,"w");
+    fwrite($f,$zipScript);
+    fclose($f);
+    exec("chmod +x $zsName");
+    exec($zsName);
+    unlink($zsName);
+
+    echo "$zipName created\n$_distErrorList\n\n";
+  }
+
+?>

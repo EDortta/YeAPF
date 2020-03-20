@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# http://developer.yahoo.com/yui/compressor/
+
+HTML_COMPRESSOR=/usr/local/bin/htmlcompressor-1.5.3.jar
+
+case "$1" in
+""|"-h"|"--help")
+    echo "Usage: minifyhtml path/to/html/file.html"
+    exit 1;
+    ;;
+esac
+
+htmlDir=`dirname $1`
+htmlFile=`basename $1`
+
+if [ ! -d "$1" ]; then
+
+  minhtmlFile=`echo $htmlFile | rev | cut -d"." -f2- | rev`.min.html
+
+  htmlFilePath=$htmlDir/$htmlFile
+  minhtmlFilePath=$htmlDir/$minhtmlFile
+
+
+  java -jar $HTML_COMPRESSOR --preserve-comments --type=html -o $minhtmlFilePath $htmlFilePath
+  echo "$htmlFilePath minified. Now located at $minhtmlFilePath"
+fi

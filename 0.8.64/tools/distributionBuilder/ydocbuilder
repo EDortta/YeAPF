@@ -1,0 +1,405 @@
+#!/usr/bin/php
+<?php
+/*
+    tools/distributionBuilder/ydocbuilder
+    YeAPF 0.8.64-7 built on 2020-03-20 13:04 (-3 DST)
+    Copyright (C) 2004-2020 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
+    2019-07-10 19:49:18 (-3 DST)
+*/
+
+  function _cleanup(&$inner)
+  {
+    unset($inner['filename']);
+    unset($inner['folder']);
+    if (isset($inner['functions'])) {
+      if (count($inner['functions'])==0)
+        unset($inner['functions']);
+      else
+        foreach($inner['functions'] as $funcName=>$funcDef)
+          if (substr($funcName,0,21)=="__anonymousFunction__")
+            unset($inner[$funcName]);
+    }
+    if (isset($inner['classes'])) {
+      if (count($inner['classes'])==0)
+        unset($inner['classes']);
+    }
+  }
+
+  global $_parserMargin, $anonymousFunctionNdx;
+  $_parserMargin=-1;
+  $anonymousFunctionNdx=0;
+
+  function _parseFile($filename, $p, $funcNameBase='', $inClass=false)
+  {
+    global $verbose, $_parserMargin, $anonymousFunctionNdx;
+
+    $_parserMargin++;
+    $_pm_="\n".str_repeat("    ", $_parserMargin);
+
+    if ($verbose) echo $_pm_."----------parsing-------\n";
+
+    $retData=array();
+    $retData['functions']=array();
+    $retData['classes']=array();
+    $funcNdx='';
+
+    $token_minus_1 = $token_minus_2 = '';
+    $token='';
+    $type=0;
+    $nestingLevel=0;
+    $firstToken=true;
+    $dropOnCurly=false;
+    do {
+      $ok=$p->get($token,$type);
+
+      // echo $_pm_."[ $token ] ".$p->commentLevel;
+
+      if ($ok) {
+        if ($token=='{') {
+          $nestingLevel++;
+          if ($firstToken)
+            $dropOnCurly=true;
+        }
+        else if ($token=='}') {
+          $nestingLevel--;
+          if ($nestingLevel<0)
+            $ok=false;
+          if ($dropOnCurly)
+            if ($nestingLevel==0)
+              $ok=false;
+        }
+        $firstToken=false;
+
+        if ($verbose)  echo $_pm_."[ $token ] TYPE: $type (line: ".$p->line()." col: ".$p->col()." nestingLevel: $nestingLevel ok: ".intval($ok).")  ";
+        if ($ok) {
+
+          /*
+              wait for a 'function'
+              In php, functions are declared as function name (...)
+              In javascript it can be declared as var name = function (...)
+          */
+          $token==strtolower($token);
+          if ( ($token=='function') ||
+               ($token=='class') ) {
+            $methodType=$token;
+            // get the function name
+            if ($token_minus_1=='=') {
+              $funcName = $token_minus_2;
+              $ok=true;
+            } else {
+              $ok=$p->get($funcName, $type);
+              if ($verbose) echo $_pm_."funcName=$funcName type=$type ok=$ok ";
+              /* (type==2 || type==3)?identifier    type==4?parentheses */
+              $ok=$ok && ($type==2 ||$type==3 || $type==4);
+              if ($type==4) {
+                if ($verbose) {
+                  echo "\n*************";
+                  echo "\n* ANON FUN";
+                  echo "\n*************\n";
+                }
+                $anonymousFunctionNdx++;
+                $funcName="__anonymousFunction__".$anonymousFunctionNdx;
+                $p->rewind();
+              }
+            }
+
+
+            if ($ok) {
+              $funcSep=$inClass?'::':'.';
+              if (trim($funcNameBase)>'')
+                $funcName="$funcNameBase$funcSep$funcName";
+              $funcOriginalName=str_replace("$","_dollar_",htmlentities($funcName, ENT_QUOTES));
+              $funcName=str_replace("$","__",$funcName);
+              $funcName=str_replace("[",".",$funcName);
+              $funcName=str_replace("]","",$funcName);
+              $funcName=str_replace("::",".",$funcName);
+              if ($verbose) echo $_pm_."$methodType: $funcName (type: $type) ";
+              //if ($verbose) echo "l: ".$p->line()." c:".$p->col().'  ';
+              $funcNdx=$funcName;
+              if($methodType=='function')
+                $retData['functions'][$funcNdx] = array();
+              else
+                $retData['classes'][$funcNdx] = array();
+
+              $funcStartLine = $p->line();
+              // get the first parentheses or curly bracket
+              $ok=$p->get($token, $type);
+              if($verbose) echo $_pm_.intval($ok)." [ $token ] (type: $type)";
+              if ($ok) {
+                if ($token=='(') {
+                  $funcParam = array();
+                  if (isset($default))
+                    unset($default);
+                  while (($token!=')') && (!$p->eof())) {
+                    // pick parameter name
+                    $p->get($token, $type);
+                    if ($verbose) echo $_pm_."\ttoken: $token type: $type";
+                    if (($type==2) || ($type==3)) {
+                      $paramName=$token;
+                      if ($verbose) echo " { $paramName $type } ";
+                      $paramName = str_replace('$','',$paramName);
+                      $funcParam[$paramName]=array();
+
+                      $p->get($token, $type);
+                      if (($type==6) && ($token=='=')) {
+                        if ($verbose) echo " getting default value ";
+                        // pick default value
+                        $p->get($token, $type);
+                        $default=$token;
+                        $k=0;
+
+                        if (!(($type==1) || ($type==3) || ($type==5))) {
+
+                          $nroParentesis=0;
+                          while ((!$p->eof()) && ($token!=',')) {
+                            $p->get($token, $type);
+                            if ($token=='(')
+                              $nroParentesis++;
+                            else if ($token==')') {
+                              $nroParentesis--;
+                            }
+
+                            if ($token!=',')
+                              $default.=' '.$token;
+                            $k++;
+                            if ($k>10)
+                              die();
+                            if ($nroParentesis==0)
+                              break;
+                          }
+
+                          $type=5;
+
+                        }
+
+                        if (($type==1) || ($type==3) || ($type==5)) {
+                          $default = urlencode($default);
+                          if ($type==1)
+                            $default = unquote($default);
+
+                          if ($type==5)
+                            $default = strtolower(unquote($default));
+
+                          $funcParam[$paramName]['default']=$default;
+                          $p->get($token, $type);
+                        } else
+                          $funcParam[$paramName]['dummy']='ok';
+                      } else
+                        $funcParam[$paramName]['dummy']='ok';
+
+                      if (trim($paramName)=='')
+                        unset($funcParam[$paramName]);
+
+                    }
+                  }
+
+                  $retData['functions'][$funcNdx]['name']=$funcOriginalName;
+                  $retData['functions'][$funcNdx]['parameters']=$funcParam;
+
+                  $p->get($token, $type);
+                  $code='';
+                  if ($token=='{') {
+                    $p->rewind();
+                    $inner=(_parseFile($filename, $p, $funcNdx));
+                    if (strpos($funcName, "__anonymousFunction__")===false) {
+                      if ($verbose) echo $_pm_."incluindo corpo da funcao $funcNdx";
+                      if (isset($inner['functions'])) {
+                        _cleanup($inner);
+                        $retData['functions'][$funcNdx]['inner']=$inner;
+                      }
+                    }
+                  }
+                  $funcEndLine = $p->line();
+                  if ($verbose) echo " $funcStartLine .. $funcEndLine";
+                  $funcMD5=md5($code);
+                  $retData['functions'][$funcNdx]['code']=array();
+                  $retData['functions'][$funcNdx]['code']['md5']=$funcMD5;
+                  $retData['functions'][$funcNdx]['code']['start']=$funcStartLine;
+                  $retData['functions'][$funcNdx]['code']['end']=$funcEndLine;
+                } else if ($token=='{') {
+                  /* funcNameBase is now the classname */
+                  $funcNameBase=$funcName;
+                  $retData['classes'][$funcNameBase]['name']=$funcOriginalName;
+                  $p->rewind();
+                  $code='';
+                  $inner=(_parseFile($filename, $p, $funcName, true));
+                  if ((isset($inner['functions'])) || (isset($inner['classes']))) {
+                    _cleanup($inner);
+                    if ($verbose) echo $_pm_."incluindo corpo da classe $funcNameBase";
+                    $retData['classes'][$funcNameBase]=$inner;
+                  }
+                  $funcEndLine = $p->line();
+                  if ($verbose) echo " $funcStartLine .. $funcEndLine";
+                  $funcMD5=md5($code);
+                  $retData['classes'][$funcNameBase]['code']=array();
+                  $retData['classes'][$funcNameBase]['code']['md5']=$funcMD5;
+                  $retData['classes'][$funcNameBase]['code']['start']=$funcStartLine;
+                  $retData['classes'][$funcNameBase]['code']['end']=$funcEndLine;
+                }
+              }
+
+              if ((strpos($funcNdx,"=")>0) || (trim($funcNdx)==''))
+                unset($retData['functions'][$funcNdx]);
+            }
+          }
+        }
+        if (  ($token==';') || ($token==',') ||
+              ($token=='var') ||
+              ($token=='}') || ($token=='(') ||
+              ($token=='{') || ($token==')')) {
+          $token_minus_1="";
+          $token_minus_2="";
+        } else {
+          if ($type!=7) {
+            $token_minus_2.=$token_minus_1;
+            $token_minus_1=$token;
+          }
+        }
+      }
+    } while ($ok);
+
+    _cleanup($retData);
+    $retData['filename']=basename($filename);
+    $retData['folder']=urlencode(dirname($filename));
+
+
+    if ($verbose) echo $_pm_."--------finish------\n";
+
+    $_parserMargin--;
+    return $retData;
+  }
+
+  function processSourceFile($filename)
+  {
+    global $src, $arrData, $arrNdx, $verbose;
+
+    if ($verbose) echo "\n\n$filename\n==================================================";
+    $arrNdx++;
+    $ndx="file_".$arrNdx;
+
+    $ndx=basename($filename);
+
+    $f=join('',file($filename));
+    $p=new xParser($f);
+    $p->toDebug=false;
+
+    $arrData[$ndx]=_parseFile($filename, $p);
+  }
+
+  function processSourceFolder($folderOrFile)
+  {
+    global $src, $avoid, $exclude;
+
+    $folderOrFile=str_replace('//','/',$folderOrFile);
+    $position = y_array_fnmatch($avoid, $folderOrFile);
+    if ($position===false) {
+      $position = y_array_fnmatch($exclude, $folderOrFile);
+    }
+
+    if ($position === false) {
+      if (is_dir($folderOrFile))
+        $folderOrFile="$folderOrFile/*";
+      echo "+ $folderOrFile\n";
+      $d = glob($folderOrFile);
+      foreach($d as $filename) {
+        if (is_dir($filename)) {
+          if (($filename!='.') && ($filename!='..')) {
+            processSourceFolder("$filename");
+          }
+        } else {
+          $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
+          if (($ext == 'js') || ($ext == 'php')) {
+            processSourceFile("$filename");
+          }
+        }
+      }
+    } else {
+      echo "- $folderOrFile\n";
+    }
+  }
+
+  function processFileList($sourceFolder, $files)
+  {
+    foreach($files as $k) {
+      //$k=preg_replace('/[^A-Za-z0-9\*\.\/\-]/', '', $k);
+      $k=str_replace("\n",'',$k);
+      $k=str_replace("\r",'',$k);
+      $k=str_replace("\t",'',$k);
+      if ($k>'')
+        if (substr($k,0,2)!='//')
+          if (substr($k,0,1)!='#')
+            processSourceFolder($k);
+    }
+  }
+
+  $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
+  $cmRequired=false;
+  if (file_exists("$mydir/yclilib.php"))
+    $cmLocation = "$mydir/yclilib.php";
+  else
+    $cmLocation = "$mydir/../yclilib.php";
+
+  (@include_once "$cmLocation") or die("yclilib.php not found\n");
+
+
+  $cwd=getcwd();
+  $args = new ArgumentsProcessor(false);
+  $myself=basename($argv[0]);
+  $exclude=$args->argValue('e;exclude',"");
+  $verbose=$args->argValue('v;verbose',0);
+  $verbose = ($verbose===__TRUE__);
+
+  $exclude=explode(",", $exclude);
+
+  echo "YeAPF 0.8.64 $myself\nCopyright (C) 2004-2020 Esteban Daniel Dortta - dortta@yahoo.com - MIT License\n";
+  if ($args->argValue('h;help')==true) {
+    echo "usage:\n\t$myself [--prior <folder>] [--verbose] [source-folder]\n";
+    echo "\t--prior <folder>\tlocation of the prior version of this folder\n";
+    echo "\t\t\t\tif none is specified, then an all-new version\n";
+    echo "\t\t\t\twill be created\n";
+    echo "\t[--verbose|-v]\tShow files being processed\n";
+    echo "\t[--exclude]   \tList of folder to be excluded from scanner. Comma separated.\n";
+    echo "\nIt will use ydistbuilder.files to find files.\nYou can set a list of unwanted files in ydocbuilder.avoid\n";
+    exit(20);
+  }
+
+  if (file_exists('ydistbuilder.files')) {
+    $projectBase='.';
+  } else if (file_exists(dirname($_SERVER["_"])."/ydistbuilder.files"))
+    $projectBase=dirname($_SERVER["_"]);
+  else
+    die("Please create 'ydistbuilder.files' with file list\n");
+
+  $files=file("$projectBase/ydistbuilder.files");
+  $avoid=file_exists("$projectBase/ydocbuilder.avoid")?file("$projectBase/ydocbuilder.avoid"):array();
+  foreach ($avoid as $key => $value) {
+    $avoid[$key]=preg_replace( '/[^[:print:]]/', '', $value ). "/*";
+  }
+  foreach ($exclude as $key => $value) {
+    $exclude[$key]=preg_replace( '/[^[:print:]]/', '', $value ). "/*";
+  }
+
+  _LOAD_YEAPF_();
+  $files=y_array_diff($files, $avoid);
+  $files=y_array_diff($files, $exclude);
+
+  $src = trim($args->getSrc(0));
+  if ($src=='')
+    $src='.';
+
+  while (substr($src,strlen($src)-1,1)=='/')
+    $src=substr($src,0,strlen($src)-1);
+
+  $xmlFilename = basename(getcwd()).".xdb";
+  $arrData = array();
+  // processSourceFolder("$src");
+  processFileList($src, $files);
+
+  $xmlData = '';
+  xq_printXML($xmlData, 'root', $arrData);
+  if ($verbose) echo "\n\n";
+  echo "writting to $xmlFilename\n";
+  if ($verbose) echo "cwd=".getcwd();
+  $xmlData="<?xml version='1.0' encoding='ISO-8859-1'?>\n".$xmlData;
+  file_put_contents($xmlFilename,$xmlData);
+?>

@@ -1,0 +1,145 @@
+#!/usr/bin/php
+<?php
+/*
+    (C) 2018 Esteban D.Dortta
+    tools/adb-set-chrome-debug
+    YeAPF 0.8.64-7 built on 2020-03-20 13:04 (-3 DST)
+    Copyright (C) 2004-2020 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
+    2018-07-09 14:58:26 (-3 DST)
+
+    This set of scripts requires adb/android-sdk/cordova installed on your device.
+    Has been well tested under Ubuntu 16 and MacOSX 10.11.6
+    It is supposed to run on Cygwin
+*/
+
+  $mydir=dirname($_SERVER['SCRIPT_FILENAME']);
+  $cmRequired=false;
+  (@include_once "$mydir/yclilib.php") or die("yclilib.php not found\n");
+
+  function findIntoFolder($folderName) {
+    $ret="";
+    $found=false;
+    $files = scandir($folderName);
+    foreach($files as $fileName) {
+      if (!$found) {
+        if ($fileName=="MainActivity.java") {
+          $found=true;
+          $ret="$folderName/$fileName";
+        }
+      }
+    }
+
+    if (!$found) {
+      foreach($files as $fileName) {
+        if (!$found) {
+          if (($fileName!=".") && ($fileName!="..")) {
+            if (is_dir("$folderName/$fileName")) {
+              $aux=findIntoFolder("$folderName/$fileName");
+              if ($aux>'') {
+                $found=true;
+                $ret=$aux;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return $ret;
+  }
+
+  $importSection = array(
+    'android.os.Build' => 0,
+    'android.util.Log' => 0,
+    'android.content.pm.ApplicationInfo' => 0,
+    'android.webkit.WebView' => 0
+  );
+
+  $injectionCode = "if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){if(0 != (getApplicationInfo().flags = ApplicationInfo.FLAG_DEBUGGABLE)){Log.i(\"My Cordova Application\", \"Enabling web debugging\");WebView.setWebContentsDebuggingEnabled(true);}}";
+
+  $args       = new ArgumentsProcessor();
+  $toHelp     =$args->argValue('help',__FALSE__)==__TRUE__;
+  $toEnable   =$args->argValue('enable',__FALSE__)==__TRUE__;
+  $toDisable  =$args->argValue('disable',__FALSE__)==__TRUE__;
+  if (($toEnable==$toDisable) || ($toHelp)) {
+    echo "simple usage:\n\t".basename("tools/adb-set-chrome-debug")." [options]\n\n";
+    echo "options:\n";
+    echo "\t--enable\n";
+    echo "\t--disable\n";
+    exit(0);
+  }
+
+  $mainActivity=findIntoFolder(getcwd());
+
+  if ($mainActivity>'') {
+    $mainActivityCode=file($mainActivity);
+
+    $lineNumber = 0;
+    $importSectionLineNumber = 0;
+    $injectionCodeLineNumber = 0;
+    $injectionCodePresent=false;
+
+    foreach ($mainActivityCode as $line) {
+      $lineNumber++;
+      $line=trim($line);
+      $line = preg_replace('/[\x00-\x1F\x7F]/u', '', $line);
+      if (mb_strtolower(mb_substr($line, 0, 7))=="import ") {
+        $importSectionLineNumber = $lineNumber;
+        $libName = rtrim(mb_substr($line, 7),';');
+
+        if (isset($importSection[$libName]))
+          $importSection[$libName]=$lineNumber;
+      }
+
+      if (mb_substr($line,0,35)=="super.onCreate(savedInstanceState);") {
+        $injectionCodeLineNumber=$lineNumber;
+      }
+
+      if ($line==$injectionCode) {
+        $injectionCodePresent=true;
+        $injectionCodeLineNumber=$lineNumber-1;
+      }
+    }
+
+
+    if ($toEnable) {
+
+      if (!$injectionCodePresent) {
+        if ($injectionCodeLineNumber<=0) {
+          echo "I don't know where to inject the code!\n";
+          exit(1);
+        }
+        echo "Adding injection code at $injectionCodeLineNumber\n";
+        array_splice($mainActivityCode, $injectionCodeLineNumber, 0, array("        $injectionCode\n"));
+      }
+
+      foreach($importSection as $key=>$value) {
+        if ($value==0) {
+          echo "adding 'import $key;' at line $importSectionLineNumber\n";
+          array_splice($mainActivityCode, $importSectionLineNumber++, 0, array("import $key;\n"));
+        }
+      }
+
+    } else if ($toDisable) {
+      if ($injectionCodePresent)
+        array_splice($mainActivityCode, $injectionCodeLineNumber, 1);
+
+      arsort($importSection);
+      print_r($importSection);
+
+      foreach($importSection as $key=>$value) {
+        if ($value>0)
+          array_splice($mainActivityCode, $value-1, 1);
+      }
+
+    }
+
+    $mainActivityCode = join("", $mainActivityCode);
+
+    if (file_exists("$mainActivity.backup"))
+      unlink("$mainActivity.backup");
+
+    rename($mainActivity, "$mainActivity.backup");
+    file_put_contents($mainActivity, $mainActivityCode);
+  }
+?>
