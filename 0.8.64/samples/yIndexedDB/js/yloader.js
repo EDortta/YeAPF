@@ -1,8 +1,8 @@
 /*********************************************
   * samples/yIndexedDB/js/yloader.js
-  * YeAPF 0.8.64-7 built on 2020-03-20 13:04 (-3 DST)
+  * YeAPF 0.8.64-8 built on 2020-03-20 13:14 (-3 DST)
   * Copyright (C) 2004-2020 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-  * 2020-03-20 13:04:36 (-3 DST)
+  * 2020-03-20 13:14:57 (-3 DST)
   * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
   * Purpose:  Build a monolitic YeAPF script so
   *           it can be loaded at once
@@ -26,7 +26,7 @@
      }
    }
  )();
- console.log("YeAPF 0.8.64-7 built on 2020-03-20 13:04 (-3 DST)");
+ console.log("YeAPF 0.8.64-8 built on 2020-03-20 13:14 (-3 DST)");
  /* START yopcontext.js */
      /***********************************************************************
       * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
@@ -10181,9 +10181,9 @@
  /* START yinterface.js */
      /*
          samples/yIndexedDB/js/yloader.js
-         YeAPF 0.8.64-7 built on 2020-03-20 13:04 (-3 DST)
+         YeAPF 0.8.64-8 built on 2020-03-20 13:14 (-3 DST)
          Copyright (C) 2004-2020 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
-         2020-03-20 13:04:36 (-3 DST)
+         2020-03-20 13:14:57 (-3 DST)
      */
      
      var yInterfaceObj = function() {

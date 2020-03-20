@@ -1,9 +1,9 @@
 <?php
 /*
     skel/service/query.php
-    YeAPF 0.8.64-7 built on 2020-03-20 13:04 (-3 DST)
+    YeAPF 0.8.64-8 built on 2020-03-20 13:14 (-3 DST)
     Copyright (C) 2004-2020 Esteban Daniel Dortta - dortta@yahoo.com - MIT License 
-    2020-03-20 13:04:36 (-3 DST)
+    2020-03-20 13:14:57 (-3 DST)
 
     skel/webApp / query.php
     This file cannot be modified within skel/webApp

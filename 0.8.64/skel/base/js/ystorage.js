@@ -1,8 +1,8 @@
 /*********************************************
  * skel/base/js/ystorage.js
- * YeAPF 0.8.64-7 built on 2020-03-20 13:04 (-3 DST)
+ * YeAPF 0.8.64-8 built on 2020-03-20 13:14 (-3 DST)
  * Copyright (C) 2004-2020 Esteban Daniel Dortta - dortta@yahoo.com - MIT License
- * 2020-03-20 13:04:35 (-3 DST)
+ * 2020-03-20 13:14:57 (-3 DST)
  * First Version (C) 2014 - esteban daniel dortta - dortta@yahoo.com
  * yServerWatcherObj and yInfoObj introduced in 2016-08-22 0.8.50-0
  *********************************************/
